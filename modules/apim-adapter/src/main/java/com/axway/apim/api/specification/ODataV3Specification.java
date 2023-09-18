@@ -7,15 +7,14 @@ public class ODataV3Specification extends ODataSpecification {
 
 
 	@Override
-	public void updateBasePath(String basePath, String host) {
-
+	public void updateBasePath(String basePath, String host) { // implementation ignored
 	}
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.ODATA_V4;
 	}
-	
+
 	@Override
 	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		String specStart = new String(apiSpecificationContent, 0, 500).toLowerCase();

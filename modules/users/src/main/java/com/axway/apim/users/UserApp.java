@@ -32,9 +32,7 @@ import com.axway.apim.users.lib.params.UserExportParams;
 public class UserApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserApp.class);
-
-    static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-
+    private static final ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
     @Override
     public String getName() {
         return "User - Management";
@@ -57,15 +55,14 @@ public class UserApp implements APIMCLIServiceProvider {
 
     @CLIServiceMethod(name = "get", description = "Get users from API-Manager in different formats")
     public static int export(String[] args) {
-        UserExportParams params;
         try {
-            params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
+            UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
+            UserApp app = new UserApp();
+            return app.export(params).getRc();
         } catch (AppException e) {
             LOG.error("Error {}", e.getMessage());
             return e.getError().getCode();
         }
-        UserApp app = new UserApp();
-        return app.export(params).getRc();
     }
 
     public ExportResult export(UserExportParams params) {
@@ -86,7 +83,7 @@ public class UserApp implements APIMCLIServiceProvider {
             result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
             return result;
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error("Error exporting users ", e);
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         }
@@ -101,7 +98,7 @@ public class UserApp implements APIMCLIServiceProvider {
         List<User> users = adapter.userAdapter.getUsers(exporter.getFilter());
         if (users.isEmpty()) {
             if (LOG.isDebugEnabled()) {
-                LOG.info("No users found using filter: {}", exporter.getFilter());
+                LOG.debug("No users found using filter: {}", exporter.getFilter());
             } else {
                 LOG.info("No users found based on the given criteria.");
             }
@@ -120,15 +117,14 @@ public class UserApp implements APIMCLIServiceProvider {
 
     @CLIServiceMethod(name = "import", description = "Import user(s) into the API-Manager")
     public static int importUsers(String[] args) {
-        UserImportParams params;
         try {
-            params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
+            UserImportParams params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
+            UserApp app = new UserApp();
+            return app.importUsers(params).getRc();
         } catch (AppException e) {
-            LOG.error("Error {}", e.getMessage());
+            LOG.error("Error importing user(s): ", e);
             return e.getError().getCode();
         }
-        UserApp app = new UserApp();
-        return app.importUsers(params).getRc();
     }
 
     public ImportResult importUsers(UserImportParams params) {
@@ -165,7 +161,7 @@ public class UserApp implements APIMCLIServiceProvider {
             result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
             return result;
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error("Error importing users ", e);
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         } finally {
@@ -175,49 +171,43 @@ public class UserApp implements APIMCLIServiceProvider {
 
     @CLIServiceMethod(name = "delete", description = "Delete selected user(s) from the API-Manager")
     public static int delete(String[] args) {
-        UserExportParams params;
         try {
-            params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
+            UserExportParams params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
+            UserApp app = new UserApp();
+            return app.delete(params).getRc();
         } catch (AppException e) {
-            LOG.error("Error {}", e.getMessage());
+            LOG.error("Error in deleting user : ", e);
             return e.getError().getCode();
         }
-        UserApp app = new UserApp();
-        return app.delete(params).getRc();
     }
 
-    public ExportResult delete(UserExportParams params) {
+    public ExportResult delete(UserExportParams params) throws AppException{
         ExportResult result = new ExportResult();
         try {
             return runExport(params, ResultHandler.USER_DELETE_HANDLER, result);
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            result.setError(ErrorCode.UNXPECTED_ERROR);
-            return result;
+            throw new AppException("Error in deleting user", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 
     @CLIServiceMethod(name = "changepassword", description = "Changes the password of the selected users.")
     public static int changePassword(String[] args) {
-        UserChangePasswordParams params;
         try {
-            params = (UserChangePasswordParams) UserChangePasswordCLIOptions.create(args).getParams();
+            UserChangePasswordParams params = (UserChangePasswordParams) UserChangePasswordCLIOptions.create(args).getParams();
+            UserApp app = new UserApp();
+            return app.changePassword(params).getRc();
         } catch (AppException e) {
-            LOG.error("Error {}", e.getMessage());
+            LOG.error("Error in change password: ", e);
             return e.getError().getCode();
         }
-        UserApp app = new UserApp();
-        return app.changePassword(params).getRc();
     }
 
-    public ExportResult changePassword(UserExportParams params) {
+    public ExportResult changePassword(UserExportParams params) throws AppException {
         ExportResult result = new ExportResult();
         try {
             return runExport(params, ResultHandler.USER_CHANGE_PASSWORD_HANDLER, result);
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            result.setError(ErrorCode.UNXPECTED_ERROR);
-            return result;
+            throw new AppException("Error in change password", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 }

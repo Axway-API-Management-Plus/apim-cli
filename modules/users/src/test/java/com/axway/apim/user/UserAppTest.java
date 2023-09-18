@@ -1,6 +1,7 @@
 package com.axway.apim.user;
 
 import com.axway.apim.WiremockWrapper;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.UserApp;
 import org.testng.Assert;
@@ -10,6 +11,8 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class UserAppTest extends WiremockWrapper {
 
@@ -85,5 +88,13 @@ public class UserAppTest extends WiremockWrapper {
         System.setIn(in);
         int returnCode = UserApp.changePassword(args);
         Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test public void testValue(){
+        int code = 1;
+        Optional<ErrorCode> errorCode = Arrays.stream(ErrorCode.values())
+            .filter(ec -> ec.getCode() == code)
+            .findFirst();
+       Assert.assertTrue(errorCode.isPresent());
     }
 }

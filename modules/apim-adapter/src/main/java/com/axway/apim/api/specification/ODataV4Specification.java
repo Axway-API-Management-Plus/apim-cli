@@ -36,8 +36,7 @@ public class ODataV4Specification extends ODataSpecification {
     private final Map<FullQualifiedName, EdmAnnotations> entityAnnotations = new HashMap<>();
 
     @Override
-    public void updateBasePath(String basePath, String host) {
-
+    public void updateBasePath(String basePath, String host) { // implementation ignored
     }
 
     @Override
