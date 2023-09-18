@@ -326,7 +326,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
         }
     }
 
-    private static void deleteInstances() throws AppException {
+    private static void deleteInstances() {
         // We need to clean some Singleton-Instances, as tests are running in the same JVM
         APIManagerAdapter.deleteInstance();
         APIMHttpClient.deleteInstances();

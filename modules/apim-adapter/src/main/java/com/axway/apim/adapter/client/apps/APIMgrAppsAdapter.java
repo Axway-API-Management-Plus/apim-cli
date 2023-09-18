@@ -42,13 +42,9 @@ public class APIMgrAppsAdapter {
     public static final String ERROR_CREATING_APPLICATION_RESPONSE_CODE = "Error creating application Response-Code: ";
 
     Map<ClientAppFilter, String> apiManagerResponse = new HashMap<>();
-
     Map<String, String> subscribedAppAPIManagerResponse = new HashMap<>();
-
     CoreParameters cmd = CoreParameters.getInstance();
-
     ObjectMapper mapper = APIManagerAdapter.mapper;
-
     Cache<String, String> applicationsCache;
     Cache<String, String> applicationsSubscriptionCache;
     Cache<String, String> applicationsCredentialCache;
@@ -180,7 +176,6 @@ public class APIMgrAppsAdapter {
             throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
-
 
     public ClientApplication getApplication(ClientAppFilter filter) throws AppException {
         List<ClientApplication> apps = getApplications(filter, false);
@@ -332,7 +327,7 @@ public class APIMgrAppsAdapter {
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                         int statusCode = httpResponse.getStatusLine().getStatusCode();
                         if (statusCode < 200 || statusCode > 299) {
-                            LOG.error("Error creating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            LOG.error("Error creating application. Response-Code: {}", statusCode);
                             throw new AppException("Error creating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                         }
                         createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
@@ -344,7 +339,7 @@ public class APIMgrAppsAdapter {
                         }
                     }
                 } else if (!actualApp.equals(desiredApp)) {
-                    LOG.info("Creating new application");
+                    LOG.info("Updating application : {}", desiredApp.getName());
                     URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + actualApp.getId()).build();
                     desiredApp.setId(actualApp.getId());
                     createdApp = updateApplication(uri, desiredApp);
@@ -378,7 +373,7 @@ public class APIMgrAppsAdapter {
         try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             if (statusCode < 200 || statusCode > 299) {
-                LOG.error("Error updating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                LOG.error("Error updating application. Response-Code: {}", statusCode);
                 throw new AppException("Error updating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
             }
             return mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
@@ -779,8 +774,8 @@ public class APIMgrAppsAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting quota. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error deletingquota. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                    LOG.error("Error deleting quota. Response-Code: {}", statusCode);
+                    throw new AppException("Error deleting quota. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
         } catch (Exception e) {
