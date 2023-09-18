@@ -34,6 +34,7 @@ import java.util.List;
 public class JsonApplicationExporter extends ApplicationExporter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonApplicationExporter.class);
+    public static final String CREATED_BY = "createdBy";
 
 
     public JsonApplicationExporter(AppExportParams params, ExportResult result) {
@@ -87,11 +88,11 @@ public class JsonApplicationExporter extends ApplicationExporter {
         mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
 
         FilterProvider filter = new SimpleFilterProvider()
-            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", "createdBy", "createdOn", "enabled"))
+            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", CREATED_BY, "createdOn", "enabled"))
             .addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("api", "apiId")) // Is handled in ExportApplication
             .addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept("apiName", "apiVersion"))
-            .addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", "createdBy", "id"))
-            .addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", "createdBy"))
+            .addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", CREATED_BY, "id"))
+            .addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", CREATED_BY))
             .addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "uriprefix", "scopes", "enabled"));
         mapper.setFilterProvider(filter);
         mapper.setSerializationInclusion(Include.NON_NULL);

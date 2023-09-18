@@ -25,6 +25,7 @@ import java.util.Objects;
 public class SecurityDevice {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityDevice.class);
+    public static final String TOKENSTORES = "tokenstores";
     private static Map<String, String> oauthTokenStores;
     private static Map<String, String> oauthInfoPolicies;
     private static Map<String, String> authenticationPolicies;
@@ -51,7 +52,7 @@ public class SecurityDevice {
         JsonNode jsonResponse = null;
         URI uri;
         try {
-            if (type.equals("tokenstores")) {
+            if (type.equals(TOKENSTORES)) {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/tokenstores").build();
             } else {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
@@ -115,7 +116,7 @@ public class SecurityDevice {
     public Map<String, String> getProperties() throws AppException {
         if (type == DeviceType.oauth) {
             if (SecurityDevice.oauthTokenStores == null)
-                SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
+                SecurityDevice.oauthTokenStores = initCustomPolicies(TOKENSTORES);
             String tokenStore = properties.get("tokenStore");
             if (tokenStore.startsWith("<key")) return properties;
             String esTokenStore = oauthTokenStores.get(tokenStore);
@@ -130,7 +131,7 @@ public class SecurityDevice {
             if (SecurityDevice.oauthInfoPolicies == null)
                 SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
             if (SecurityDevice.oauthTokenStores == null)
-                SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
+                SecurityDevice.oauthTokenStores = initCustomPolicies(TOKENSTORES);
             String infoPolicy = properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
             if (infoPolicy.startsWith("<key")) return properties;
             String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);

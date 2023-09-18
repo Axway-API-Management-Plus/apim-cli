@@ -16,6 +16,9 @@ import com.axway.apim.lib.error.AppException;
 
 public class UserFilter implements CustomPropertiesFilter {
 
+    public static final String FIELD = "field";
+    public static final String VALUE = "value";
+    public static final String OP = "op";
     private String id;
     String description;
     String email;
@@ -40,9 +43,9 @@ public class UserFilter implements CustomPropertiesFilter {
     public void setDescription(String description) {
         if (description == null) return;
         this.description = description;
-        filters.add(new BasicNameValuePair("field", "description"));
-        filters.add(new BasicNameValuePair("op", "like"));
-        filters.add(new BasicNameValuePair("value", description));
+        filters.add(new BasicNameValuePair(FIELD, "description"));
+        filters.add(new BasicNameValuePair(OP, "like"));
+        filters.add(new BasicNameValuePair(VALUE, description));
     }
 
     public void setEmail(String email) {
@@ -54,16 +57,16 @@ public class UserFilter implements CustomPropertiesFilter {
             op = "like";
             email = email.replace("*", "");
         }
-        filters.add(new BasicNameValuePair("field", "email"));
-        filters.add(new BasicNameValuePair("op", op));
-        filters.add(new BasicNameValuePair("value", email.toLowerCase()));
+        filters.add(new BasicNameValuePair(FIELD, "email"));
+        filters.add(new BasicNameValuePair(OP, op));
+        filters.add(new BasicNameValuePair(VALUE, email.toLowerCase()));
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        filters.add(new BasicNameValuePair("field", "enabled"));
-        filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", (enabled) ? "enabled" : "disabled"));
+        filters.add(new BasicNameValuePair(FIELD, "enabled"));
+        filters.add(new BasicNameValuePair(OP, "eq"));
+        filters.add(new BasicNameValuePair(VALUE, (enabled) ? "enabled" : "disabled"));
     }
 
     public void setName(String name) {
@@ -82,25 +85,25 @@ public class UserFilter implements CustomPropertiesFilter {
             op = "like";
             loginName = loginName.replace("*", "");
         }
-        filters.add(new BasicNameValuePair("field", "loginName"));
-        filters.add(new BasicNameValuePair("op", op));
-        filters.add(new BasicNameValuePair("value", loginName));
+        filters.add(new BasicNameValuePair(FIELD, "loginName"));
+        filters.add(new BasicNameValuePair(OP, op));
+        filters.add(new BasicNameValuePair(VALUE, loginName));
     }
 
     public void setPhone(String phone) {
         if (phone == null) return;
         this.phone = phone;
-        filters.add(new BasicNameValuePair("field", "phone"));
-        filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", phone));
+        filters.add(new BasicNameValuePair(FIELD, "phone"));
+        filters.add(new BasicNameValuePair(OP, "eq"));
+        filters.add(new BasicNameValuePair(VALUE, phone));
     }
 
     public void setRole(String role) {
         if (role == null) return;
         this.role = role;
-        filters.add(new BasicNameValuePair("field", "role"));
-        filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", role));
+        filters.add(new BasicNameValuePair(FIELD, "role"));
+        filters.add(new BasicNameValuePair(OP, "eq"));
+        filters.add(new BasicNameValuePair(VALUE, role));
     }
 
     public void setType(String type) {

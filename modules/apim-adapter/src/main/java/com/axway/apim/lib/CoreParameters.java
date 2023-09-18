@@ -168,7 +168,7 @@ public class CoreParameters implements Parameters {
         this.password = password;
     }
 
-    public Boolean isForce() {
+    public boolean isForce() {
         if (force != null) return force;
         return Boolean.parseBoolean(getFromProperties("force"));
     }
@@ -183,7 +183,7 @@ public class CoreParameters implements Parameters {
         this.ignoreQuotas = ignoreQuotas;
     }
 
-    public Boolean isIgnoreQuotas() {
+    public boolean isIgnoreQuotas() {
         if (ignoreQuotas != null) return ignoreQuotas;
         return Boolean.parseBoolean(getFromProperties("ignoreQuotas"));
     }
@@ -201,7 +201,7 @@ public class CoreParameters implements Parameters {
         this.quotaMode = quotaMode;
     }
 
-    public Boolean isIgnoreClientApps() {
+    public boolean isIgnoreClientApps() {
         if (clientAppsMode == Mode.ignore) return true;
         if (getFromProperties("clientAppsMode") != null) {
             return Boolean.parseBoolean(getFromProperties("clientAppsMode"));
@@ -222,7 +222,7 @@ public class CoreParameters implements Parameters {
         this.clientAppsMode = clientAppsMode;
     }
 
-    public Boolean isIgnoreClientOrgs() {
+    public boolean isIgnoreClientOrgs() {
         if (clientOrgsMode == Mode.ignore) return true;
         if (getFromProperties("clientOrgsMode") != null) {
             return Boolean.parseBoolean(getFromProperties("clientOrgsMode"));

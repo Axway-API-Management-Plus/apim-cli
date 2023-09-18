@@ -10,13 +10,14 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> {
-	
-	private static final long serialVersionUID = 1L;
 
-	public QuotaRestrictionSerializer() {
+    private static final long serialVersionUID = 1L;
+    public static final String METHOD = "method";
+
+    public QuotaRestrictionSerializer() {
 		this(null);
 	}
-	
+
 	public QuotaRestrictionSerializer(Class<QuotaRestriction> t) {
 		super(t);
 	}
@@ -26,7 +27,7 @@ public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> 
 		jgen.writeStartObject();
 		if(quotaRestriction.getRestrictedAPI()==null) {
 			jgen.writeObjectField("api", "*");
-			jgen.writeObjectField("method", "*");
+			jgen.writeObjectField(METHOD, "*");
 		} else { // API-Specific quota
 			// Don't write the API-Name as it's confusing it is ignored during import when the API-Path is given.
 			jgen.writeObjectField("apiPath", quotaRestriction.getRestrictedAPI().getPath());
@@ -37,17 +38,17 @@ public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> 
 				jgen.writeObjectField("apiRoutingKey", quotaRestriction.getRestrictedAPI().getApiRoutingKey());
 			}
 			if(quotaRestriction.getMethod()==null || "*".equals(quotaRestriction.getMethod())) {
-				jgen.writeObjectField("method", "*");
+				jgen.writeObjectField(METHOD, "*");
 			} else {
 				APIMethod method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(quotaRestriction.getApiId(), quotaRestriction.getMethod());
-				jgen.writeObjectField("method", method.getName());
+				jgen.writeObjectField(METHOD, method.getName());
 			}
 		}
 		jgen.writePOJOField("type",quotaRestriction.getType());
 		jgen.writePOJOField("config",quotaRestriction.getConfig());
 		jgen.writeEndObject();
 	}
-	
+
 	@Override
 	public Class<QuotaRestriction> handledType() {
 		return QuotaRestriction.class;

@@ -40,6 +40,9 @@ public class APIMgrAppsAdapter {
     public static final String APPLICATIONS = "/applications";
     public static final String ERROR_CREATING_APPLICATION_ERROR = "Error creating application. Error: ";
     public static final String ERROR_CREATING_APPLICATION_RESPONSE_CODE = "Error creating application Response-Code: ";
+    public static final String PERMISSIONS = "permissions";
+    public static final String API_KEY = "apiKey";
+    public static final String CREDENTIAL_TYPE = "credentialType";
 
     Map<ClientAppFilter, String> apiManagerResponse = new HashMap<>();
     Map<String, String> subscribedAppAPIManagerResponse = new HashMap<>();
@@ -319,7 +322,7 @@ public class APIMgrAppsAdapter {
                     LOG.info("Creating new application");
                     URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS).build();
                     FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", "permissions"));
+                        SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", PERMISSIONS));
                     mapper.setFilterProvider(filter);
                     String json = mapper.writeValueAsString(desiredApp);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -365,7 +368,7 @@ public class APIMgrAppsAdapter {
 
     public ClientApplication updateApplication(URI uri, ClientApplication clientApplication) throws IOException {
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
+            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", PERMISSIONS));
         mapper.setFilterProvider(filter);
         String json = mapper.writeValueAsString(clientApplication);
         HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -409,7 +412,7 @@ public class APIMgrAppsAdapter {
             if (cred instanceof OAuth) {
                 endpoint = "oauth";
                 filter = new SimpleFilterProvider().setDefaultFilter(
-                    SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
+                    SimpleBeanPropertyFilter.serializeAllExcept(CREDENTIAL_TYPE, "clientId", API_KEY));
                 final String credentialId = ((OAuth) cred).getClientId();
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
@@ -426,7 +429,7 @@ public class APIMgrAppsAdapter {
                 final String credentialId = ((ExtClients) cred).getClientId();
                 endpoint = "extclients";
                 filter = new SimpleFilterProvider().setDefaultFilter(
-                    SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "apiKey", "applicationId"));
+                    SimpleBeanPropertyFilter.serializeAllExcept(CREDENTIAL_TYPE, API_KEY, "applicationId"));
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
                     LOG.info("Found extclients credential with same ID");
@@ -441,7 +444,7 @@ public class APIMgrAppsAdapter {
                 final String credentialId = ((APIKey) cred).getApiKey();
                 endpoint = "apikeys";
                 filter = new SimpleFilterProvider().setDefaultFilter(
-                    SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
+                    SimpleBeanPropertyFilter.serializeAllExcept(CREDENTIAL_TYPE, "clientId", API_KEY));
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
                     LOG.info("Found apikey credential with same ID");
@@ -722,7 +725,7 @@ public class APIMgrAppsAdapter {
     private void saveOrUpdateApplicationPermissions(ClientApplication desiredApp, List<ApplicationPermission> permissions2Create, boolean update) throws AppException {
         if (permissions2Create == null || permissions2Create.isEmpty()) return;
         for (ApplicationPermission appPerm : permissions2Create) {
-            String endpoint = "permissions";
+            String endpoint = PERMISSIONS;
             try {
                 if (update) {
                     endpoint += "/" + appPerm.getId();

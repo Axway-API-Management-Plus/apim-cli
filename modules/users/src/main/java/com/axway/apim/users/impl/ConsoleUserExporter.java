@@ -15,8 +15,13 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleUserExporter extends UserResultHandler {
-	
-	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
+
+    public static final String ENABLED = "Enabled";
+    public static final String EMAIL = "Email";
+    public static final String LOGIN_NAME = "Login-Name";
+    public static final String USER_ID = "User-Id";
+    public static final String NAME = "Name";
+    Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
 	public ConsoleUserExporter(UserExportParams params, ExportResult result) {
 		super(params, result);
@@ -36,36 +41,36 @@ public class ConsoleUserExporter extends UserResultHandler {
 			break;
 		}
 	}
-	
+
 	private void printStandard(List<User> users) {
 		Console.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
-				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
-				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
-				new Column().header("Email").with(User::getEmail),
-				new Column().header("Enabled").with(user -> Boolean.toString(user.isEnabled()))
+				new Column().header(USER_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
+				new Column().header(LOGIN_NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
+				new Column().header(EMAIL).with(User::getEmail),
+				new Column().header(ENABLED).with(user -> Boolean.toString(user.isEnabled()))
 				)));
 	}
-	
+
 	private void printWide(List<User> users) {
 		Console.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
-				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
-				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
-				new Column().header("Email").with(User::getEmail),
-				new Column().header("Enabled").with(user -> Boolean.toString(user.isEnabled())),
+				new Column().header(USER_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
+				new Column().header(LOGIN_NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
+				new Column().header(EMAIL).with(User::getEmail),
+				new Column().header(ENABLED).with(user -> Boolean.toString(user.isEnabled())),
 				new Column().header("Organization").with(user -> user.getOrganization().getName()),
 				new Column().header("Role").with(User::getRole)
 				)));
 	}
-	
+
 	private void printUltra(List<User> users) {
 		Console.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
-				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
-				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
-				new Column().header("Email").with(User::getEmail),
-				new Column().header("Enabled").with(user -> Boolean.toString(user.isEnabled())),
+				new Column().header(USER_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
+				new Column().header(LOGIN_NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
+				new Column().header(EMAIL).with(User::getEmail),
+				new Column().header(ENABLED).with(user -> Boolean.toString(user.isEnabled())),
 				new Column().header("Organization").with(user -> user.getOrganization().getName()),
 				new Column().header("Role").with(User::getRole),
 				new Column().header("Created on").with(user -> new Date(user.getCreatedOn()).toString()),

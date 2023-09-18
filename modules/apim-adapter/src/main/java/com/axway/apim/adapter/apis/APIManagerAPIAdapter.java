@@ -59,6 +59,8 @@ public class APIManagerAPIAdapter {
     public static final String PROXIES = "/proxies/";
     public static final String APIREPO = "/apirepo/";
     public static final String UNKNOWN_API = "Unknown API";
+    public static final String ORGANIZATION_ID = "organizationId";
+    public static final String APPLICATIONS = "/applications/";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
@@ -766,7 +768,7 @@ public class APIManagerAPIAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/importFromUrl/").build();
             List<NameValuePair> nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("organizationId", api.getOrganization().getId()));
+            nameValuePairs.add(new BasicNameValuePair(ORGANIZATION_ID, api.getOrganization().getId()));
             nameValuePairs.add(new BasicNameValuePair("type", "wsdl"));
             nameValuePairs.add(new BasicNameValuePair("url", wsdlUrl));
             nameValuePairs.add(new BasicNameValuePair("name", api.getName()));
@@ -799,7 +801,7 @@ public class APIManagerAPIAdapter {
                 .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
                 .addTextBody("type", "swagger")
                 .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
-                .addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
+                .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
                 .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
             RestAPICall importSwagger = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) importSwagger.execute()) {
@@ -848,7 +850,7 @@ public class APIManagerAPIAdapter {
                     try {
                         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
                         mapper.setFilterProvider(filter);
-                        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/quota").build();
+                        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + app.getId() + "/quota").build();
                         HttpEntity entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
                         RestAPICall request = new PUTRequest(entity, uri);
                         Response responseObj = httpHelper.execute(request, true);
@@ -978,7 +980,7 @@ public class APIManagerAPIAdapter {
 
     public void grantClientApplication(ClientApplication clientApplication, API api) throws AppException {
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + clientApplication.getId() + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + clientApplication.getId() + "/apis").build();
             HttpEntity entity = new StringEntity("{\"apiId\":\"" + api.getId() + "\",\"enabled\":true}", ContentType.APPLICATION_JSON);
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
@@ -998,7 +1000,7 @@ public class APIManagerAPIAdapter {
     public void revokeClientOrganization(List<Organization> organizations, API api) throws AppException {
         try {
             for (Organization organization : organizations) {
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/apiaccess").addParameter("organizationId", organization.getId()).build();
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/apiaccess").addParameter(ORGANIZATION_ID, organization.getId()).build();
                 RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -1020,7 +1022,7 @@ public class APIManagerAPIAdapter {
             LOG.debug("{}", apiAccesses);
             for (APIAccess apiAccess : apiAccesses) {
                 if (apiAccess.getApiId().equals(api.getId())) {
-                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + clientApplication.getId() + "/apis/" + apiAccess.getId()).build();
+                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + clientApplication.getId() + "/apis/" + apiAccess.getId()).build();
                     RestAPICall request = new DELRequest(uri);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                         int statusCode = httpResponse.getStatusLine().getStatusCode();

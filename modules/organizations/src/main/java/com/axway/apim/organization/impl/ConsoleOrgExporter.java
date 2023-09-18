@@ -22,12 +22,18 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleOrgExporter extends OrgResultHandler {
-	
-	APIManagerAdapter adapter;
-	
+
+    public static final String ORGANIZATION_ID = "Organization-Id";
+    public static final String NAME = "Name";
+    public static final String V_HOST = "V-Host";
+    public static final String DEV = "Dev";
+    public static final String EMAIL = "Email";
+    public static final String ENABLED = "Enabled";
+    APIManagerAdapter adapter;
+
 	Map<String, Integer> apiCountPerOrg = null;
 	Map<String, Integer> appCountPerOrg = null;
-	
+
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
 	public ConsoleOrgExporter(OrgExportParams params, ExportResult result) {
@@ -52,39 +58,39 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 			printUltra(orgs);
 		}
 	}
-	
+
 	private void printStandard(List<Organization> orgs) {
 		Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
-				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
-				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
-				new Column().header("Dev").with(org -> Boolean.toString(org.isDevelopment())),
-				new Column().header("Email").with(Organization::getEmail),
-				new Column().header("Enabled").with(org -> Boolean.toString(org.isEnabled()))
+				new Column().header(ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
+				new Column().header(V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
+				new Column().header(DEV).with(org -> Boolean.toString(org.isDevelopment())),
+				new Column().header(EMAIL).with(Organization::getEmail),
+				new Column().header(ENABLED).with(org -> Boolean.toString(org.isEnabled()))
 				)));
 	}
-	
+
 	private void printWide(List<Organization> orgs) {
 		Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
-				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
-				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
-				new Column().header("Dev").with(org -> Boolean.toString(org.isDevelopment())),
-				new Column().header("Email").with(Organization::getEmail),
-				new Column().header("Enabled").with(org -> Boolean.toString(org.isEnabled())),
+				new Column().header(ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
+				new Column().header(V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
+				new Column().header(DEV).with(org -> Boolean.toString(org.isDevelopment())),
+				new Column().header(EMAIL).with(Organization::getEmail),
+				new Column().header(ENABLED).with(org -> Boolean.toString(org.isEnabled())),
 				new Column().header("Created on").with(org -> new Date(org.getCreatedOn()).toString()),
 				new Column().header("Restricted").with(org -> Boolean.toString(org.isRestricted()))
 				)));
 	}
-	
+
 	private void printUltra(List<Organization> orgs) {
 		Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
-				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
-				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
-				new Column().header("Dev").with(org -> Boolean.toString(org.isDevelopment())),
-				new Column().header("Email").with(Organization::getEmail),
-				new Column().header("Enabled").with(org -> Boolean.toString(org.isEnabled())),
+				new Column().header(ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
+				new Column().header(V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
+				new Column().header(DEV).with(org -> Boolean.toString(org.isDevelopment())),
+				new Column().header(EMAIL).with(Organization::getEmail),
+				new Column().header(ENABLED).with(org -> Boolean.toString(org.isEnabled())),
 				new Column().header("Created on").with(org -> new Date(org.getCreatedOn()).toString()),
 				new Column().header("Restricted").with(org -> Boolean.toString(org.isRestricted())),
 				new Column().header("APIs").with(this::getNoOfAPIsForOrg),
@@ -96,7 +102,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	public OrgFilter getFilter() {
 		return getBaseOrgFilterBuilder().build();
 	}
-	
+
 	private String getNoOfAPIsForOrg(Organization org) {
 		try {
 			if(this.apiCountPerOrg==null) {
@@ -113,7 +119,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 			return "Err";
 		}
 	}
-	
+
 	private String getNoOfAppsForOrg(Organization org) {
 		try {
 			if(this.appCountPerOrg==null) {

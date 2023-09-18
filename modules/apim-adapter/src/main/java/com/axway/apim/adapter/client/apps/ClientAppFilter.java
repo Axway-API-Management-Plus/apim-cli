@@ -28,6 +28,8 @@ import com.axway.apim.lib.error.ErrorCode;
 public class ClientAppFilter implements CustomPropertiesFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
+    public static final String FIELD = "field";
+    public static final String VALUE = "value";
 
     boolean includeQuota;
 
@@ -132,9 +134,9 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     public void setOrganization(Organization organization) {
         if (organization == null) return;
         this.organization = organization;
-        filters.add(new BasicNameValuePair("field", "orgid"));
+        filters.add(new BasicNameValuePair(FIELD, "orgid"));
         filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", organization.getId()));
+        filters.add(new BasicNameValuePair(VALUE, organization.getId()));
     }
 
     public Organization getOrganization() {
@@ -144,9 +146,9 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     public void setCreatedBy(User createdBy) {
         if (createdBy == null) return;
         this.createdBy = createdBy;
-        filters.add(new BasicNameValuePair("field", "userid"));
+        filters.add(new BasicNameValuePair(FIELD, "userid"));
         filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", createdBy.getId()));
+        filters.add(new BasicNameValuePair(VALUE, createdBy.getId()));
     }
 
     public User getCreatedBy() {
@@ -196,9 +198,9 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     public void setState(String state) {
         if (state == null) return;
         this.state = state;
-        filters.add(new BasicNameValuePair("field", "state"));
+        filters.add(new BasicNameValuePair(FIELD, "state"));
         filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", state));
+        filters.add(new BasicNameValuePair(VALUE, state));
     }
 
     public String getState() {
