@@ -348,7 +348,7 @@ public class APIMgrAppsAdapter {
                     URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + actualApp.getId()).build();
                     desiredApp.setId(actualApp.getId());
                     createdApp = updateApplication(uri, desiredApp);
-                }else {
+                } else {
                     createdApp = actualApp;
                 }
             } catch (Exception e) {
@@ -407,10 +407,8 @@ public class APIMgrAppsAdapter {
         if (app.getCredentials() == null || app.getCredentials().isEmpty()) return;
         String endpoint;
         for (ClientAppCredential cred : app.getCredentials()) {
-
             if (actualApp != null && actualApp.getCredentials().contains(cred))
                 continue; //nothing to do
-
             boolean update = false;
             FilterProvider filter;
             if (cred instanceof OAuth) {
@@ -470,7 +468,6 @@ public class APIMgrAppsAdapter {
                 mapper.setSerializationInclusion(Include.NON_NULL);
                 String json = mapper.writeValueAsString(cred);
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -572,6 +569,13 @@ public class APIMgrAppsAdapter {
         deleteOAuthResources(desiredApp, scopes2Delete);
     }
 
+    public HttpEntity createHttpEntity(FilterProvider filter, Object object) throws JsonProcessingException {
+        mapper.setFilterProvider(filter);
+        mapper.setSerializationInclusion(Include.NON_NULL);
+        String json = mapper.writeValueAsString(object);
+        return new StringEntity(json, ContentType.APPLICATION_JSON);
+    }
+
     private void saveOrUpdateOAuthResources(ClientApplication desiredApp, List<ClientAppOauthResource> scopes2Create, boolean update) throws AppException {
         if (scopes2Create == null || scopes2Create.isEmpty()) return;
         for (ClientAppOauthResource res : scopes2Create) {
@@ -585,10 +589,7 @@ public class APIMgrAppsAdapter {
                 }
                 FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept("scopes", "enabled"));
-                mapper.setFilterProvider(filter);
-                mapper.setSerializationInclusion(Include.NON_NULL);
-                String json = mapper.writeValueAsString(res);
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                HttpEntity entity = createHttpEntity(filter, res);
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
@@ -736,10 +737,7 @@ public class APIMgrAppsAdapter {
                 }
                 FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept("user"));
-                mapper.setFilterProvider(filter);
-                mapper.setSerializationInclusion(Include.NON_NULL);
-                String json = mapper.writeValueAsString(appPerm);
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                HttpEntity entity = createHttpEntity(filter, appPerm);
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
