@@ -607,13 +607,13 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void pollCatalog() throws AppException {
-        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("d90122a7-9f47-420c-85ca-926125ea7bf6", "Test-App-API2-4618", "published");
+        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("e4ded8c8-0a40-4b50-bc13-552fb7209150", "Test-App-API2-4618", "published");
         Assert.assertTrue(status);
     }
 
     @Test
     public void pollCatalogUnpublished() throws AppException {
-        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("d90122a7-9f47-420c-85ca-926125ea7bf6", "Test-App-API2-4618", "unpublished");
+        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("e4ded8c8-0a40-4b50-bc13-552fb7209150", "Test-App-API2-4618", "unpublished");
         Assert.assertTrue(status);
     }
 

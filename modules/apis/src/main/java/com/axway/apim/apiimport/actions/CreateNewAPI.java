@@ -89,7 +89,7 @@ public class CreateNewAPI {
                 // In case, the existing API is already in use (Published), we have to grant access to our new imported API
                 apiAdapter.upgradeAccessToNewerAPI(createdAPI, actualAPI);
             }
-            if(apiAdapter.pollCatalogForPublishedState(createdAPI.getApiId(), createdAPI.getName(), createdAPI.getState())) {
+            if(apiAdapter.pollCatalogForPublishedState(createdAPI.getId(), createdAPI.getName(), createdAPI.getState())) {
                 // Is a Quota is defined we must manage it
                 new APIQuotaManager(desiredAPI, actualAPI).execute(createdAPI);
                 // Grant access to the API

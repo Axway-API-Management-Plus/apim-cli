@@ -1,5 +1,5 @@
 {
-  "id": "d90122a7-9f47-420c-85ca-926125ea7bf6",
+  "id": "e4ded8c8-0a40-4b50-bc13-552fb7209150",
   "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
   "deprecated": false,
   "apiVersion": "1.0.0",
