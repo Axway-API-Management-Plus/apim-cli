@@ -1013,10 +1013,8 @@ public class APIManagerAPIAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
-                    LOG.error("API  {} not found in API manger catalog", apiName);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("API manager response : {}", response);
-                    }
+                    LOG.error("API  {} not found in API manger catalog Response code : {}", apiName, statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("API Not found in API Manager catalog", ErrorCode.CANT_CREATE_BE_API);
                 }
                 JsonNode jsonNode = mapper.readTree(response);
