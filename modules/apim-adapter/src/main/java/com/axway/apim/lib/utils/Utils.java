@@ -409,4 +409,10 @@ public class Utils {
             logger.debug("APIManager Response : {}", EntityUtils.toString(httpResponse.getEntity()));
         }
     }
+
+    public static void logPayload(Logger logger, String httpResponse) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("APIManager Response : {}", httpResponse);
+        }
+    }
 }

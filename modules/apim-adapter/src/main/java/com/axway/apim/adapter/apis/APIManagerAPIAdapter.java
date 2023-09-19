@@ -988,24 +988,24 @@ public class APIManagerAPIAdapter {
      * @throws AppException AppException
      */
     public boolean pollCatalogForPublishedState(String apiId, String apiName, String apiState) throws AppException {
+        if (!apiState.equals("published")) {
+            LOG.info("Not checking catalog for API state : {}", apiState);
+            return true;
+        }
         RetryPolicy<Object> retryPolicy = RetryPolicy.builder()
             .abortOn(AppException.class)
             .withDelay(Duration.ofSeconds(3))
             .withMaxRetries(80)
             .build();
         try {
-            return Failsafe.with(retryPolicy).get(() -> checkCatalogForApiPublishedState(apiId, apiName, apiState));
+            return Failsafe.with(retryPolicy).get(() -> checkCatalogForApiPublishedState(apiId, apiName));
         } catch (FailsafeException e) {
             LOG.error("Fail to poll catalog", e);
             throw (AppException) e.getCause();
         }
     }
 
-    public boolean checkCatalogForApiPublishedState(String apiId, String apiName, String apiState) throws AppException {
-        if (!apiState.equals("published")) {
-            LOG.info("Not checking catalog for API state : {}", apiState);
-            return true;
-        }
+    public boolean checkCatalogForApiPublishedState(String apiId, String apiName) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/" + apiId).build();
             RestAPICall restAPICall = new GETRequest(uri);
@@ -1014,7 +1014,9 @@ public class APIManagerAPIAdapter {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
                     LOG.error("API  {} not found in API manger catalog Response code : {}", apiName, statusCode);
-                    Utils.logPayload(LOG, httpResponse);
+                    Utils.logPayload(LOG, response);
+                    if(statusCode == 500) // catalog returns 500 if it takes times to load cache
+                        return false;
                     throw new AppException("API Not found in API Manager catalog", ErrorCode.CANT_CREATE_BE_API);
                 }
                 JsonNode jsonNode = mapper.readTree(response);
