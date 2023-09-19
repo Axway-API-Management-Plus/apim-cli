@@ -56,6 +56,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <wiremock.version>2.35.0</wiremock.version>
         <citrus.version>3.4.0</citrus.version>
+        <failsafe.version>3.3.2</failsafe.version>
     </properties>
     <scm>
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
@@ -231,6 +232,12 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>2.10.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.failsafe</groupId>
+                <artifactId>failsafe</artifactId>
+                <version>${failsafe.version}</version>
             </dependency>
 
             <dependency>

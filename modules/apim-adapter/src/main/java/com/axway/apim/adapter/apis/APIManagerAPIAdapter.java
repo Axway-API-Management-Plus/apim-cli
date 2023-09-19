@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import dev.failsafe.Failsafe;
+import dev.failsafe.FailsafeException;
+import dev.failsafe.RetryPolicy;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -48,6 +51,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -612,17 +616,57 @@ public class APIManagerAPIAdapter {
         LOG.debug("Deleting Backend API : {}", api.getApiId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
-
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting Backend-API using URI: {}. Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error deleting Backend-API. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("Error deleting Backend-API. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
         } catch (Exception e) {
             throw new AppException("Cannot delete Backend-API.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
+    }
+
+    public boolean isBackendApiExists(API api) {
+        LOG.debug("Get Backend API : {}", api.getApiId());
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
+            RestAPICall request = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 200) {
+                    LOG.error("Error getting Backend-API  Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
+                    return false;
+                }
+                return true;
+            }
+        } catch (Exception e) {
+            LOG.error("Cannot get Backend-API.", e);
+            return false;
+        }
+    }
+
+    public boolean isFrontendApiExists(API api) {
+        LOG.debug("Get Frontend API : {}", api.getId());
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
+            RestAPICall request = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 200) {
+                    LOG.error("Error getting Frontend-API  Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
+                    return false;
+                }
+                return true;
+            }
+        } catch (Exception e) {
+            LOG.error("Cannot get Frontend-API.", e);
+            return false;
         }
     }
 
@@ -935,7 +979,62 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void grantClientOrganization(List<Organization> grantAccessToOrgs, API api, boolean allOrgs) throws AppException {
+    /**
+     * Polling catalog to make sure the API manager cache is loaded
+     *
+     * @param apiId   api id
+     * @param apiName api name
+     * @return returns true if api found in catalog
+     * @throws AppException AppException
+     */
+    public boolean pollCatalogForPublishedState(String apiId, String apiName, String apiState) throws AppException {
+        RetryPolicy<Object> retryPolicy = RetryPolicy.builder()
+            .abortOn(AppException.class)
+            .withDelay(Duration.ofSeconds(3))
+            .withMaxRetries(80)
+            .build();
+        try {
+            return Failsafe.with(retryPolicy).get(() -> checkCatalogForApiPublishedState(apiId, apiName, apiState));
+        } catch (FailsafeException e) {
+            LOG.error("Fail to poll catalog", e);
+            throw (AppException) e.getCause();
+        }
+    }
+
+    public boolean checkCatalogForApiPublishedState(String apiId, String apiName, String apiState) throws AppException {
+        if (!apiState.equals("published")) {
+            LOG.info("Not checking catalog for API state : {}", apiState);
+            return true;
+        }
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/" + apiId).build();
+            RestAPICall restAPICall = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) restAPICall.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 200) {
+                    LOG.error("API  {} not found in API manger catalog", apiName);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("API manager response : {}", response);
+                    }
+                    throw new AppException("API Not found in API Manager catalog", ErrorCode.CANT_CREATE_BE_API);
+                }
+                JsonNode jsonNode = mapper.readTree(response);
+                String state = jsonNode.get("state").textValue();
+                if (state.equals("published")) {
+                    return true;
+                }
+            }
+        } catch (AppException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AppException("Unexpected error creating Backend-API based on API-Specification. Error message: " + e.getMessage(), ErrorCode.CANT_CREATE_BE_API, e);
+        }
+        return false;
+    }
+
+    public void grantClientOrganization(List<Organization> grantAccessToOrgs, API api, boolean allOrgs) throws
+        AppException {
         StringBuilder formBody;
         if (allOrgs) {
             formBody = new StringBuilder("action=all_orgs&apiId=" + api.getId());

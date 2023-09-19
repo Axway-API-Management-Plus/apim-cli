@@ -1,11 +1,11 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/portal/v1.4/apirepo/1f4263ca-7f03-41d9-9d34-9eff79d29bd8"
+    "url": "/api/portal/v1.4/discovery/swagger/api/id/d90122a7-9f47-420c-85ca-926125ea7bf6"
   },
   "response": {
     "status": 200,
-    "bodyFileName": "backend_api_by_id.json",
+    "bodyFileName": "getCatalogById.json",
     "headers": {
       "Content-Type": "application/json"
     }

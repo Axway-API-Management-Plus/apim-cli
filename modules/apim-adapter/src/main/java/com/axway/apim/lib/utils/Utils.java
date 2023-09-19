@@ -23,6 +23,8 @@ import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -375,7 +377,7 @@ public class Utils {
 
     public static boolean equalsTagMap(TagMap source, TagMap target) {
         if (source == target) return true;
-        if( source == null || target == null)
+        if (source == null || target == null)
             return false;
         if (source.size() != target.size()) return false;
         for (String tagName : target.keySet()) {
@@ -387,18 +389,24 @@ public class Utils {
         return true;
     }
 
-    public static int handleAppException(Exception e, Logger logger, ErrorCodeMapper errorCodeMapper){
-        if(e instanceof  AppException){
+    public static int handleAppException(Exception e, Logger logger, ErrorCodeMapper errorCodeMapper) {
+        if (e instanceof AppException) {
             ErrorCode errorCode = ((AppException) e).getError();
-            if(errorCode == ErrorCode.SUCCESS){
+            if (errorCode == ErrorCode.SUCCESS) {
                 return ErrorCode.SUCCESS.getCode();
-            }else {
+            } else {
                 logger.error("Unexpected error :", e);
                 return errorCodeMapper.getMapedErrorCode(errorCode).getCode();
             }
-        }else {
+        } else {
             logger.error("Unexpected error :", e);
             return errorCodeMapper.getMapedErrorCode(ErrorCode.UNXPECTED_ERROR).getCode();
+        }
+    }
+
+    public static void logPayload(Logger logger, HttpResponse httpResponse) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("APIManager Response : {}", EntityUtils.toString(httpResponse.getEntity()));
         }
     }
 }

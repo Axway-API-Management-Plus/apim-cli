@@ -17,8 +17,6 @@ public class APIImportManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportManager.class);
 
-    private final boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
-
     /**
      * This method is taking in the APIChangeState to decide about the strategy how to
      * synchronize the desired API-State into the API-Manager.
@@ -29,6 +27,7 @@ public class APIImportManager {
      * @throws AppException is the desired state can't be replicated into the API-Manager.
      */
     public void applyChanges(APIChangeState changeState, boolean forceUpdate, boolean updateOnly) throws AppException {
+        boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
         boolean orgAdminSelfService = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()).getOadminSelfServiceEnabled();
         if (!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded()) {
             if (orgAdminSelfService) {
@@ -64,9 +63,9 @@ public class APIImportManager {
                     throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
                 }
             }
+            LOG.debug("Apply breaking changes: {} & and Non-Breaking: {}, for {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges(), changeState.getActualAPI().getState().toUpperCase());
             if (changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
                 LOG.info("Update API Strategy: All changes can be applied in current state.");
-                LOG.debug("Apply breaking changes: {} & and Non-Breaking: {}, for {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges(), changeState.getActualAPI().getState().toUpperCase());
                 UpdateExistingAPI updateAPI = new UpdateExistingAPI();
                 updateAPI.execute(changeState);
             } else if (changeState.isRecreateAPI() || CoreParameters.getInstance().isZeroDowntimeUpdate()) {
@@ -75,12 +74,10 @@ public class APIImportManager {
                 } else {
                     LOG.info("Update API Strategy: Re-Create API for a Zero-Downtime update.");
                 }
-                LOG.debug("Apply breaking changes: {} & and Non-Breaking: {}, for {}",changeState.getBreakingChanges(), changeState.getNonBreakingChanges(), changeState.getActualAPI().getState().toUpperCase());
                 RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
                 recreate.execute(changeState);
             } else { // We have changes, that require a re-creation of the API
                 LOG.info("Update API Strategy: Re-Publish API to apply changes");
-                LOG.debug("Apply breaking changes: {} & and Non-Breaking:  {}, for {}" ,changeState.getBreakingChanges(), changeState.getNonBreakingChanges(), changeState.getActualAPI().getState().toUpperCase());
                 RepublishToUpdateAPI republish = new RepublishToUpdateAPI();
                 republish.execute(changeState);
             }

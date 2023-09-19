@@ -126,15 +126,16 @@ public class APIStatusManager {
             apiToUpdate.setState(desiredState);
             if (desiredState.equals(API.STATE_DELETED)) {
                 // If an API in state unpublished or pending, also an orgAdmin can delete it
-                apimAdapter.apiAdapter.deleteAPIProxy(apiToUpdate);
+                if (apimAdapter.apiAdapter.isFrontendApiExists(apiToUpdate))
+                    apimAdapter.apiAdapter.deleteAPIProxy(apiToUpdate);
                 // Additionally we need to delete the BE-API
-                apimAdapter.apiAdapter.deleteBackendAPI(apiToUpdate);
+                if (apimAdapter.apiAdapter.isBackendApiExists(apiToUpdate))
+                    apimAdapter.apiAdapter.deleteBackendAPI(apiToUpdate);
             } else {
                 apimAdapter.apiAdapter.updateAPIStatus(apiToUpdate, desiredState, vhost);
                 if (vhost != null && desiredState.equals(API.STATE_UNPUBLISHED)) {
                     this.updateVHostRequired = true; // Flag to control update of the VHost
                 }
-
             }
             // Take over the status, as it has been updated now
             apiToUpdate.setState(desiredState);

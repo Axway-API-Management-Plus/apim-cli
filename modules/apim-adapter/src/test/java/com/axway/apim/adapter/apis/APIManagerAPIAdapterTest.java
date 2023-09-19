@@ -480,13 +480,17 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void upgradeAccessToNewerAPI() {
-
+    public void upgradeAccessToNewerAPI() throws AppException {
+        APIFilter filter = new APIFilter.Builder()
+            .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
+            .build();
+        API api = apiManagerAPIAdapter.getAPI(filter, true);
+        api.setApplications(new ArrayList<>());
+        apiManagerAPIAdapter.upgradeAccessToNewerAPI(api, api);
     }
 
     @Test
     public void loadActualAPI() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter filter = new APIFilter.Builder()
                 .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
                 .build();
@@ -496,7 +500,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void testTranslateMethodToName() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter filter = new APIFilter.Builder()
                 .translateMethods(APIFilter.METHOD_TRANSLATION.AS_NAME)
                 .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
@@ -519,7 +522,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void testTranslateMethodToId() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter filter = new APIFilter.Builder()
                 .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
                 .build();
@@ -538,7 +540,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void testTranslatePolicyToExternalName() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         // Get the API to test with
         APIFilter filter = new APIFilter.Builder()
                 .translatePolicies(APIFilter.POLICY_TRANSLATION.TO_NAME)
@@ -555,7 +556,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void loadAPIIncludingQuota() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter filter = new APIFilter.Builder()
                 .includeQuotas(true)
                 .includeClientApplications(true)
@@ -577,7 +577,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void loadAPIIncludingClientOrgs() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter filter = new APIFilter.Builder()
                 .includeClientOrganizations(true)
                 .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
@@ -591,7 +590,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void loadAPIIncludingClientApps() throws IOException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter filter = new APIFilter.Builder()
                 .includeClientApplications(true)
                 .includeQuotas(true)
@@ -606,5 +604,50 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         Assert.assertNotNull(api.getApplications(), "should have a subscribed application");
         Assert.assertNotNull(api.getApplications().get(0).getAppQuota(), "Subscribed application should have a quota");
     }
+
+    @Test
+    public void pollCatalog() throws AppException {
+        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("d90122a7-9f47-420c-85ca-926125ea7bf6", "Test-App-API2-4618", "published");
+        Assert.assertTrue(status);
+    }
+
+    @Test
+    public void pollCatalogUnpublished() throws AppException {
+        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("d90122a7-9f47-420c-85ca-926125ea7bf6", "Test-App-API2-4618", "unpublished");
+        Assert.assertTrue(status);
+    }
+
+    @Test(expectedExceptions = AppException.class)
+    public void pollCatalogException() throws AppException {
+        boolean status = apiManagerAPIAdapter.pollCatalogForPublishedState("d90122a7-9f47-420c-85ca-926125ea7bf6-invalid", "Test-App-API2-4618", "published");
+        Assert.assertFalse(status);
+    }
+
+    @Test
+    public void isBackendApiExists(){
+        API api = new API();
+        api.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+        Assert.assertTrue(apiManagerAPIAdapter.isBackendApiExists(api));
+    }
+    @Test
+    public void isBackendApiNotExists(){
+        API api = new API();
+        api.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8-not");
+        Assert.assertFalse(apiManagerAPIAdapter.isBackendApiExists(api));
+    }
+
+    @Test
+    public void isFrontendApiExists(){
+        API api = new API();
+        api.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        Assert.assertTrue(apiManagerAPIAdapter.isFrontendApiExists(api));
+    }
+    @Test
+    public void isFrontendApiNotExists(){
+        API api = new API();
+        api.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150-not");
+        Assert.assertFalse(apiManagerAPIAdapter.isFrontendApiExists(api));
+    }
+
 
 }
