@@ -35,7 +35,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
         ExportTestAction swaggerExport = new ExportTestAction();
         ImportTestAction swaggerImport = new ImportTestAction();
         description("Import an API including applications to export it afterwards");
-
+        variable("useApiAdmin", "true"); // Use apiadmin account
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/api/test/" + this.getClass().getSimpleName() + "-${apiNumber}");
         variable("apiName", this.getClass().getSimpleName() + "-${apiNumber}");
@@ -48,7 +48,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
         variable("exportAPIName", "${apiName}.json");
 
         // ############## Creating Test-Application 1 #################
-        createVariable("app1Name", "Consuming Test App 1 ${orgNumber}");
+        createVariable("app1Name", "Consuming Test App ${apiNumber} ${orgNumber}");
         http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
                 .payload("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
