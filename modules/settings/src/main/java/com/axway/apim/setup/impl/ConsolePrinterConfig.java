@@ -16,41 +16,41 @@ import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.error.AppException;
 
 public class ConsolePrinterConfig {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(ConsolePrinterConfig.class);
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterConfig.class);
+
 	APIManagerAdapter adapter;
-	
+
 	StandardExportParams params;
 
 	ConfigType[] standardFields = new ConfigType[] {
-			ConfigType.APIManager, 
-			ConfigType.APIPortal, 
-			ConfigType.General, 
+			ConfigType.APIManager,
+			ConfigType.APIPortal,
+			ConfigType.General,
 			ConfigType.APIRegistration
 	};
 	ConfigType[] wideFields = new ConfigType[] {
-			ConfigType.APIManager, 
-			ConfigType.APIPortal, 
-			ConfigType.General, 
+			ConfigType.APIManager,
+			ConfigType.APIPortal,
+			ConfigType.General,
 			ConfigType.APIRegistration,
 			ConfigType.APIImport,
-			ConfigType.Delegation, 
-			ConfigType.GlobalPolicies, 
+			ConfigType.Delegation,
+			ConfigType.GlobalPolicies,
 			ConfigType.FaultHandlers
 	};
-	
+
 	ConfigType[] ultraFields = new ConfigType[] {
-			ConfigType.APIManager, 
-			ConfigType.APIPortal, 
-			ConfigType.General, 
-			ConfigType.APIRegistration, 
-			ConfigType.APIImport, 
-			ConfigType.Delegation, 
-			ConfigType.GlobalPolicies, 
-			ConfigType.FaultHandlers, 
-			ConfigType.Session, 
-			ConfigType.AdvisoryBanner, 
+			ConfigType.APIManager,
+			ConfigType.APIPortal,
+			ConfigType.General,
+			ConfigType.APIRegistration,
+			ConfigType.APIImport,
+			ConfigType.Delegation,
+			ConfigType.GlobalPolicies,
+			ConfigType.FaultHandlers,
+			ConfigType.Session,
+			ConfigType.AdvisoryBanner,
 	};
 
 	public ConsolePrinterConfig(StandardExportParams params) {
@@ -77,7 +77,7 @@ public class ConsolePrinterConfig {
 			print(config, ultraFields);
 		}
 	}
-	
+
 	private void print(Config config, ConfigType[] configTypes) {
 		for(ConfigType configType : configTypes) {
 			Console.println(configType.getClearName()+":");
@@ -94,7 +94,7 @@ public class ConsolePrinterConfig {
 			Console.println();
 		}
 	}
-	
+
 	private String getFieldValue(String fieldName, Config config) {
 		try {
 			PropertyDescriptor pd = new PropertyDescriptor(fieldName, config.getClass());

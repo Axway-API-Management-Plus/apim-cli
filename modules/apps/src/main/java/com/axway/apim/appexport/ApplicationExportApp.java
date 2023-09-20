@@ -122,7 +122,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params, result);
         List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
-        if (apps.size() == 0) {
+        if (apps.isEmpty()) {
             if (LOG.isDebugEnabled()) {
                 LOG.info("No applications found using filter: {}", exporter.getFilter());
             } else {

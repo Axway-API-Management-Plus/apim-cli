@@ -17,11 +17,11 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsolePrinterPolicies {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(ConsolePrinterPolicies.class);
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterPolicies.class);
+
 	APIManagerAdapter adapter;
-	
+
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
 	public ConsolePrinterPolicies() {
@@ -39,7 +39,7 @@ public class ConsolePrinterPolicies {
 		printPolicies(policies);
 		Console.println("You may use 'apim api get -policy <PolicyName> -s api-env' to list all APIs using this policy");
 	}
-	
+
 	private void printPolicies(List<Policy> policies) {
 		Console.println(AsciiTable.getTable(borderStyle, policies, Arrays.asList(
 				new Column().header("Policy-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Policy::getName),
@@ -47,7 +47,7 @@ public class ConsolePrinterPolicies {
 				new Column().header("APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(ConsolePrinterPolicies::getNumberOfRelatedAPIs)
 				)));
 	}
-	
+
 	private static String getNumberOfRelatedAPIs(Policy policy) {
 		try {
 			return Integer.toString(getRelatedAPIs(policy).size());
@@ -56,7 +56,7 @@ public class ConsolePrinterPolicies {
 			return "Err";
 		}
 	}
-	
+
 	private static List<API> getRelatedAPIs(Policy policy) throws AppException {
 		APIFilter apiFilter = new APIFilter.Builder().hasPolicyName(policy.getName()).build();
 		return APIManagerAdapter.getInstance().apiAdapter.getAPIs(apiFilter, true);

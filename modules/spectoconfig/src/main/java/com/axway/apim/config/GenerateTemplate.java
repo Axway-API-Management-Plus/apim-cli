@@ -38,6 +38,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -132,13 +133,13 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         SwaggerParseResult result = new OpenAPIV3Parser().readLocation(uri, authorizationValues, parseOptions);
         List<String> messages = result.getMessages();
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new AppException(messages.toString(), ErrorCode.UNSUPPORTED_API_SPECIFICATION);
         }
         OpenAPI openAPI = result.getOpenAPI();
         Info info = openAPI.getInfo();
         List<Server> servers = openAPI.getServers();
-        if (servers == null || servers.size() == 0) {
+        if (servers == null || servers.isEmpty()) {
             throw new AppException("servers element is not found", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
         }
         Server server = servers.get(0);
@@ -374,7 +375,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         String filename;
         try {
             filename = new File(new URL(url).getPath()).getName();
-            String content = IOUtils.toString(inputStream, "UTF-8");
+            String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             File file = new File(configPath);
             String parent = file.getParent();
 

@@ -1,6 +1,7 @@
 package com.axway.apim.appexport.impl;
 
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +98,7 @@ public abstract class ApplicationExporter {
             return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.application);
         } catch (AppException e) {
             LOG.error("Error reading custom properties configuration for applications from API-Manager");
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -105,7 +106,7 @@ public abstract class ApplicationExporter {
         if (this.userIdToLogin.containsKey(userId)) return this.userIdToLogin.get(userId);
         String loginName;
         if (userId == null) {
-            LOG.error("Application: {} has no createdBy information.", app.toString());
+            LOG.error("Application: {} has no createdBy information.", app);
         }
         try {
             loginName = APIManagerAdapter.getInstance().userAdapter.getUserForId(app.getCreatedBy()).getLoginName();

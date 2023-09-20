@@ -409,11 +409,11 @@ public class APIMgrAppsAdapter {
 
     private void saveCredentials(ClientApplication app, ClientApplication actualApp) throws JsonProcessingException {
         if (app.getCredentials() == null || app.getCredentials().isEmpty()) return;
-        StringBuilder endpoint = new StringBuilder();
         for (ClientAppCredential cred : app.getCredentials()) {
             if (actualApp != null && actualApp.getCredentials().contains(cred))
                 continue; //nothing to do
             boolean update = false;
+            StringBuilder endpoint = new StringBuilder();
             FilterProvider filter;
             if (cred instanceof OAuth) {
                 endpoint.append("oauth");

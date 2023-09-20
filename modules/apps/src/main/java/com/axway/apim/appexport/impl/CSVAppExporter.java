@@ -30,41 +30,41 @@ public class CSVAppExporter extends ApplicationExporter {
 
     private enum HeaderFields {
         standard(new String[]{
-                "ID",
-                "Organization",
-                "Name",
-                "Email",
-                "Phone",
-                "State",
-                "Enabled",
-                "Created by"
+            "ID",
+            "Organization",
+            "Name",
+            "Email",
+            "Phone",
+            "State",
+            "Enabled",
+            "Created by"
         }),
         wide(new String[]{
-                "ID",
-                "Organization",
-                "Name",
-                "Email",
-                "Phone",
-                "State",
-                "Enabled",
-                "Created by",
-                "API Quota",
-                "API-Method",
-                "Quota Config"
+            "ID",
+            "Organization",
+            "Name",
+            "Email",
+            "Phone",
+            "State",
+            "Enabled",
+            "Created by",
+            "API Quota",
+            "API-Method",
+            "Quota Config"
         }),
         ultra(new String[]{
-                "ID",
-                "Organization",
-                "Name",
-                "Email",
-                "Phone",
-                "State",
-                "Enabled",
-                "Created by",
-                "API-Name",
-                "API-Version",
-                "Access created by",
-                "Access created on"
+            "ID",
+            "Organization",
+            "Name",
+            "Email",
+            "Phone",
+            "State",
+            "Enabled",
+            "Created by",
+            "API-Name",
+            "API-Version",
+            "Access created by",
+            "Access created on"
         });
 
         final String[] headerFields;
@@ -113,7 +113,7 @@ public class CSVAppExporter extends ApplicationExporter {
             }
             // With wide - Report the application quotas
             if (wide.equals(Wide.wide)) {
-                if (app.getAppQuota() != null && app.getAppQuota().getRestrictions() != null && app.getAppQuota().getRestrictions().size() != 0) {
+                if (app.getAppQuota() != null && app.getAppQuota().getRestrictions() != null && !app.getAppQuota().getRestrictions().isEmpty()) {
                     for (QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
                         writeRecords(csvPrinter, app, null, restriction, wide);
                     }
@@ -123,8 +123,8 @@ public class CSVAppExporter extends ApplicationExporter {
 
                 // With ultra - Report all subscribed APIs
             } else if (wide.equals(Wide.ultra)) {
-                if (app.getApiAccess() != null) ;
-                app.getApiAccess().sort(new APIAccessComparator());
+                if (app.getApiAccess() != null)
+                    app.getApiAccess().sort(new APIAccessComparator());
                 for (APIAccess apiAccess : app.getApiAccess()) {
                     writeRecords(csvPrinter, app, apiAccess, null, wide);
                 }
@@ -154,47 +154,47 @@ public class CSVAppExporter extends ApplicationExporter {
 
     private void writeStandardToCSV(CSVPrinter csvPrinter, ClientApplication app) throws IOException {
         csvPrinter.printRecord(
-                app.getId(),
-                app.getOrganization().getName(),
-                app.getName(),
-                app.getEmail(),
-                app.getPhone(),
-                app.getState(),
-                app.isEnabled(),
-                getCreatedBy(app.getCreatedBy(), app)
+            app.getId(),
+            app.getOrganization().getName(),
+            app.getName(),
+            app.getEmail(),
+            app.getPhone(),
+            app.getState(),
+            app.isEnabled(),
+            getCreatedBy(app.getCreatedBy(), app)
         );
     }
 
     private void writeWideToCSV(CSVPrinter csvPrinter, ClientApplication app, QuotaRestriction quotaRestriction) throws IOException {
         csvPrinter.printRecord(
-                app.getId(),
-                app.getOrganization().getName(),
-                app.getName(),
-                app.getEmail(),
-                app.getPhone(),
-                app.getState(),
-                app.isEnabled(),
-                getCreatedBy(app.getCreatedBy(), app),
-                getRestrictedAPI(quotaRestriction),
-                getRestrictedMethod(quotaRestriction),
-                getQuotaConfig(quotaRestriction)
+            app.getId(),
+            app.getOrganization().getName(),
+            app.getName(),
+            app.getEmail(),
+            app.getPhone(),
+            app.getState(),
+            app.isEnabled(),
+            getCreatedBy(app.getCreatedBy(), app),
+            getRestrictedAPI(quotaRestriction),
+            getRestrictedMethod(quotaRestriction),
+            getQuotaConfig(quotaRestriction)
         );
     }
 
     private void writeUltraToCSV(CSVPrinter csvPrinter, ClientApplication app, APIAccess apiAccess) throws IOException {
         csvPrinter.printRecord(
-                app.getId(),
-                app.getOrganization().getName(),
-                app.getName(),
-                app.getEmail(),
-                app.getPhone(),
-                app.getState(),
-                app.isEnabled(),
-                getCreatedBy(app.getCreatedBy(), app),
-                apiAccess.getApiName(),
-                apiAccess.getApiVersion(),
-                getCreatedBy(apiAccess.getCreatedBy(), app),
-                getCreatedOn(apiAccess.getCreatedOn())
+            app.getId(),
+            app.getOrganization().getName(),
+            app.getName(),
+            app.getEmail(),
+            app.getPhone(),
+            app.getState(),
+            app.isEnabled(),
+            getCreatedBy(app.getCreatedBy(), app),
+            apiAccess.getApiName(),
+            apiAccess.getApiVersion(),
+            getCreatedBy(apiAccess.getCreatedBy(), app),
+            getCreatedOn(apiAccess.getCreatedOn())
         );
     }
 

@@ -22,13 +22,18 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsolePrinterRemoteHosts {
 
-	protected static Logger LOG = LoggerFactory.getLogger(ConsolePrinterRemoteHosts.class);
-	
-	APIManagerAdapter adapter;
-	
+    private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterRemoteHosts.class);
+    public static final String ID = "Id";
+    public static final String NAME = "Name";
+    public static final String PORT = "Port";
+    public static final String ORGANIZATION = "Organization";
+    public static final String RELATED_AP_IS = "Related APIs";
+
+    APIManagerAdapter adapter;
+
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
-	
-	private StandardExportParams params;
+
+	private final StandardExportParams params;
 
 	public ConsolePrinterRemoteHosts(StandardExportParams params) {
 		this.params = params;
@@ -54,38 +59,38 @@ public class ConsolePrinterRemoteHosts {
 			printUltra(remoteHosts.values());
 		}
 	}
-	
+
 	private void printStandard(Collection<RemoteHost> remoteHosts) {
 		Console.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
-				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
-				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
-				new Column().header("Organization").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
-				new Column().header("Related APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
+				new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
+				new Column().header(PORT).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
+				new Column().header(ORGANIZATION).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
+				new Column().header(RELATED_AP_IS).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
 				)));
 		printDetails(remoteHosts);
 	}
-	
+
 	private void printWide(Collection<RemoteHost> remoteHosts) {
 		Console.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
-				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
-				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
-				new Column().header("Organization").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
+				new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
+				new Column().header(PORT).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
+				new Column().header(ORGANIZATION).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
 				new Column().header("HTTP 1.1").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getAllowHTTP11())),
 				new Column().header("Verify cert. hostname").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getVerifyServerHostname())),
 				new Column().header("Send SNI").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getOfferTLSServerName())),
-				new Column().header("Related APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
+				new Column().header(RELATED_AP_IS).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
 				)));
 		printDetails(remoteHosts);
 	}
-	
+
 	private void printUltra(Collection<RemoteHost> remoteHosts) {
 		Console.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
-				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
-				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
-				new Column().header("Organization").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
+				new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
+				new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
+				new Column().header(PORT).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
+				new Column().header(ORGANIZATION).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
 				new Column().header("HTTP 1.1").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getAllowHTTP11())),
 				new Column().header("Verify cert. hostname").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getVerifyServerHostname())),
 				new Column().header("Send SNI").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getOfferTLSServerName())),
@@ -93,11 +98,11 @@ public class ConsolePrinterRemoteHosts {
 				new Column().header("Active TO").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getActiveTimeout())),
 				new Column().header("Trans. TO").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getTransactionTimeout())),
 				new Column().header("Idle TO").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getIdleTimeout())),
-				new Column().header("Related APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
+				new Column().header(RELATED_AP_IS).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
 				)));
 		printDetails(remoteHosts);
 	}
-	
+
 	private void printDetails(Collection<RemoteHost> remoteHosts) {
 		if(remoteHosts.size()!=1) return;
 		RemoteHost remoteHost = remoteHosts.iterator().next();
@@ -120,14 +125,14 @@ public class ConsolePrinterRemoteHosts {
 			for(API api : relatedAPIs) {
 				Console.printf("%-25s (%s)", api.getName(), api.getVersion());
 			}
-			if(relatedAPIs==null || relatedAPIs.size()==0) {
+			if(relatedAPIs.isEmpty()) {
 				Console.println("No API found with backend: '" + remoteHost.getName() + "' and port: " + remoteHost.getPort());
 			}
 		} catch (AppException e) {
 			Console.println("ERR");
 		}
 	}
-	
+
 	private static String getNumberOfRelatedAPIs(String backendHost, Integer port) {
 		try {
 			return Integer.toString(getRelatedAPIs(backendHost, port).size());
@@ -136,11 +141,11 @@ public class ConsolePrinterRemoteHosts {
 			return "Err";
 		}
 	}
-	
+
 	private static String getCreatedBy(RemoteHost remoteHost) {
 		return (remoteHost.getCreatedBy()!=null) ? remoteHost.getCreatedBy().getName(): "N/A";
 	}
-	
+
 	private static List<API> getRelatedAPIs(String backendHost, Integer port) throws AppException {
 		String portFilter = String.valueOf(port);
 		if(port==443 || port==80) {

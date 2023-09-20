@@ -18,6 +18,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class OrgConfigAdapter extends OrgAdapter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OrgConfigAdapter.class);
 
     OrgImportParams importParams;
 
@@ -93,7 +97,7 @@ public class OrgConfigAdapter extends OrgAdapter {
     private void addImage(List<Organization> orgs, File parentFolder) throws AppException {
         for (Organization org : orgs) {
             String imageUrl = org.getImageUrl();
-            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl == null || imageUrl.isEmpty()) continue;
             if (imageUrl.startsWith("data:")) {
                 org.setImage(Image.createImageFromBase64(imageUrl));
             } else {
@@ -113,7 +117,7 @@ public class OrgConfigAdapter extends OrgAdapter {
                         .hasName(apiAccess.getApiName())
                         .build()
                     , false);
-                if (apis == null || apis.size() == 0) {
+                if (apis == null || apis.isEmpty()) {
                     LOG.error("API with name: {} not found. Ignoring this APIs.", apiAccess.getApiName());
                     result.setError(ErrorCode.UNKNOWN_API);
                     it.remove();
