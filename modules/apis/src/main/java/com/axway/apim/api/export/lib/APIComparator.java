@@ -6,7 +6,7 @@ import com.axway.apim.api.API;
 
 public class APIComparator implements Comparator<API> {
 
-	public APIComparator() {
+	public APIComparator() { // default constructor
 	}
 
 	@Override

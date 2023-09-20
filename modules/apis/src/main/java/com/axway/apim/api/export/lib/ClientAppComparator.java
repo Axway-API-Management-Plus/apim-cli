@@ -6,7 +6,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 
 public class ClientAppComparator implements Comparator<ClientApplication> {
 
-	public ClientAppComparator() {
+	public ClientAppComparator() { //default constructor
 	}
 
 	@Override

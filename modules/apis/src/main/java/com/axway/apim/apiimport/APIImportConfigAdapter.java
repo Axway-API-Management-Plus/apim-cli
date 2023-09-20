@@ -47,6 +47,9 @@ public class APIImportConfigAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
     public static final String DEFAULT = "_default";
+    public static final String ORIGINAL = "original";
+    public static final String MANUAL = "manual";
+    public static final String VALIDATE_ORGANIZATION = "validateOrganization";
 
     /**
      * This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file
@@ -100,14 +103,14 @@ public class APIImportConfigAdapter {
             mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
             mapper.registerModule(module);
             ObjectReader reader = mapper.reader();
-            baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
+            baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {
                 try {
                     // If the baseConfig doesn't have a valid organization, the stage config must
                     validateOrganization = baseConfig.getOrganization() == null;
-                    ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
+                    ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute(VALIDATE_ORGANIZATION, validateOrganization);
                     // Organization must be valid in staged configuration
-                    apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substituteVariables(stageConfigFile));
+                    apiConfig = updater.withAttribute(VALIDATE_ORGANIZATION, true).readValue(Utils.substituteVariables(stageConfigFile));
                     LOG.info("Loaded stage API-Config from file: {}", stageConfigFile);
                 } catch (FileNotFoundException e) {
                     LOG.warn("No config file found for stage: {}", stage);
@@ -268,10 +271,10 @@ public class APIImportConfigAdapter {
     }
 
     private void validateDescription(API apiConfig) throws AppException {
-        if (apiConfig.getDescriptionType() == null || apiConfig.getDescriptionType().equals("original")) return;
+        if (apiConfig.getDescriptionType() == null || apiConfig.getDescriptionType().equals(ORIGINAL)) return;
         String descriptionType = apiConfig.getDescriptionType();
         switch (descriptionType) {
-            case "manual":
+            case MANUAL:
                 if (apiConfig.getDescriptionManual() == null) {
                     throw new AppException("descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
                 }
@@ -316,12 +319,12 @@ public class APIImportConfigAdapter {
                         newLine = "\n";
                     }
                     apiConfig.setDescriptionManual(markdownDescription.toString());
-                    apiConfig.setDescriptionType("manual");
+                    apiConfig.setDescriptionType(MANUAL);
                 } catch (IOException e) {
                     throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
                 }
                 break;
-            case "original":
+            case ORIGINAL:
                 break;
             default:
                 throw new AppException("Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -337,9 +340,9 @@ public class APIImportConfigAdapter {
                 throw new AppException("apiMethods descriptionType can't be null set default value as 'original'", ErrorCode.CANT_READ_CONFIG_FILE);
             }
             switch (descriptionType) {
-                case "original":
+                case ORIGINAL:
                     return;
-                case "manual":
+                case MANUAL:
                     if (apiMethod.getDescriptionManual() == null) {
                         throw new AppException("apiMethods descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
                     }
@@ -518,7 +521,7 @@ public class APIImportConfigAdapter {
     }
 
     private void validateInboundProfile(API importApi) throws AppException {
-        if (importApi.getInboundProfiles() == null || importApi.getInboundProfiles().size() == 0) {
+        if (importApi.getInboundProfiles() == null || importApi.getInboundProfiles().isEmpty()) {
             Map<String, InboundProfile> def = new HashMap<>();
             def.put(DEFAULT, InboundProfile.getDefaultInboundProfile());
             importApi.setInboundProfiles(def);
@@ -610,7 +613,7 @@ public class APIImportConfigAdapter {
     }
 
     private void validateOutboundProfile(API importApi) throws AppException {
-        if (importApi.getOutboundProfiles() == null || importApi.getOutboundProfiles().size() == 0) return;
+        if (importApi.getOutboundProfiles() == null || importApi.getOutboundProfiles().isEmpty()) return;
         Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
         boolean defaultProfileFound = false;
         while (it.hasNext()) {

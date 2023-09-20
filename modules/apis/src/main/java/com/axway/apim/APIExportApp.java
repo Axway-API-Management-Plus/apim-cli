@@ -205,9 +205,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
                     result.setError(resultHandler.getResult().getErrorCode());
                 }
                 APIManagerAdapter.deleteInstance();
-                if (result.hasError()) {
-                    if (result.getErrorCode() != ErrorCode.CHECK_CERTS_FOUND_CERTS)
-                        LOG.error("An error happened during export. Please check the log");
+                if (result.hasError() && (result.getErrorCode() != ErrorCode.CHECK_CERTS_FOUND_CERTS))
+                        {LOG.error("An error happened during export. Please check the log");
                 }
                 return result.getErrorCode().getCode();
             }

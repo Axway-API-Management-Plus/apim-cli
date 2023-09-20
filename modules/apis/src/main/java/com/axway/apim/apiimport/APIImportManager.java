@@ -58,10 +58,8 @@ public class APIImportManager {
             }
             LOG.info("Recognized the following changes. Potentially Breaking: {} plus Non-Breaking: {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges());
             LOG.info("Is Breaking changes : {} Enforce Breaking changes : {}", changeState.isBreaking(), enforceBreakingChange);
-            if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
-                if (!enforceBreakingChange) {
+            if (changeState.isBreaking() && (!enforceBreakingChange)) {
                     throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
-                }
             }
             LOG.debug("Apply breaking changes: {} & and Non-Breaking: {}, for {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges(), changeState.getActualAPI().getState().toUpperCase());
             if (changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
