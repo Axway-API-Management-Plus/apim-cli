@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class AppQuotaSerializer extends StdSerializer<APIQuota> {
-	
+
 	private final transient JsonSerializer<Object> defaultSerializer;
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	public AppQuotaSerializer(JsonSerializer<Object> defaultSerializer) {
 		this(null, defaultSerializer);
 	}
@@ -21,7 +21,7 @@ public class AppQuotaSerializer extends StdSerializer<APIQuota> {
 	public AppQuotaSerializer(Class<APIQuota> quota, JsonSerializer<Object> defaultSerializer) {
 		super(quota);
 		this.defaultSerializer = defaultSerializer;
-		
+
 	}
 
 	@Override

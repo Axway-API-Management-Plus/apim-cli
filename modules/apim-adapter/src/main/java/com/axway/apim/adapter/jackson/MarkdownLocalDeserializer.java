@@ -15,7 +15,7 @@ import java.util.List;
 public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public MarkdownLocalDeserializer() {
 		this(null);
 	}
@@ -23,8 +23,8 @@ public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
 	public MarkdownLocalDeserializer(Class<List<String>> user) {
 		super(user);
 	}
-	
-	
+
+
 
 	@Override
 	public List<String> deserialize(JsonParser jp, DeserializationContext ctxt)

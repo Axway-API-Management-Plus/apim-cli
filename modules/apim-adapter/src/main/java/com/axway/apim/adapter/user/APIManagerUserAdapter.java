@@ -77,7 +77,8 @@ public class APIManagerUserAdapter {
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                     throw new AppException("No user found for user id: " + userId, ErrorCode.UNKNOWN_USER);
                 } else if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Received Status-Code: {} Response: {}", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Received Status-Code: {}", httpResponse.getStatusLine().getStatusCode());
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -164,7 +165,7 @@ public class APIManagerUserAdapter {
     }
 
     public User createOrUpdateUser(User desiredUser, User actualUser) throws AppException {
-        User createdUser;
+
         FilterProvider filter;
         try {
             URI uri;
@@ -181,37 +182,43 @@ public class APIManagerUserAdapter {
             }
             mapper.setFilterProvider(filter);
             mapper.setSerializationInclusion(Include.NON_NULL);
-            try {
-                RestAPICall request;
-                String json = mapper.writeValueAsString(desiredUser);
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                if (actualUser == null) {
-                    request = new POSTRequest(entity, uri);
-                    LOG.debug("Creating a new User with name : {}", desiredUser.getName());
-                } else {
-                    request = new PUTRequest(entity, uri);
-                    LOG.debug("Updating a  User with name : {}", desiredUser.getName());
-                }
-                LOG.debug("Create/Update User Http Verb : {} URI : {}",request.getClass().getName(), uri);
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating user. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating/updating user. Response-Code: " + statusCode, ErrorCode.UNXPECTED_ERROR);
-                    }
-                    createdUser = mapper.readValue(httpResponse.getEntity().getContent(), User.class);
-                    desiredUser.setId(createdUser.getId());
-                    saveImage(desiredUser, actualUser);
-                }
-            } catch (Exception e) {
-                throw new AppException("Error creating/updating user.", ErrorCode.UNXPECTED_ERROR, e);
-            }
+            User createdUser = upsertUser(uri, desiredUser, actualUser);
             // Force reload of updated user next time
             userCache.remove(createdUser.getId());
             return createdUser;
 
         } catch (Exception e) {
             throw new AppException("Error creating/updating user", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
+
+    public User upsertUser(URI uri, User desiredUser, User actualUser) throws AppException {
+        try {
+            RestAPICall request;
+            String json = mapper.writeValueAsString(desiredUser);
+            HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+            if (actualUser == null) {
+                request = new POSTRequest(entity, uri);
+                LOG.debug("Creating a new User with name : {}", desiredUser.getName());
+            } else {
+                request = new PUTRequest(entity, uri);
+                LOG.debug("Updating a  User with name : {}", desiredUser.getName());
+            }
+            LOG.debug("Create/Update User Http Verb : {} URI : {}",request.getClass().getName(), uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error creating/updating user. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
+                    throw new AppException("Error creating/updating user. Response-Code: " + statusCode, ErrorCode.UNXPECTED_ERROR);
+                }
+                User createdUser = mapper.readValue(httpResponse.getEntity().getContent(), User.class);
+                desiredUser.setId(createdUser.getId());
+                saveImage(desiredUser, actualUser);
+                return createdUser;
+            }
+        } catch (Exception e) {
+            throw new AppException("Error creating/updating user.", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 
@@ -225,7 +232,8 @@ public class APIManagerUserAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error changing password of user. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error changing password of user. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("Error changing password of user. Response-Code: " + statusCode, ErrorCode.ERROR_CHANGEPASSWORD);
                 }
             }
@@ -241,7 +249,8 @@ public class APIManagerUserAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting user. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error deleting user. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("Error deleting user. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Also remove this user from cache
@@ -265,7 +274,8 @@ public class APIManagerUserAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error saving/updating user image. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error saving/updating user image. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                 }
             }
         } catch (Exception e) {

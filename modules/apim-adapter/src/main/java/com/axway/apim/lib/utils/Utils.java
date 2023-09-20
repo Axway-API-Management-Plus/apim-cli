@@ -415,4 +415,12 @@ public class Utils {
             logger.debug("APIManager Response : {}", httpResponse);
         }
     }
+
+    public static void sleep(int retryDelay){
+        try {
+            Thread.sleep(retryDelay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }

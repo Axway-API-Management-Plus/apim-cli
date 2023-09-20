@@ -45,17 +45,6 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
                 organization.setName(node.asText());
                 return organization;
             }
-            // organization name is given in the config file
-            // If we don't have an Admin-Account don't try to load the organization!
-            // commented out to support org admin self service.
-
-//				User user = APIManagerAdapter.getCurrentUser(false);
-//				if(!node.asText().equals(user.getOrganization().getName())) {
-//					LOG.warn("The given API-Organization is invalid as OrgAdmin user: '"+user.getName()+"' belongs to organization: '" + user.getOrganization().getName() + "'. API will be registered with OrgAdmin organization.");
-//				}
-//				return user.getOrganization();
-//			}
-
             // Otherwise make sure the organization exists and try to load it
             Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
             if (organization == null && validateOrganization(ctxt)) {

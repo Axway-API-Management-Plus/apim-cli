@@ -205,7 +205,9 @@ public class APIManagerAPIAdapter {
             LOG.debug("Found: {} exposed API(s): {}", apis.size(), dbgCrit);
             return apis;
         }
-        LOG.debug("No existing API found based on filter: {}", getFilterFields(filter));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("No existing API found based on filter: {}", getFilterFields(filter));
+        }
         return apis;
     }
 
@@ -458,7 +460,8 @@ public class APIManagerAPIAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 200) {
                         if (filter.isUseFEAPIDefinition()) {
-                            LOG.debug("Failed to download API-Specification with version {} from Frontend-API. Received Status-Code: {} Response: {}", specVersion, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            LOG.debug("Failed to download API-Specification with version {} from Frontend-API. Received Status-Code: {}", specVersion, statusCode);
+                            Utils.logPayload(LOG, httpResponse);
                             continue;
                         } else {
                             LOG.error("Failed to download original API-Specification. You may use the toggle -useFEAPIDefinition to download the Frontend-API specification instead.");
@@ -602,7 +605,8 @@ public class APIManagerAPIAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting API-Proxy using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error deleting API-Proxy using URI: {} Response-Code: {}", uri, statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("Error deleting API-Proxy. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 LOG.info("API: {} {} ( {} ) successfully deleted", api.getName(), api.getVersion(), api.getId());
@@ -934,7 +938,9 @@ public class APIManagerAPIAdapter {
             return false;
         }
         if (apiToUpgradeAccess.getId().equals(referenceAPI.getId())) {
-            LOG.warn("API to upgrade access: {} and reference/old API: {} are the same. Skip upgrade access to newer API.", Utils.getAPILogString(apiToUpgradeAccess), Utils.getAPILogString(referenceAPI));
+            if(LOG.isWarnEnabled()) {
+                LOG.warn("API to upgrade access: {} and reference/old API: {} are the same. Skip upgrade access to newer API.", Utils.getAPILogString(apiToUpgradeAccess), Utils.getAPILogString(referenceAPI));
+            }
             return false;
         }
         LOG.debug("Upgrade access & subscriptions to API: {} {}  ({})", apiToUpgradeAccess.getName(), apiToUpgradeAccess.getVersion(), apiToUpgradeAccess.getId());
@@ -955,11 +961,7 @@ public class APIManagerAPIAdapter {
                 String response = httpResponse.getResponseBody();
                 if ((statusCode == 403 || statusCode == 404) && (response.contains(UNKNOWN_API) || response.contains("The entity could not be found"))) {
                     LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
-                    try {
-                        Thread.sleep(cmd.getRetryDelay());
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                    Utils.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(request, true);
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode != 204) {
@@ -1106,7 +1108,8 @@ public class APIManagerAPIAdapter {
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
-                        LOG.error("Error revoking Organization access to API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                        LOG.error("Error revoking Organization access to API using URI: {} Response-Code: {}", uri, statusCode);
+                        Utils.logPayload(LOG, httpResponse);
                         throw new AppException("Error revoking api access: " + statusCode, ErrorCode.ACCESS_ORGANIZATION_ERR);
                     }
                     LOG.info("Organization : {} removed access from API: {} {} ( {} ) successfully revoked ", organization.getName(), api.getName(), api.getVersion(), api.getId());
@@ -1128,7 +1131,8 @@ public class APIManagerAPIAdapter {
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                         int statusCode = httpResponse.getStatusLine().getStatusCode();
                         if (statusCode != 204) {
-                            LOG.error("Error revoking application access to API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            LOG.error("Error revoking application access to API using URI: {} Response-Code: {}", uri, statusCode);
+                            Utils.logPayload(LOG, httpResponse);
                             throw new AppException("Error revoking api access: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                         }
                         LOG.info("Application : {} removed access from API: {} {} ( {} ) successfully revoked ", clientApplication.getName(), api.getName(), api.getVersion(), api.getId());

@@ -87,7 +87,8 @@ public class APIManagerQuotaAdapter {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/" + quotaId).build();
             } else {
                 if (applicationsQuotaCache.containsKey(quotaId)) {
-                    LOG.debug("Found quota with ID: {} in cache: {}", quotaId, applicationsQuotaCache.get(quotaId));
+                    if(LOG.isDebugEnabled())
+                        LOG.debug("Found quota with ID: {} in cache: {}", quotaId, applicationsQuotaCache.get(quotaId));
                     this.apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
                     return;
                 }

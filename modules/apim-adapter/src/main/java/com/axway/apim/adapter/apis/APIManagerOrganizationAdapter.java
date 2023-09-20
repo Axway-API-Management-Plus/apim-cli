@@ -74,7 +74,8 @@ public class APIManagerOrganizationAdapter {
             LOG.debug("Load organization with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Received Status-Code: {} Response: {}", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Received Status-Code: {}", httpResponse.getStatusLine().getStatusCode());
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -103,7 +104,6 @@ public class APIManagerOrganizationAdapter {
     }
 
     public void createOrUpdateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
-        Organization createdOrg;
         try {
             URI uri;
             if (actualOrg == null) {
@@ -118,38 +118,42 @@ public class APIManagerOrganizationAdapter {
                     SimpleBeanPropertyFilter.serializeAllExcept("image", "createdOn", "apis"));
             mapper.setFilterProvider(filter);
             mapper.setSerializationInclusion(Include.NON_NULL);
-            try {
-                RestAPICall request;
-                if (actualOrg == null) {
-                    String json = mapper.writeValueAsString(desiredOrg);
-                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new POSTRequest(entity, uri);
-                } else {
-                    desiredOrg.setId(actualOrg.getId());
-                    if (desiredOrg.getDn() == null) desiredOrg.setDn(actualOrg.getDn());
-                    String json = mapper.writeValueAsString(desiredOrg);
-                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new PUTRequest(entity, uri);
-                }
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating organization. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating/updating organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
-                    }
-                    createdOrg = mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
-                }
-            } catch (Exception e) {
-                throw new AppException("Error creating/updating organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
-            }
+            Organization createdOrg = upsertOrganization(uri, actualOrg, desiredOrg);
             desiredOrg.setId(createdOrg.getId());
             saveImage(desiredOrg, actualOrg);
             saveAPIAccess(desiredOrg, actualOrg);
             // Force reload of this organization next time
             organizationCache.remove(createdOrg.getId());
-
         } catch (Exception e) {
             throw new AppException("Error creating/updating organization", ErrorCode.CANT_CREATE_API_PROXY, e);
+        }
+    }
+
+    public Organization upsertOrganization(URI uri, Organization actualOrg, Organization desiredOrg) throws AppException {
+        try {
+            RestAPICall request;
+            if (actualOrg == null) {
+                String json = mapper.writeValueAsString(desiredOrg);
+                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                request = new POSTRequest(entity, uri);
+            } else {
+                desiredOrg.setId(actualOrg.getId());
+                if (desiredOrg.getDn() == null) desiredOrg.setDn(actualOrg.getDn());
+                String json = mapper.writeValueAsString(desiredOrg);
+                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                request = new PUTRequest(entity, uri);
+            }
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error creating/updating organization. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
+                    throw new AppException("Error creating/updating organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                return mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
+            }
+        } catch (Exception e) {
+            throw new AppException("Error creating/updating organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
     }
 
@@ -160,7 +164,8 @@ public class APIManagerOrganizationAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting organization. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error deleting organization. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                     throw new AppException("Error deleting organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Deleted org should also be deleted from the cache
@@ -185,7 +190,8 @@ public class APIManagerOrganizationAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error saving/updating organization image. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Error saving/updating organization image. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
                 }
             }
         } catch (Exception e) {

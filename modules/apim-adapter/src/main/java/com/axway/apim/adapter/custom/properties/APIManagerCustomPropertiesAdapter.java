@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class APIManagerCustomPropertiesAdapter {
 
@@ -73,12 +70,12 @@ public class APIManagerCustomPropertiesAdapter {
 
     public Map<String, CustomProperty> getRequiredCustomProperties(Type type) throws AppException {
         Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
-        if (allCustomProps == null) return null;
+        if (allCustomProps == null) return Collections.emptyMap();
         Map<String, CustomProperty> requiredCustomProps = new HashMap<>();
-        for (String propName : allCustomProps.keySet()) {
-            CustomProperty prop = allCustomProps.get(propName);
+        for (Map.Entry<String, CustomProperty> value : allCustomProps.entrySet()) {
+            CustomProperty prop = value.getValue();
             if (prop.getRequired()) {
-                requiredCustomProps.put(propName, prop);
+                requiredCustomProps.put(value.getKey(), prop);
             }
         }
         return requiredCustomProps;
@@ -86,7 +83,7 @@ public class APIManagerCustomPropertiesAdapter {
 
     public Map<String, CustomProperty> getCustomProperties(Type type) throws AppException {
         CustomProperties customPropertiesLocal = getCustomProperties();
-        if (customPropertiesLocal == null) return null;
+        if (customPropertiesLocal == null) return Collections.emptyMap();
         switch (type) {
             case api:
                 return customPropertiesLocal.getApi();
