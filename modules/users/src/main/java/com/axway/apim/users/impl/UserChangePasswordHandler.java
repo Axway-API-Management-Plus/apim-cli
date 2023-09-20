@@ -13,10 +13,13 @@ import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserChangePasswordHandler extends UserResultHandler {
-	
-	String newPassword;
+    private static final Logger LOG = LoggerFactory.getLogger(UserChangePasswordHandler.class);
+
+    String newPassword;
 
 	public UserChangePasswordHandler(UserExportParams params, ExportResult result) {
 		super(params, result);

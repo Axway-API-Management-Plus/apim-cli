@@ -128,7 +128,7 @@ public abstract class APIResultHandler {
             return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.api);
         } catch (AppException e) {
             LOG.error("Error reading custom properties configuration from API-Manager");
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -156,7 +156,7 @@ public abstract class APIResultHandler {
                         String authenticationPolicy = device.getProperties().get("authenticationPolicy");
                         usedSecurity.add(Utils.getExternalPolicyName(authenticationPolicy));
                     } else {
-                        usedSecurity.add("" + device.getType().getName());
+                        usedSecurity.add(device.getType().getName());
                     }
                 }
             }

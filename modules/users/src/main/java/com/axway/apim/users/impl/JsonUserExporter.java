@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonUserExporter extends UserResultHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(JsonUserExporter.class);
 
     public JsonUserExporter(UserExportParams params, ExportResult result) {
         super(params, result);

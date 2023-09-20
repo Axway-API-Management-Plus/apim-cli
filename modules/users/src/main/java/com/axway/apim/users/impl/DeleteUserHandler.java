@@ -12,10 +12,15 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteUserHandler extends UserResultHandler {
 
-	public DeleteUserHandler(UserExportParams params, ExportResult result) {
+    private static final Logger LOG = LoggerFactory.getLogger(DeleteUserHandler.class);
+
+
+    public DeleteUserHandler(UserExportParams params, ExportResult result) {
 		super(params, result);
 	}
 

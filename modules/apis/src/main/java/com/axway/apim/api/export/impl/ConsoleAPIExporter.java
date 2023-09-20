@@ -21,6 +21,11 @@ import java.util.*;
 
 public class ConsoleAPIExporter extends APIResultHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ConsoleAPIExporter.class);
+    public static final String ID = "API-Id";
+    public static final String PATH = "Path";
+    public static final String NAME = "Name";
+    public static final String VERSION = "Version";
+    public static final String CREATED_ON = "Created-On";
 
     Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
@@ -47,38 +52,38 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
     private void printStandard(List<API> apis) {
         Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-                new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
-                new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
-                new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
-                new Column().header("Version").with(API::getVersion),
-                new Column().header("Created-On").with(this::getFormattedDate)
+                new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+                new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+                new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+                new Column().header(VERSION).with(API::getVersion),
+                new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
     }
 
     private void printWide(List<API> apis) {
         Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-                new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
-                new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
-                new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
-                new Column().header("Version").with(API::getVersion),
+                new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+                new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+                new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+                new Column().header(VERSION).with(API::getVersion),
                 new Column().header("V-Host").with(API::getVhost),
                 new Column().header("State").with(this::getState),
                 new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
                 new Column().header("Security").with(APIResultHandler::getUsedSecurity),
                 new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(this::getUsedPoliciesForConsole),
                 new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
-                new Column().header("Created-On").with(this::getFormattedDate)
+                new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
     }
 
     private void printUltra(List<API> apis) {
         Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-                new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
-                new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
-                new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
-                new Column().header("Version").with(API::getVersion),
+                new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+                new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+                new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+                new Column().header(VERSION).with(API::getVersion),
                 new Column().header("V-Host").with(API::getVhost),
                 new Column().header("State").with(this::getState),
                 new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
@@ -89,7 +94,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
                 new Column().header("Apps").with(this::getAppCount),
                 new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
                 new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> Boolean.toString(hasTags(api))),
-                new Column().header("Created-On").with(this::getFormattedDate)
+                new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
     }
