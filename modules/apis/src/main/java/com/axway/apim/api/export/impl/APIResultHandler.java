@@ -4,12 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -178,7 +173,7 @@ public abstract class APIResultHandler {
 
     protected static Map<PolicyType, List<String>> getUsedPolicies(API api) {
         Iterator<OutboundProfile> it;
-        Map<PolicyType, List<String>> result = new HashMap<>();
+        Map<PolicyType, List<String>> result = new EnumMap<>(PolicyType.class);
         List<String> requestPolicies = new ArrayList<>();
         List<String> routingPolicies = new ArrayList<>();
         List<String> responsePolicies = new ArrayList<>();

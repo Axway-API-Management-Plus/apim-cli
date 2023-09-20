@@ -91,11 +91,11 @@ public class APIChangeState {
                     Object actualValue = method2.invoke(actualAPI, null);
                     if (desiredValue == null && actualValue == null) continue;
                     if (desiredValue == null) {
-                        LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), desiredValue, actualValue);
+                        LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), null, actualValue);
                         continue; // No change, if nothing is provided!
                     }
                     // desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
-                    if ((desiredValue != null && actualValue == null) || !(Utils.compareValues(actualValue, desiredValue))) {
+                    if (actualValue == null || !Utils.compareValues(actualValue, desiredValue)) {
                         APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
                         // Property change requires proxy update
                         if (property.copyProp()) this.proxyUpdateRequired = true;
@@ -144,7 +144,7 @@ public class APIChangeState {
         Field field;
         Class clazz = (sourceAPI.getClass().equals(API.class)) ? sourceAPI.getClass() : sourceAPI.getClass().getSuperclass();
         boolean hasProperyCopied = false;
-        if (propsToCopy.size() != 0) {
+        if (!propsToCopy.isEmpty()) {
             String message = "Updating Frontend-API (Proxy) for the following properties: ";
             for (String fieldName : propsToCopy) {
                 try {
@@ -221,7 +221,7 @@ public class APIChangeState {
      * @return true, if a breakingChange or a nonBreakingChange was found otherwise false.
      */
     public boolean hasAnyChanges() {
-        return this.breakingChanges.size() != 0 || this.nonBreakingChanges.size() != 0;
+        return !this.breakingChanges.isEmpty() || !this.nonBreakingChanges.isEmpty();
     }
 
     /**
@@ -297,12 +297,8 @@ public class APIChangeState {
     public boolean isAdminAccountNeeded() throws AppException {
         boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()).getOadminSelfServiceEnabled();
         if (orgAdminSelfServiceEnabled) return false;
-        if ((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) &&
-                (getActualAPI() == null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
-            return false;
-        } else {
-            return true;
-        }
+        return (!getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && !getDesiredAPI().getState().equals(API.STATE_DELETED)) ||
+                (getActualAPI() != null && !getActualAPI().getState().equals(API.STATE_UNPUBLISHED));
     }
 
     public String waiting4Approval() throws AppException {

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class UnknownAPISpecification extends APISpecification {
 
-    private final Logger LOG = LoggerFactory.getLogger(UnknownAPISpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UnknownAPISpecification.class);
     String apiName;
 
     public UnknownAPISpecification(String apiName) {

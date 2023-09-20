@@ -15,7 +15,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonNodeOpenAPI3SpecFilter {
 
-    static Logger LOG = LoggerFactory.getLogger(JsonNodeOpenAPI3SpecFilter.class);
+    private JsonNodeOpenAPI3SpecFilter() {
+        throw new IllegalStateException("JsonNodeOpenAPI3SpecFilter class");
+    }
+
+    private static final Logger LOG = LoggerFactory.getLogger(JsonNodeOpenAPI3SpecFilter.class);
+    public static final String COMPONENTS = "components";
 
     public static void filter(JsonNode openAPISpec, APISpecificationFilter filterConfig) {
         JsonNode paths = openAPISpec.get("paths");
@@ -47,14 +52,14 @@ public class JsonNodeOpenAPI3SpecFilter {
             // Remote operation from path
             ((ObjectNode) path).remove(excludeVerb);
             // Remove the entire path, if no more remaining operations
-            if (path.size() == 0) {
+            if (path.isEmpty()) {
                 ((ObjectNode) paths).remove(excludePath);
             }
         }
         JsonNode schemas = null;
-        if (openAPISpec.get("components") != null && openAPISpec.get("components").get("schemas") != null) {
+        if (openAPISpec.get(COMPONENTS) != null && openAPISpec.get(COMPONENTS).get("schemas") != null) {
             // OpenAPI 3.x.x
-            schemas = openAPISpec.get("components").get("schemas");
+            schemas = openAPISpec.get(COMPONENTS).get("schemas");
         } else if (openAPISpec.get("definitions") != null) {
             // Swagger 2.x
             schemas = openAPISpec.get("definitions");

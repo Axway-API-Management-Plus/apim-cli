@@ -6,8 +6,6 @@ import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +38,7 @@ public class OutboundProfile extends Profile {
 
     public String getAuthenticationProfile() {
         // give a default value in case of blank value
-        // useful in equals methods null = "" = _default 
+        // useful in equals methods null = "" = _default
         if (StringUtils.isBlank(authenticationProfile))
             return "_default";
         else
@@ -52,7 +50,7 @@ public class OutboundProfile extends Profile {
     }
 
     public String getRouteType() {
-        // default value policy is set in case of an existing value (different of "proxy" ) or in case of existing routePoulicy 
+        // default value policy is set in case of an existing value (different of "proxy" ) or in case of existing routePoulicy
         if ((StringUtils.isNotBlank(routeType) && !StringUtils.equals("proxy", routeType)) || (routePolicy != null)) {
             return "policy";
         } else {
@@ -97,7 +95,7 @@ public class OutboundProfile extends Profile {
     }
 
     public List<Object> getParameters() {
-        if (parameters == null || parameters.size() == 0)
+        if (parameters == null || parameters.isEmpty())
             return null;
         return parameters;
     }
@@ -120,10 +118,8 @@ public class OutboundProfile extends Profile {
         if (APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
             // We need to inject the format as default
             for (Object params : parameters) {
-                if (params instanceof Map<?, ?>) {
-                    if (!((Map<?, ?>) params).containsKey("format")) {
+                if (params instanceof Map<?, ?> && (!((Map<?, ?>) params).containsKey("format"))) {
                         ((Map<String, ?>) params).put("format", null);
-                    }
                 }
             }
         }

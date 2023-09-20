@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public abstract class APISpecification {
-    private final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
 
     public enum APISpecType {
         SWAGGER_API_1x("Swagger 1.x", ".json"),
@@ -126,7 +126,7 @@ public abstract class APISpecification {
         return true;
     }
 
-    protected void setMapperForDataFormat() throws AppException {
+    protected void setMapperForDataFormat() {
         try {
             JsonFactory jsonFactory = new JsonFactory();
             mapper = new ObjectMapper(jsonFactory);
@@ -153,8 +153,10 @@ public abstract class APISpecification {
             boolean rc = swaggerFromImport.equals(swaggerFromGateway);
             if (!rc) {
                 LOG.info("Detected API-Definition-File sizes: API-Manager: {} vs Import: {}", gatewayApiSpecification.apiSpecificationContent.length, apiSpecification.apiSpecificationContent.length);
-                LOG.debug("Specification from Gateway : {}", new String(gatewayApiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
-                LOG.debug("Specification from Source : {}", new String(apiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Specification from Gateway : {}", new String(gatewayApiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                    LOG.debug("Specification from Source : {}", new String(apiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                }
             }
             return rc;
         } catch (IOException e) {

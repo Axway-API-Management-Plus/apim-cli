@@ -37,22 +37,21 @@ public class EndpointConfig {
     @Bean
     public HttpClient apiManager() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         return CitrusEndpoints
-                .http()
-                .client()
-                .requestUrl("https://" + host + ":" + port + "/api/portal/v1.4")
-                .requestFactory(sslRequestFactory())
-                .interceptors(interceptors())
-                .build();
+            .http()
+            .client()
+            .requestUrl("https://" + host + ":" + port + "/api/portal/v1.4")
+            .requestFactory(sslRequestFactory())
+            .interceptors(interceptors())
+            .build();
     }
 
     @Bean
     public org.apache.http.client.HttpClient httpClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .build();
-        return httpClient;
+        return HttpClientBuilder.create()
+            .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
+            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+            .build();
     }
 
     @Bean
@@ -60,7 +59,8 @@ public class EndpointConfig {
         return Arrays.asList(new LoggingClientInterceptor(), basicAuthInterceptor());
     }
 
-    @Bean BasicAuthInterceptor basicAuthInterceptor(){
+    @Bean
+    BasicAuthInterceptor basicAuthInterceptor() {
         return new BasicAuthInterceptor();
     }
 

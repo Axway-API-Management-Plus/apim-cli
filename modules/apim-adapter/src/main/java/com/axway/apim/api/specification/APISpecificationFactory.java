@@ -24,6 +24,10 @@ import java.util.Base64;
 
 public class APISpecificationFactory {
 
+    private APISpecificationFactory() {
+        throw new IllegalStateException("APISpecificationFactory class");
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
 
     private static final ArrayList<Class<?>> specificationTypes = new ArrayList<Class<?>>() {

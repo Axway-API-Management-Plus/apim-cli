@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ODataV2Specification extends ODataSpecification {
-    private final Logger LOG = LoggerFactory.getLogger(ODataV2Specification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ODataV2Specification.class);
 
     Edm edm;
     @SuppressWarnings("rawtypes")
