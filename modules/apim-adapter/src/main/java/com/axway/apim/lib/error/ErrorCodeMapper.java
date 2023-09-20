@@ -1,12 +1,12 @@
 package com.axway.apim.lib.error;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ErrorCodeMapper {
 
-    private final Map<ErrorCode, ErrorCode> myMap = new EnumMap<>(ErrorCode.class);
+    private final Map<ErrorCode, ErrorCode> myMap = new HashMap<>();
+
 
     public ErrorCodeMapper() {
         super();
