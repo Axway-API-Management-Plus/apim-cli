@@ -29,6 +29,8 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     private APIManagerAdapter apiManagerAdapter;
 
+
+
     @BeforeClass
     public void init() {
         try {

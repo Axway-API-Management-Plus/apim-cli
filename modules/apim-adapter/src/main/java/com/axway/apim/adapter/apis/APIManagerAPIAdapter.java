@@ -7,11 +7,11 @@ import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.jackson.APIImportSerializerModifier;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.*;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.specification.APISpecification;
 import com.axway.apim.api.specification.APISpecification.APISpecType;
 import com.axway.apim.api.specification.APISpecificationFactory;
-import com.axway.apim.api.model.*;
-import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -992,6 +992,7 @@ public class APIManagerAPIAdapter {
             LOG.info("Not checking catalog for API state : {}", apiState);
             return true;
         }
+        LOG.info("Checking api state in catalog : {} {}", apiId, apiState);
         RetryPolicy<Object> retryPolicy = RetryPolicy.builder()
             .abortOn(AppException.class)
             .withDelay(Duration.ofSeconds(3))
@@ -1015,12 +1016,13 @@ public class APIManagerAPIAdapter {
                 if (statusCode != 200) {
                     LOG.error("API  {} not found in API manger catalog Response code : {}", apiName, statusCode);
                     Utils.logPayload(LOG, response);
-                    if(statusCode == 500) // catalog returns 500 if it takes times to load cache
+                    if (statusCode == 500) // catalog returns 500 if it takes times to load cache
                         return false;
                     throw new AppException("API Not found in API Manager catalog", ErrorCode.CANT_CREATE_BE_API);
                 }
                 JsonNode jsonNode = mapper.readTree(response);
                 String state = jsonNode.get("state").textValue();
+                LOG.info("Catalog ");
                 if (state.equals("published")) {
                     return true;
                 }

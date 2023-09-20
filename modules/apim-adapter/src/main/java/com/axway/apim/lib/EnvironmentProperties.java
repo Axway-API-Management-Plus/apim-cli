@@ -22,12 +22,11 @@ public class EnvironmentProperties implements Map<String, String> {
 
     public static final boolean RETAIN_BACKEND_URL = Boolean.parseBoolean(System.getenv().getOrDefault("retain.backend.url","false"));
     public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_console","false"));
-
+    public static final boolean CHECK_CATALOG = Boolean.parseBoolean(System.getenv().getOrDefault("check_catalog","false"));
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 
     private final String stage;
     private String swaggerPromoteHome;
-
     private Properties mainProperties = new Properties();
     private Properties stageProperties = new Properties();
     private final Properties systemProperties = System.getProperties();

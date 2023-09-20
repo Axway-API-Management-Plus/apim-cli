@@ -4,6 +4,7 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,17 +90,18 @@ public class CreateNewAPI {
                 // In case, the existing API is already in use (Published), we have to grant access to our new imported API
                 apiAdapter.upgradeAccessToNewerAPI(createdAPI, actualAPI);
             }
-            if(apiAdapter.pollCatalogForPublishedState(createdAPI.getId(), createdAPI.getName(), createdAPI.getState())) {
-                // Is a Quota is defined we must manage it
-                new APIQuotaManager(desiredAPI, actualAPI).execute(createdAPI);
-                // Grant access to the API
-                new ManageClientOrgs(desiredAPI, createdAPI).execute(reCreation);
-                // Handle subscription to applications
-                new ManageClientApps(desiredAPI, createdAPI, actualAPI).execute(reCreation);
-                // Provide the ID of the created API to the desired API just for logging purposes
-                changes.getDesiredAPI().setId(createdAPI.getId());
-                LOG.info("{} Successfully created {} API: {} {} (ID: {})", changes.waiting4Approval(), createdAPI.getState(), createdAPI.getName(), createdAPI.getVersion(), createdAPI.getId());
+            if (EnvironmentProperties.CHECK_CATALOG) {
+                apiAdapter.pollCatalogForPublishedState(createdAPI.getId(), createdAPI.getName(), createdAPI.getState());
             }
+            // Is a Quota is defined we must manage it
+            new APIQuotaManager(desiredAPI, actualAPI).execute(createdAPI);
+            // Grant access to the API
+            new ManageClientOrgs(desiredAPI, createdAPI).execute(reCreation);
+            // Handle subscription to applications
+            new ManageClientApps(desiredAPI, createdAPI, actualAPI).execute(reCreation);
+            // Provide the ID of the created API to the desired API just for logging purposes
+            changes.getDesiredAPI().setId(createdAPI.getId());
+            LOG.info("{} Successfully created {} API: {} {} (ID: {})", changes.waiting4Approval(), createdAPI.getState(), createdAPI.getName(), createdAPI.getVersion(), createdAPI.getId());
         } finally {
             if (createdAPI == null) {
                 LOG.warn("Can't create PropertiesExport as createdAPI is null");
