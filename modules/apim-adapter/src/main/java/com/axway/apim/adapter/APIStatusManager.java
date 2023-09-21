@@ -84,12 +84,11 @@ public class APIStatusManager {
             return;
         }
         LOG.debug("Updating API-Status from: {} to {}", apiToUpdate.getState(), desiredState);
-        if (!enforceBreakingChange) {
-            if (StatusChangeRequiresEnforce.getEnum(apiToUpdate.getState()) != null &&
-                StatusChangeRequiresEnforce.valueOf(apiToUpdate.getState()).enforceRequired.contains(desiredState)) {
+        if (!enforceBreakingChange && (StatusChangeRequiresEnforce.getEnum(apiToUpdate.getState()) != null &&
+                StatusChangeRequiresEnforce.valueOf(apiToUpdate.getState()).enforceRequired.contains(desiredState))) {
                 throw new AppException("Status change from actual status: '" + apiToUpdate.getState() + "' to desired status: '" + desiredState + "' "
                     + "is breaking. Enforce change with option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
-            }
+
         }
 
         try {

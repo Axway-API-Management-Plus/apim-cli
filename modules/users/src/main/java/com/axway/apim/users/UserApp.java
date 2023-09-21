@@ -1,11 +1,5 @@
 package com.axway.apim.users;
 
-import java.util.List;
-
-import com.axway.apim.lib.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.CustomProperties.Type;
@@ -17,9 +11,9 @@ import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.users.adapter.UserConfigAdapter;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.adapter.UserAdapter;
+import com.axway.apim.users.adapter.UserConfigAdapter;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.impl.UserResultHandler.ResultHandler;
 import com.axway.apim.users.lib.UserImportParams;
@@ -29,6 +23,10 @@ import com.axway.apim.users.lib.cli.UserExportCLIOptions;
 import com.axway.apim.users.lib.cli.UserImportCLIOptions;
 import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class UserApp implements APIMCLIServiceProvider {
 

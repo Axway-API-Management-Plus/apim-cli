@@ -55,7 +55,7 @@ public class APIMHttpClient {
         return apimHttpClient;
     }
 
-    public void deleteInstances() {
+    public static void deleteInstances() {
         apimHttpClient = null;
     }
 

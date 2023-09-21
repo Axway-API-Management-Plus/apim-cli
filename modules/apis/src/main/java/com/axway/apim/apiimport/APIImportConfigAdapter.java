@@ -632,10 +632,9 @@ public class APIImportConfigAdapter {
                 }
             }
             // Check the referenced authentication profile exists
-            if (!profile.getAuthenticationProfile().equals(DEFAULT)) {
-                if (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null) {
+            if (!profile.getAuthenticationProfile().equals(DEFAULT) && (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null)) {
                     throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '" + profile.getAuthenticationProfile() + "'", ErrorCode.REFERENCED_PROFILE_INVALID);
-                }
+
             }
             // Check a routingPolicy is given, if routeType is policy
             if ("policy".equals(profile.getRouteType()) && profile.getRoutePolicy() == null) {

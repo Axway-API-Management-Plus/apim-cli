@@ -14,7 +14,6 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

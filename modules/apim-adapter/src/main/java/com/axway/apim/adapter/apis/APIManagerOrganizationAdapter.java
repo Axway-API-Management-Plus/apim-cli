@@ -148,7 +148,7 @@ public class APIManagerOrganizationAdapter {
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error creating/updating organization. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
-                    throw new AppException("Error creating/updating organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error creating/updating organization. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 return mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
             }
@@ -166,7 +166,7 @@ public class APIManagerOrganizationAdapter {
                 if (statusCode != 204) {
                     LOG.error("Error deleting organization. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
-                    throw new AppException("Error deleting organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error deleting organization. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Deleted org should also be deleted from the cache
                 organizationCache.remove(org.getId());

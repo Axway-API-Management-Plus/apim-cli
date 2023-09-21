@@ -71,7 +71,6 @@ public class APIManagerAdapter {
 
 
     private static APIManagerAdapter instance;
-    private static APIMHttpClient apimHttpClient;
     private String apiManagerVersion = null;
     public static String apiManagerName = null;
     public static boolean initialized = false;
@@ -101,7 +100,6 @@ public class APIManagerAdapter {
             instance = new APIManagerAdapter();
             cmd = CoreParameters.getInstance();
             cmd.validateRequiredParameters();
-            apimHttpClient = APIMHttpClient.getInstance();
             instance.loginToAPIManager();
             instance.setApiManagerVersion();
             initialized = true;
@@ -124,7 +122,7 @@ public class APIManagerAdapter {
             }
             instance.apiManagerVersion = null;
             instance = null;
-            apimHttpClient.deleteInstances();
+            APIMHttpClient.deleteInstances();
         }
         initialized = false;
     }
@@ -318,7 +316,7 @@ public class APIManagerAdapter {
     private static void getCsrfToken(HttpResponse response) throws AppException {
         for (Header header : response.getAllHeaders()) {
             if (header.getName().equalsIgnoreCase("csrf-token")) {
-                apimHttpClient.setCsrfToken(header.getValue());
+                APIMHttpClient.getInstance().setCsrfToken(header.getValue());
                 break;
             }
         }
@@ -362,7 +360,7 @@ public class APIManagerAdapter {
                     }
                 }
                 initAttempts++;
-            } while (apimcliCacheManager.getStatus() == Status.UNINITIALIZED && initAttempts <= maxAttempts);
+            } while (apimcliCacheManager != null && apimcliCacheManager.getStatus() == Status.UNINITIALIZED && initAttempts <= maxAttempts);
         }
         return apimcliCacheManager;
     }
