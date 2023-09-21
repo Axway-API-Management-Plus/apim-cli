@@ -69,7 +69,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner  {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
 			.extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
-
+        sleep(3000);
 		echo("####### Re-Import same application - Should be a No-Change #######");
 		createVariable(TestParams.PARAM_EXPECTED_RC, "10");
 		importApp.doExecute(context);
