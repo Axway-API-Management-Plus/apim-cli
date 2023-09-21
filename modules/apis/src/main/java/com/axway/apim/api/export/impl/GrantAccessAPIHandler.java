@@ -77,6 +77,7 @@ public class GrantAccessAPIHandler extends APIResultHandler {
                     }
                 }
             } catch (Exception e) {
+                LOG.error("Error grant access to API", e);
                 if (e instanceof AppException) {
                     result.setError(((AppException)e).getError());
                 }else {

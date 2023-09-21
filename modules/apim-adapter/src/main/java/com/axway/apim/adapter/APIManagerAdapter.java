@@ -69,11 +69,10 @@ public class APIManagerAdapter {
     public static final String TYPE_FRONT_END = "proxies";
     public static final String TYPE_BACK_END = "apirepo";
 
-
     private static APIManagerAdapter instance;
     private String apiManagerVersion = null;
     private String apiManagerName = null;
-    public static boolean initialized = false;
+    private boolean initialized;
     public static final ObjectMapper mapper = new ObjectMapper();
     private static final Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
     private boolean usingOrgAdmin = false;
@@ -102,7 +101,6 @@ public class APIManagerAdapter {
             cmd.validateRequiredParameters();
             instance.loginToAPIManager();
             instance.setApiManagerVersion();
-            initialized = true;
             LOG.info("Successfully connected to API-Manager ({}) on: {}", instance.getApiManagerVersion(), cmd.getAPIManagerURL());
         }
         return instance;
@@ -154,8 +152,12 @@ public class APIManagerAdapter {
         this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter(this);
         this.appAdapter = new APIMgrAppsAdapter(this);
         this.userAdapter = new APIManagerUserAdapter(this);
+        initialized = true;
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     public APIMCLICacheManager getCacheManager() {
         return cacheManager;

@@ -28,12 +28,13 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
     @Override
     public Organization deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
-        APIManagerOrganizationAdapter organizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        APIManagerOrganizationAdapter organizationAdapter = apiManagerAdapter.getOrgAdapter();
         JsonNode node = jp.getCodec().readTree(jp);
         // Deserialization depends on the direction
         if ("organizationId".equals(jp.currentName())) {
             // APIManagerAdapter is not yet initialized
-            if (!APIManagerAdapter.initialized) {
+            if (!apiManagerAdapter.isInitialized()) {
                 Organization organization = new Organization();
                 organization.setId(node.asText());
                 return organization;
@@ -42,7 +43,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
             return organizationAdapter.getOrgForId(node.asText());
         } else {
             // APIManagerAdapter is not yet initialized
-            if (!APIManagerAdapter.initialized) {
+            if (!apiManagerAdapter.isInitialized()) {
                 Organization organization = new Organization();
                 organization.setName(node.asText());
                 return organization;
