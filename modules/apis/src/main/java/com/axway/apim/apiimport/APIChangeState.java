@@ -145,7 +145,7 @@ public class APIChangeState {
         Class clazz = (sourceAPI.getClass().equals(API.class)) ? sourceAPI.getClass() : sourceAPI.getClass().getSuperclass();
         boolean hasProperyCopied = false;
         if (!propsToCopy.isEmpty()) {
-            String message = "Updating Frontend-API (Proxy) for the following properties: ";
+            StringBuilder message = new StringBuilder("Updating Frontend-API (Proxy) for the following properties: ");
             for (String fieldName : propsToCopy) {
                 try {
                     field = clazz.getDeclaredField(fieldName);
@@ -159,7 +159,7 @@ public class APIChangeState {
                         if (desiredObject == null) continue;
                         Method setMethod = targetAPI.getClass().getMethod(setterMethodName, field.getType());
                         setMethod.invoke(targetAPI, desiredObject);
-                        message = message + fieldName + " ";
+                        message.append(fieldName + " ");
                         hasProperyCopied = true;
                     }
                 } catch (Exception e) {
@@ -168,7 +168,7 @@ public class APIChangeState {
             }
             if (logMessage) {
                 if (hasProperyCopied) {
-                    LOG.info(message);
+                    LOG.info("{}", message);
                 } else {
                     LOG.debug("API-Proxy requires no updates");
                 }

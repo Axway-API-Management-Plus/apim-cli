@@ -22,6 +22,7 @@ import java.util.*;
     "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class ExportAPI {
+    public static final String DEFAULT = "_default";
     API actualAPIProxy = null;
 
     public String getPath() {
@@ -45,9 +46,9 @@ public class ExportAPI {
         if (this.actualAPIProxy.getOutboundProfiles() == null) return null;
         if (this.actualAPIProxy.getOutboundProfiles().isEmpty()) return null;
         if (this.actualAPIProxy.getOutboundProfiles().size() == 1) {
-            OutboundProfile defaultProfile = this.actualAPIProxy.getOutboundProfiles().get("_default");
+            OutboundProfile defaultProfile = this.actualAPIProxy.getOutboundProfiles().get(DEFAULT);
             if (defaultProfile.getRouteType().equals("proxy")
-                && defaultProfile.getAuthenticationProfile().equals("_default")
+                && defaultProfile.getAuthenticationProfile().equals(DEFAULT)
                 && defaultProfile.getRequestPolicy() == null
                 && defaultProfile.getResponsePolicy() == null
                 && defaultProfile.getFaultHandlerPolicy() == null)
@@ -56,7 +57,7 @@ public class ExportAPI {
         for (OutboundProfile profile : this.actualAPIProxy.getOutboundProfiles().values()) {
             profile.setApiId(null);
             // If the AuthenticationProfile is _default there is no need to export it, hence null is returned
-            if ("_default".equals(profile.getAuthenticationProfile())) {
+            if (DEFAULT.equals(profile.getAuthenticationProfile())) {
                 profile.setAuthenticationProfile(null);
             }
         }
@@ -329,7 +330,7 @@ public class ExportAPI {
     public String getBackendBasepath() {
         //ISSUE-299
         // Resource path is part of API specification (like open api servers.url or swagger basePath) and we don't need to manage it in config file.
-        String backendBasePath = this.getServiceProfiles().get("_default").getBasePath();
+        String backendBasePath = this.getServiceProfiles().get(DEFAULT).getBasePath();
         if (CoreParameters.getInstance().isOverrideSpecBasePath() && this.actualAPIProxy.getResourcePath() != null) { //Issue 354
             backendBasePath = backendBasePath + this.actualAPIProxy.getResourcePath();
         }

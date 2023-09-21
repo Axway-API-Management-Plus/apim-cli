@@ -27,6 +27,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
     public static final String NAME = "Name";
     public static final String VERSION = "Version";
     public static final String CREATED_ON = "Created-On";
+    public static final String FORMAT = "%-25s";
 
     Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
@@ -133,14 +134,14 @@ public class ConsoleAPIExporter extends APIResultHandler {
             }
         }
         Console.println("A P I  -  D E T A I L S");
-        Console.println(String.format("%-25s", "Organization: ") + api.getOrganization().getName());
-        Console.println(String.format("%-25s", "Created On: ") + new Date(api.getCreatedOn()));
-        Console.println(String.format("%-25s", "Created By: ") + getCreatedBy(api));
-        Console.println(String.format("%-25s", "Granted Organizations: ") + getGrantedOrganizations(api).toString().replace("[", "").replace("]", ""));
-        Console.println(String.format("%-25s", "Subscribed applications: ") + getSubscribedApplications(api));
-        Console.println(String.format("%-25s", "Custom-Policies: ") + getUsedPolicies(api));
-        Console.println(String.format("%-25s", "Tags: ") + getTags(api));
-        Console.println(String.format("%-25s", "Custom-Properties: ") + getCustomProps(api));
+        Console.println(String.format(FORMAT, "Organization: ") + api.getOrganization().getName());
+        Console.println(String.format(FORMAT, "Created On: ") + new Date(api.getCreatedOn()));
+        Console.println(String.format(FORMAT, "Created By: ") + getCreatedBy(api));
+        Console.println(String.format(FORMAT, "Granted Organizations: ") + getGrantedOrganizations(api).toString().replace("[", "").replace("]", ""));
+        Console.println(String.format(FORMAT, "Subscribed applications: ") + getSubscribedApplications(api));
+        Console.println(String.format(FORMAT, "Custom-Policies: ") + getUsedPolicies(api));
+        Console.println(String.format(FORMAT, "Tags: ") + getTags(api));
+        Console.println(String.format(FORMAT, "Custom-Properties: ") + getCustomProps(api));
     }
 
     private boolean hasQuota(API api) {

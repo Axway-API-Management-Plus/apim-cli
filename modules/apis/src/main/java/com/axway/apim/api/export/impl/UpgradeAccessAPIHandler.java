@@ -38,12 +38,12 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
             Console.println("Force flag given to upgrade: " + apis.size() + " API(s)");
         } else {
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+                Console.println("Okay, going to upgrade: " + apis.size() + " API(s) based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
             } else {
                 Console.println("Canceled.");
                 return;
             }
         }
-        Console.println("Okay, going to upgrade: " + apis.size() + " API(s) based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
         for (API api : apis) {
             try {
                 if (APIManagerAdapter.getInstance().getApiAdapter().upgradeAccessToNewerAPI(api, referenceAPI,

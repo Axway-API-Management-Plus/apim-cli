@@ -42,7 +42,8 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
     @Override
     public void execute(List<API> apis) throws AppException {
         cal.add(Calendar.DAY_OF_YEAR, checkCertParams.getNumberOfDays());
-        LOG.info("Going to check certificate expiration of: {} selected API(s) within the next {} days (Not valid after: {})", apis.size(), checkCertParams.getNumberOfDays(), formatDate(cal.getTime().getTime()));
+        if (LOG.isDebugEnabled())
+            LOG.debug("Going to check certificate expiration of: {} selected API(s) within the next {} days (Not valid after: {})", apis.size(), checkCertParams.getNumberOfDays(), formatDate(cal.getTime().getTime()));
         List<ApiPlusCert> expiredCerts = new ArrayList<>();
         for (API api : apis) {
             if (api.getCaCerts() == null) continue;
@@ -97,7 +98,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
         LOG.info("Done!");
     }
 
-    public void writeJSON(List<APICert> apiCerts) {
+    public void writeJSON(List<APICert> apiCerts) throws AppException {
         try {
             String givenTarget = params.getTarget();
             File localFolder = new File(givenTarget);
@@ -110,7 +111,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             }
             LOG.debug("Successfully exported Certificate Expiry Data to file : {}", filePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AppException("Error writing json", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 

@@ -32,12 +32,12 @@ public class ApproveAPIHandler extends APIResultHandler {
 			Console.println("Force flag given to approve/publish: "+apis.size()+" API(s) on V-Host: " + vhostToUse);
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			} else {
+                Console.println("Okay, going to approve: " + apis.size() + " API(s) on V-Host: " + vhostToUse);
+            } else {
 				Console.println("Canceled.");
 				return;
 			}
 		}
-		Console.println("Okay, going to approve: " + apis.size() + " API(s) on V-Host: " + vhostToUse);
 		for(API api : apis) {
 			try {
 				APIManagerAdapter.getInstance().getApiAdapter().publishAPI(api, ((APIApproveParams)params).getPublishVhost());

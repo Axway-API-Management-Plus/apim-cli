@@ -5,6 +5,7 @@ import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.APIManagerSettingsApp;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
@@ -14,12 +15,12 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 
 	APIManagerAdapter adapter;
 
-	public ConsoleAPIManagerSetupExporter(APIManagerSetupExportParams params, ExportResult result) {
+	public ConsoleAPIManagerSetupExporter(APIManagerSetupExportParams params, ExportResult result) throws AppException {
 		super(params, result);
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			throw new RuntimeException("Unable to get APIManagerAdapter", e);
+			throw new AppException("Unable to get APIManagerAdapter", ErrorCode.UNXPECTED_ERROR);
 		}
 	}
 

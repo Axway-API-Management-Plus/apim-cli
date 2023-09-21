@@ -66,6 +66,7 @@ public class APIChangeHandler extends APIResultHandler {
         } else {
             Console.println("Okay, going to change: " + apisToChange.size() + " API(s)");
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+                Console.println("Going to change API.");
             } else {
                 Console.println("Canceled.");
                 return;

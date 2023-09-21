@@ -5,6 +5,7 @@ import com.axway.apim.api.model.Alerts;
 import com.axway.apim.lib.APIManagerAlertsAnnotation;
 import com.axway.apim.lib.APIManagerAlertsAnnotation.AlertType;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +32,11 @@ public class ConsolePrinterAlerts {
 			AlertType.Quota
 	};
 
-	public ConsolePrinterAlerts() {
+	public ConsolePrinterAlerts() throws AppException {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			throw new RuntimeException("Unable to get APIManagerAdapter", e);
+			throw new AppException("Unable to get APIManagerAdapter", ErrorCode.UNXPECTED_ERROR);
 		}
 	}
 

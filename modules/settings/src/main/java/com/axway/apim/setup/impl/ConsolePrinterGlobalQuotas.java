@@ -3,6 +3,7 @@ package com.axway.apim.setup.impl;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.model.Quotas;
 import com.github.freva.asciitable.AsciiTable;
@@ -19,11 +20,11 @@ public class ConsolePrinterGlobalQuotas {
 
     Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
-    public ConsolePrinterGlobalQuotas() {
+    public ConsolePrinterGlobalQuotas() throws AppException {
         try {
             adapter = APIManagerAdapter.getInstance();
         } catch (AppException e) {
-            throw new RuntimeException("Unable to get APIManagerAdapter", e);
+            throw new AppException("Unable to get APIManagerAdapter", ErrorCode.UNXPECTED_ERROR);
         }
     }
 

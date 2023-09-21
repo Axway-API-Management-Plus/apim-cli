@@ -3,6 +3,7 @@ package com.axway.apim.setup.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +25,11 @@ public class ConsolePrinterPolicies {
 
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
-	public ConsolePrinterPolicies() {
+	public ConsolePrinterPolicies() throws AppException {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			throw new RuntimeException("Unable to get APIManagerAdapter", e);
+			throw new AppException("Unable to get APIManagerAdapter", ErrorCode.UNXPECTED_ERROR);
 		}
 	}
 

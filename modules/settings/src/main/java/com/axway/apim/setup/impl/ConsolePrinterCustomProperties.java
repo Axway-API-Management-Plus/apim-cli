@@ -4,6 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -23,12 +24,12 @@ public class ConsolePrinterCustomProperties {
 
 	private final List<CustomPropertyWithName> propertiesWithName;
 
-	public ConsolePrinterCustomProperties() {
+	public ConsolePrinterCustomProperties() throws AppException {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 			propertiesWithName = new ArrayList<>();
 		} catch (AppException e) {
-			throw new RuntimeException("Unable to get APIManagerAdapter", e);
+			throw new AppException("Unable to get APIManagerAdapter", ErrorCode.UNXPECTED_ERROR);
 		}
 	}
 

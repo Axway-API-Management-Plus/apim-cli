@@ -46,36 +46,39 @@ public class RevokeAccessAPIHandler extends APIResultHandler {
         }
         if (!CoreParameters.getInstance().isForce()) {
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+                Console.println("Going to revoke access.");
             } else {
                 Console.println("Canceled.");
                 return;
             }
         }
-        APIManagerAPIAdapter apiAdapter =APIManagerAdapter.getInstance().getApiAdapter();
+        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
 
         for (API api : apis) {
             try {
                 if (clientApplication == null) {
                     apiAdapter.revokeClientOrganization(orgs, api);
-                    LOG.info("API: {} revoked access to organization: {}", api.toStringHuman(), orgs);
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("API: {} revoked access to organization: {}", api.toStringHuman(), orgs);
                 } else {
                     boolean deleteFlag = false;
                     for (Organization organization : orgs) {
                         LOG.debug("{} {}", clientApplication.getOrganizationId(), organization.getId());
                         if (clientApplication.getOrganizationId().equals(organization.getId())) {
                             List<APIAccess> apiAccesses = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(clientApplication, APIManagerAPIAccessAdapter.Type.applications);
-                            if(apiAccesses.isEmpty()){
+                            if (apiAccesses.isEmpty()) {
                                 throw new AppException(String.format("Application %s is not associated with API %s", clientApplication.getName(), api.getName()), ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
                             }
                             clientApplication.setApiAccess(apiAccesses);
                             apiAdapter.revokeClientApplication(clientApplication, api);
-                            LOG.info("API: {} revoked access to application: {}", api.toStringHuman(), clientApplication);
+                            if (LOG.isDebugEnabled())
+                                LOG.debug("API: {} revoked access to application: {}", api.toStringHuman(), clientApplication);
                             deleteFlag = true;
                             break;
                         }
                     }
                     if (!deleteFlag) {
-                        throw new Exception("Application " + clientApplication.getName() + " Does not belong to organization " + orgs);
+                        throw new AppException("Application " + clientApplication.getName() + " Does not belong to organization " + orgs, ErrorCode.UNXPECTED_ERROR);
                     }
                 }
             } catch (Exception e) {

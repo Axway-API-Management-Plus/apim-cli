@@ -8,7 +8,11 @@ import com.axway.apim.lib.error.AppException;
 
 public final class Helper {
 
-    public static Parameters getParams(CLIOptions cliOptions) throws AppException {
+    private Helper(){
+        throw new IllegalStateException("Access blocked");
+    }
+
+    public static Parameters getParams(CLIOptions cliOptions)  {
         APIGrantAccessParams params = new APIGrantAccessParams();
         params.setOrgId(cliOptions.getValue("orgId"));
         params.setOrgName(cliOptions.getValue("orgName"));

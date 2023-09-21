@@ -30,12 +30,12 @@ public class DeleteAppHandler extends ApplicationExporter {
 			Console.println("Force flag given to delete: "+apps.size()+" Application(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			} else {
+                Console.println("Okay, going to delete: " + apps.size() + " Application(s)");
+            } else {
 				Console.println("Canceled.");
 				return;
 			}
 		}
-		Console.println("Okay, going to delete: " + apps.size() + " Application(s)");
 		for(ClientApplication app : apps) {
 			try {
 				APIManagerAdapter.getInstance().getAppAdapter().deleteApplication(app);

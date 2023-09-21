@@ -15,6 +15,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.organization.lib.OrgExportParams;
 import com.github.freva.asciitable.AsciiTable;
@@ -36,12 +37,12 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 
     Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
-    public ConsoleOrgExporter(OrgExportParams params, ExportResult result) {
+    public ConsoleOrgExporter(OrgExportParams params, ExportResult result) throws AppException {
         super(params, result);
         try {
             adapter = APIManagerAdapter.getInstance();
         } catch (AppException e) {
-            throw new RuntimeException("Unable to get APIManagerAdapter", e);
+            throw new AppException("Unable to get APIManagerAdapter", ErrorCode.UNXPECTED_ERROR);
         }
     }
 

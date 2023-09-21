@@ -47,17 +47,19 @@ public class GrantAccessAPIHandler extends APIResultHandler {
         }
         if (!CoreParameters.getInstance().isForce()) {
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+                Console.println("Going to grant access");
             } else {
                 Console.println("Canceled.");
                 return;
             }
         }
-        APIManagerAPIAdapter apiAdapter =APIManagerAdapter.getInstance().getApiAdapter();
+        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         for (API api : apis) {
             try {
                 if (clientApplication == null) {
                     apiAdapter.grantClientOrganization(orgs, api, false);
-                    LOG.info("API: {} granted access to orgs: {}", api.toStringHuman(), orgs);
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("API: {} granted access to orgs: {}", api.toStringHuman(), orgs);
                 } else {
                     boolean deleteFlag = false;
                     for (Organization organization : orgs) {
@@ -66,21 +68,22 @@ public class GrantAccessAPIHandler extends APIResultHandler {
                             LOG.debug("{} {}", apiAccess.getApiId(), api.getId());
                             if (apiAccess.getApiId().equals(api.getId())) {
                                 apiAdapter.grantClientApplication(clientApplication, api);
-                                LOG.info("API: {} granted access to application: {}", api.toStringHuman(), clientApplication);
+                                if (LOG.isDebugEnabled())
+                                    LOG.debug("API: {} granted access to application: {}", api.toStringHuman(), clientApplication);
                                 deleteFlag = true;
                                 break;
                             }
                         }
                     }
                     if (!deleteFlag) {
-                        throw new Exception("API " + api.getName() + " Does not belong to organization " + orgs);
+                        throw new AppException("API " + api.getName() + " Does not belong to organization " + orgs, ErrorCode.UNXPECTED_ERROR);
                     }
                 }
             } catch (Exception e) {
                 LOG.error("Error grant access to API", e);
                 if (e instanceof AppException) {
-                    result.setError(((AppException)e).getError());
-                }else {
+                    result.setError(((AppException) e).getError());
+                } else {
                     result.setError(ErrorCode.ERR_GRANTING_ACCESS_TO_API);
                     LOG.error("Error granting access to API:  {}  for organizations: {} Error message: {}", api.toStringHuman(), orgs, e.getMessage());
                 }
