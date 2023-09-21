@@ -21,7 +21,7 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 		validateRemoteHost
 	}
 
-	static Logger LOG = LoggerFactory.getLogger(RemotehostDeserializer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RemotehostDeserializer.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,7 +61,7 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 		return remoteHost;
 	}
 
-	private Boolean validateRemoteHost(DeserializationContext ctxt) {
+	private boolean validateRemoteHost(DeserializationContext ctxt) {
 		if(ctxt.getAttribute(Params.validateRemoteHost)==null) return true;
 		return (Boolean)ctxt.getAttribute(Params.validateRemoteHost);
 	}

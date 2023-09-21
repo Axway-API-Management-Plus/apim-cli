@@ -19,47 +19,47 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("OrganizationFilter")
 public class Organization extends AbstractEntity implements CustomPropertiesEntity {
-	
+
 	private String email;
-	
+
 	@JsonProperty("image")
 	private String imageUrl;
-	
+
 	@JsonIgnore
 	private Image image;
-	
+
 	private boolean restricted;
-	
+
 	private String virtualHost;
-	
+
 	private String phone;
-	
+
 	private boolean enabled;
-	
+
 	private boolean development;
-	
+
 	private String dn;
-	
+
 	private Long createdOn;
-	
+
 	private String startTrialDate;
-	
+
 	private String endTrialDate;
-	
+
 	private String trialDuration;
-	
+
 	private String isTrial;
 
 	private Map<String, String> customProperties = null;
-	
+
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
 	private List<APIAccess> apiAccess = new ArrayList<>();
-	
+
 	public Organization() {
 		super();
 	}
-	
+
 	public Organization(String name) {
 		super();
 		setName(name);
@@ -71,7 +71,7 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 
 	public void setEmail(String email) {
 		this.email = email;
-	}	
+	}
 
 	public String getImageUrl() {
 		return imageUrl;
@@ -176,16 +176,19 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 	public void setIsTrial(String isTrial) {
 		this.isTrial = isTrial;
 	}
-	
+
 	public List<APIAccess> getApiAccess() {
 		return apiAccess;
 	}
 	public void setApiAccess(List<APIAccess> apiAccess) {
 		this.apiAccess = apiAccess;
 	}
-	
-	// This avoids, that custom properties are wrapped within customProperties { ... }
-	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+
+    /**
+     * This avoids, that custom properties are wrapped within customProperties { ... }
+     * 	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+     *  @return custom properties
+     */
 	@JsonAnyGetter
 	public Map<String, String> getCustomProperties() {
 		return customProperties;
@@ -195,7 +198,7 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
@@ -214,9 +217,9 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 		if(other == null) return false;
 		if(other instanceof Organization) {
 			Organization otherOrg = (Organization)other;
-			return 
+			return
 					StringUtils.equals(otherOrg.getName(), this.getName()) &&
-					StringUtils.equals(otherOrg.getEmail(), this.getEmail()) && 
+					StringUtils.equals(otherOrg.getEmail(), this.getEmail()) &&
 					StringUtils.equals(otherOrg.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherOrg.getPhone(), this.getPhone()) &&
 					(otherOrg.getApiAccess().size() == this.getApiAccess().size() && otherOrg.getApiAccess().containsAll(this.getApiAccess())) &&
@@ -231,23 +234,23 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 	public String toString() {
 		return "'" + getName() + "'";
 	}
-	
+
 	public static class Builder {
 		String name;
 		String id;
-		
+
 		public Organization build() {
 			Organization org = new Organization();
 			org.setName(name);
 			org.setId(id);
 			return org;
 		}
-		
+
 		public Builder hasName(String name) {
 			this.name = name;
 			return this;
 		}
-		
+
 		public Builder hasId(String id) {
 			this.id = id;
 			return this;

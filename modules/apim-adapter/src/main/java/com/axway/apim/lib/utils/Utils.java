@@ -231,8 +231,9 @@ public class Utils {
         Map<String, CustomProperty> configuredCustomProperties = propertiesAdapter.getCustomProperties(type);
         Map<String, CustomProperty> requiredConfiguredCustomProperties = propertiesAdapter.getRequiredCustomProperties(type);
         if (customProperties != null) {
-            for (String desiredCustomProperty : customProperties.keySet()) {
-                String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
+            for (Map.Entry<String, String> entry : customProperties.entrySet()) {
+                String desiredCustomPropertyValue = entry.getValue();
+                String desiredCustomProperty = entry.getKey();
                 CustomProperty configuredCustomProperty = configuredCustomProperties.get(desiredCustomProperty);
                 if (configuredCustomProperty == null) {
                     throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);

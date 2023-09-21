@@ -31,7 +31,7 @@ public abstract class ODataSpecification extends APISpecification {
             try {
                 String backend = getBasePath(apiSpecificationFile);
                 Server server = new Server();
-                LOG.info("Set backend server: " + backend + " based on given Metadata URL");
+                LOG.info("Set backend server: {} based on given Metadata URL", backend);
                 server.setUrl(backend);
                 openAPI.addServersItem(server);
             } catch (MalformedURLException e) {

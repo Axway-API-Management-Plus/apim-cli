@@ -10,12 +10,10 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 public class APIImportSerializerModifier extends BeanSerializerModifier {
-	
-	boolean serializeAsDeprecated;
 
-	public APIImportSerializerModifier(boolean serializeAsDeprecated) {
+
+	public APIImportSerializerModifier() {
 		super();
-		this.serializeAsDeprecated = serializeAsDeprecated;
 	}
 
 	@Override
@@ -24,7 +22,7 @@ public class APIImportSerializerModifier extends BeanSerializerModifier {
 		for(int i=0; i<beanProperties.size();i++) {
 			BeanPropertyWriter writer = beanProperties.get(i);
 			if(writer.getName().equals("state")) {
-				beanProperties.set(i, new StateSerializer(writer, serializeAsDeprecated));
+				beanProperties.set(i, new StateSerializer(writer));
 				break;
 			}
 		}

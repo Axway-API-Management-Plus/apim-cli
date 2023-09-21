@@ -34,7 +34,7 @@ public class ConsolePrinterCustomProperties {
 
 	public void addProperties(Map<String, CustomProperty> customProperties, Type group) {
 		if(customProperties == null || customProperties.isEmpty()) {
-			Console.println("No custom properties configured for: " + group.niceName);
+			Console.println("No custom properties configured for: " + group.name());
 			return;
 		}
 		propertiesWithName.addAll(getCustomPropertiesWithName(customProperties, group));
@@ -60,13 +60,14 @@ public class ConsolePrinterCustomProperties {
 
 	private List<CustomPropertyWithName> getCustomPropertiesWithName(Map<String, CustomProperty> customProperties, Type group) {
 		List<CustomPropertyWithName> result = new ArrayList<>();
-		for (String customProperty : customProperties.keySet()) {
-			CustomProperty customPropertyConfig = customProperties.get(customProperty);
-			CustomPropertyWithName propWithName = new CustomPropertyWithName(customPropertyConfig);
-			propWithName.setName(customProperty);
-			propWithName.setGroup(group);
-			result.add(propWithName);
-		}
+        for (Map.Entry<String, CustomProperty> entry : customProperties.entrySet()) {
+            CustomProperty customPropertyConfig = entry.getValue();
+            String customProperty = entry.getKey();
+            CustomPropertyWithName propWithName = new CustomPropertyWithName(customPropertyConfig);
+            propWithName.setName(customProperty);
+            propWithName.setGroup(group);
+            result.add(propWithName);
+        }
 		return result;
 	}
 

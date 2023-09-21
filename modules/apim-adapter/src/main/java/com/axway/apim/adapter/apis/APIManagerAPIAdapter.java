@@ -565,7 +565,7 @@ public class APIManagerAPIAdapter {
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
             SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
-        mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
+        mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier()));
         mapper.setFilterProvider(filter);
         mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
         translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
@@ -872,9 +872,6 @@ public class APIManagerAPIAdapter {
     public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
         APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
         upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, null, null, null);
-        // Existing applications now got access to the new API, hence we have to update the internal state
-        // APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
-        // Additionally we need to preserve existing (maybe manually created) application quotas
         boolean updateAppQuota = false;
         if (!referenceAPI.getApplications().isEmpty()) {
             LOG.debug("Found: {} subscribed applications for this API. Taking over potentially configured quota configuration.", referenceAPI.getApplications().size());
@@ -1005,7 +1002,6 @@ public class APIManagerAPIAdapter {
         try {
             return Failsafe.with(retryPolicy).get(() -> checkCatalogForApiPublishedState(apiId, apiName));
         } catch (FailsafeException e) {
-            LOG.error("Fail to poll catalog", e);
             throw (AppException) e.getCause();
         }
     }

@@ -6,18 +6,16 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
 public class StateSerializer extends BeanPropertyWriter {
-	
-	private boolean serializerStateAsDeprecated = true;
-	
+
+
     private final BeanPropertyWriter writer;
 
-	
+
 	private static final long serialVersionUID = 1L;
-	
-    public StateSerializer(BeanPropertyWriter writer, boolean serializerStateAsDeprecated) {
+
+    public StateSerializer(BeanPropertyWriter writer) {
         super(writer);
         this.writer = writer;
-        this.serializerStateAsDeprecated = serializerStateAsDeprecated;
     }
 
     @Override
@@ -25,7 +23,7 @@ public class StateSerializer extends BeanPropertyWriter {
                                  JsonGenerator gen,
                                  SerializerProvider prov) throws Exception {
         Object value = writer.get(bean);
-        if (value != null && value instanceof String) {
+        if (value instanceof String) {
         	if(value.equals(API.STATE_DEPRECATED)) {
         		gen.writeStringField(writer.getName(), API.STATE_PUBLISHED);
         	} else {
