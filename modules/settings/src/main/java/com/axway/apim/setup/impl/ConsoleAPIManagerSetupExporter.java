@@ -51,7 +51,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		}
 
 		if(params.isExportCustomProperties()) {
-			Console.println("Configured custom properties for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
+			Console.println("Configured custom properties for: '" + APIManagerAdapter.getInstance().getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 			ConsolePrinterCustomProperties propertiesPrinter = new ConsolePrinterCustomProperties();
 			for(Type type: Type.values()) {
 				propertiesPrinter.addProperties(adapter.getCustomPropertiesAdapter().getCustomProperties(type), type);

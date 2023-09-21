@@ -72,7 +72,7 @@ public class APIManagerAdapter {
 
     private static APIManagerAdapter instance;
     private String apiManagerVersion = null;
-    public static String apiManagerName = null;
+    private String apiManagerName = null;
     public static boolean initialized = false;
     public static final ObjectMapper mapper = new ObjectMapper();
     private static final Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
@@ -551,12 +551,12 @@ public class APIManagerAdapter {
         return apiManagerVersion;
     }
 
-    public static String getApiManagerName() throws AppException {
-        if (APIManagerAdapter.apiManagerName != null) {
+    public String getApiManagerName() throws AppException {
+        if (apiManagerName != null) {
             return apiManagerName;
         }
-        APIManagerAdapter.apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
-        return APIManagerAdapter.apiManagerName;
+        apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
+        return apiManagerName;
     }
 
     public static String getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
@@ -613,7 +613,6 @@ public class APIManagerAdapter {
 
     /**
      * @return true, when admin credentials are provided
-     * @throws AppException when the API-Manager instance is not initialized
      */
     public boolean hasAdminAccount() {
         return hasAdminAccount;

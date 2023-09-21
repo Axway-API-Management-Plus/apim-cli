@@ -29,7 +29,7 @@ public class ConsolePrinterGlobalQuotas {
 
     public void export(Quotas quotas) throws AppException {
         Console.println();
-        Console.println("Global Quotas for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
+        Console.println("Global Quotas for: '" + APIManagerAdapter.getInstance().getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
         Console.println();
         printQuotas(quotas);
     }
