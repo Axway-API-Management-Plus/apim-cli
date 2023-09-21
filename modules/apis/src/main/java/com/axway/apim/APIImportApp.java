@@ -1,13 +1,5 @@
 package com.axway.apim;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -24,7 +16,14 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.Utils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the Entry-Point of program and responsible to:
@@ -55,21 +54,20 @@ public class APIImportApp implements APIMCLIServiceProvider {
 
     public int importAPI(APIImportParams params) {
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+        APIManagerAdapter apimAdapter = null;
         try {
             params.validateRequiredParameters();
             // Clean some Singleton-Instances, as tests are running in the same JVM
-            APIManagerAdapter.deleteInstance();
-            APIMHttpClient.deleteInstances();
             RollbackHandler.deleteInstance();
             errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
-            APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
+            apimAdapter = APIManagerAdapter.getInstance();
             APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params);
             // Creates an API-Representation of the desired API
             API desiredAPI = configAdapter.getDesiredAPI();
             List<NameValuePair> filters = new ArrayList<>();
             // If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins
             // the unpublished or pending APIs become the actual API
-            if (!APIManagerAdapter.hasAdminAccount()) {
+            if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
                 filters.add(new BasicNameValuePair("field", "state"));
                 filters.add(new BasicNameValuePair("op", "ne"));
                 filters.add(new BasicNameValuePair("value", "published"));
@@ -90,7 +88,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
                 .useFilter(filters)
                 .useFEAPIDefinition(params.isUseFEAPIDefinition()) // Should API-Definition load from the FE-API?
                 .build();
-            API actualAPI = apimAdapter.apiAdapter.getAPI(filter, true);
+            API actualAPI = apimAdapter.getApiAdapter().getAPI(filter, true);
             APIChangeState changes = new APIChangeState(actualAPI, desiredAPI);
             new APIImportManager().applyChanges(changes, params.isForceUpdate(), params.isUpdateOnly());
             APIPropertiesExport.getInstance().store();
@@ -107,7 +105,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
             LOG.error(e.getMessage(), e);
             return ErrorCode.UNXPECTED_ERROR.getCode();
         } finally {
-            APIManagerAdapter.deleteInstance();
+            Utils.deleteInstance(apimAdapter);
         }
     }
 

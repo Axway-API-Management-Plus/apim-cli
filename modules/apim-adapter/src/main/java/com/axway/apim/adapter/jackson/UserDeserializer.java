@@ -2,6 +2,7 @@ package com.axway.apim.adapter.jackson;
 
 import java.io.IOException;
 
+import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ public class UserDeserializer extends StdDeserializer<User> {
     @Override
     public User deserialize(JsonParser jp, DeserializationContext ctxt)
         throws IOException, JsonProcessingException {
+        APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().getUserAdapter();
         JsonNode node = jp.getCodec().readTree(jp);
         User user = null;
         // Deserialization depends on the direction
@@ -42,7 +44,7 @@ public class UserDeserializer extends StdDeserializer<User> {
         if (isUseLoginName(ctxt)) {
             // Try to initialize this user based on the loginname
             try {
-                user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(node.asText());
+                user = userAdapter.getUserForLoginName(node.asText());
             } catch (AppException e) {
                 LOG.error("Error reading user with loginName: {} from API-Manager.", node.asText());
             }
@@ -53,7 +55,7 @@ public class UserDeserializer extends StdDeserializer<User> {
         } else {
             // Try to initialize this user based on the User-ID
             try {
-                user = APIManagerAdapter.getInstance().userAdapter.getUserForId(node.asText());
+                user = userAdapter.getUserForId(node.asText());
             } catch (AppException e) {
                 LOG.error("Error reading user with ID: {} from API-Manager.", node.asText());
             }

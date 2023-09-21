@@ -24,7 +24,6 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
@@ -37,6 +36,7 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
 
     @AfterClass
     public void stop() {
+        apimanagerAdapter.deleteInstance();
         close();
     }
 
@@ -46,7 +46,7 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
+        List<User> users = apimanagerAdapter.getUserAdapter().getUsers(exporter.getFilter());
         exporter.export(users);
     }
 
@@ -56,7 +56,7 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
+        List<User> users = apimanagerAdapter.getUserAdapter().getUsers(exporter.getFilter());
         exporter.export(users);
     }
 
@@ -66,7 +66,7 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
+        List<User> users = apimanagerAdapter.getUserAdapter().getUsers(exporter.getFilter());
         exporter.export(users);
     }
 }

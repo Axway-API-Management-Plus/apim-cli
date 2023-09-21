@@ -23,23 +23,24 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class APIManagerOAuthClientProfilesAdapter {
-	
-	private static final String CACHE_KEY = "OAUTH_CLIENT_CACHE_KEY";
-	
-	private static final Logger LOG = LoggerFactory.getLogger(APIManagerOAuthClientProfilesAdapter.class);
-	
-	ObjectMapper mapper = APIManagerAdapter.mapper;
-	
-	private final CoreParameters cmd;
-	
-	Cache<String, String> oauthClientCache = APIManagerAdapter.getCache(CacheType.oauthClientProviderCache, String.class, String.class);
 
-	public APIManagerOAuthClientProfilesAdapter() {
+	private static final String CACHE_KEY = "OAUTH_CLIENT_CACHE_KEY";
+
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerOAuthClientProfilesAdapter.class);
+
+	ObjectMapper mapper = APIManagerAdapter.mapper;
+
+	private final CoreParameters cmd;
+
+	Cache<String, String> oauthClientCache;
+
+	public APIManagerOAuthClientProfilesAdapter(APIManagerAdapter apiManagerAdapter) {
 		cmd = CoreParameters.getInstance();
+        oauthClientCache = apiManagerAdapter.getCache(CacheType.oauthClientProviderCache, String.class, String.class);
 	}
-	
+
 	String apiManagerResponse = null;
-	
+
 	private void readOAuthClientProfilesFromAPIManager() throws AppException {
 		if(apiManagerResponse!=null) return;
 		if(oauthClientCache.containsKey(CACHE_KEY)) this.apiManagerResponse = oauthClientCache.get(CACHE_KEY);
@@ -59,7 +60,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 			throw new AppException("Can't get OAuth Client profiles from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
-	
+
 	public List<OAuthClientProfile> getOAuthClientProfiles() throws AppException {
 		readOAuthClientProfilesFromAPIManager();
 		List<OAuthClientProfile> clientProfiles;
@@ -70,7 +71,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 		}
 		return clientProfiles;
 	}
-	
+
 	public OAuthClientProfile getOAuthClientProfile(String profileName) throws AppException {
 		List<OAuthClientProfile> profiles = getOAuthClientProfiles();
 		for(OAuthClientProfile profile : profiles) {

@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
 
+import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.Console;
@@ -226,8 +227,9 @@ public class Utils {
     }
 
     public static void validateCustomProperties(Map<String, String> customProperties, Type type) throws AppException {
-        Map<String, CustomProperty> configuredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties(type);
-        Map<String, CustomProperty> requiredConfiguredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getRequiredCustomProperties(type);
+        APIManagerCustomPropertiesAdapter propertiesAdapter = APIManagerAdapter.getInstance().getCustomPropertiesAdapter();
+        Map<String, CustomProperty> configuredCustomProperties = propertiesAdapter.getCustomProperties(type);
+        Map<String, CustomProperty> requiredConfiguredCustomProperties = propertiesAdapter.getRequiredCustomProperties(type);
         if (customProperties != null) {
             for (String desiredCustomProperty : customProperties.keySet()) {
                 String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
@@ -422,5 +424,10 @@ public class Utils {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static void deleteInstance(APIManagerAdapter apiManagerAdapter){
+        if(apiManagerAdapter != null)
+            apiManagerAdapter.deleteInstance();
     }
 }

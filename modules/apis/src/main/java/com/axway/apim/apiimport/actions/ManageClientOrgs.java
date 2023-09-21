@@ -37,10 +37,11 @@ public class ManageClientOrgs {
         if (desiredState.getState().equals(API.STATE_UNPUBLISHED)) return;
         // The API isn't Re-Created (to take over manually created ClientOrgs) and there are no orgs configured - We can skip the rest
         if (desiredState.getClientOrganizations() == null && !reCreation) return;
+
         // From here, the assumption is that existing Org-Access has been upgraded already - We only have to take care about additional orgs
         if ((desiredState).isRequestForAllOrgs()) {
             LOG.info("Granting permission to all organizations");
-            apiManager.apiAdapter.grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState, true);
+            apiManager.getApiAdapter().grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState, true);
         } else {
             List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
             List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
@@ -50,12 +51,12 @@ public class ManageClientOrgs {
                     LOG.info("All desired organizations: {} have already access. Nothing to do.", desiredState.getClientOrganizations());
                 }
             } else {
-                apiManager.apiAdapter.grantClientOrganization(missingDesiredOrgs, actualState, false);
+                apiManager.getApiAdapter().grantClientOrganization(missingDesiredOrgs, actualState, false);
             }
             if (!removingActualOrgs.isEmpty()) {
                 if (CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.Mode.replace)) {
                     LOG.info("Removing access for orgs: {} from API: {}", removingActualOrgs, actualState.getName());
-                    apiManager.accessAdapter.removeClientOrganization(removingActualOrgs, actualState.getId());
+                    apiManager.getAccessAdapter().removeClientOrganization(removingActualOrgs, actualState.getId());
                 } else {
                     LOG.info("NOT removing access for existing orgs: {} from API: {} as clientOrgsMode NOT set to replace.",removingActualOrgs,actualState.getName());
                 }
@@ -71,9 +72,9 @@ public class ManageClientOrgs {
             if (referenceOrgs.contains(org)) {
                 continue;
             }
-            Organization organization = apiManager.orgAdapter.getOrgForName(org.getName());
+            Organization organization = apiManager.getOrgAdapter().getOrgForName(org.getName());
             if (organization == null) {
-                LOG.warn("Configured organizations: {}", apiManager.orgAdapter.getAllOrgs());
+                LOG.warn("Configured organizations: {}", apiManager.getOrgAdapter().getAllOrgs());
                 throw new AppException("Unknown Org-Name: '" + org.getName() + "'", ErrorCode.UNKNOWN_ORGANIZATION);
             }
             missingOrgs.add(organization);

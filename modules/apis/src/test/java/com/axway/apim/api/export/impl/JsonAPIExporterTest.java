@@ -44,10 +44,9 @@ public class JsonAPIExporterTest extends WiremockWrapper {
         String[] args = {"-host", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-t", tmpDir, "-o", "json", "-deleteTarget"};
         CLIOptions options = CLIAPIExportOptions.create(args);
         APIExportParams params = (APIExportParams) options.getParams();
-        APIManagerAdapter.deleteInstance();
         APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         JsonAPIExporter jsonAPIExporter = new JsonAPIExporter(params);
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
+        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.getApiAdapter();
         API api = apiManagerAPIAdapter.getAPI(new APIFilter.Builder().hasId(params.getId()).includeOriginalAPIDefinition(true).build(), true);
         api.setApplications(new ArrayList<>());
         api.setClientOrganizations(new ArrayList<>());
@@ -58,5 +57,7 @@ public class JsonAPIExporterTest extends WiremockWrapper {
         assertEquals(documentContext.read("$.name", String.class), "petstore3");
         assertEquals(documentContext.read("$.outboundProfiles._default.requestPolicy", String.class), "Validate Size & Token");
         assertEquals(documentContext.read("$.outboundProfiles._default.responsePolicy", String.class), "Remove Header & Audit data");
+        apiManagerAdapter.deleteInstance();
+
     }
 }

@@ -82,7 +82,7 @@ public abstract class UserResultHandler {
 
 	protected List<String> getAPICustomProperties() {
 		try {
-			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user);
+			return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.user);
 		} catch (AppException e) {
 			LOG.error("Error reading custom properties user configuration from API-Manager");
 			return Collections.emptyList();

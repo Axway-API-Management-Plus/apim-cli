@@ -50,14 +50,14 @@ public class APIManagerOrganizationAdapter {
 
     Cache<String, String> organizationCache;
 
-    public APIManagerOrganizationAdapter() {
+    public APIManagerOrganizationAdapter(APIManagerAdapter apiManagerAdapter) {
         cmd = CoreParameters.getInstance();
-        organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
+        organizationCache = apiManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
     }
 
     private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
         if (apiManagerResponse.get(filter) != null) return;
-        if (!APIManagerAdapter.hasAdminAccount()) {
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
             LOG.warn("Using OrgAdmin only to load all organizations.");
         }
         String orgId = "";
@@ -79,7 +79,7 @@ public class APIManagerOrganizationAdapter {
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                if (!orgId.equals("")) {
+                if (!orgId.isEmpty()) {
                     // Store it as an Array
                     response = "[" + response + "]";
                     apiManagerResponse.put(filter, response);
@@ -107,7 +107,7 @@ public class APIManagerOrganizationAdapter {
         try {
             URI uri;
             if (actualOrg == null) {
-                if (!APIManagerAdapter.hasAdminAccount()) {
+                if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
                     throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
                 }
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations").build();
@@ -244,7 +244,7 @@ public class APIManagerOrganizationAdapter {
     void addAPIAccess(Organization org, boolean addAPIAccess) throws AppException {
         if (!addAPIAccess) return;
         try {
-            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.organizations, true);
+            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(org, Type.organizations, true);
             org.getApiAccess().addAll(apiAccess);
         } catch (Exception e) {
             throw new AppException("Error reading organizations API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -255,11 +255,7 @@ public class APIManagerOrganizationAdapter {
         if (org.getApiAccess() == null || org.getApiAccess().isEmpty()) return;
         if (actualOrg != null && actualOrg.getApiAccess().size() == org.getApiAccess().size() && new HashSet<>(actualOrg.getApiAccess()).containsAll(org.getApiAccess()))
             return;
-        if (!APIManagerAdapter.hasAdminAccount()) {
-            LOG.warn("Ignoring API-Access, as no admin account is given");
-            return;
-        }
-        APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
+        APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().getAccessAdapter();
         accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.organizations);
     }
 

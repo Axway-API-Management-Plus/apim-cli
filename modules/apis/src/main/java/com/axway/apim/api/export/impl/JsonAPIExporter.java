@@ -134,7 +134,7 @@ public class JsonAPIExporter extends APIResultHandler {
         }
 
         LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
-        if (!APIManagerAdapter.hasAdminAccount()) {
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
             LOG.warn("- No Quotas has been exported for the API");
             LOG.warn("- No Client-Organizations");
@@ -144,7 +144,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
     private String getVHost(ExportAPI exportAPI) throws AppException {
         if (exportAPI.getVhost() != null) return exportAPI.getVhost().replace(":", "_") + File.separator;
-        String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
+        String orgVHost = APIManagerAdapter.getInstance().getOrgAdapter().getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
         if (orgVHost != null) return orgVHost.replace(":", "_") + File.separator;
         return "";
     }

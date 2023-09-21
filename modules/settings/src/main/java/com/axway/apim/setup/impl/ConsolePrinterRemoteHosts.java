@@ -153,7 +153,7 @@ public class ConsolePrinterRemoteHosts {
 		}
 		APIFilter apiFilter = new APIFilter.Builder().hasBackendBasepath("*"+backendHost+"*"+portFilter).build();
 		try {
-			return APIManagerAdapter.getInstance().apiAdapter.getAPIs(apiFilter, true);
+			return APIManagerAdapter.getInstance().getApiAdapter().getAPIs(apiFilter, true);
 		} catch (AppException e) {
 			throw e;
 		}

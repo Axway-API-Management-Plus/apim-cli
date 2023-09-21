@@ -23,7 +23,6 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
@@ -36,6 +35,7 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
 
     @AfterClass
     public void stop() {
+        Utils.deleteInstance(apimanagerAdapter);
         close();
     }
 
@@ -45,7 +45,7 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
+        List<Organization> organizations = apimanagerAdapter.getOrgAdapter().getOrgs(exporter.getFilter());
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
         consoleOrgExporter.export(organizations);
     }
@@ -56,7 +56,7 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
+        List<Organization> organizations = apimanagerAdapter.getOrgAdapter().getOrgs(exporter.getFilter());
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
         consoleOrgExporter.export(organizations);
     }
@@ -67,7 +67,7 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
+        List<Organization> organizations = apimanagerAdapter.getOrgAdapter().getOrgs(exporter.getFilter());
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
         consoleOrgExporter.export(organizations);
     }

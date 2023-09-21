@@ -40,7 +40,7 @@ public class APIChangeHandler extends APIResultHandler {
                     api = changeBackendBasePath(api, changeParams.getNewBackend(), changeParams.getOldBackend());
                 }
                 // Reload the actual API again, to get a clone
-                API actualAPI = adapter.apiAdapter.getAPI(new APIFilter.Builder(APIType.ACTUAL_API).hasId(api.getId()).build(), false);
+                API actualAPI = adapter.getApiAdapter().getAPI(new APIFilter.Builder(APIType.ACTUAL_API).hasId(api.getId()).build(), false);
                 APIChangeState changeState = new APIChangeState(actualAPI, api);
                 if (!changeState.hasAnyChanges()) {
                     LOG.warn("No changes for API: {}", api.getName());

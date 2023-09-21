@@ -48,8 +48,8 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
         this.deserializeMode = deserializeMode;
         this.addRestrictedAPI = addRestrictedAPI;
         try {
-            this.apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
-            this.apiMethodAdapter = APIManagerAdapter.getInstance().methodAdapter;
+            this.apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
+            this.apiMethodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +109,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
                     // If data comes from API-Manager api contains the API-ID
                     if (deserializeMode == DeserializeMode.apiManagerData) {
                         // api contains the ID of the API
-                        api = APIManagerAdapter.getInstance().apiAdapter.getAPIWithId(node.get("api").asText());
+                        api = APIManagerAdapter.getInstance().getApiAdapter().getAPIWithId(node.get("api").asText());
                         // In the API-Config file the api contains the apiName
                     } else if (deserializeMode == DeserializeMode.configFile) {
                         // If the apiPath is given, it takes precedence and the API-Name and API-Version is completely ignored

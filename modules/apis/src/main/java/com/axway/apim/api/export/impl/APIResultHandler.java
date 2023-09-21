@@ -125,7 +125,7 @@ public abstract class APIResultHandler {
 
     protected List<String> getAPICustomProperties() {
         try {
-            return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.api);
+            return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.api);
         } catch (AppException e) {
             LOG.error("Error reading custom properties configuration from API-Manager");
             return Collections.emptyList();

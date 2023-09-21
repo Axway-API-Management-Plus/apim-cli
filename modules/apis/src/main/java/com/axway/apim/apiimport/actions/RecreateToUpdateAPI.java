@@ -37,7 +37,7 @@ public class RecreateToUpdateAPI {
 		new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
 		// Maintain the Ehcache
 		// All cached entities referencing this API must be updated with the correct API-ID
-		APIManagerAdapter.cacheManager.flipApiId(changes.getActualAPI().getId(), createNewAPI.getCreatedAPI().getId());
+		APIManagerAdapter.getInstance().getCacheManager().flipApiId(changes.getActualAPI().getId(), createNewAPI.getCreatedAPI().getId());
 	}
 
 }

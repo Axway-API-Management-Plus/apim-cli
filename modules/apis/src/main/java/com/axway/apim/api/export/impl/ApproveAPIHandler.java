@@ -40,7 +40,7 @@ public class ApproveAPIHandler extends APIResultHandler {
 		Console.println("Okay, going to approve: " + apis.size() + " API(s) on V-Host: " + vhostToUse);
 		for(API api : apis) {
 			try {
-				APIManagerAdapter.getInstance().apiAdapter.publishAPI(api, ((APIApproveParams)params).getPublishVhost());
+				APIManagerAdapter.getInstance().getApiAdapter().publishAPI(api, ((APIApproveParams)params).getPublishVhost());
 				LOG.info("API: {} {} {} successfully approved/published.", api.getName(), api.getVersion(), api.getId());
 			} catch(Exception e) {
 				LOG.error("Error approving API: {} {} {} " , api.getName(), api.getVersion(), api.getId());

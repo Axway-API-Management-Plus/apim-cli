@@ -3,6 +3,7 @@ package com.axway.apim.api.export.impl;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
@@ -50,22 +51,24 @@ public class RevokeAccessAPIHandler extends APIResultHandler {
                 return;
             }
         }
+        APIManagerAPIAdapter apiAdapter =APIManagerAdapter.getInstance().getApiAdapter();
+
         for (API api : apis) {
             try {
                 if (clientApplication == null) {
-                    APIManagerAdapter.getInstance().apiAdapter.revokeClientOrganization(orgs, api);
+                    apiAdapter.revokeClientOrganization(orgs, api);
                     LOG.info("API: {} revoked access to organization: {}", api.toStringHuman(), orgs);
                 } else {
                     boolean deleteFlag = false;
                     for (Organization organization : orgs) {
                         LOG.debug("{} {}", clientApplication.getOrganizationId(), organization.getId());
                         if (clientApplication.getOrganizationId().equals(organization.getId())) {
-                            List<APIAccess> apiAccesses = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(clientApplication, APIManagerAPIAccessAdapter.Type.applications);
+                            List<APIAccess> apiAccesses = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(clientApplication, APIManagerAPIAccessAdapter.Type.applications);
                             if(apiAccesses.isEmpty()){
                                 throw new AppException(String.format("Application %s is not associated with API %s", clientApplication.getName(), api.getName()), ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
                             }
                             clientApplication.setApiAccess(apiAccesses);
-                            APIManagerAdapter.getInstance().apiAdapter.revokeClientApplication(clientApplication, api);
+                            apiAdapter.revokeClientApplication(clientApplication, api);
                             LOG.info("API: {} revoked access to application: {}", api.toStringHuman(), clientApplication);
                             deleteFlag = true;
                             break;

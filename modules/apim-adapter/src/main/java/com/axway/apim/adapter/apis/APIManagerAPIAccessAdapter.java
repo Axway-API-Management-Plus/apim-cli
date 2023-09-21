@@ -58,10 +58,11 @@ public class APIManagerAPIAccessAdapter {
     private static final HttpHelper httpHelper = new HttpHelper();
 
 
-    public APIManagerAPIAccessAdapter() {
+
+    public APIManagerAPIAccessAdapter(APIManagerAdapter apiManagerAdapter) {
         cmd = CoreParameters.getInstance();
-        caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
-        caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
+        caches.put(Type.applications, apiManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
+        caches.put(Type.organizations, apiManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
     }
 
     Map<Type, Map<String, String>> apiManagerResponse = new EnumMap<>(Type.class);
@@ -111,7 +112,7 @@ public class APIManagerAPIAccessAdapter {
             });
             if (includeAPIName) {
                 for (APIAccess apiAccess : allApiAccess) {
-                    API api = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
+                    API api = APIManagerAdapter.getInstance().getApiAdapter().getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
                     if (api == null) {
                         throw new AppException("Unable to find API with ID: " + apiAccess.getApiId() + " referenced by " + type.niceName + ": " + entity.getName() + ". You may try again with -clearCache", ErrorCode.UNKNOWN_API);
                     }

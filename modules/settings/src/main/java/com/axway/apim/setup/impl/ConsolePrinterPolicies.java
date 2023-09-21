@@ -59,6 +59,6 @@ public class ConsolePrinterPolicies {
 
 	private static List<API> getRelatedAPIs(Policy policy) throws AppException {
 		APIFilter apiFilter = new APIFilter.Builder().hasPolicyName(policy.getName()).build();
-		return APIManagerAdapter.getInstance().apiAdapter.getAPIs(apiFilter, true);
+		return APIManagerAdapter.getInstance().getApiAdapter().getAPIs(apiFilter, true);
 	}
 }

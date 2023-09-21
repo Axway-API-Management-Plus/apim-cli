@@ -22,7 +22,6 @@ public class ManagerVersionCheckTest extends WiremockWrapper {
 			coreParameters.setHostname("localhost");
 			coreParameters.setUsername("apiadmin");
 			coreParameters.setPassword(Utils.getEncryptedPassword());
-			APIManagerAdapter.deleteInstance();
 			apiManagerAdapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
 			throw new RuntimeException(e);
@@ -31,7 +30,8 @@ public class ManagerVersionCheckTest extends WiremockWrapper {
 
 	@AfterClass
 	public void close() {
-		super.close();
+        Utils.deleteInstance(apiManagerAdapter);
+        super.close();
 	}
 
 
@@ -47,7 +47,7 @@ public class ManagerVersionCheckTest extends WiremockWrapper {
 		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP10"));
 	}
 
-	
+
 	@Test
 	public void isVersionWithAPIManager7720200130() {
 		apiManagerAdapter.setApiManagerVersion("7.7.20200130");
@@ -62,7 +62,7 @@ public class ManagerVersionCheckTest extends WiremockWrapper {
 		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3"), "Failed with requested version 7.6.2 SP3");
 		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP10"), "Failed with requested version 7.5.3 SP10");
 	}
-	
+
 	@Test
 	public void isVersionWithAPIManager7720200331() {
 		apiManagerAdapter.setApiManagerVersion("7.7.20200331");

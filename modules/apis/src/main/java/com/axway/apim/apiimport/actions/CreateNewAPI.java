@@ -1,5 +1,6 @@
 package com.axway.apim.apiimport.actions;
 
+import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.DesiredAPI;
@@ -38,8 +39,9 @@ public class CreateNewAPI {
 
         API desiredAPI = changes.getDesiredAPI();
         API actualAPI = changes.getActualAPI();
-
-        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        APIManagerAPIAdapter apiAdapter = apiManagerAdapter.getApiAdapter();
+        APIManagerAPIMethodAdapter methodAdapter = apiManagerAdapter.getMethodAdapter();
         RollbackHandler rollback = RollbackHandler.getInstance();
 
         API createdBEAPI = apiAdapter.importBackendAPI(desiredAPI);
@@ -49,7 +51,7 @@ public class CreateNewAPI {
             desiredAPI.setApiId(createdBEAPI.getApiId());
             createdAPI = apiAdapter.createAPIProxy(desiredAPI);
             List<APIMethod> desiredApiMethods = desiredAPI.getApiMethods();
-            List<APIMethod> actualApiMethods = APIManagerAdapter.getInstance().methodAdapter.getAllMethodsForAPI(createdAPI.getId());
+            List<APIMethod> actualApiMethods = methodAdapter.getAllMethodsForAPI(createdAPI.getId());
             LOG.debug("Number of Methods : {}", actualApiMethods.size());
             ManageApiMethods manageApiMethods = new ManageApiMethods();
             manageApiMethods.updateApiMethods(createdAPI.getId(), actualApiMethods, desiredApiMethods);

@@ -21,7 +21,7 @@ public class ClientAppImportManager {
     private ClientApplication actualApp;
 
     public ClientAppImportManager() throws AppException {
-        this.apiMgrAppAdapter = APIManagerAdapter.getInstance().appAdapter;
+        this.apiMgrAppAdapter = APIManagerAdapter.getInstance().getAppAdapter();
     }
 
     public void replicate() throws AppException {

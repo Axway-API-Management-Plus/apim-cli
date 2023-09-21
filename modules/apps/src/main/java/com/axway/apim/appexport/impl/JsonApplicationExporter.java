@@ -111,7 +111,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
             writeBytesToFile(app.getImage().getImageContent(), localFolder + File.separator + app.getImage().getBaseFilename());
         }
         LOG.info("Successfully exported application to folder: {}", localFolder);
-        if (!APIManagerAdapter.hasAdminAccount()) {
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
             LOG.warn("- No Quotas has been exported for the API");
             LOG.warn("- No Client-Organizations");

@@ -2,6 +2,7 @@ package com.axway.apim.api.export.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
@@ -119,12 +120,14 @@ public class ConsoleAPIExporter extends APIResultHandler {
     private void printDetails(List<API> apis) {
         if (apis.size() != 1) return;
         API api = apis.get(0);
+
         // If wide isn't ultra, we have to reload some more information for the detail view
         if (!params.getWide().equals(Wide.ultra)) {
             try {
-                APIManagerAdapter.getInstance().apiAdapter.addClientApplications(api);
-                APIManagerAdapter.getInstance().apiAdapter.addClientOrganizations(api);
-                APIManagerAdapter.getInstance().apiAdapter.addQuotaConfiguration(api);
+                APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
+                apiAdapter.addClientApplications(api);
+                apiAdapter.addClientOrganizations(api);
+                apiAdapter.addQuotaConfiguration(api);
             } catch (AppException e) {
                 LOG.error("Error loading API details.", e);
             }
@@ -156,7 +159,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
     private String getCreatedBy(API api) {
         try {
-            return APIManagerAdapter.getInstance().userAdapter.getUserForId(api.getCreatedBy()).getName();
+            return APIManagerAdapter.getInstance().getUserAdapter().getUserForId(api.getCreatedBy()).getName();
         } catch (Exception e) {
             LOG.error("Error getting created by user", e);
             return "Err";

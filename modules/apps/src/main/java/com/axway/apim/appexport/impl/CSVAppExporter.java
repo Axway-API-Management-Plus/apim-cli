@@ -1,6 +1,8 @@
 package com.axway.apim.appexport.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter.Builder;
 import com.axway.apim.api.API;
@@ -74,11 +76,14 @@ public class CSVAppExporter extends ApplicationExporter {
         }
     }
 
-    APIManagerAdapter apiManager;
+    private final APIManagerAPIAdapter apiAdapter;
+    private final APIManagerAPIMethodAdapter methodAdapter;
 
     public CSVAppExporter(AppExportParams params, ExportResult result) throws AppException {
         super(params, result);
-        apiManager = APIManagerAdapter.getInstance();
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        apiAdapter = apiManagerAdapter.getApiAdapter();
+        methodAdapter = apiManagerAdapter.getMethodAdapter();
     }
 
     @Override
@@ -200,16 +205,16 @@ public class CSVAppExporter extends ApplicationExporter {
 
     private String getRestrictedAPI(QuotaRestriction quotaRestriction) throws AppException {
         if (quotaRestriction == null) return "N/A";
-        API api = apiManager.apiAdapter.getAPIWithId(quotaRestriction.getApiId());
+        API api = apiAdapter.getAPIWithId(quotaRestriction.getApiId());
         if (api == null) return "Err";
         return api.getName();
     }
 
     private String getRestrictedMethod(QuotaRestriction quotaRestriction) throws AppException {
         if (quotaRestriction == null) return "N/A";
-        API restrictedAPI = apiManager.apiAdapter.getAPIWithId(quotaRestriction.getApiId());
+        API restrictedAPI = apiAdapter.getAPIWithId(quotaRestriction.getApiId());
         if (restrictedAPI == null) return "Err";
-        return quotaRestriction.getMethod().equals("*") ? "All Methods" : apiManager.methodAdapter.getMethodForId(restrictedAPI.getId(), quotaRestriction.getMethod()).getName();
+        return quotaRestriction.getMethod().equals("*") ? "All Methods" : methodAdapter.getMethodForId(restrictedAPI.getId(), quotaRestriction.getMethod()).getName();
     }
 
     private String getQuotaConfig(QuotaRestriction quotaRestriction) {

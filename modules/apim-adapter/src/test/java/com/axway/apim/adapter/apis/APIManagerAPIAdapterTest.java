@@ -28,6 +28,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     APIManagerAPIAdapter apiManagerAPIAdapter;
 
     private APIManagerAdapter apiManagerAdapter;
+    private APIManagerOrganizationAdapter orgAdapter;
 
 
 
@@ -35,13 +36,13 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
             apiManagerAdapter = APIManagerAdapter.getInstance();
-            apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
+            apiManagerAPIAdapter = apiManagerAdapter.getApiAdapter();
+            orgAdapter = apiManagerAdapter.getOrgAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -49,6 +50,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @AfterClass
     public void close() {
+        apiManagerAdapter.deleteInstance();
         super.close();
     }
 
@@ -160,8 +162,8 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void createAPIProxy() throws AppException {
-        APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
-        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.getApiAdapter();
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -176,7 +178,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateAPIProxy() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -192,7 +194,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void deleteAPIProxy() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -211,7 +213,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void deleteBackendAPI() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -231,7 +233,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void publishAPIDoNothing() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -250,7 +252,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void publishAPI() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -270,7 +272,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void getAPIDatFile() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -285,7 +287,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateAPIStatus() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -305,7 +307,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateRetirementDateDoNothing() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -327,7 +329,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateRetirementDate() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -349,7 +351,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void importBackendAPI() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -368,7 +370,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     @Test
     public void importBackendAPIWsdl() throws AppException {
-        Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+        Organization organization = orgAdapter.getOrgForName("orga");
         API api = new API();
         api.setName("petstore");
         api.setPath("/api/v3");
@@ -417,7 +419,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     @Test
     public void grantClientOrganizationAll(){
         try {
-            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            Organization organization = orgAdapter.getOrgForName("orga");
             List<Organization> organizations = new ArrayList<>();
             organizations.add(organization);
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
@@ -433,7 +435,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
             ClientAppFilter clientAppFilter = new ClientAppFilter.Builder()
                 .hasName("Test App 2008")
                 .build();
-            ClientApplication clientApplication = apiManagerAdapter.appAdapter.getApplication(clientAppFilter);
+            ClientApplication clientApplication = apiManagerAdapter.getAppAdapter().getApplication(clientAppFilter);
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
             apiManagerAPIAdapter.grantClientApplication(clientApplication, api);
         }catch (AppException e){
@@ -444,7 +446,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     @Test
     public void revokeClientOrganization(){
         try {
-            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            Organization organization = orgAdapter.getOrgForName("orga");
             List<Organization> organizations = new ArrayList<>();
             organizations.add(organization);
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
@@ -460,7 +462,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
             ClientAppFilter clientAppFilter = new ClientAppFilter.Builder()
                 .hasName("Test App 2008")
                 .build();
-            ClientApplication clientApplication = apiManagerAdapter.appAdapter.getApplication(clientAppFilter);
+            ClientApplication clientApplication = apiManagerAdapter.getAppAdapter().getApplication(clientAppFilter);
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
             apiManagerAPIAdapter.revokeClientApplication(clientApplication, api);
         }catch (AppException e){
@@ -471,7 +473,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     @Test
     public void grantClientOrganization(){
         try {
-            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            Organization organization = orgAdapter.getOrgForName("orga");
             List<Organization> organizations = new ArrayList<>();
             organizations.add(organization);
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");

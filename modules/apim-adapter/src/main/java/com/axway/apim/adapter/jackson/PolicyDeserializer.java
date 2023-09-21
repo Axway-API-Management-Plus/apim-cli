@@ -15,9 +15,9 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class PolicyDeserializer extends StdDeserializer<Policy> {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	public PolicyDeserializer() {
 		this(null);
 	}
@@ -38,10 +38,10 @@ public class PolicyDeserializer extends StdDeserializer<Policy> {
 			createdPolicy.setId(policy);
 			return createdPolicy;
 		} else {
-			return APIManagerAdapter.getInstance().policiesAdapter.getPolicyForName(PolicyType.getTypeForJsonKey(jp.currentName()), policy);
+			return APIManagerAdapter.getInstance().getPoliciesAdapter().getPolicyForName(PolicyType.getTypeForJsonKey(jp.currentName()), policy);
 		}
 	}
-	
+
 	private static String getName(String policy) {
 		if(policy.startsWith("<key")) {
 			policy = policy.substring(policy.indexOf("<key type='FilterCircuit'>"));

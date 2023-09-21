@@ -283,7 +283,7 @@ public class APIManagerAPIAdapter {
             if (backendBasePath.contains("${env")) // issue #332
                 return;
             URL url = new URL(backendBasePath);
-            RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(url.getHost(), url.getPort());
+            RemoteHost remoteHost = APIManagerAdapter.getInstance().getRemoteHostsAdapter().getRemoteHost(url.getHost(), url.getPort());
             api.setRemotehost(remoteHost);
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
@@ -296,7 +296,7 @@ public class APIManagerAPIAdapter {
         if (!includeMethods)
             return;
         try {
-            List<APIMethod> apiMethods = APIManagerAdapter.getInstance().methodAdapter.getAllMethodsForAPI(api.getId());
+            List<APIMethod> apiMethods = APIManagerAdapter.getInstance().getMethodAdapter().getAllMethodsForAPI(api.getId());
             api.setApiMethods(apiMethods);
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
@@ -342,9 +342,9 @@ public class APIManagerAPIAdapter {
                 APIMethod method = null;
                 for (String apiId : apiIds) {
                     if (mode == METHOD_TRANSLATION.AS_NAME) {
-                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(apiId, key);
+                        method = APIManagerAdapter.getInstance().getMethodAdapter().getMethodForId(apiId, key);
                     } else {
-                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiId, key);
+                        method = APIManagerAdapter.getInstance().getMethodAdapter().getMethodForName(apiId, key);
                     }
                     if (method != null) break;
                 }
@@ -381,12 +381,13 @@ public class APIManagerAPIAdapter {
     }
 
     private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
-        if (!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
+        if (!addQuota || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         APIQuota applicationQuota = null;
         APIQuota systemQuota;
+        APIManagerQuotaAdapter quotaAdapter = APIManagerAdapter.getInstance().getQuotaAdapter();
         try {
-            applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-Quota
-            systemQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+            applicationQuota = quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-Quota
+            systemQuota = quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
             api.setApplicationQuota(applicationQuota);
             api.setSystemQuota(systemQuota);
         } catch (AppException e) {
@@ -396,7 +397,7 @@ public class APIManagerAPIAdapter {
     }
 
     private void addExistingClientAppQuotas(API api, boolean addQuota) throws AppException {
-        if (!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
+        if (!addQuota || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         if (api.getApplications() == null || api.getApplications().isEmpty()) return;
         if (api.getApplications().size() > 1000) {
             LOG.info("Loading application quotas for {} subscribed applications. This might take a few minutes ...", api.getApplications().size());
@@ -404,7 +405,7 @@ public class APIManagerAPIAdapter {
             LOG.info("Loading application quotas for {} subscribed applications.", api.getApplications().size());
         }
         for (ClientApplication app : api.getApplications()) {
-            APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true);
+            APIQuota appQuota = APIManagerAdapter.getInstance().getQuotaAdapter().getQuota(app.getId(), null, true, true);
             app.setAppQuota(appQuota);
         }
     }
@@ -414,12 +415,12 @@ public class APIManagerAPIAdapter {
     }
 
     private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
-        if (!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;
+        if (!addClientOrganizations || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         List<Organization> grantedOrgs;
-        List<Organization> allOrgs = APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
+        List<Organization> allOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getAllOrgs();
         grantedOrgs = new ArrayList<>();
         for (Organization org : allOrgs) {
-            List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, APIManagerAPIAccessAdapter.Type.organizations);
+            List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(org, APIManagerAPIAccessAdapter.Type.organizations);
             for (APIAccess access : orgAPIAccess) {
                 if (access.getApiId().equals(api.getId())) {
                     grantedOrgs.add(org);
@@ -436,7 +437,7 @@ public class APIManagerAPIAdapter {
     private void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
         List<ClientApplication> apps;
-        apps = APIManagerAdapter.getInstance().appAdapter.getAppsSubscribedWithAPI(api.getId());
+        apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());
         api.setApplications(apps);
     }
 
@@ -869,6 +870,7 @@ public class APIManagerAPIAdapter {
     }
 
     public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
+        APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
         upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, null, null, null);
         // Existing applications now got access to the new API, hence we have to update the internal state
         // APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
@@ -886,9 +888,9 @@ public class APIManagerAPIAdapter {
                         updateAppQuota = true;
                         restriction.setApiId(apiToUpgradeAccess.getId()); // Take over the quota config to new API
                         if (!restriction.getMethod().equals("*")) { // The restriction is for a specific method
-                            String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
+                            String originalMethodName = methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
                             // Try to find the same operation for the newly created API based on the name
-                            String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiToUpgradeAccess.getId(), originalMethodName).getId();
+                            String newMethodId = methodAdapter.getMethodForName(apiToUpgradeAccess.getId(), originalMethodName).getId();
                             restriction.setMethod(newMethodId);
                         }
                     }

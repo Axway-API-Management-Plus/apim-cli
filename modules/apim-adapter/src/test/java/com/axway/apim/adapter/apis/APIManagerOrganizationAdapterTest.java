@@ -13,19 +13,18 @@ import org.testng.annotations.Test;
 
 public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
-    private APIManagerAdapter apiManagerAdapter;
+    private APIManagerOrganizationAdapter organizationAdapter;
     String orgName = "orga";
 
     @BeforeClass
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerAdapter = APIManagerAdapter.getInstance();
+            organizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -40,17 +39,15 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     @Test
     public void getOrgForName() throws AppException {
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
-        Organization organization = apiManagerOrganizationAdapter.getOrgForName(orgName);
+        Organization organization = organizationAdapter.getOrgForName(orgName);
         Assert.assertEquals(organization.getName(), orgName);
     }
 
     @Test
     public void deleteOrganization() throws AppException {
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
-        Organization organization = apiManagerOrganizationAdapter.getOrgForName(orgName);
+        Organization organization = organizationAdapter.getOrgForName(orgName);
         try {
-            apiManagerOrganizationAdapter.deleteOrganization(organization);
+            organizationAdapter.deleteOrganization(organization);
         } catch (AppException appException) {
             Assert.fail("unable to delete organization", appException);
         }
@@ -58,14 +55,12 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     @Test
     public void createOrganization() {
-
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         Organization organization = new Organization();
         organization.setName(orgName);
         organization.setDevelopment(true);
         organization.setEmail("orga@axway.com");
         try {
-            apiManagerOrganizationAdapter.createOrganization(organization);
+            organizationAdapter.createOrganization(organization);
         } catch (AppException appException) {
             Assert.fail("unable to Create organization", appException);
         }
@@ -105,12 +100,11 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 //
     @Test
     public void addImage() throws AppException {
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
-        Organization organization = apiManagerOrganizationAdapter.getOrg(orgFilter);
+        Organization organization = organizationAdapter.getOrg(orgFilter);
         organization.setImageUrl("https://axway.com/favicon.ico");
         try {
-            apiManagerOrganizationAdapter.addImage(organization, true);
+            organizationAdapter.addImage(organization, true);
         } catch (Exception appException) {
             Assert.fail("unable to add Image", appException);
         }

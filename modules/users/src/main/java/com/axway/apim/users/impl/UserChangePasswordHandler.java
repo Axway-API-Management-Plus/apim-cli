@@ -40,7 +40,7 @@ public class UserChangePasswordHandler extends UserResultHandler {
 		Console.println("Okay, going to change the password for: " + users.size() + " Users(s)");
 		for(User user : users) {
 			try {
-				APIManagerAdapter.getInstance().userAdapter.changePassword(newPassword, user);
+				APIManagerAdapter.getInstance().getUserAdapter().changePassword(newPassword, user);
 			} catch(Exception e) {
 				LOG.error("Error changing password of user: {}", user.getName());
 			}

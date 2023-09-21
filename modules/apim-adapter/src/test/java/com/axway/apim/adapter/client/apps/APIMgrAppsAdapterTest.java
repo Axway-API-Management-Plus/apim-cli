@@ -33,18 +33,17 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 	private final String testHostname = "localhost";
 	private final int testPort = 8075;
 
-	private APIManagerAdapter apiManagerAdapter;
+    private APIMgrAppsAdapter clientAppAdapter;
 
 	@BeforeClass
 	public void init() {
 		try {
 			initWiremock();
-			APIManagerAdapter.deleteInstance();
 			CoreParameters coreParameters = new CoreParameters();
 			coreParameters.setHostname("localhost");
 			coreParameters.setUsername("apiadmin");
 			coreParameters.setPassword(Utils.getEncryptedPassword());
-			apiManagerAdapter = APIManagerAdapter.getInstance();
+            clientAppAdapter = APIManagerAdapter.getInstance().getAppAdapter();
 		} catch (AppException e) {
 			throw new RuntimeException(e);
 		}
@@ -58,7 +57,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void queryForUniqueApplication() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasName("Application 123").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		Assert.assertNotNull(requestUri, "RequestUri is null");
@@ -67,7 +65,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void withoutAnyFilter() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		URI requestUri = clientAppAdapter.getApplicationsUri(null);
 		Assert.assertNotNull(requestUri, "RequestUri is null");
 		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications");
@@ -75,7 +72,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void usingApplicationId() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasId("5893475934875934").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 
@@ -85,7 +81,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void filterForAppName() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasName("MyTestApp").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 
@@ -95,7 +90,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void filterForOrgId() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasOrganizationId("42342342342343223").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 
@@ -105,7 +99,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void filterStatePending() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasState("pending").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 
@@ -115,7 +108,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void filterStatePendingAndAppName() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasState("pending").hasName("AnotherPendingApp").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
@@ -131,8 +123,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 		customFilters.add(new BasicNameValuePair("op", "eq"));
 		customFilters.add(new BasicNameValuePair("value", "this@there.com"));
 
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
-
 		ClientAppFilter filter = new ClientAppFilter.Builder()
 				.hasName("AnotherPendingApp")
 				.build();
@@ -145,7 +135,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void filterNullValues() throws IOException, URISyntaxException {
-		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasState(null).hasName(null).hasOrganizationId(null).build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
@@ -157,32 +146,28 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void getApplications() throws AppException {
-		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
-		List<ClientApplication> clientApplications = appAdapter.getAllApplications(false);
+		List<ClientApplication> clientApplications = clientAppAdapter.getAllApplications(false);
 		Assert.assertNotNull(clientApplications);
 	}
 
 	@Test
 	public void getAppsSubscribedWithAPI() throws AppException {
-		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
-		List<ClientApplication> clientApplications = appAdapter.getAppsSubscribedWithAPI("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+		List<ClientApplication> clientApplications = clientAppAdapter.getAppsSubscribedWithAPI("e4ded8c8-0a40-4b50-bc13-552fb7209150");
 		Assert.assertNotNull(clientApplications);
 	}
 
 	@Test
 	public void getApplication() throws AppException {
-		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
-		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
+		ClientApplication clientApplication = clientAppAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		Assert.assertEquals(clientApplication.getName(), "Test App 2008");
 	}
 
 
 	@Test
 	public void deleteApplication() throws AppException {
-		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
-		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
+		ClientApplication clientApplication = clientAppAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		try {
-			appAdapter.deleteApplication(clientApplication);
+            clientAppAdapter.deleteApplication(clientApplication);
 
 		} catch (AppException appException) {
 			Assert.fail("unable to delete application", appException);
@@ -191,13 +176,12 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void updateApplication() throws AppException {
-		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
-		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
+		ClientApplication clientApplication = clientAppAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		ClientApplication updatedApplication = new ClientApplication();
 		updatedApplication.setName("test");
 		updatedApplication.setId(clientApplication.getId());
 		try {
-			appAdapter.createOrUpdateApplication(updatedApplication, clientApplication);
+            clientAppAdapter.createOrUpdateApplication(updatedApplication, clientApplication);
 
 		} catch (AppException appException) {
 			Assert.fail("unable to update application", appException);
@@ -206,11 +190,10 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void createApplication() {
-		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		ClientApplication clientApplication = new ClientApplication();
 		clientApplication.setName("test");
 		try {
-			appAdapter.createApplication(clientApplication);
+            clientAppAdapter.createApplication(clientApplication);
 
 		} catch (AppException appException) {
 			appException.printStackTrace();
@@ -220,7 +203,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
     @Test
     public void saveQuota(){
-        APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
         ClientApplication clientApplicationNew = new ClientApplication();
         clientApplicationNew.setName("test");
 
@@ -228,7 +210,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         clientApplicationExisting.setName("test");
         clientApplicationNew.setId(UUID.randomUUID().toString());
         try {
-            appAdapter.saveQuota(clientApplicationNew, clientApplicationExisting);
+            clientAppAdapter.saveQuota(clientApplicationNew, clientApplicationExisting);
         } catch (AppException e) {
             Assert.fail("unable to update application", e);
         }
@@ -236,19 +218,17 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
     @Test
     public void createUpsertUriPost() throws AppException, URISyntaxException {
-        APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
         String json ="";
         HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         CoreParameters cmd = CoreParameters.getInstance();
         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/1d2aeeca-2716-449e-a7a0-5d7213dbcbaf" + "/quota").build();
-        RestAPICall request = appAdapter.createUpsertUri(entity, uri, null);
+        RestAPICall request = clientAppAdapter.createUpsertUri(entity, uri, null);
         Assert.assertNotNull(request);
         Assert.assertTrue(request instanceof POSTRequest);
     }
 
     @Test
     public void createUpsertUriPutWithExistingQuota() throws AppException, URISyntaxException {
-        APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
         String json ="";
         HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         CoreParameters cmd = CoreParameters.getInstance();
@@ -258,7 +238,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         APIQuota apiQuota = new APIQuota();
         apiQuota.setName("quota");
         actualApp.setAppQuota(apiQuota);
-        RestAPICall request = appAdapter.createUpsertUri(entity, uri, actualApp);
+        RestAPICall request = clientAppAdapter.createUpsertUri(entity, uri, actualApp);
         Assert.assertNotNull(request);
         Assert.assertTrue(request instanceof PUTRequest);
     }
@@ -266,14 +246,13 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
     @Test
     public void createUpsertUriPostWithNoQuota() throws AppException, URISyntaxException {
         System.out.println(UUID.randomUUID());
-        APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
         String json ="";
         HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         CoreParameters cmd = CoreParameters.getInstance();
         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/1d2aeeca-2716-449e-a7a0-5d7213dbcbaf" + "/quota").build();
         ClientApplication actualApp = new ClientApplication();
         actualApp.setName("testapp");
-        RestAPICall request = appAdapter.createUpsertUri(entity, uri, actualApp);
+        RestAPICall request = clientAppAdapter.createUpsertUri(entity, uri, actualApp);
         Assert.assertNotNull(request);
         Assert.assertTrue(request instanceof POSTRequest);
     }

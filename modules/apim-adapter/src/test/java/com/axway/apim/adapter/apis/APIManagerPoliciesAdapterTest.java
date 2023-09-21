@@ -15,18 +15,17 @@ import java.util.List;
 
 public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
 
-    private APIManagerAdapter apiManagerAdapter;
+    private APIManagerPoliciesAdapter apiManagerPoliciesAdapter;
 
     @BeforeClass
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerAdapter = APIManagerAdapter.getInstance();
+            apiManagerPoliciesAdapter = APIManagerAdapter.getInstance().getPoliciesAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -40,21 +39,18 @@ public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
 
     @Test
     public void getAllPolicies() throws AppException {
-        APIManagerPoliciesAdapter apiManagerPoliciesAdapter = apiManagerAdapter.policiesAdapter;
         List<Policy> policies = apiManagerPoliciesAdapter.getAllPolicies();
         Assert.assertNotNull(policies);
     }
 
     @Test(expectedExceptions = AppException.class)
     public void getPolicyForNameNegative()throws AppException {
-        APIManagerPoliciesAdapter apiManagerPoliciesAdapter = apiManagerAdapter.policiesAdapter;
         Policy policy = apiManagerPoliciesAdapter.getPolicyForName(APIManagerPoliciesAdapter.PolicyType.REQUEST, "test");
         Assert.assertNotNull(policy);
     }
 
     @Test
     public void getPolicyForName()throws AppException {
-        APIManagerPoliciesAdapter apiManagerPoliciesAdapter = apiManagerAdapter.policiesAdapter;
         Policy policy = apiManagerPoliciesAdapter.getPolicyForName(APIManagerPoliciesAdapter.PolicyType.REQUEST, "Validate Size & Token");
         Assert.assertNotNull(policy);
     }

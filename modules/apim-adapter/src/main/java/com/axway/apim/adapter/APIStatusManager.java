@@ -1,5 +1,6 @@
 package com.axway.apim.adapter;
 
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
@@ -95,6 +96,7 @@ public class APIStatusManager {
             String[] possibleStatus = StatusChangeMap.valueOf(apiToUpdate.getState()).possibleStates;
             String intermediateState = null;
             boolean statusMovePossible = false;
+            APIManagerAPIAdapter apiAdapter = apimAdapter.getApiAdapter();
             for (String status : possibleStatus) {
                 if (desiredState.equals(status)) {
                     statusMovePossible = true; // Direct move to new state possible
@@ -126,13 +128,13 @@ public class APIStatusManager {
             apiToUpdate.setState(desiredState);
             if (desiredState.equals(API.STATE_DELETED)) {
                 // If an API in state unpublished or pending, also an orgAdmin can delete it
-                if (apimAdapter.apiAdapter.isFrontendApiExists(apiToUpdate))
-                    apimAdapter.apiAdapter.deleteAPIProxy(apiToUpdate);
+                if (apiAdapter.isFrontendApiExists(apiToUpdate))
+                    apiAdapter.deleteAPIProxy(apiToUpdate);
                 // Additionally we need to delete the BE-API
-                if (apimAdapter.apiAdapter.isBackendApiExists(apiToUpdate))
-                    apimAdapter.apiAdapter.deleteBackendAPI(apiToUpdate);
+                if (apiAdapter.isBackendApiExists(apiToUpdate))
+                    apiAdapter.deleteBackendAPI(apiToUpdate);
             } else {
-                apimAdapter.apiAdapter.updateAPIStatus(apiToUpdate, desiredState, vhost);
+                apiAdapter.updateAPIStatus(apiToUpdate, desiredState, vhost);
                 if (vhost != null && desiredState.equals(API.STATE_UNPUBLISHED)) {
                     this.updateVHostRequired = true; // Flag to control update of the VHost
                 }

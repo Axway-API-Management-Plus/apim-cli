@@ -295,7 +295,7 @@ public class APIChangeState {
 
 
     public boolean isAdminAccountNeeded() throws AppException {
-        boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()).getOadminSelfServiceEnabled();
+        boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
         if (orgAdminSelfServiceEnabled) return false;
         return (!getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && !getDesiredAPI().getState().equals(API.STATE_DELETED)) ||
                 (getActualAPI() != null && !getActualAPI().getState().equals(API.STATE_UNPUBLISHED));
@@ -303,7 +303,7 @@ public class APIChangeState {
 
     public String waiting4Approval() throws AppException {
         String isWaitingMsg = "";
-        if (isAdminAccountNeeded() && !APIManagerAdapter.hasAdminAccount()) {
+        if (isAdminAccountNeeded() && !APIManagerAdapter.getInstance().hasAdminAccount()) {
             isWaitingMsg = "Waiting for approval ... ";
         }
         return isWaitingMsg;

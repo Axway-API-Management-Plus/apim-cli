@@ -12,6 +12,7 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
             LOG.error("Error {}", e.getMessage());
             return e.getError().getCode();
         }
-        ApplicationExportApp app = new ApplicationExportApp();
-        return app.export(params).getRc();
+        return ApplicationExportApp.export(params).getRc();
     }
 
     @CLIServiceMethod(name = "delete", description = "Delete selected application(s) from the API-Manager")
@@ -64,11 +64,10 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
             LOG.error("Error {}", e.getMessage());
             return e.getError().getCode();
         }
-        ApplicationExportApp app = new ApplicationExportApp();
-        return app.delete(params).getRc();
+        return ApplicationExportApp.delete(params).getRc();
     }
 
-    public ExportResult delete(AppExportParams params) {
+    public static ExportResult delete(AppExportParams params) {
         ExportResult result = new ExportResult();
         try {
             return runExport(params, ResultHandler.DELETE_APP_HANDLER, result);
@@ -83,7 +82,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
         }
     }
 
-    public ExportResult export(AppExportParams params) {
+    public static ExportResult export(AppExportParams params) {
         ExportResult result = new ExportResult();
         try {
             params.validateRequiredParameters();
@@ -105,40 +104,34 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
             LOG.error(e.getMessage(), e);
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
-        } finally {
-            try {
-                // make sure the cache is updated, even an exception is thrown
-                APIManagerAdapter.deleteInstance();
-            } catch (Exception e) {
-                LOG.error("Unable to delete instance", e);
-            }
         }
     }
 
-    private ExportResult runExport(AppExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
+    private static ExportResult runExport(AppExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
         // We need to clean some Singleton-Instances, as tests are running in the same JVM
-        APIManagerAdapter.deleteInstance();
-        APIMHttpClient.deleteInstances();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
-        if (apps.isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.info("No applications found using filter: {}", exporter.getFilter());
+        try {
+            ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params, result);
+            List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
+            if (apps.isEmpty()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.info("No applications found using filter: {}", exporter.getFilter());
+                } else {
+                    LOG.info("No applications found based on the given filters.");
+                }
             } else {
-                LOG.info("No applications found based on the given filters.");
+                LOG.info("Found {} application(s).", apps.size());
+                exporter.export(apps);
+                if (exporter.hasError()) {
+                    LOG.info("");
+                    LOG.error("Please check the log. At least one error was recorded.");
+                } else {
+                    LOG.debug("Successfully exported {} application(s).", apps.size());
+                }
             }
-        } else {
-            LOG.info("Found {} application(s).", apps.size());
-            exporter.export(apps);
-            if (exporter.hasError()) {
-                LOG.info("");
-                LOG.error("Please check the log. At least one error was recorded.");
-            } else {
-                LOG.debug("Successfully exported {} application(s).", apps.size());
-            }
-            APIManagerAdapter.deleteInstance();
+            return result;
+        }finally {
+            Utils.deleteInstance(apimanagerAdapter);
         }
-        return result;
     }
 }

@@ -25,12 +25,11 @@ public class APIManagerOAuthClientProfilesAdapterTest extends WiremockWrapper {
     public void initWiremock() {
         super.initWiremock();
         try {
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("test");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerOAuthClientProfilesAdapter = APIManagerAdapter.getInstance().oauthClientAdapter;
+            apiManagerOAuthClientProfilesAdapter = APIManagerAdapter.getInstance().getOauthClientAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }

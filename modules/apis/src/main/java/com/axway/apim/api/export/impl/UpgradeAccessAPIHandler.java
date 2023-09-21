@@ -46,7 +46,7 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
         Console.println("Okay, going to upgrade: " + apis.size() + " API(s) based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
         for (API api : apis) {
             try {
-                if (APIManagerAdapter.getInstance().apiAdapter.upgradeAccessToNewerAPI(api, referenceAPI,
+                if (APIManagerAdapter.getInstance().getApiAdapter().upgradeAccessToNewerAPI(api, referenceAPI,
                         upgradeParams.getReferenceAPIDeprecate(), upgradeParams.getReferenceAPIRetire(), upgradeParams.getReferenceAPIRetirementDate())) {
                     LOG.info("API: {} {} {} successfully upgraded.", api.getName(), api.getVersion(), api.getId());
                 }

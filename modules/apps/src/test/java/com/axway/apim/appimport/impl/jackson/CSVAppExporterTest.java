@@ -31,38 +31,40 @@ public class CSVAppExporterTest extends WiremockWrapper {
     public void tesCVSExport() throws AppException {
         String[] args = {"-h", "localhost", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CSV_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         CSVAppExporter csvAppExporter = new CSVAppExporter(params, result);
         csvAppExporter.export(apps);
+        apimanagerAdapter.deleteInstance();
     }
 
     @Test
     public void tesCVSExportWide() throws AppException {
         String[] args = {"-h", "localhost", "-wide", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CSV_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         CSVAppExporter csvAppExporter = new CSVAppExporter(params, result);
         csvAppExporter.export(apps);
+        apimanagerAdapter.deleteInstance();
+
     }
 
     @Test
     public void tesCVSExportUltra() throws AppException {
         String[] args = {"-h", "localhost", "-ultra", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CSV_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         CSVAppExporter csvAppExporter = new CSVAppExporter(params, result);
         csvAppExporter.export(apps);
+        apimanagerAdapter.deleteInstance();
+
     }
 }
