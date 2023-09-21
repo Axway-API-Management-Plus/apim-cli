@@ -351,7 +351,7 @@ public class APIManagerAdapter {
             do {
                 try {
                     CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);//NOSONAR
-                    apimcliCacheManager = new APIMCLICacheManager(ehcacheManager);
+                    apimcliCacheManager = new APIMCLICacheManager(ehcacheManager);//NOSONAR
                     apimcliCacheManager.init();
                 } catch (StateTransitionException e) {
                     LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}", initAttempts, maxAttempts);
