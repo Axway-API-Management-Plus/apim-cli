@@ -38,7 +38,7 @@ public class DeleteAppHandler extends ApplicationExporter {
 		Console.println("Okay, going to delete: " + apps.size() + " Application(s)");
 		for(ClientApplication app : apps) {
 			try {
-				APIManagerAdapter.getInstance().appAdapter.deleteApplication(app);
+				APIManagerAdapter.getInstance().getAppAdapter().deleteApplication(app);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_DELETING_ORG);
 				LOG.error("Error deleting application: {}" , app.getName());

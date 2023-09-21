@@ -4,6 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
@@ -51,19 +52,20 @@ public class GrantAccessAPIHandler extends APIResultHandler {
                 return;
             }
         }
+        APIManagerAPIAdapter apiAdapter =APIManagerAdapter.getInstance().getApiAdapter();
         for (API api : apis) {
             try {
                 if (clientApplication == null) {
-                    APIManagerAdapter.getInstance().apiAdapter.grantClientOrganization(orgs, api, false);
+                    apiAdapter.grantClientOrganization(orgs, api, false);
                     LOG.info("API: {} granted access to orgs: {}", api.toStringHuman(), orgs);
                 } else {
                     boolean deleteFlag = false;
                     for (Organization organization : orgs) {
-                        List<APIAccess> apiAccesses = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(organization, APIManagerAPIAccessAdapter.Type.organizations);
+                        List<APIAccess> apiAccesses = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(organization, APIManagerAPIAccessAdapter.Type.organizations);
                         for (APIAccess apiAccess : apiAccesses) {
                             LOG.debug("{} {}", apiAccess.getApiId(), api.getId());
                             if (apiAccess.getApiId().equals(api.getId())) {
-                                APIManagerAdapter.getInstance().apiAdapter.grantClientApplication(clientApplication, api);
+                                apiAdapter.grantClientApplication(clientApplication, api);
                                 LOG.info("API: {} granted access to application: {}", api.toStringHuman(), clientApplication);
                                 deleteFlag = true;
                                 break;
@@ -75,6 +77,7 @@ public class GrantAccessAPIHandler extends APIResultHandler {
                     }
                 }
             } catch (Exception e) {
+                LOG.error("Error grant access to API", e);
                 if (e instanceof AppException) {
                     result.setError(((AppException)e).getError());
                 }else {

@@ -16,6 +16,7 @@
         <Logger name="com.consol.citrus" level="info"/>
         <Logger name="org.apache" level="info"/>
         <Logger name="org.ehcache" level="error"/>
+        <Logger name="com.github.tomakehurst.wiremock" level="trace"/>
 
         <Root level="info">
             <AppenderRef ref="STDOUT"/>

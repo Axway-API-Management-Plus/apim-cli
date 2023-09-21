@@ -156,7 +156,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
     }
 
     private void addAPIAccess(List<ClientApplication> apps, Result result) throws AppException {
-        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         for (ClientApplication app : apps) {
             if (app.getApiAccess() == null) continue;
             Iterator<APIAccess> it = app.getApiAccess().iterator();
@@ -191,7 +191,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
     }
 
     private void validateAppPermissions(List<ClientApplication> apps) throws AppException {
-        APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().userAdapter;
+        APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().getUserAdapter();
         for (ClientApplication app : apps) {
             if (app.getPermissions() == null || app.getPermissions().isEmpty()) continue;
             // First check, if there is an ALL User

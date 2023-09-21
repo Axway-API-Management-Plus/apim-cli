@@ -1,6 +1,8 @@
 package com.axway.apim.apiimport;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerOAuthClientProfilesAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
@@ -221,8 +223,9 @@ public class APIImportConfigAdapter {
             apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
             return;
         }
+        APIManagerOrganizationAdapter organizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
         if (apiConfig.getClientOrganizations().contains(new Organization.Builder().hasName("ALL").build())) {
-            List<Organization> allOrgs = APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
+            List<Organization> allOrgs = organizationAdapter.getAllOrgs();
             apiConfig.getClientOrganizations().clear();
             apiConfig.getClientOrganizations().addAll(allOrgs);
             apiConfig.setRequestForAllOrgs(true);
@@ -238,7 +241,7 @@ public class APIImportConfigAdapter {
             List<Organization> foundOrgs = new ArrayList<>();
             while (it.hasNext()) {
                 Organization desiredOrg = it.next();
-                Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(desiredOrg.getName());
+                Organization org =organizationAdapter.getOrgForName(desiredOrg.getName());
                 if (org == null) {
                     LOG.warn("Unknown organization with name: {} configured. Ignoring this organization.", desiredOrg.getName());
                     invalidClientOrgs = invalidClientOrgs == null ? desiredOrg.getName() : invalidClientOrgs + ", " + desiredOrg.getName();
@@ -408,7 +411,7 @@ public class APIImportConfigAdapter {
                 app = it.next();
                 if (app.getName() != null) {
                     ClientAppFilter filter = new ClientAppFilter.Builder().hasName(app.getName()).build();
-                    loadedApp = APIManagerAdapter.getInstance().appAdapter.getApplication(filter);
+                    loadedApp = APIManagerAdapter.getInstance().getAppAdapter().getApplication(filter);
                     if (loadedApp == null) {
                         LOG.warn("Unknown application with name: {} configured. Ignoring this application.", filter.getApplicationName());
                         invalidClientApps = invalidClientApps == null ? app.getName() : invalidClientApps + ", " + app.getName();
@@ -436,7 +439,7 @@ public class APIImportConfigAdapter {
                         continue;
                     }
                 }
-                if (!APIManagerAdapter.hasAdminAccount()) {
+                if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
                     if (!apiConfig.getOrganization().equals(loadedApp != null ? loadedApp.getOrganization() : null)) {
                         LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.", loadedApp != null ? loadedApp.getName() : null);
                         it.remove();
@@ -629,10 +632,9 @@ public class APIImportConfigAdapter {
                 }
             }
             // Check the referenced authentication profile exists
-            if (!profile.getAuthenticationProfile().equals(DEFAULT)) {
-                if (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null) {
+            if (!profile.getAuthenticationProfile().equals(DEFAULT) && (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null)) {
                     throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '" + profile.getAuthenticationProfile() + "'", ErrorCode.REFERENCED_PROFILE_INVALID);
-                }
+
             }
             // Check a routingPolicy is given, if routeType is policy
             if ("policy".equals(profile.getRouteType()) && profile.getRoutePolicy() == null) {
@@ -665,10 +667,11 @@ public class APIImportConfigAdapter {
         if (!authnProfile.getType().equals(AuthType.oauth)) return;
         String providerProfile = (String) authnProfile.getParameters().get("providerProfile");
         if (providerProfile != null && providerProfile.startsWith("<key")) return;
-        OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
+        APIManagerOAuthClientProfilesAdapter oAuthClientProfilesAdapter =  APIManagerAdapter.getInstance().getOauthClientAdapter();
+        OAuthClientProfile clientProfile = oAuthClientProfilesAdapter.getOAuthClientProfile(providerProfile);
         if (clientProfile == null) {
             List<String> knownProfiles = new ArrayList<>();
-            for (OAuthClientProfile profile : APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfiles()) {
+            for (OAuthClientProfile profile :oAuthClientProfilesAdapter.getOAuthClientProfiles()) {
                 knownProfiles.add(profile.getName());
             }
             throw new AppException("The OAuth provider profile is unkown: '" + providerProfile + "'. Known profiles: " + knownProfiles, ErrorCode.REFERENCED_PROFILE_INVALID);
@@ -719,8 +722,8 @@ public class APIImportConfigAdapter {
 
     private void validateHasQueryStringKey(API importApi) throws AppException {
         if (importApi.getApiRoutingKey() == null) return; // Nothing to check
-        if (APIManagerAdapter.hasAdminAccount()) {
-            Boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(true).getApiRoutingKeyEnabled();
+        if (APIManagerAdapter.getInstance().hasAdminAccount()) {
+            Boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(true).getApiRoutingKeyEnabled();
             if (!apiRoutingKeyEnabled) {
                 throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
             }

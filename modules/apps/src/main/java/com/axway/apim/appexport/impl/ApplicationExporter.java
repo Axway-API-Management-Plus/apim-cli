@@ -95,7 +95,7 @@ public abstract class ApplicationExporter {
 
     protected List<String> getCustomProperties() {
         try {
-            return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.application);
+            return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.application);
         } catch (AppException e) {
             LOG.error("Error reading custom properties configuration for applications from API-Manager");
             return Collections.emptyList();
@@ -109,7 +109,7 @@ public abstract class ApplicationExporter {
             LOG.error("Application: {} has no createdBy information.", app);
         }
         try {
-            loginName = APIManagerAdapter.getInstance().userAdapter.getUserForId(app.getCreatedBy()).getLoginName();
+            loginName = APIManagerAdapter.getInstance().getUserAdapter().getUserForId(app.getCreatedBy()).getLoginName();
         } catch (AppException e) {
             LOG.error("Error getting createdBy user with Id: {} for application: {}", app.getCreatedBy(), app);
             loginName = app.getCreatedBy();

@@ -40,7 +40,7 @@ public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> 
 			if(quotaRestriction.getMethod()==null || "*".equals(quotaRestriction.getMethod())) {
 				jgen.writeObjectField(METHOD, "*");
 			} else {
-				APIMethod method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(quotaRestriction.getApiId(), quotaRestriction.getMethod());
+				APIMethod method = APIManagerAdapter.getInstance().getMethodAdapter().getMethodForId(quotaRestriction.getApiId(), quotaRestriction.getMethod());
 				jgen.writeObjectField(METHOD, method.getName());
 			}
 		}

@@ -13,7 +13,7 @@ import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,19 +61,18 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 
     public ImportResult importApp(AppImportParams params) {
         ImportResult result = new ImportResult();
+        APIManagerAdapter apiManagerAdapter = null;
         try {
             params.validateRequiredParameters();
             // We need to clean some Singleton-Instances, as tests are running in the same JVM
-            APIManagerAdapter.deleteInstance();
-            APIMHttpClient.deleteInstances();
-            APIManagerAdapter.getInstance();
+            apiManagerAdapter = APIManagerAdapter.getInstance();
             // Load the desired state of the application
             ClientAppAdapter desiredAppsAdapter = new ClientAppConfigAdapter(params, result);
             List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
             ClientAppImportManager importManager = new ClientAppImportManager();
             for (ClientApplication desiredApp : desiredApps) {
                 //I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
-                ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
+                ClientApplication actualApp = apiManagerAdapter.getAppAdapter().getApplication(new ClientAppFilter.Builder()
                     .includeCredentials(true)
                     .includeImage(true)
                     .includeQuotas(true)
@@ -98,7 +97,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         } finally {
-            APIManagerAdapter.deleteInstance();
+            Utils.deleteInstance(apiManagerAdapter);
         }
     }
 }

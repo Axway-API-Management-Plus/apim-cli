@@ -267,7 +267,7 @@ public class ExportAPI {
         if (apiQuota == null || apiQuota.getRestrictions() == null) return apiQuota;
         for (QuotaRestriction restriction : apiQuota.getRestrictions()) {
             if ("*".equals(restriction.getMethod())) continue;
-            restriction.setMethod(APIManagerAdapter.getInstance().methodAdapter.getMethodForId(this.actualAPIProxy.getId(), restriction.getMethod()).getName());
+            restriction.setMethod(APIManagerAdapter.getInstance().getMethodAdapter().getMethodForId(this.actualAPIProxy.getId(), restriction.getMethod()).getName());
         }
         return apiQuota;
     }
@@ -278,7 +278,7 @@ public class ExportAPI {
     }
 
     public List<String> getClientOrganizations() throws AppException {
-        if (!APIManagerAdapter.hasAdminAccount()) return null;
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return null;
         if (this.actualAPIProxy.getClientOrganizations().isEmpty()) return null;
         if (this.actualAPIProxy.getClientOrganizations().size() == 1 &&
             this.actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization()))

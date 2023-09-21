@@ -8,6 +8,7 @@ import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,16 +40,16 @@ public class ClientApplicationImportAppTest extends WiremockWrapper {
     }
 
     @Test
-    public void importApplicationReturnCodeMapping() {
-        try {
-            ClassLoader classLoader = this.getClass().getClassLoader();
-            String applicationFile = classLoader.getResource("com/axway/apim/appimport/apps/basic/application.json").getFile();
-            String[] args = {"-h", "localhost1", "-c", applicationFile, "-returnCodeMapping", "10:0, 25:0"};
-            int returnCode = ClientApplicationImportApp.importApp(args);
-            Assert.assertEquals(returnCode, 0);
-        } finally {
-            APIManagerAdapter.deleteInstance();
-        }
+    public void importApplicationReturnCodeMapping() throws AppException {
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        String applicationFile = classLoader.getResource("com/axway/apim/appimport/apps/basic/application.json").getFile();
+        String[] args = {"-h", "localhost1", "-c", applicationFile, "-returnCodeMapping", "10:0, 25:0"};
+        int returnCode = ClientApplicationImportApp.importApp(args);
+        Assert.assertEquals(returnCode, 0);
+        // cleanup
+        APIManagerAdapter.getInstance().deleteInstance();
+
     }
 
     @Test
@@ -94,8 +95,7 @@ public class ClientApplicationImportAppTest extends WiremockWrapper {
         ClientApplication existingApp = objectMapper.readValue(existing, ClientApplication.class);
 
 
-
-        String actual= "{\n" +
+        String actual = "{\n" +
             "  \"name\": \"Test app\",\n" +
             "  \"state\": \"approved\",\n" +
             "  \"enabled\": true,\n" +

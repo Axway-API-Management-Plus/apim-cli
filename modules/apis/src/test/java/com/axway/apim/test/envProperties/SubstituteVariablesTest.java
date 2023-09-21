@@ -27,7 +27,6 @@ public class SubstituteVariablesTest  extends WiremockWrapper {
         try {
             new TestSetup().initCliHome();
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");

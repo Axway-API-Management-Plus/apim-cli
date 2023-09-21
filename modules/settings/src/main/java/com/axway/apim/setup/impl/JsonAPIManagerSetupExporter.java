@@ -98,7 +98,7 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
             throw new AppException("Can't create configuration export", ErrorCode.UNXPECTED_ERROR, e);
         }
         LOG.info("Successfully exported API-Manager configuration into: {}{}", localFolder, configFile);
-        if (!APIManagerAdapter.hasAdminAccount()) {
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export of configuration restricted.");
         }
     }
@@ -106,7 +106,7 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
     private String getExportFolder(Config config) {
         try {
             if (config == null) {
-                config = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount());
+                config = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount());
             }
             String name = config.getPortalName().toLowerCase();
             name = name.replace(" ", "-");

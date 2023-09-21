@@ -31,12 +31,12 @@ public class RecreateToUpdateAPITest extends WiremockWrapper {
 
     @Test
     public void testRepublishToUpdateApi() throws AppException {
-        APIManagerAdapter.deleteInstance();
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
-        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        Organization organization = apiManagerAdapter.getOrgAdapter().getOrgForName("orga");
         RecreateToUpdateAPI recreateToUpdateAPI = new RecreateToUpdateAPI();
         API actualAPI = new API();
         actualAPI.setName("petstore");
@@ -65,5 +65,6 @@ public class RecreateToUpdateAPITest extends WiremockWrapper {
         desiredAPI.setApiDefinition(apiSpecification);
         APIChangeState apiChangeState = new APIChangeState(actualAPI, desiredAPI);
         recreateToUpdateAPI.execute(apiChangeState);
+        apiManagerAdapter.deleteInstance();
     }
 }

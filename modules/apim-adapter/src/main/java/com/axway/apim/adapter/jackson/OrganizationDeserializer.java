@@ -1,6 +1,7 @@
 package com.axway.apim.adapter.jackson;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -27,26 +28,28 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
     @Override
     public Organization deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        APIManagerOrganizationAdapter organizationAdapter = apiManagerAdapter.getOrgAdapter();
         JsonNode node = jp.getCodec().readTree(jp);
         // Deserialization depends on the direction
         if ("organizationId".equals(jp.currentName())) {
             // APIManagerAdapter is not yet initialized
-            if (!APIManagerAdapter.initialized) {
+            if (!apiManagerAdapter.isInitialized()) {
                 Organization organization = new Organization();
                 organization.setId(node.asText());
                 return organization;
             }
             // organizationId is given by API-Manager
-            return APIManagerAdapter.getInstance().orgAdapter.getOrgForId(node.asText());
+            return organizationAdapter.getOrgForId(node.asText());
         } else {
             // APIManagerAdapter is not yet initialized
-            if (!APIManagerAdapter.initialized) {
+            if (!apiManagerAdapter.isInitialized()) {
                 Organization organization = new Organization();
                 organization.setName(node.asText());
                 return organization;
             }
             // Otherwise make sure the organization exists and try to load it
-            Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
+            Organization organization =organizationAdapter.getOrgForName(node.asText());
             if (organization == null && validateOrganization(ctxt)) {
                 throw new AppException("The given organization: '" + node.asText() + "' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
             }

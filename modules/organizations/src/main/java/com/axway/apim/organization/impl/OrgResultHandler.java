@@ -76,7 +76,7 @@ public abstract class OrgResultHandler {
 
 	protected List<String> getCustomProperties() {
 		try {
-			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.organization);
+			return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.organization);
 		} catch (AppException e) {
 			LOG.error("Error reading custom properties configuration for organization from API-Manager");
 			return Collections.emptyList();

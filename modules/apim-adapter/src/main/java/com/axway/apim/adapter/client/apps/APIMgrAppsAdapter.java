@@ -53,12 +53,12 @@ public class APIMgrAppsAdapter {
     Cache<String, String> applicationsCredentialCache;
     Cache<String, String> applicationsQuotaCache;
 
-    public APIMgrAppsAdapter() {
-        applicationsCache = APIManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
-        applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
-        applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
+    public APIMgrAppsAdapter(APIManagerAdapter apiManagerAdapter) {
+        applicationsCache = apiManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
+        applicationsSubscriptionCache = apiManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
+        applicationsCredentialCache = apiManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
         // Must be refactored to use Quota-Adapter instead of doing this in
-        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
+        applicationsQuotaCache = apiManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
     /**
@@ -126,7 +126,7 @@ public class APIMgrAppsAdapter {
                 ClientApplication app = apps.get(i);
                 addImage(app, filter.isIncludeImage());
                 if (filter.isIncludeQuota()) {
-                    app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true));
+                    app.setAppQuota(APIManagerAdapter.getInstance().getQuotaAdapter().getQuota(app.getId(), null, true, true));
                 }
                 addApplicationCredentials(app, filter.isIncludeCredentials());
                 addOauthResources(app, filter.isIncludeOauthResources());
@@ -272,7 +272,7 @@ public class APIMgrAppsAdapter {
                 };
                 List<ApplicationPermission> appPermissions = mapper.readValue(response, classType);
                 for (ApplicationPermission permission : appPermissions) {
-                    User user = APIManagerAdapter.getInstance().userAdapter.getUserForId(permission.getUserId());
+                    User user = APIManagerAdapter.getInstance().getUserAdapter().getUserForId(permission.getUserId());
                     if (user == null)
                         throw new AppException("No user found for ID: " + permission.getUserId() + " assigned to application: " + app.getName(), ErrorCode.UNXPECTED_ERROR);
                     permission.setUser(user);
@@ -287,7 +287,7 @@ public class APIMgrAppsAdapter {
     void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws AppException {
         if (!addAPIAccess) return;
         try {
-            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, Type.applications, true);
+            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(app, Type.applications, true);
             app.getApiAccess().addAll(apiAccess);
         } catch (AppException e) {
             throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -557,11 +557,7 @@ public class APIMgrAppsAdapter {
     private void saveAPIAccess(ClientApplication app, ClientApplication actualApp) throws AppException {
         if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return;
         if (actualApp != null && app.getApiAccess().equals(actualApp.getApiAccess())) return;
-        if (!APIManagerAdapter.hasAdminAccount()) {
-            LOG.warn("Ignoring API-Access, as no admin account is given");
-            return;
-        }
-        APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
+        APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().getAccessAdapter();
         accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
     }
 

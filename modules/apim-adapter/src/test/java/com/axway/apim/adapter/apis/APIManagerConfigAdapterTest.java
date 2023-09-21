@@ -23,13 +23,12 @@ public class APIManagerConfigAdapterTest extends WiremockWrapper {
     public void initWiremock() {
         super.initWiremock();
         try {
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("test");
             coreParameters.setPassword(Utils.getEncryptedPassword());
             apiManagerAdapter = APIManagerAdapter.getInstance();
-            apiManagerConfigAdapter = apiManagerAdapter.configAdapter;
+            apiManagerConfigAdapter = apiManagerAdapter.getConfigAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }

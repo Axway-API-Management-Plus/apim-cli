@@ -27,7 +27,7 @@ public class APIManagerAdapterTest extends WiremockWrapper {
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
+
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
@@ -40,6 +40,7 @@ public class APIManagerAdapterTest extends WiremockWrapper {
 
     @AfterClass
     public void close() {
+        apiManagerAdapter.deleteInstance();
         super.close();
     }
 

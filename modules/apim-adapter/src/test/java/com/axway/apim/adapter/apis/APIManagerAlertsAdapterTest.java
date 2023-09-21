@@ -19,12 +19,11 @@ public class APIManagerAlertsAdapterTest extends WiremockWrapper {
     public void initWiremock() {
         super.initWiremock();
         try {
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("test");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerAlertsAdapter = APIManagerAdapter.getInstance().alertsAdapter;
+            apiManagerAlertsAdapter = APIManagerAdapter.getInstance().getAlertsAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }

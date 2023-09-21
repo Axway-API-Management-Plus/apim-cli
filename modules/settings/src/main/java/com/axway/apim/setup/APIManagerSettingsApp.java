@@ -14,7 +14,7 @@ import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.setup.adapter.APIManagerConfigAdapter;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler.ResultHandler;
@@ -100,37 +100,38 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
     private ExportResult exportAPIManagerSetup(APIManagerSetupExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
         // We need to clean some Singleton-Instances, as tests are running in the same JVM
-        APIManagerAdapter.deleteInstance();
-        APIMHttpClient.deleteInstances();
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(exportImpl, params, result);
-        APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        if (params.isExportConfig()) {
-            apiManagerConfig.setConfig(adapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()));
+        try {
+            APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(exportImpl, params, result);
+            APIManagerConfig apiManagerConfig = new APIManagerConfig();
+            if (params.isExportConfig()) {
+                apiManagerConfig.setConfig(adapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
+            }
+            if (params.isExportAlerts()) {
+                apiManagerConfig.setAlerts(adapter.getAlertsAdapter().getAlerts());
+            }
+            if (params.isExportRemoteHosts()) {
+                apiManagerConfig.setRemoteHosts(adapter.getRemoteHostsAdapter().getRemoteHosts(exporter.getRemoteHostFilter()));
+            }
+            if (params.isExportQuotas()) {
+                apiManagerConfig.setQuotas(getGlobalQuotas(adapter));
+            }
+            exporter.export(apiManagerConfig);
+            if (exporter.hasError()) {
+                LOG.error("Please check the log. At least one error was recorded.");
+            } else {
+                LOG.info("API-Manager configuration successfully exported.");
+            }
+            return result;
+        } finally {
+            Utils.deleteInstance(adapter);
         }
-        if (params.isExportAlerts()) {
-            apiManagerConfig.setAlerts(adapter.alertsAdapter.getAlerts());
-        }
-        if (params.isExportRemoteHosts()) {
-            apiManagerConfig.setRemoteHosts(adapter.remoteHostsAdapter.getRemoteHosts(exporter.getRemoteHostFilter()));
-        }
-        if (params.isExportQuotas()) {
-            apiManagerConfig.setQuotas(getGlobalQuotas(adapter));
-        }
-        exporter.export(apiManagerConfig);
-        if (exporter.hasError()) {
-            LOG.error("Please check the log. At least one error was recorded.");
-        } else {
-            LOG.info("API-Manager configuration successfully exported.");
-        }
-        APIManagerAdapter.deleteInstance();
-        return result;
     }
 
     public Quotas getGlobalQuotas(APIManagerAdapter adapter) throws AppException {
         Quotas quotas = new Quotas();
-        APIQuota systemQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
-        APIQuota applicationQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
+        APIQuota systemQuota = adapter.getQuotaAdapter().getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
+        APIQuota applicationQuota = adapter.getQuotaAdapter().getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
         QuotaRestriction systemQuotaRestriction = systemQuota.getRestrictions().stream().filter(
             quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().orElse(null);
         QuotaRestriction applicationQuotaRestriction = applicationQuota.getRestrictions().stream().filter(
@@ -144,28 +145,27 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         ImportResult result = new ImportResult();
         StringBuilder updatedAssets = new StringBuilder();
+        APIManagerAdapter apimAdapter = null;
         try {
             params.validateRequiredParameters();
             // Clean some Singleton-Instances, as tests are running in the same JVM
-            APIManagerAdapter.deleteInstance();
-            APIMHttpClient.deleteInstances();
             errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
-            APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
+            apimAdapter = APIManagerAdapter.getInstance();
             APIManagerConfig desiredConfig = new APIManagerConfigAdapter(params).getManagerConfig();
             if (desiredConfig.getConfig() != null) {
-                apimAdapter.configAdapter.updateConfiguration(desiredConfig.getConfig());
+                apimAdapter.getConfigAdapter().updateConfiguration(desiredConfig.getConfig());
                 updatedAssets.append("Config ");
                 LOG.debug("API-Manager configuration successfully updated.");
             }
             if (desiredConfig.getAlerts() != null) {
-                apimAdapter.alertsAdapter.updateAlerts(desiredConfig.getAlerts());
+                apimAdapter.getAlertsAdapter().updateAlerts(desiredConfig.getAlerts());
                 updatedAssets.append("Alerts ");
                 LOG.debug("API-Manager alerts successfully updated.");
             }
             if (desiredConfig.getRemoteHosts() != null) {
                 for (RemoteHost desiredRemoteHost : desiredConfig.getRemoteHosts().values()) {
-                    RemoteHost actualRemoteHost = apimAdapter.remoteHostsAdapter.getRemoteHost(desiredRemoteHost.getName(), desiredRemoteHost.getPort());
-                    apimAdapter.remoteHostsAdapter.createOrUpdateRemoteHost(desiredRemoteHost, actualRemoteHost);
+                    RemoteHost actualRemoteHost = apimAdapter.getRemoteHostsAdapter().getRemoteHost(desiredRemoteHost.getName(), desiredRemoteHost.getPort());
+                    apimAdapter.getRemoteHostsAdapter().createOrUpdateRemoteHost(desiredRemoteHost, actualRemoteHost);
                 }
                 updatedAssets.append("Remote-Hosts ");
                 LOG.debug("API-Manager remote host(s) successfully updated.");
@@ -187,16 +187,17 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         } finally {
-            APIManagerAdapter.deleteInstance();
+            Utils.deleteInstance(apimAdapter);
         }
     }
 
     public void upsertGlobalQuota(Quotas quotas) throws AppException {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+        APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction systemQuotaRestriction = quotas.getSystemQuota();
         if (systemQuotaRestriction != null) {
             LOG.debug("Updating System Global Quota : {}", systemQuotaRestriction);
-            APIQuota systemQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
+            APIQuota systemQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
             if (systemQuota.getRestrictions() != null) {
                 for (Iterator<QuotaRestriction> iterator = systemQuota.getRestrictions().iterator(); iterator.hasNext(); ) {
                     QuotaRestriction quotaRestriction = iterator.next();
@@ -207,14 +208,13 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
                 }
                 systemQuota.getRestrictions().add(systemQuotaRestriction);
             }
-            adapter.quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
+            quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
             LOG.debug("System Global Quota is updated");
         }
-
         QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
         if (applicationQuotaRestriction != null) {
             LOG.debug("Updating Application Global Quota : {}", applicationQuotaRestriction);
-            APIQuota applicationQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
+            APIQuota applicationQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
             if (applicationQuota.getRestrictions() != null) {
                 for (Iterator<QuotaRestriction> iterator = applicationQuota.getRestrictions().iterator(); iterator.hasNext(); ) {
                     QuotaRestriction quotaRestriction = iterator.next();
@@ -225,7 +225,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
                 }
                 applicationQuota.getRestrictions().add(applicationQuotaRestriction);
             }
-            adapter.quotaAdapter.saveQuota(applicationQuota, APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId());
+            quotaAdapter.saveQuota(applicationQuota, APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId());
             LOG.debug("Application Global Quota is updated");
         }
     }

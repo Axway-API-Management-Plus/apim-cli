@@ -32,7 +32,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setConfig(apimanagerAdapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()));
+        apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
         exporter.export(apiManagerConfig);
     }
 
@@ -44,7 +44,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setAlerts(apimanagerAdapter.alertsAdapter.getAlerts());
+        apiManagerConfig.setAlerts(apimanagerAdapter.getAlertsAdapter().getAlerts());
         exporter.export(apiManagerConfig);
     }
 
@@ -56,7 +56,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setRemoteHosts(apimanagerAdapter.remoteHostsAdapter.getRemoteHosts(new RemoteHostFilter.Builder().build()));
+        apiManagerConfig.setRemoteHosts(apimanagerAdapter.getRemoteHostsAdapter().getRemoteHosts(new RemoteHostFilter.Builder().build()));
         exporter.export(apiManagerConfig);
     }
 
@@ -68,7 +68,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setRemoteHosts(apimanagerAdapter.remoteHostsAdapter.getRemoteHosts(new RemoteHostFilter.Builder().build()));
+        apiManagerConfig.setRemoteHosts(apimanagerAdapter.getRemoteHostsAdapter().getRemoteHosts(new RemoteHostFilter.Builder().build()));
         exporter.export(apiManagerConfig);
     }
 
@@ -80,7 +80,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setRemoteHosts(apimanagerAdapter.remoteHostsAdapter.getRemoteHosts(new RemoteHostFilter.Builder().build()));
+        apiManagerConfig.setRemoteHosts(apimanagerAdapter.getRemoteHostsAdapter().getRemoteHosts(new RemoteHostFilter.Builder().build()));
         exporter.export(apiManagerConfig);
     }
 

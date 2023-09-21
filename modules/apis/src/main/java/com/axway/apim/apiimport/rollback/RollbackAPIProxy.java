@@ -3,6 +3,7 @@ package com.axway.apim.apiimport.rollback;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
@@ -28,23 +29,24 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
     @Override
     public void rollback() throws AppException {
         try {
+            APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
             if (rollbackAPI.getId() != null) { // We already have an ID to the FE-API can delete it directly
                 LOG.info("Rollback FE-API: {} (ID: {} / State: {})", this.rollbackAPI.getName(), this.rollbackAPI.getId(), this.rollbackAPI.getState());
                 if (rollbackAPI.getId() != null) {
-                    this.rollbackAPI = APIManagerAdapter.getInstance().apiAdapter.getAPIWithId(this.rollbackAPI.getId());
+                    this.rollbackAPI = apiAdapter.getAPIWithId(this.rollbackAPI.getId());
                     new APIStatusManager().update(rollbackAPI, API.STATE_UNPUBLISHED, true);
                 }
-                APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(this.rollbackAPI);
+                apiAdapter.deleteAPIProxy(this.rollbackAPI);
             } else {
                 // As we don't have the FE-API ID, try to find the FE-API, based on the BE-API-ID
                 APIFilter filter = new APIFilter.Builder().hasApiId(rollbackAPI.getApiId()).build();
-                API existingAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(filter, false);// The path is not set at this point, hence we provide null
+                API existingAPI = apiAdapter.getAPI(filter, false);// The path is not set at this point, hence we provide null
                 if (existingAPI != null) {
                     LOG.info("Rollback FE-API: {} (ID: {} / State: {})", existingAPI.getName(), existingAPI.getId(), existingAPI.getState());
                     if (existingAPI.getState() != null && existingAPI.getState().equals(API.STATE_PUBLISHED)) {
                         new APIStatusManager().update(existingAPI, API.STATE_UNPUBLISHED, true);
                     }
-                    APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(existingAPI);
+                    apiAdapter.deleteAPIProxy(existingAPI);
                 } else {
                     LOG.info("No FE-API found to rollback.");
                 }

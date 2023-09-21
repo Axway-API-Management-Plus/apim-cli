@@ -36,7 +36,6 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
         try {
             new TestSetup().initCliHome();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("test");

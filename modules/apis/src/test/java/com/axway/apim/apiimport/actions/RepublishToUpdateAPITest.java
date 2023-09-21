@@ -26,12 +26,12 @@ public class RepublishToUpdateAPITest extends WiremockWrapper {
 
     @Test
     public void testRepublishToUpdateApi() throws AppException {
-        APIManagerAdapter.deleteInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
-        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        Organization organization = apiManagerAdapter.getOrgAdapter().getOrgForName("orga");
         RepublishToUpdateAPI republishToUpdateAPI = new RepublishToUpdateAPI();
         API actualAPI = new API();
         actualAPI.setName("petstore");
@@ -52,5 +52,6 @@ public class RepublishToUpdateAPITest extends WiremockWrapper {
         desiredAPI.setState("published");
         APIChangeState apiChangeState = new APIChangeState(actualAPI, desiredAPI);
         republishToUpdateAPI.execute(apiChangeState);
+        apiManagerAdapter.deleteInstance();
     }
 }

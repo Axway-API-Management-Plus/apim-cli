@@ -389,7 +389,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
         public Builder hasName(String name) throws AppException {
             if (name == null) return this;
             if (name.contains("|")) {
-                Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(name.substring(name.indexOf("|") + 1));
+                Organization org = APIManagerAdapter.getInstance().getOrgAdapter().getOrgForName(name.substring(name.indexOf("|") + 1));
                 hasOrganization(org);
                 this.applicationName = name.substring(0, name.indexOf("|"));
             } else {
@@ -412,7 +412,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         public Builder hasOrganizationName(String organizationName) throws AppException {
             if (organizationName == null) return this;
-            Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(organizationName);
+            Organization org = APIManagerAdapter.getInstance().getOrgAdapter().getOrgForName(organizationName);
             if (org == null) {
                 throw new AppException("The organization with name: '" + organizationName + "' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
             }
@@ -426,7 +426,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         public Builder hasCreatedByLoginName(String loginName) throws AppException {
             if (loginName == null) return this;
-            User user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(loginName);
+            User user = APIManagerAdapter.getInstance().getUserAdapter().getUserForLoginName(loginName);
             if (user == null) {
                 throw new AppException("The user with login name: '" + loginName + "' is unknown.", ErrorCode.UNKNOWN_USER);
             }

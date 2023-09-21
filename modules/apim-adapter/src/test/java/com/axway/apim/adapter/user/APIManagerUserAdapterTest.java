@@ -14,17 +14,18 @@ import org.testng.annotations.Test;
 public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     private APIManagerAdapter apiManagerAdapter;
+    private APIManagerUserAdapter apiManagerUserAdapter;
 
     @BeforeClass
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
             apiManagerAdapter = APIManagerAdapter.getInstance();
+            apiManagerUserAdapter = apiManagerAdapter.getUserAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -32,6 +33,7 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @AfterClass
     public void close() {
+        apiManagerAdapter.deleteInstance();
         super.close();
     }
 
@@ -40,7 +42,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void getUsers() throws AppException {
-        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
         Assert.assertEquals(user.getLoginName(), loginName);
@@ -48,7 +49,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void deleteUser() throws AppException {
-        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
         try {
@@ -60,7 +60,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateUser() throws AppException {
-        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
         User desiredUser = new User();
@@ -73,7 +72,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateUserCreateNewUserFlow() throws AppException {
-        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         User user = new User();
         user.setEmail("updated@axway.com");
         user.setName("usera");
@@ -84,7 +82,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void changePassword() throws AppException {
-        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
         try {
@@ -96,7 +93,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void addImage() throws AppException {
-        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
         user.setImageUrl("https://axway.com/favicon.ico");

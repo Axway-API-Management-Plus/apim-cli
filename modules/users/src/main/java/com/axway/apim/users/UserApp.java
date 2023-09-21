@@ -1,10 +1,5 @@
 package com.axway.apim.users;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.CustomProperties.Type;
@@ -16,9 +11,9 @@ import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.users.adapter.UserConfigAdapter;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.adapter.UserAdapter;
+import com.axway.apim.users.adapter.UserConfigAdapter;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.impl.UserResultHandler.ResultHandler;
 import com.axway.apim.users.lib.UserImportParams;
@@ -28,11 +23,16 @@ import com.axway.apim.users.lib.cli.UserExportCLIOptions;
 import com.axway.apim.users.lib.cli.UserImportCLIOptions;
 import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class UserApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserApp.class);
     private static final ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+
     @Override
     public String getName() {
         return "User - Management";
@@ -91,28 +91,29 @@ public class UserApp implements APIMCLIServiceProvider {
 
     private ExportResult runExport(UserExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
         // We need to clean some Singleton-Instances, as tests are running in the same JVM
-        APIManagerAdapter.deleteInstance();
-        APIMHttpClient.deleteInstances();
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
-        UserResultHandler exporter = UserResultHandler.create(exportImpl, params, result);
-        List<User> users = adapter.userAdapter.getUsers(exporter.getFilter());
-        if (users.isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("No users found using filter: {}", exporter.getFilter());
+        try {
+            UserResultHandler exporter = UserResultHandler.create(exportImpl, params, result);
+            List<User> users = adapter.getUserAdapter().getUsers(exporter.getFilter());
+            if (users.isEmpty()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No users found using filter: {}", exporter.getFilter());
+                } else {
+                    LOG.info("No users found based on the given criteria.");
+                }
             } else {
-                LOG.info("No users found based on the given criteria.");
+                LOG.info("Found {} user(s).", users.size());
+                exporter.export(users);
+                if (exporter.hasError()) {
+                    LOG.error("Please check the log. At least one error was recorded.");
+                } else {
+                    LOG.debug("Successfully exported {} user(s).", users.size());
+                }
             }
-        } else {
-            LOG.info("Found {} user(s).", users.size());
-            exporter.export(users);
-            if (exporter.hasError()) {
-                LOG.error("Please check the log. At least one error was recorded.");
-            } else {
-                LOG.debug("Successfully exported {} user(s).", users.size());
-            }
-            APIManagerAdapter.deleteInstance();
+            return result;
+        } finally {
+            Utils.deleteInstance(adapter);
         }
-        return result;
     }
 
     @CLIServiceMethod(name = "import", description = "Import user(s) into the API-Manager")
@@ -129,25 +130,24 @@ public class UserApp implements APIMCLIServiceProvider {
 
     public ImportResult importUsers(UserImportParams params) {
         ImportResult result = new ImportResult();
+        APIManagerAdapter apiManagerAdapter = null;
         try {
+            apiManagerAdapter = APIManagerAdapter.getInstance();
             params.validateRequiredParameters();
             // We need to clean some Singleton-Instances, as tests are running in the same JVM
-            APIManagerAdapter.deleteInstance();
-            APIMHttpClient.deleteInstances();
-            APIManagerAdapter.getInstance();
             // Load the desired state of the organization
             UserAdapter userAdapter = new UserConfigAdapter(params);
             List<User> desiredUsers = userAdapter.getUsers();
             UserImportManager importManager = new UserImportManager();
 
             for (User desiredUser : desiredUsers) {
-                User actualUser = APIManagerAdapter.getInstance().userAdapter.getUser(
+                User actualUser = apiManagerAdapter.getUserAdapter().getUser(
                     new UserFilter.Builder()
                         .hasLoginName(desiredUser.getLoginName())
                         .includeImage(true)
-                        .includeCustomProperties(APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user))
+                        .includeCustomProperties(apiManagerAdapter.getCustomPropertiesAdapter().getCustomPropertyNames(Type.user))
                         .build());
-                User actualUserWithEmail = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasEmail(desiredUser.getEmail()).build());
+                User actualUserWithEmail = apiManagerAdapter.getUserAdapter().getUser(new UserFilter.Builder().hasEmail(desiredUser.getEmail()).build());
                 if (actualUserWithEmail != null && actualUser != null && !actualUser.getId().equals(actualUserWithEmail.getId())) {
                     LOG.error("A different user: {} with the supplied email address: {} already exists. ", actualUserWithEmail.getLoginName(), desiredUser.getEmail());
                     continue;
@@ -165,7 +165,7 @@ public class UserApp implements APIMCLIServiceProvider {
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         } finally {
-            APIManagerAdapter.deleteInstance();
+            Utils.deleteInstance(apiManagerAdapter);
         }
     }
 
@@ -181,7 +181,7 @@ public class UserApp implements APIMCLIServiceProvider {
         }
     }
 
-    public ExportResult delete(UserExportParams params) throws AppException{
+    public ExportResult delete(UserExportParams params) throws AppException {
         ExportResult result = new ExportResult();
         try {
             return runExport(params, ResultHandler.USER_DELETE_HANDLER, result);

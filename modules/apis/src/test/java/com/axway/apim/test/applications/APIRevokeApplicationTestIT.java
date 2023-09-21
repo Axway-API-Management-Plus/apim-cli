@@ -2,9 +2,7 @@ package com.axway.apim.test.applications;
 
 import com.axway.apim.APIExportApp;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.exceptions.ValidationException;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 @Test(testName = "APIRevokeApplicationTestIT")
@@ -26,8 +23,6 @@ public class APIRevokeApplicationTestIT extends TestNGCitrusTestDesigner {
     @Value("${apiManagerHost}")
     private String host;
 
-    @Value("${apiManagerPort}")
-    private int port;
 
     @Value("${apiManagerUser}")
     private String username;
@@ -43,12 +38,25 @@ public class APIRevokeApplicationTestIT extends TestNGCitrusTestDesigner {
         /* Org id and org name was set by pretest */
         String apiNumber = RandomNumberFunction.getRandomNumber(3, true);
         variable("apiNumber", apiNumber);
-        variable("testOrgName", "${orgName}");
-        // variable("orgNameTest", "grant_org-api-${apiNumber}-org");
-        createVariable("useApiAdmin", "true"); // Use apiadmin account
+      //  variable("testOrgName", "${orgName}");
+         variable("testOrgName", "grant_org-api-${apiNumber}-org");
+        variable("useApiAdmin", "true"); // Use apiadmin account
         variable("apiPath", "/grant_org-api-${apiNumber}");
         variable("apiName", "Grant to some orgs API-${apiNumber}");
         variable("appName", "Application API-${apiNumber}");
+
+        echo("#### Create Organization  ###");
+        http().client("apiManager")
+            .send()
+            .post("/organizations")
+            .name("createOrganization")
+            .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .payload("{\"name\": \"${testOrgName}\", \"description\": \"${testOrgName}\", \"enabled\": true, \"development\": true }");
+
+        http().client("apiManager")
+            .receive()
+            .response(HttpStatus.CREATED).extractFromPayload("$.id", "testOrgId");
+
 
         echo("#### Create Application  ###");
         http().client("apiManager")
@@ -56,7 +64,7 @@ public class APIRevokeApplicationTestIT extends TestNGCitrusTestDesigner {
             .post("/applications")
             .name("createApplication")
             .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .payload("{\"name\":\"${appName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
+            .payload("{\"name\":\"${appName}\",\"apis\":[],\"organizationId\":\"${testOrgId}\"}");
 
         http().client("apiManager")
             .receive()

@@ -25,7 +25,6 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
@@ -37,6 +36,7 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
     }
     @AfterClass
     public void stop() {
+        Utils.deleteInstance(apimanagerAdapter);
         close();
     }
 
@@ -46,7 +46,7 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         ConsoleAppExporter consoleAppExporter = new ConsoleAppExporter(params, result);
         consoleAppExporter.export(apps);
     }
@@ -57,7 +57,7 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         ConsoleAppExporter consoleAppExporter = new ConsoleAppExporter(params, result);
         consoleAppExporter.export(apps);
     }
@@ -68,7 +68,7 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CONSOLE_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         ConsoleAppExporter consoleAppExporter = new ConsoleAppExporter(params, result);
         consoleAppExporter.export(apps);
     }

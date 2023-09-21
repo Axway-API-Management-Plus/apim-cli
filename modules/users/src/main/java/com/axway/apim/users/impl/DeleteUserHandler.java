@@ -39,7 +39,7 @@ public class DeleteUserHandler extends UserResultHandler {
 		Console.println("Okay, going to delete: " + users.size() + " Users(s)");
 		for(User user : users) {
 			try {
-				APIManagerAdapter.getInstance().userAdapter.deleteUser(user);
+				APIManagerAdapter.getInstance().getUserAdapter().deleteUser(user);
 			} catch(Exception e) {
 				LOG.error("Error deleting user: {}", user.getName());
 			}

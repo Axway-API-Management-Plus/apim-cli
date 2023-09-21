@@ -61,48 +61,37 @@ public class APIManagerAdapter {
     public static final String ADMIN = "admin";
     public static final String OADMIN = "oadmin";
     public static final String USER = "user";
-
-    private static APIManagerAdapter instance;
-
-    private String apiManagerVersion = null;
-    public static String apiManagerName = null;
-
-    public static boolean initialized = false;
-
-    public static final ObjectMapper mapper = new ObjectMapper();
-
-    private static final Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
-
-    private boolean usingOrgAdmin = false;
-    private boolean hasAdminAccount = false;
-
     public static final String CREDENTIAL_TYPE_API_KEY = "apikeys";
     public static final String CREDENTIAL_TYPE_EXT_CLIENTID = "extclients";
     public static final String CREDENTIAL_TYPE_OAUTH = "oauth";
-
     public static final String SYSTEM_API_QUOTA = "00000000-0000-0000-0000-000000000000";
     public static final String APPLICATION_DEFAULT_QUOTA = "00000000-0000-0000-0000-000000000001";
-
     public static final String TYPE_FRONT_END = "proxies";
     public static final String TYPE_BACK_END = "apirepo";
 
+    private static APIManagerAdapter instance;
+    private String apiManagerVersion = null;
+    private String apiManagerName = null;
+    private boolean initialized;
+    public static final ObjectMapper mapper = new ObjectMapper();
+    private static final Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
+    private boolean usingOrgAdmin = false;
+    private boolean hasAdminAccount = false;
     private static CoreParameters cmd;
-
-    public static APIMCLICacheManager cacheManager;
-    public APIManagerConfigAdapter configAdapter;
-    public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
-    public APIManagerAlertsAdapter alertsAdapter;
-    public APIManagerRemoteHostsAdapter remoteHostsAdapter;
-    public APIManagerAPIAdapter apiAdapter;
-    public APIManagerAPIMethodAdapter methodAdapter;
-    public APIManagerPoliciesAdapter policiesAdapter;
-    public APIManagerQuotaAdapter quotaAdapter;
-    public APIManagerOrganizationAdapter orgAdapter;
-    public APIManagerAPIAccessAdapter accessAdapter;
-    public APIManagerOAuthClientProfilesAdapter oauthClientAdapter;
-    public APIMgrAppsAdapter appAdapter;
-    public APIManagerUserAdapter userAdapter;
-
+    private final APIMCLICacheManager cacheManager;
+    private final APIManagerConfigAdapter configAdapter;
+    private final APIManagerCustomPropertiesAdapter customPropertiesAdapter;
+    private final APIManagerAlertsAdapter alertsAdapter;
+    private final APIManagerRemoteHostsAdapter remoteHostsAdapter;
+    private final APIManagerAPIAdapter apiAdapter;
+    private final APIManagerAPIMethodAdapter methodAdapter;
+    private final APIManagerPoliciesAdapter policiesAdapter;
+    private final APIManagerQuotaAdapter quotaAdapter;
+    private final APIManagerOrganizationAdapter orgAdapter;
+    private final APIManagerAPIAccessAdapter accessAdapter;
+    private final APIManagerOAuthClientProfilesAdapter oauthClientAdapter;
+    private final APIMgrAppsAdapter appAdapter;
+    private final APIManagerUserAdapter userAdapter;
     private static final HttpHelper httpHelper = new HttpHelper();
 
     public static synchronized APIManagerAdapter getInstance() throws AppException {
@@ -112,13 +101,12 @@ public class APIManagerAdapter {
             cmd.validateRequiredParameters();
             instance.loginToAPIManager();
             instance.setApiManagerVersion();
-            initialized = true;
             LOG.info("Successfully connected to API-Manager ({}) on: {}", instance.getApiManagerVersion(), cmd.getAPIManagerURL());
         }
         return instance;
     }
 
-    public static synchronized void deleteInstance()  {
+    public synchronized void deleteInstance() {
         if (cacheManager != null && cacheManager.getStatus() == Status.AVAILABLE) {
             LOG.debug("Closing cache ...");
             cacheManager.close();
@@ -132,6 +120,7 @@ public class APIManagerAdapter {
             }
             instance.apiManagerVersion = null;
             instance = null;
+            APIMHttpClient.deleteInstances();
         }
         initialized = false;
     }
@@ -148,6 +137,7 @@ public class APIManagerAdapter {
     }
 
     private APIManagerAdapter() {
+        this.cacheManager = initCacheManager();
         // For now this okay, may be replaced with a Factory later
         this.configAdapter = new APIManagerConfigAdapter();
         this.customPropertiesAdapter = new APIManagerCustomPropertiesAdapter();
@@ -156,12 +146,73 @@ public class APIManagerAdapter {
         this.apiAdapter = new APIManagerAPIAdapter();
         this.methodAdapter = new APIManagerAPIMethodAdapter();
         this.policiesAdapter = new APIManagerPoliciesAdapter();
-        this.quotaAdapter = new APIManagerQuotaAdapter();
-        this.orgAdapter = new APIManagerOrganizationAdapter();
-        this.accessAdapter = new APIManagerAPIAccessAdapter();
-        this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter();
-        this.appAdapter = new APIMgrAppsAdapter();
-        this.userAdapter = new APIManagerUserAdapter();
+        this.quotaAdapter = new APIManagerQuotaAdapter(this);
+        this.orgAdapter = new APIManagerOrganizationAdapter(this);
+        this.accessAdapter = new APIManagerAPIAccessAdapter(this);
+        this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter(this);
+        this.appAdapter = new APIMgrAppsAdapter(this);
+        this.userAdapter = new APIManagerUserAdapter(this);
+        initialized = true;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public APIMCLICacheManager getCacheManager() {
+        return cacheManager;
+    }
+
+    public APIManagerConfigAdapter getConfigAdapter() {
+        return configAdapter;
+    }
+
+    public APIManagerCustomPropertiesAdapter getCustomPropertiesAdapter() {
+        return customPropertiesAdapter;
+    }
+
+    public APIManagerAlertsAdapter getAlertsAdapter() {
+        return alertsAdapter;
+    }
+
+    public APIManagerRemoteHostsAdapter getRemoteHostsAdapter() {
+        return remoteHostsAdapter;
+    }
+
+    public APIManagerAPIAdapter getApiAdapter() {
+        return apiAdapter;
+    }
+
+    public APIManagerAPIMethodAdapter getMethodAdapter() {
+        return methodAdapter;
+    }
+
+    public APIManagerPoliciesAdapter getPoliciesAdapter() {
+        return policiesAdapter;
+    }
+
+    public APIManagerQuotaAdapter getQuotaAdapter() {
+        return quotaAdapter;
+    }
+
+    public APIManagerOrganizationAdapter getOrgAdapter() {
+        return orgAdapter;
+    }
+
+    public APIManagerAPIAccessAdapter getAccessAdapter() {
+        return accessAdapter;
+    }
+
+    public APIManagerOAuthClientProfilesAdapter getOauthClientAdapter() {
+        return oauthClientAdapter;
+    }
+
+    public APIMgrAppsAdapter getAppAdapter() {
+        return appAdapter;
+    }
+
+    public APIManagerUserAdapter getUserAdapter() {
+        return userAdapter;
     }
 
     public void loginToAPIManager() throws AppException {
@@ -249,18 +300,18 @@ public class APIManagerAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
                     throw new AppException("Status-Code: " + statusCode + ", Can't get current-user for user '" + currentUser + "'",
-                            ErrorCode.API_MANAGER_COMMUNICATION);
+                        ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 User user = mapper.readValue(currentUser, User.class);
                 if (user == null) {
                     throw new AppException("Can't get current-user information on response: '" + currentUser + "'",
-                            ErrorCode.API_MANAGER_COMMUNICATION);
+                        ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 return user;
             }
         } catch (Exception e) {
             throw new AppException("Error: '" + e.getMessage() + "' while parsing current-user information on response",
-                    ErrorCode.API_MANAGER_COMMUNICATION, e);
+                ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 
@@ -273,14 +324,10 @@ public class APIManagerAdapter {
         }
     }
 
-    private static CacheManager getCacheManager() {
-        if (APIManagerAdapter.cacheManager != null) {
-            if (APIManagerAdapter.cacheManager.getStatus() == Status.UNINITIALIZED)
-                APIManagerAdapter.cacheManager.init();
-            return APIManagerAdapter.cacheManager;
-        }
+    private APIMCLICacheManager initCacheManager() {
+        APIMCLICacheManager apimcliCacheManager = null;
         if (CoreParameters.getInstance().isIgnoreCache()) {
-            APIManagerAdapter.cacheManager = new APIMCLICacheManager(new DoNothingCacheManager());
+            apimcliCacheManager = new APIMCLICacheManager(new DoNothingCacheManager());
         } else {
             URL cacheConfigUrl;
             File cacheConfigFile = null;
@@ -304,8 +351,8 @@ public class APIManagerAdapter {
             do {
                 try {
                     CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);//NOSONAR
-                    APIManagerAdapter.cacheManager = new APIMCLICacheManager(ehcacheManager);
-                    APIManagerAdapter.cacheManager.init();
+                    apimcliCacheManager = new APIMCLICacheManager(ehcacheManager);//NOSONAR
+                    apimcliCacheManager.init();
                 } catch (StateTransitionException e) {
                     LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}", initAttempts, maxAttempts);
                     try {
@@ -315,18 +362,18 @@ public class APIManagerAdapter {
                     }
                 }
                 initAttempts++;
-            } while (APIManagerAdapter.cacheManager.getStatus() == Status.UNINITIALIZED && initAttempts <= maxAttempts);
+            } while (apimcliCacheManager != null && apimcliCacheManager.getStatus() == Status.UNINITIALIZED && initAttempts <= maxAttempts);
         }
-        return cacheManager;
+        return apimcliCacheManager;
     }
 
-    public static <K, V> Cache<K, V> getCache(CacheType cacheType, Class<K> key, Class<V> value) {
-        getCacheManager();
+    public <K, V> Cache<K, V> getCache(CacheType cacheType, Class<K> key, Class<V> value) {
+
         if (CoreParameters.getInstance() instanceof StandardImportParams) {
             List<CacheType> enabledCaches = StandardImportParams.getInstance().getEnabledCacheTypes();
-            APIManagerAdapter.cacheManager.setEnabledCaches(enabledCaches);
+            cacheManager.setEnabledCaches(enabledCaches);
         }
-        Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
+        Cache<K, V> cache = cacheManager.getCache(cacheType.name(), key, value);
         if (CoreParameters.getInstance().clearCaches() != null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
             cache.clear();
             LOG.info("Cache: {} successfully cleared.", cacheType);
@@ -506,23 +553,23 @@ public class APIManagerAdapter {
         return apiManagerVersion;
     }
 
-    public static String getApiManagerName() throws AppException {
-        if (APIManagerAdapter.apiManagerName != null) {
+    public String getApiManagerName() throws AppException {
+        if (apiManagerName != null) {
             return apiManagerName;
         }
-        APIManagerAdapter.apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
-        return APIManagerAdapter.apiManagerName;
+        apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
+        return apiManagerName;
     }
 
     public static String getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
             HttpEntity entity = MultipartEntityBuilder.create()
-                    .addBinaryBody("file", certificate, ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
-                    .addTextBody("inbound", cert.getInbound())
-                    .addTextBody("outbound", cert.getOutbound())
-                    .addTextBody("passphrase", password)
-                    .build();
+                .addBinaryBody("file", certificate, ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
+                .addTextBody("inbound", cert.getInbound())
+                .addTextBody("outbound", cert.getOutbound())
+                .addTextBody("passphrase", password)
+                .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -555,8 +602,8 @@ public class APIManagerAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
             HttpEntity entity = MultipartEntityBuilder.create()
-                    .addBinaryBody("file", fileFontent, contentType, filename)
-                    .build();
+                .addBinaryBody("file", fileFontent, contentType, filename)
+                .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
                 return mapper.readTree(httpResponse.getEntity().getContent());
@@ -568,9 +615,8 @@ public class APIManagerAdapter {
 
     /**
      * @return true, when admin credentials are provided
-     * @throws AppException when the API-Manager instance is not initialized
      */
-    public static boolean hasAdminAccount() throws AppException {
-        return APIManagerAdapter.getInstance().hasAdminAccount;
+    public boolean hasAdminAccount() {
+        return hasAdminAccount;
     }
 }

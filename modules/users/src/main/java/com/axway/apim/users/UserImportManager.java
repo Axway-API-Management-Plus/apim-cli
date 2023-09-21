@@ -17,7 +17,7 @@ public class UserImportManager {
 
     public UserImportManager() throws AppException {
         super();
-        this.userAdapter = APIManagerAdapter.getInstance().userAdapter;
+        this.userAdapter = APIManagerAdapter.getInstance().getUserAdapter();
     }
 
     public void replicate(User desiredUser, User actualUser) throws AppException {

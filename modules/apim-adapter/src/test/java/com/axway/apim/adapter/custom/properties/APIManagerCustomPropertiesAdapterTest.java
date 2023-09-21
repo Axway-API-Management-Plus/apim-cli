@@ -18,18 +18,17 @@ import java.util.Map;
 
 public class APIManagerCustomPropertiesAdapterTest extends WiremockWrapper {
 
-    private APIManagerAdapter apimanagerAdapter;
+    private APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter;
 
     @BeforeClass
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apimanagerAdapter = APIManagerAdapter.getInstance();
+            apiManagerCustomPropertiesAdapter = APIManagerAdapter.getInstance().getCustomPropertiesAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -42,7 +41,6 @@ public class APIManagerCustomPropertiesAdapterTest extends WiremockWrapper {
 
     @Test
     public void getCustomProperties() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         CustomProperties customProperties = apiManagerCustomPropertiesAdapter.getCustomProperties();
         Assert.assertNotNull(customProperties);
         Assert.assertNotNull(customProperties.getApi());
@@ -53,42 +51,36 @@ public class APIManagerCustomPropertiesAdapterTest extends WiremockWrapper {
 
     @Test
     public void getCustomPropertiesApi() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         Map<String, CustomProperty> customPropertyMap = apiManagerCustomPropertiesAdapter.getCustomProperties(CustomProperties.Type.api);
         Assert.assertNotNull(customPropertyMap);
     }
 
     @Test
     public void getCustomPropertiesApplication() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         Map<String, CustomProperty> customPropertyMap = apiManagerCustomPropertiesAdapter.getCustomProperties(CustomProperties.Type.application);
         Assert.assertNotNull(customPropertyMap);
     }
 
     @Test
     public void getCustomPropertiesOrganization() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         Map<String, CustomProperty> customPropertyMap = apiManagerCustomPropertiesAdapter.getCustomProperties(CustomProperties.Type.organization);
         Assert.assertNotNull(customPropertyMap);
     }
 
     @Test
     public void getCustomPropertiesUser() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         Map<String, CustomProperty> customPropertyMap = apiManagerCustomPropertiesAdapter.getCustomProperties(CustomProperties.Type.user);
         Assert.assertNotNull(customPropertyMap);
     }
 
     @Test
     public void getCustomPropertyNames() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         List<String> names = apiManagerCustomPropertiesAdapter.getCustomPropertyNames(CustomProperties.Type.api);
         Assert.assertNotNull(names);
     }
 
     @Test
     public void getRequiredCustomProperties() throws AppException {
-        APIManagerCustomPropertiesAdapter apiManagerCustomPropertiesAdapter = apimanagerAdapter.customPropertiesAdapter;
         Map<String, CustomProperty> customPropertyMap = apiManagerCustomPropertiesAdapter.getRequiredCustomProperties(CustomProperties.Type.api);
         Assert.assertNotNull(customPropertyMap);
     }

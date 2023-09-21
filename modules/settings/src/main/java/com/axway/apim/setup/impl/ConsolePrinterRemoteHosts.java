@@ -46,7 +46,7 @@ public class ConsolePrinterRemoteHosts {
 
 	public void export(Map<String, RemoteHost> remoteHosts) throws AppException {
 		Console.println();
-		Console.println("Remote hosts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
+		Console.println("Remote hosts for: '" + APIManagerAdapter.getInstance().getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 		Console.println();
 		switch(params.getWide()) {
 		case standard:
@@ -153,7 +153,7 @@ public class ConsolePrinterRemoteHosts {
 		}
 		APIFilter apiFilter = new APIFilter.Builder().hasBackendBasepath("*"+backendHost+"*"+portFilter).build();
 		try {
-			return APIManagerAdapter.getInstance().apiAdapter.getAPIs(apiFilter, true);
+			return APIManagerAdapter.getInstance().getApiAdapter().getAPIs(apiFilter, true);
 		} catch (AppException e) {
 			throw e;
 		}

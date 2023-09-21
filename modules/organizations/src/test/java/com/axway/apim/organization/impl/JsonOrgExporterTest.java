@@ -29,12 +29,12 @@ public class JsonOrgExporterTest extends WiremockWrapper {
     public void testJsonExport() throws AppException {
         String[] args = {"-h", "localhost", "-o", "json", "-deleteTarget"};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.JSON_EXPORTER, params, result);
-        List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
+        List<Organization> organizations = apimanagerAdapter.getOrgAdapter().getOrgs(exporter.getFilter());
         JsonOrgExporter jsonOrgExporter = new JsonOrgExporter(params, result);
         jsonOrgExporter.export(organizations);
+        apimanagerAdapter.deleteInstance();
     }
 }

@@ -18,7 +18,6 @@ public class ClientAppImportManagerTest extends WiremockWrapper {
     @BeforeClass
     public void init() {
         initWiremock();
-        APIManagerAdapter.deleteInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("apiadmin");

@@ -24,14 +24,13 @@ public class ConfigOutboundProfileTest extends WiremockWrapper {
 	public void close() {
 		super.close();
 	}
-	
+
 	private static final String testPackage = "com/axway/apim/model/";
-	
+
 	ObjectMapper mapper = new ObjectMapper();
-	
+
 	@Test
 	public void testProfilesEquality() throws IOException {
-		APIManagerAdapter.deleteInstance();
 		CoreParameters coreParameters = new CoreParameters();
 		coreParameters.setHostname("localhost");
 		coreParameters.setUsername("test");

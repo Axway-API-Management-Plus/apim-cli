@@ -28,8 +28,8 @@ public class APIImportManager {
      */
     public void applyChanges(APIChangeState changeState, boolean forceUpdate, boolean updateOnly) throws AppException {
         boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
-        boolean orgAdminSelfService = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()).getOadminSelfServiceEnabled();
-        if (!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded()) {
+        boolean orgAdminSelfService = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
+        if (!APIManagerAdapter.getInstance().hasAdminAccount() && changeState.isAdminAccountNeeded()) {
             if (orgAdminSelfService) {
                 LOG.info("Desired API-State set to published using OrgAdmin account only. Going to create a publish request.");
             } else {
@@ -80,7 +80,7 @@ public class APIImportManager {
                 republish.execute(changeState);
             }
         }
-        if (!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
+        if (!APIManagerAdapter.getInstance().hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
             LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
                     + "You may update the pending API as often as you want before it is finally published.");
         }

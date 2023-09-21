@@ -31,12 +31,12 @@ public class YamlApplicationExporterTest extends WiremockWrapper {
     public void testYamlExport() throws AppException {
         String[] args = {"-h", "localhost", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.YAML_EXPORTER, params, result);
-        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
         YamlApplicationExporter yamlApplicationExporter = new YamlApplicationExporter(params, result);
         yamlApplicationExporter.export(apps);
+        apimanagerAdapter.deleteInstance();
     }
 }
