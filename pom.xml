@@ -55,6 +55,7 @@
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.sources>src/main</sonar.sources>
+        <sonar.inclusions>src/main</sonar.inclusions>
         <wiremock.version>2.35.0</wiremock.version>
         <citrus.version>3.4.0</citrus.version>
         <failsafe.version>3.3.2</failsafe.version>
