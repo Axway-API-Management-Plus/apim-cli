@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 public class CoreParameters implements Parameters {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
+    public static final String CLIENT_APPS_MODE = "clientAppsMode";
+    public static final String CLIENT_ORGS_MODE = "clientOrgsMode";
 
     public enum Mode {
         replace,
@@ -34,7 +37,7 @@ public class CoreParameters implements Parameters {
         }
     }
 
-    public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
+    public static final String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
     private static final String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
     private URI apiManagerUrl = null;
     private static CoreParameters instance;
@@ -71,8 +74,7 @@ public class CoreParameters implements Parameters {
     private boolean disableCompression;
     private boolean overrideSpecBasePath;
 
-    public CoreParameters() {
-        instance = this;
+    public CoreParameters() { // Default constructor
     }
 
     public static synchronized CoreParameters getInstance() {
@@ -203,16 +205,16 @@ public class CoreParameters implements Parameters {
 
     public boolean isIgnoreClientApps() {
         if (clientAppsMode == Mode.ignore) return true;
-        if (getFromProperties("clientAppsMode") != null) {
-            return Boolean.parseBoolean(getFromProperties("clientAppsMode"));
+        if (getFromProperties(CLIENT_APPS_MODE) != null) {
+            return Boolean.parseBoolean(getFromProperties(CLIENT_APPS_MODE));
         }
         return false;
     }
 
     public Mode getClientAppsMode() {
         if (clientAppsMode != null) return clientAppsMode;
-        if (getFromProperties("clientAppsMode") != null) {
-            return Mode.valueOf(getFromProperties("clientAppsMode"));
+        if (getFromProperties(CLIENT_APPS_MODE) != null) {
+            return Mode.valueOf(getFromProperties(CLIENT_APPS_MODE));
         }
         return Mode.add;
     }
@@ -224,16 +226,16 @@ public class CoreParameters implements Parameters {
 
     public boolean isIgnoreClientOrgs() {
         if (clientOrgsMode == Mode.ignore) return true;
-        if (getFromProperties("clientOrgsMode") != null) {
-            return Boolean.parseBoolean(getFromProperties("clientOrgsMode"));
+        if (getFromProperties(CLIENT_ORGS_MODE) != null) {
+            return Boolean.parseBoolean(getFromProperties(CLIENT_ORGS_MODE));
         }
         return false;
     }
 
     public Mode getClientOrgsMode() {
         if (clientOrgsMode != null) return clientOrgsMode;
-        if (getFromProperties("clientOrgsMode") != null) {
-            return Mode.valueOf(getFromProperties("clientOrgsMode"));
+        if (getFromProperties(CLIENT_ORGS_MODE) != null) {
+            return Mode.valueOf(getFromProperties(CLIENT_ORGS_MODE));
         }
         return Mode.add;
     }
@@ -376,7 +378,7 @@ public class CoreParameters implements Parameters {
     }
 
     public List<CacheType> clearCaches() {
-        if (getClearCache() == null) return null;
+        if (getClearCache() == null) return Collections.emptyList();
         if (cachesToClear != null) return cachesToClear;
         cachesToClear = createCacheList(getClearCache());
         return cachesToClear;

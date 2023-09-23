@@ -7,21 +7,25 @@ import com.axway.apim.api.model.APISpecificationFilter;
 
 public class BaseAPISpecificationFilter {
 
+    private BaseAPISpecificationFilter() {
+        throw new IllegalStateException("Utility class");
+    }
+
     protected static class FilterConfig {
 
-        APISpecificationFilter filterConfig;
+        APISpecificationFilter filterConfigFilter;
 
-        public FilterConfig(APISpecificationFilter filterConfig) {
+        public FilterConfig(APISpecificationFilter filterConfigFilter) {
             super();
-            this.filterConfig = filterConfig;
+            this.filterConfigFilter = filterConfigFilter;
         }
 
         public boolean filterOperations(String path, String verb, List<String> tags) {
             // Nothing to filter at all
-            if (filterConfig.getExclude().isEmpty() && filterConfig.getInclude().isEmpty())
+            if (filterConfigFilter.getExclude().isEmpty() && filterConfigFilter.getInclude().isEmpty())
                 return false;
             // Check if there is any SPECIFIC EXCLUDE filter is excluding the operation
-            for (APISpecIncludeExcludeFilter filter : filterConfig.getExclude()) {
+            for (APISpecIncludeExcludeFilter filter : filterConfigFilter.getExclude()) {
                 if (filter.filter(path, verb, tags, false, true)) {
                     // Must be filtered in any case, as it is specific, even it might be included as
                     // exclude overwrite includes
@@ -29,7 +33,7 @@ public class BaseAPISpecificationFilter {
                 }
             }
             // Check if there is any SPECIFIC INCLUDE filter is including the operation
-            for (APISpecIncludeExcludeFilter filter : filterConfig.getInclude()) {
+            for (APISpecIncludeExcludeFilter filter : filterConfigFilter.getInclude()) {
                 if (filter.filter(path, verb, tags, false, true)) {
                     // Should be included as it is given with a specific filter
                     return false;
@@ -37,32 +41,32 @@ public class BaseAPISpecificationFilter {
             }
             // Now, check for WILDCARD EXCLUDES, which have less priority, than the specific
             // filters
-            for (APISpecIncludeExcludeFilter filter : filterConfig.getExclude()) {
+            for (APISpecIncludeExcludeFilter filter : filterConfigFilter.getExclude()) {
                 if (filter.filter(path, verb, tags, true, false)) {
                     // Should be filtered
                     return true;
                 }
             }
             // Check if there is any WILDCARD INCLUDE configured
-            for (APISpecIncludeExcludeFilter filter : filterConfig.getInclude()) {
+            for (APISpecIncludeExcludeFilter filter : filterConfigFilter.getInclude()) {
                 if (filter.filter(path, verb, tags, true, false)) {
                     return false;
                 }
             }
             // If there is at least one include - Filter it anyway
             // Otherwise dont filter
-            return !filterConfig.getInclude().isEmpty();
+            return !filterConfigFilter.getInclude().isEmpty();
 
         }
 
         public boolean filterModel(String modelName) {
-            for (APISpecIncludeExcludeFilter filter : filterConfig.getExclude()) {
+            for (APISpecIncludeExcludeFilter filter : filterConfigFilter.getExclude()) {
                 for (String model2Exclude : filter.getModels()) {
                     if (model2Exclude.equals(modelName)) return true;
                 }
             }
             boolean modelIncludeFilterConfigured = false;
-            for (APISpecIncludeExcludeFilter filter : filterConfig.getInclude()) {
+            for (APISpecIncludeExcludeFilter filter : filterConfigFilter.getInclude()) {
                 for (String model2Include : filter.getModels()) {
                     modelIncludeFilterConfigured = true;
                     if (model2Include.equals(modelName)) {
