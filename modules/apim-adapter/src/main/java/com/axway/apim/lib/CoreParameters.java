@@ -74,7 +74,8 @@ public class CoreParameters implements Parameters {
     private boolean disableCompression;
     private boolean overrideSpecBasePath;
 
-    public CoreParameters() { // Default constructor
+    public CoreParameters() {
+        instance = this;
     }
 
     public static synchronized CoreParameters getInstance() {
