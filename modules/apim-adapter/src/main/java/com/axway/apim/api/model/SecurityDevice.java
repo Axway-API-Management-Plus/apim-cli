@@ -15,7 +15,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,9 +25,11 @@ public class SecurityDevice {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityDevice.class);
     public static final String TOKENSTORES = "tokenstores";
-    private static Map<String, String> oauthTokenStores;
-    private static Map<String, String> oauthInfoPolicies;
-    private static Map<String, String> authenticationPolicies;
+    public static final String TOKEN_STORE = "tokenStore";
+    public static final String NOT_CONFIGURED_IN_THIS_API_MANAGER = "' is not configured in this API-Manager";
+    private Map<String, String> oauthTokenStores;
+    private Map<String, String> oauthInfoPolicies;
+    private Map<String, String> authenticationPolicies;
     private String name;
     private DeviceType type;
     int order;
@@ -59,16 +60,12 @@ public class SecurityDevice {
                     .setParameter("type", type).build();
             }
             RestAPICall getRequest = new GETRequest(uri);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()){
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 jsonResponse = mapper.readTree(response);
                 for (JsonNode node : jsonResponse) {
                     policyMap.put(node.get("name").asText(), node.get("id").asText());
                 }
-            } catch (IOException e) {
-                throw new AppException("Can't read " + type + " from response: '" + jsonResponse + "'. "
-                    + "Please make sure that you use an Admin-Role user.",
-                    ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
         } catch (Exception e) {
             throw new AppException("Can't read " + type + " from response: '" + jsonResponse + "'. "
@@ -115,46 +112,46 @@ public class SecurityDevice {
 
     public Map<String, String> getProperties() throws AppException {
         if (type == DeviceType.oauth) {
-            if (SecurityDevice.oauthTokenStores == null)
-                SecurityDevice.oauthTokenStores = initCustomPolicies(TOKENSTORES);
-            String tokenStore = properties.get("tokenStore");
+            if (oauthTokenStores == null)
+                oauthTokenStores = initCustomPolicies(TOKENSTORES);
+            String tokenStore = properties.get(TOKEN_STORE);
             if (tokenStore.startsWith("<key")) return properties;
             String esTokenStore = oauthTokenStores.get(tokenStore);
             if (esTokenStore == null) {
                 LOG.error("The tokenstore: {} is not configured in this API-Manager", tokenStore);
                 LOG.error("Available token stores: {}", oauthTokenStores.keySet());
-                throw new AppException("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
+                throw new AppException("The tokenstore: '" + tokenStore + NOT_CONFIGURED_IN_THIS_API_MANAGER, ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
-                properties.put("tokenStore", esTokenStore);
+                properties.put(TOKEN_STORE, esTokenStore);
             }
         } else if (type == DeviceType.oauthExternal && this.convertPolicies) {
-            if (SecurityDevice.oauthInfoPolicies == null)
-                SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
-            if (SecurityDevice.oauthTokenStores == null)
-                SecurityDevice.oauthTokenStores = initCustomPolicies(TOKENSTORES);
-            String infoPolicy = properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
+            if (oauthInfoPolicies == null)
+                oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
+            if (oauthTokenStores == null)
+                oauthTokenStores = initCustomPolicies(TOKENSTORES);
+            String infoPolicy = properties.get(TOKEN_STORE); // The token-info-policy is stored in the tokenStore as well
             if (infoPolicy.startsWith("<key")) return properties;
             String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);
             if (esInfoPolicy == null) {
                 LOG.error("The Information-Policy: {} is not configured in this API-Manager", infoPolicy);
                 LOG.error("Available information policies: {}", oauthInfoPolicies.keySet());
-                throw new AppException("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
+                throw new AppException("The Information-Policy: '" + infoPolicy + NOT_CONFIGURED_IN_THIS_API_MANAGER, ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
-                properties.put("tokenStore", esInfoPolicy);
+                properties.put(TOKEN_STORE, esInfoPolicy);
                 properties.put("oauth.token.client_id", "${oauth.token.client_id}");
                 properties.put("oauth.token.scopes", "${oauth.token.scopes}");
                 properties.put("oauth.token.valid", "${oauth.token.valid}");
             }
         } else if (type == DeviceType.authPolicy && this.convertPolicies) {
-            if (SecurityDevice.authenticationPolicies == null)
-                SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
+            if (authenticationPolicies == null)
+                authenticationPolicies = initCustomPolicies("authentication");
             String authPolicy = properties.get("authenticationPolicy");
             if (authPolicy.startsWith("<key")) return properties;
             String esAuthPolicy = authenticationPolicies.get(authPolicy);
             if (esAuthPolicy == null) {
                 LOG.error("The Authentication-Policy: {} is not configured in this API-Manager", authPolicy);
                 LOG.error("Available authentication policies: {}", authenticationPolicies.keySet());
-                throw new AppException("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
+                throw new AppException("The Authentication-Policy: '" + authPolicy + NOT_CONFIGURED_IN_THIS_API_MANAGER, ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
                 properties.put("authenticationPolicy", esAuthPolicy);
             }
@@ -178,7 +175,7 @@ public class SecurityDevice {
             SecurityDevice otherSecurityDevice = (SecurityDevice) other;
             if (!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
             if (!StringUtils.equals(otherSecurityDevice.getType().getName(), this.getType().getName())) return false;
-            //if(otherSecurityDevice.getOrder()!=this.getOrder()) return false; Ignore order check as 7.7.20211130 returning order id as  1 n whereas 7.7.20220830 returning order id as 0
+            //Ignore order check as 7.7.20211130 returning order id as  1 n whereas 7.7.20220830 returning order id as 0
             try {
                 if (!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;
             } catch (AppException e) {

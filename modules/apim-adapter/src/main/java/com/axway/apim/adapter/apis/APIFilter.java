@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 public class APIFilter implements CustomPropertiesFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIFilter.class);
+    private static final Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+?^$\\\\|]");
+
     public static final String FIELD = "field";
     public static final String OP = "op";
     public static final String VALUE = "value";
@@ -868,7 +870,6 @@ public class APIFilter implements CustomPropertiesFilter {
 
     private static boolean isPolicyUsed(API api, String policyName) throws AppException {
         // pattern for escaping special regex characters (except *)
-        Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+?^$\\\\|]");
         String escaped = SPECIAL_REGEX_CHARS.matcher(policyName).replaceAll("\\\\$0");
         Pattern pattern = Pattern.compile(escaped.toLowerCase().replace("*", ".*"));
         if (api.getOutboundProfiles() != null) {
