@@ -73,7 +73,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
                 new Column().header("State").with(this::getState),
                 new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
                 new Column().header("Security").with(APIResultHandler::getUsedSecurity),
-                new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(this::getUsedPoliciesForConsole),
+                new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(this::getUsedPoliciesForConsole),
                 new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
                 new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
@@ -90,12 +90,12 @@ public class ConsoleAPIExporter extends APIResultHandler {
                 new Column().header("State").with(this::getState),
                 new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
                 new Column().header("Security").with(APIResultHandler::getUsedSecurity),
-                new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(this::getUsedPoliciesForConsole),
+                new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(this::getUsedPoliciesForConsole),
                 new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
                 new Column().header("Orgs").with(this::getOrgCount),
                 new Column().header("Apps").with(this::getAppCount),
                 new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
-                new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> Boolean.toString(hasTags(api))),
+                new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(api -> Boolean.toString(hasTags(api))),
                 new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
