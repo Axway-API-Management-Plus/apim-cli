@@ -190,7 +190,7 @@ public class ODataV2Specification extends ODataSpecification {
         List<String> navProperties = new ArrayList<>();
         List<String> structProperties = entityType.getPropertyNames();
 
-        if (entityType.getNavigationPropertyNames() != null && entityType.getNavigationPropertyNames().size() > 0) {
+        if (entityType.getNavigationPropertyNames() != null && !entityType.getNavigationPropertyNames().isEmpty()) {
             navProperties.addAll(entityType.getNavigationPropertyNames());
             operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: " + navProperties;
             operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
@@ -416,6 +416,7 @@ public class ODataV2Specification extends ODataSpecification {
                 }
             }
         } catch (EdmException e) {
+            LOG.error("Error", e);
         }
     }
 
@@ -448,9 +449,9 @@ public class ODataV2Specification extends ODataSpecification {
             if (summary == null && longDescription == null && quickInfo == null) return null;
             String description = "";
             if (quickInfo != null) description = quickInfo;
-            if (!description.equals("") && summary != null) description += "<br />";
+            if (!description.isEmpty() && summary != null) description += "<br />";
             if (summary != null) description += summary;
-            if (!description.equals("") && longDescription != null) description += "<br />";
+            if (!description.isEmpty() && longDescription != null) description += "<br />";
             if (longDescription != null) description += longDescription;
             return description;
         } catch (EdmException e) {

@@ -21,35 +21,35 @@ public class DeleteUserHandler extends UserResultHandler {
 
 
     public DeleteUserHandler(UserExportParams params, ExportResult result) {
-		super(params, result);
-	}
+        super(params, result);
+    }
 
-	@Override
-	public void export(List<User> users) throws AppException {
-		Console.println(users.size() + " selected for deletion.");
-		if(CoreParameters.getInstance().isForce()) {
-			Console.println("Force flag given to delete: "+users.size()+" User(s)");
-		} else {
-			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			} else {
-				Console.println("Canceled.");
-				return;
-			}
-		}
-		Console.println("Okay, going to delete: " + users.size() + " Users(s)");
-		for(User user : users) {
-			try {
-				APIManagerAdapter.getInstance().getUserAdapter().deleteUser(user);
-			} catch(Exception e) {
-				LOG.error("Error deleting user: {}", user.getName());
-			}
-		}
-		Console.println("Done!");
-	}
+    @Override
+    public void export(List<User> users) throws AppException {
+        Console.println(users.size() + " selected for deletion.");
+        if (CoreParameters.getInstance().isForce()) {
+            Console.println("Force flag given to delete: " + users.size() + " User(s)");
+        } else {
+            if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+                Console.println("Okay, going to delete: " + users.size() + " Users(s)");
+            } else {
+                Console.println("Canceled.");
+                return;
+            }
+        }
+        for (User user : users) {
+            try {
+                APIManagerAdapter.getInstance().getUserAdapter().deleteUser(user);
+            } catch (Exception e) {
+                LOG.error("Error deleting user: {}", user.getName());
+            }
+        }
+        Console.println("Done!");
+    }
 
-	@Override
-	public UserFilter getFilter() {
-		Builder builder = getBaseFilterBuilder();
-		return builder.build();
-	}
+    @Override
+    public UserFilter getFilter() {
+        Builder builder = getBaseFilterBuilder();
+        return builder.build();
+    }
 }

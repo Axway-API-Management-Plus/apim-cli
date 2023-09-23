@@ -11,10 +11,6 @@
 
     <artifactId>apimcli-spectoconfig</artifactId>
     <name>Axway API-Manager CLI API Configuration Template Creation</name>
-    <properties>
-        <sonar.test.exclusions>**/GenerateTemplateTest.java, **/GenerateTemplateCLIOptionsTest.java</sonar.test.exclusions>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
