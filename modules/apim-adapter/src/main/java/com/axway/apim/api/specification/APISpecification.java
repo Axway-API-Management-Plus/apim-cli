@@ -17,20 +17,24 @@ import java.util.Arrays;
 
 public abstract class APISpecification {
     private static final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
+    public static final String JSON = ".json";
+    public static final String YAML = ".yaml";
+    public static final String METADATA = "$metadata";
+
 
     public enum APISpecType {
-        SWAGGER_API_1x("Swagger 1.x", ".json"),
-        SWAGGER_API_1x_YAML("Swagger 1.x (YAML)", ".yaml"),
-        SWAGGER_API_20("Swagger 2.0", ".json"),
-        SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
-        OPEN_API_30("Open API 3.0", ".json"),
-        OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
+        SWAGGER_API_1x("Swagger 1.x", JSON),
+        SWAGGER_API_1x_YAML("Swagger 1.x (YAML)", YAML),
+        SWAGGER_API_20("Swagger 2.0", JSON),
+        SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", YAML),
+        OPEN_API_30("Open API 3.0", JSON),
+        OPEN_API_30_YAML("Open API 3.0 (YAML)", YAML),
         WSDL_API("WSDL", ".xml"),
         WADL_API("Web Application Description Language (WADL)", ".wadl"),
-        ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", "$metadata", "Given OData specification is converted into an OpenAPI 3 specification.",
+        ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", METADATA, "Given OData specification is converted into an OpenAPI 3 specification.",
             "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
-        ODATA_V3("OData V4", "$metadata"),
-        ODATA_V4("OData V4", "$metadata"),
+        ODATA_V3("OData V4", METADATA),
+        ODATA_V4("OData V4", METADATA),
         UNKNOWN("Unknown", ".txt");
 
         final String niceName;

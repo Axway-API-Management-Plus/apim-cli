@@ -31,6 +31,8 @@ import java.util.Map;
 
 public class ODataV2Specification extends ODataSpecification {
     private static final Logger LOG = LoggerFactory.getLogger(ODataV2Specification.class);
+    public static final String ENTITY_SET = "EntitySet ";
+    public static final String UNEXPECTED_ERROR = "Unexpected error";
 
     Edm edm;
     @SuppressWarnings("rawtypes")
@@ -49,7 +51,7 @@ public class ODataV2Specification extends ODataSpecification {
 
     @Override
     public void updateBasePath(String basePath, String host) {
-
+        // not supported.
     }
 
     @Override
@@ -132,14 +134,14 @@ public class ODataV2Specification extends ODataSpecification {
                 .addApiResponse("200", createResponse(
                     function.getReturnType().getType().getName(),
                     getSchemaForType(function.getReturnType().getType(), function.getReturnType().getMultiplicity())))
-                ._default(createResponse("Unexpected error"));
+                ._default(createResponse(UNEXPECTED_ERROR));
             operation.setResponses(responses);
         } catch (Exception e) {
             // Happens for instance, when the given returnType cannot be resolved
             LOG.error("Error setting response for function: {} Creating standard response.", function.getName(), e);
             ApiResponses responses = new ApiResponses()
                 .addApiResponse("200", createResponse(function.getName(), new StringSchema()))
-                ._default(createResponse("Unexpected error"));
+                ._default(createResponse(UNEXPECTED_ERROR));
             operation.setResponses(responses);
         }
         return pathItem;
@@ -217,9 +219,9 @@ public class ODataV2Specification extends ODataSpecification {
         operation.addParametersItem(createParameter("$format", "Response format if supported by the backend service.", getSchemaAllowedValues(FormatValues.values())));
 
         responses = new ApiResponses()
-            .addApiResponse("200", createResponse("EntitySet " + entityName,
+            .addApiResponse("200", createResponse(ENTITY_SET + entityName,
                 getSchemaForType(entity.getEntityType(), (idPath) ? EdmMultiplicity.ONE : EdmMultiplicity.MANY)))
-            ._default(createResponse("Unexpected error"));
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.GET, operation);
         operation.setDescription(operationDescription);
@@ -235,8 +237,8 @@ public class ODataV2Specification extends ODataSpecification {
         operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to create", true));
 
         responses = new ApiResponses()
-            .addApiResponse("201", createResponse("EntitySet " + entityName))
-            ._default(createResponse("Unexpected error"));
+            .addApiResponse("201", createResponse(ENTITY_SET + entityName))
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.POST, operation);
 
@@ -249,8 +251,8 @@ public class ODataV2Specification extends ODataSpecification {
         operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to update", true));
 
         responses = new ApiResponses()
-            .addApiResponse("200", createResponse("EntitySet " + entityName))
-            ._default(createResponse("Unexpected error"));
+            .addApiResponse("200", createResponse(ENTITY_SET + entityName))
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.PATCH, operation);
 
@@ -262,8 +264,8 @@ public class ODataV2Specification extends ODataSpecification {
         operation.setDescription("Delete entity in EntitySet " + entityName);
 
         responses = new ApiResponses()
-            .addApiResponse("204", createResponse("EntitySet " + entityName + " successfully deleted"))
-            ._default(createResponse("Unexpected error"));
+            .addApiResponse("204", createResponse(ENTITY_SET + entityName + " successfully deleted"))
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.DELETE, operation);
 

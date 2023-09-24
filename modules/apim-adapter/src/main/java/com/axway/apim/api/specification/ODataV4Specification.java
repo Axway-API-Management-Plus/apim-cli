@@ -29,6 +29,10 @@ import java.util.*;
 
 public class ODataV4Specification extends ODataSpecification {
 
+    public static final String QUERY = "query";
+    public static final String ERROR = "error";
+    public static final String MESSAGE = "message";
+    public static final String ENTITY_SET = "EntitySet ";
     private final Logger logger = LoggerFactory.getLogger(ODataV4Specification.class);
     private final Map<String, Schema> schemas = new HashMap<>();
     private final Map<String, String> knownEntityTags = new HashMap<>();
@@ -106,7 +110,7 @@ public class ODataV4Specification extends ODataSpecification {
     public void addTopSkipSearchAndCount(OpenAPI openAPI) {
         Parameter topParameter = new Parameter();
         topParameter.setName("$top");
-        topParameter.setIn("query");
+        topParameter.setIn(QUERY);
         IntegerSchema integerSchema = new IntegerSchema();
         integerSchema.setMinimum(BigDecimal.valueOf(0));
         integerSchema.setFormat(null);
@@ -120,20 +124,20 @@ public class ODataV4Specification extends ODataSpecification {
         parameters.put("top", topParameter);
         Parameter skipParameter = new Parameter();
         skipParameter.setName("$skip");
-        skipParameter.setIn("query");
+        skipParameter.setIn(QUERY);
         skipParameter.setSchema(integerSchema);
         skipParameter.setDescription("Skip the first n items, see [Paging - Skip](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionskip)");
         parameters.put("skip", skipParameter);
         Parameter countParameter = new Parameter();
         countParameter.setName("$count");
-        countParameter.setIn("query");
+        countParameter.setIn(QUERY);
         BooleanSchema booleanSchema = new BooleanSchema();
         countParameter.setSchema(booleanSchema);
         countParameter.setDescription("Include count of items, see [Count](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptioncount)");
         parameters.put("count", countParameter);
         Parameter searchParameter = new Parameter();
         searchParameter.setName("$search");
-        searchParameter.setIn("query");
+        searchParameter.setIn(QUERY);
         StringSchema stringSchema = new StringSchema();
         searchParameter.setSchema(stringSchema);
         searchParameter.setDescription("Search items by search phrases, see [Searching](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionsearch)");
@@ -146,38 +150,38 @@ public class ODataV4Specification extends ODataSpecification {
         errorResponse.setDescription("Error");
         Content content = new Content();
         MediaType mediaType = new MediaType();
-        mediaType.setSchema(new Schema<>().$ref("error"));
+        mediaType.setSchema(new Schema<>().$ref(ERROR));
         content.addMediaType("application/json", mediaType);
         errorResponse.setContent(content);
         Map<String, ApiResponse> apiResponses = openAPI.getComponents().getResponses();
         if (apiResponses == null) {
             apiResponses = new HashMap<>();
         }
-        apiResponses.put("error", errorResponse);
+        apiResponses.put(ERROR, errorResponse);
         openAPI.getComponents().setResponses(apiResponses);
     }
 
     public void addErrorSchema() {
         ObjectSchema error = new ObjectSchema();
-        error.setRequired(Collections.singletonList("error"));
+        error.setRequired(Collections.singletonList(ERROR));
         ObjectSchema objectSchema = new ObjectSchema();
-        objectSchema.setRequired(Arrays.asList("code", "message"));
+        objectSchema.setRequired(Arrays.asList("code", MESSAGE));
         objectSchema.addProperty("code", new StringSchema());
-        objectSchema.addProperty("message", new StringSchema());
+        objectSchema.addProperty(MESSAGE, new StringSchema());
         objectSchema.addProperty("target", new StringSchema());
         ArraySchema detailsSchema = new ArraySchema();
         ObjectSchema detailsObject = new ObjectSchema();
-        detailsObject.setRequired(Arrays.asList("code", "message"));
+        detailsObject.setRequired(Arrays.asList("code", MESSAGE));
         detailsSchema.items(detailsObject);
         detailsSchema.addProperty("code", new StringSchema());
-        detailsSchema.addProperty("message", new StringSchema());
+        detailsSchema.addProperty(MESSAGE, new StringSchema());
         detailsSchema.addProperty("target", new StringSchema());
         objectSchema.addProperty("details", detailsSchema);
         ObjectSchema innerError = new ObjectSchema();
         innerError.setDescription("The structure of this object is service-specific");
         objectSchema.addProperty("innererror", innerError);
-        error.addProperty("error", objectSchema);
-        schemas.put("error", error);
+        error.addProperty(ERROR, objectSchema);
+        schemas.put(ERROR, error);
     }
 
 
@@ -212,7 +216,7 @@ public class ODataV4Specification extends ODataSpecification {
         response200.setContent(responseContent);
         responses.addApiResponse("200", response200);
         ApiResponse response4xx = new ApiResponse();
-        response4xx.$ref("error");
+        response4xx.$ref(ERROR);
         responses.addApiResponse("4XX", response4xx);
         batchOperation.setResponses(responses);
         openAPI.getPaths().addPathItem("/$batch", pathItem);
@@ -313,9 +317,9 @@ public class ODataV4Specification extends ODataSpecification {
             operation.addParametersItem(new Parameter().$ref("count"));
         }
         ApiResponse response4xx = new ApiResponse();
-        response4xx.$ref("error");
+        response4xx.$ref(ERROR);
         responses = new ApiResponses()
-            .addApiResponse("200", createResponse("EntitySet " + entityName,
+            .addApiResponse("200", createResponse(ENTITY_SET + entityName,
                 getSchemaForType(edm, entityType, idPath))).addApiResponse("4XX", response4xx);
 
         operation.setResponses(responses);
@@ -336,7 +340,7 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setDescription("Create a new entity in EntitySet: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to create", true));
         responses = new ApiResponses()
-            .addApiResponse("201", createResponse("EntitySet " + entityName))
+            .addApiResponse("201", createResponse(ENTITY_SET + entityName))
             .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.POST, operation);
@@ -350,7 +354,7 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setDescription("Update an existing entity: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to update", true));
         responses = new ApiResponses()
-            .addApiResponse("200", createResponse("EntitySet " + entityName))
+            .addApiResponse("200", createResponse(ENTITY_SET + entityName))
             .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.PATCH, operation);

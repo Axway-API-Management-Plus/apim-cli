@@ -20,6 +20,7 @@ import java.util.Objects;
 public class OAS3xSpecification extends APISpecification {
     private static final Logger LOG = LoggerFactory.getLogger(OAS3xSpecification.class);
     public static final String SERVERS = "servers";
+    public static final String OPENAPI = "openapi";
 
     private JsonNode openAPI = null;
 
@@ -150,8 +151,8 @@ public class OAS3xSpecification extends APISpecification {
             setMapperForDataFormat();
             if (this.mapper == null) return false;
             openAPI = this.mapper.readTree(apiSpecificationContent);
-            LOG.debug("openapi tag value : {}", openAPI.get("openapi"));
-            return openAPI.has("openapi") && openAPI.get("openapi").asText().startsWith("3.0.");
+            LOG.debug("openapi tag value : {}", openAPI.get(OPENAPI));
+            return openAPI.has(OPENAPI) && openAPI.get(OPENAPI).asText().startsWith("3.0.");
         } catch (AppException e) {
             if (e.getError() == ErrorCode.UNSUPPORTED_FEATURE) {
                 throw e;

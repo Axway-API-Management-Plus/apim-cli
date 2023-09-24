@@ -52,6 +52,8 @@ public class APIImportConfigAdapter {
     public static final String ORIGINAL = "original";
     public static final String MANUAL = "manual";
     public static final String VALIDATE_ORGANIZATION = "validateOrganization";
+    public static final String EXCEPTION = "Exception: ";
+    public static final String FROM_FILESYSTEM_OR_CLASSPATH = " from filesystem or classpath.";
 
     /**
      * This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file
@@ -127,12 +129,12 @@ public class APIImportConfigAdapter {
                         + "between version 1.8.0 and 1.9.0. You can find more information here: "
                         + "https://github.com/Axway-API-Management-Plus/apim-cli/wiki/2.1.10-API-Specification#filter-api-specifications", ErrorCode.CANT_READ_CONFIG_FILE, e);
             } else {
-                throw new AppException("Error reading API-Config file(s)", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
+                throw new AppException("Error reading API-Config file(s)", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
             }
         } catch (JsonParseException e) {
-            throw new AppException("Cannot parse API-Config file(s).", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
+            throw new AppException("Cannot parse API-Config file(s).", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
         } catch (Exception e) {
-            throw new AppException("Error reading API-Config file(s)", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
+            throw new AppException("Error reading API-Config file(s)", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
         }
     }
 
@@ -515,9 +517,9 @@ public class APIImportConfigAdapter {
         if (is == null) {
             LOG.error("Can't read certificate: {} from file or classpath.", cert.getCertFile());
             LOG.error("Certificates in filesystem are either expected relative to the API-Config-File or as an absolute path.");
-            LOG.error("In the same directory. 		Example: \"myCertFile.crt\"");
-            LOG.error("Relative to it.         		Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
-            LOG.error("With an absolute path   		Example: \"/another/location/with/allMyCerts/myCertFile.crt\"");
+            LOG.error("In the same directory -  Example: \"myCertFile.crt\"");
+            LOG.error("Relative to it -         Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
+            LOG.error("With an absolute path -  Example: \"/another/location/with/allMyCerts/myCertFile.crt\"");
             throw new AppException("Can't read certificate: " + cert.getCertFile() + " from file or classpath.", ErrorCode.CANT_READ_CONFIG_FILE);
         }
         return is;
@@ -698,7 +700,8 @@ public class APIImportConfigAdapter {
                 // If not found absolute & relative - Try to load it from ClassPath
                 LOG.debug("Trying to load Client-Certificate from classpath");
                 if (this.getClass().getResource(keystore) == null) {
-                    throw new AppException("Can't read Client-Certificate-Keystore: " + keystore + " from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
+                    throw new AppException("Can't read Client-Certificate-Keystore: " + keystore +
+                        FROM_FILESYSTEM_OR_CLASSPATH, ErrorCode.UNXPECTED_ERROR);
                 }
                 clientCertFile = new File(Objects.requireNonNull(this.getClass().getResource(keystore)).getFile());
             }
@@ -716,7 +719,7 @@ public class APIImportConfigAdapter {
             authnProfile.getParameters().put("pfx", data);
             authnProfile.getParameters().remove("certFile");
         } catch (Exception e) {
-            throw new AppException("Can't read Client-Cert-File: " + keystore + " from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+            throw new AppException("Can't read Client-Cert-File: " + keystore + FROM_FILESYSTEM_OR_CLASSPATH, ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 
@@ -761,7 +764,7 @@ public class APIImportConfigAdapter {
             // An image is configured, but not found
             throw new AppException("Configured image: '" + importApi.getImage().getFilename() + "' not found in filesystem (Relative/Absolute) or classpath.", ErrorCode.UNXPECTED_ERROR);
         } catch (Exception e) {
-            throw new AppException("Can't read configured image-file: " + importApi.getImage().getFilename() + " from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+            throw new AppException("Can't read configured image-file: " + importApi.getImage().getFilename() + FROM_FILESYSTEM_OR_CLASSPATH, ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 

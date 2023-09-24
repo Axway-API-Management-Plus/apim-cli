@@ -6,6 +6,8 @@ import com.axway.apim.lib.error.AppException;
 
 public class CoreCLIOptions extends CLIOptions {
 
+    public static final String ROLLBACK = "rollback";
+    public static final String HTTP_PROXY_PORT = "httpProxyPort";
     private final CLIOptions cliOptions;
 
     public CoreCLIOptions(CLIOptions cliOptions) {
@@ -27,11 +29,11 @@ public class CoreCLIOptions extends CLIOptions {
         params.setReturnCodeMapping(getValue("returnCodeMapping"));
         params.setForce(hasOption("force"));
         params.setIgnoreCache(hasOption("ignoreCache"));
-        if (getValue("rollback") != null) params.setRollback(Boolean.parseBoolean(getValue("rollback")));
+        if (getValue(ROLLBACK) != null) params.setRollback(Boolean.parseBoolean(getValue(ROLLBACK)));
         // Also support -f for backwards compatibility
         if (!params.isForce()) params.setForce(Boolean.parseBoolean(getValue("f")));
         params.setProxyHost(getValue("httpProxyHost"));
-        params.setProxyPort((getValue("httpProxyPort") != null) ? Integer.valueOf(getValue("httpProxyPort")) : null);
+        params.setProxyPort((getValue(HTTP_PROXY_PORT) != null) ? Integer.valueOf(getValue(HTTP_PROXY_PORT)) : null);
         params.setProxyUsername(getValue("httpProxyUsername"));
         params.setProxyPassword(getValue("httpProxyPassword"));
         params.setRetryDelay(getValue("retryDelay"));
@@ -102,7 +104,7 @@ public class CoreCLIOptions extends CLIOptions {
         option.setRequired(false);
         cliOptions.addOption(option);
 
-        option = new Option("rollback", true, "Allows to disable the rollback feature");
+        option = new Option(ROLLBACK, true, "Allows to disable the rollback feature");
         option.setRequired(false);
         option.setArgName("true");
         cliOptions.addOption(option);
@@ -117,7 +119,7 @@ public class CoreCLIOptions extends CLIOptions {
         option.setArgName("true");
         cliOptions.addOption(option);
 
-        option = new Option("httpProxyPort", true, "The proxy port");
+        option = new Option(HTTP_PROXY_PORT, true, "The proxy port");
         option.setRequired(false);
         option.setArgName("true");
         cliOptions.addOption(option);

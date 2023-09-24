@@ -28,51 +28,59 @@ import java.io.IOException;
 import java.util.List;
 
 public class CSVAppExporter extends ApplicationExporter {
+    public static final String PHONE = "Phone";
     private static final Logger LOG = LoggerFactory.getLogger(CSVAppExporter.class);
+    public static final String ID = "ID";
+    public static final String ORGANIZATION = "Organization";
+    public static final String NAME = "Name";
+    public static final String EMAIL = "Email";
+    public static final String STATE = "State";
+    public static final String ENABLED = "Enabled";
+    public static final String CREATED_BY = "Created by";
 
     private enum HeaderFields {
         standard(new String[]{
-            "ID",
-            "Organization",
-            "Name",
-            "Email",
-            "Phone",
-            "State",
-            "Enabled",
-            "Created by"
+            ID,
+            ORGANIZATION,
+            NAME,
+            EMAIL,
+            PHONE,
+            STATE,
+            ENABLED,
+            CREATED_BY
         }),
         wide(new String[]{
-            "ID",
-            "Organization",
-            "Name",
-            "Email",
-            "Phone",
-            "State",
-            "Enabled",
-            "Created by",
+            ID,
+            ORGANIZATION,
+            NAME,
+            EMAIL,
+            PHONE,
+            STATE,
+            ENABLED,
+            CREATED_BY,
             "API Quota",
             "API-Method",
             "Quota Config"
         }),
         ultra(new String[]{
-            "ID",
-            "Organization",
-            "Name",
-            "Email",
-            "Phone",
-            "State",
-            "Enabled",
-            "Created by",
+            ID,
+            ORGANIZATION,
+            NAME,
+            EMAIL,
+            PHONE,
+            STATE,
+            ENABLED,
+            CREATED_BY,
             "API-Name",
             "API-Version",
             "Access created by",
             "Access created on"
         });
 
-        final String[] headerFields;
+        final String[] fields;
 
         HeaderFields(String[] headerFields) {
-            this.headerFields = headerFields;
+            this.fields = headerFields;
         }
     }
 
@@ -99,7 +107,7 @@ public class CSVAppExporter extends ApplicationExporter {
                 throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
             }
             try (FileWriter appendable = new FileWriter(target)) {
-                try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.Builder.create().setHeader(HeaderFields.valueOf(wide.name()).headerFields).build())) {
+                try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.Builder.create().setHeader(HeaderFields.valueOf(wide.name()).fields).build())) {
                     writeRecords(csvPrinter, apps, wide);
                     LOG.info("Application export successfully written to file: {}", target.getCanonicalPath());
                 }

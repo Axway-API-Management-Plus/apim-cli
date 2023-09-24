@@ -12,6 +12,7 @@ import com.axway.apim.lib.error.ErrorCode;
 
 public abstract class CLIOptions {
 
+    public static final String VERSION = "version";
     private final CommandLineParser parser = new RelaxedParser();
 
     private String[] args;
@@ -48,7 +49,7 @@ public abstract class CLIOptions {
         option.setRequired(false);
         optionalOptions.addOption(option);
 
-        option = new Option("version", "Print the APIM CLI Version number");
+        option = new Option(VERSION, "Print the APIM CLI Version number");
         option.setRequired(false);
         optionalOptions.addOption(option);
     }
@@ -81,9 +82,9 @@ public abstract class CLIOptions {
             if (commandLine.hasOption("help")) {
                 printUsage("Usage information", args);
                 throw new AppException("help", ErrorCode.SUCCESS);
-            } else if (commandLine.hasOption("version")) {
+            } else if (commandLine.hasOption(VERSION)) {
                 Console.println(CLIOptions.class.getPackage().getImplementationVersion());
-                throw new AppException("version", ErrorCode.SUCCESS);
+                throw new AppException(VERSION, ErrorCode.SUCCESS);
             }
             cmd = parser.parse(options, args);
             this.envProperties = new EnvironmentProperties(cmd.getOptionValue("stage"), getValue("apimCLIHome"));
