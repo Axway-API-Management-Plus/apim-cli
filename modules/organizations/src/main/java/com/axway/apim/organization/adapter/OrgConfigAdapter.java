@@ -134,6 +134,6 @@ public class OrgConfigAdapter extends OrgAdapter {
                 LOG.warn("No config file found for stage: {}", stage);
             }
         }
-        return null;
+        return org;
     }
 }

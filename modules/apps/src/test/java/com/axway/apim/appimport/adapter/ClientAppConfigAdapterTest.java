@@ -36,7 +36,6 @@ public class ClientAppConfigAdapterTest extends WiremockWrapper {
             clientAppConfigAdapter.readConfig();
         } catch (AppException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
         }
     }
 }

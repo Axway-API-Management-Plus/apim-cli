@@ -58,7 +58,6 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
 
     @Override
     protected void readConfig() throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -67,14 +66,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
         File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
         List<ClientApplication> baseApps;
         // Try to read a list of applications
-        try {
-            // Check the config file is json
-            mapper.readTree(configFile);
-            LOG.debug("Handling JSON Configuration file: {}", configFile);
-        } catch (IOException ioException) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            LOG.debug("Handling Yaml Configuration file: {}", configFile);
-        }
+        ObjectMapper mapper = Utils.createObjectMapper(configFile);
         try {
             mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
             mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile)));
@@ -90,7 +82,9 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
             try {
                 LOG.debug("Error reading array of applications, hence trying to read single application now.");
                 ClientApplication app = mapper.readValue(Utils.substituteVariables(configFile), ClientApplication.class);
+                LOG.info("{}", app);
                 app = readClientApplication(mapper, app, stageConfig, stage);
+                LOG.info("{}", app);
                 this.apps = new ArrayList<>();
                 this.apps.add(app);
             } catch (Exception pe) {
@@ -231,6 +225,6 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
                 LOG.warn("No config file found for stage: {}", stage);
             }
         }
-        return null;
+        return app;
     }
 }
