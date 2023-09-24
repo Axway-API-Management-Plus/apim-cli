@@ -55,15 +55,15 @@ public class CoreParameters implements Parameters {
     private int port = -1;
     private String username;
     private String password;
-    private Boolean force;
-    private Boolean ignoreQuotas;
-    private Boolean zeroDowntimeUpdate;
+    private boolean force;
+    private boolean ignoreQuotas;
+    private boolean zeroDowntimeUpdate;
     private Mode quotaMode;
     private Mode clientAppsMode;
     private Mode clientOrgsMode;
     private String detailsExportFile;
-    private Boolean rollback = true;
-    private Boolean ignoreCache = false;
+    private boolean rollback = true;
+    private boolean ignoreCache = false;
     private String apimCLIHome;
     private String proxyHost;
     private Integer proxyPort;
@@ -172,22 +172,18 @@ public class CoreParameters implements Parameters {
     }
 
     public boolean isForce() {
-        if (force != null) return force;
         return Boolean.parseBoolean(getFromProperties("force"));
     }
 
-    public void setForce(Boolean force) {
-        if (force == null) return;
+    public void setForce(boolean force) {
         this.force = force;
     }
 
-    public void setIgnoreQuotas(Boolean ignoreQuotas) {
-        if (ignoreQuotas == null) return;
+    public void setIgnoreQuotas(boolean ignoreQuotas) {
         this.ignoreQuotas = ignoreQuotas;
     }
 
     public boolean isIgnoreQuotas() {
-        if (ignoreQuotas != null) return ignoreQuotas;
         return Boolean.parseBoolean(getFromProperties("ignoreQuotas"));
     }
 
@@ -274,12 +270,11 @@ public class CoreParameters implements Parameters {
         this.detailsExportFile = detailsExportFile;
     }
 
-    public Boolean isRollback() {
+    public boolean isRollback() {
         return rollback;
     }
 
-    public void setRollback(Boolean rollback) {
-        if (rollback == null) return;
+    public void setRollback(boolean rollback) {
         this.rollback = rollback;
     }
 
@@ -288,8 +283,7 @@ public class CoreParameters implements Parameters {
         return ignoreCache;
     }
 
-    public void setIgnoreCache(Boolean ignoreCache) {
-        if (ignoreCache == null) return;
+    public void setIgnoreCache(boolean ignoreCache) {
         this.ignoreCache = ignoreCache;
     }
 
@@ -369,12 +363,11 @@ public class CoreParameters implements Parameters {
         }
     }
 
-    public Boolean isZeroDowntimeUpdate() {
-        if (zeroDowntimeUpdate == null) return false;
+    public boolean isZeroDowntimeUpdate() {
         return zeroDowntimeUpdate;
     }
 
-    public void setZeroDowntimeUpdate(Boolean zeroDowntimeUpdate) {
+    public void setZeroDowntimeUpdate(boolean zeroDowntimeUpdate) {
         this.zeroDowntimeUpdate = zeroDowntimeUpdate;
     }
 

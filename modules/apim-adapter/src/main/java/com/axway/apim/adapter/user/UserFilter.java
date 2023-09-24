@@ -1,18 +1,16 @@
 package com.axway.apim.adapter.user;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.axway.apim.adapter.apis.FilterHelper;
+import com.axway.apim.api.model.User;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.axway.apim.api.model.User;
-import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.error.AppException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserFilter implements CustomPropertiesFilter {
 
@@ -166,9 +164,9 @@ public class UserFilter implements CustomPropertiesFilter {
         if (!(obj instanceof UserFilter)) return false;
         UserFilter other = (UserFilter) obj;
         return (
-                StringUtils.equals(other.getId(), this.getId()) &&
-                        StringUtils.equals(other.getLoginName(), this.getLoginName()) &&
-                        other.isEnabled() == this.isEnabled()
+            StringUtils.equals(other.getId(), this.getId()) &&
+                StringUtils.equals(other.getLoginName(), this.getLoginName()) &&
+                other.isEnabled() == this.isEnabled()
         );
     }
 
@@ -185,7 +183,7 @@ public class UserFilter implements CustomPropertiesFilter {
         return "UserFilter [loginName=" + loginName + ", id=" + id + "]";
     }
 
-    public boolean filter(User user) throws AppException {
+    public boolean filter(User user) {
         if (this.getType() == null && this.getOrganizationName() == null) { // Nothing given to filter out.
             return true;
         }

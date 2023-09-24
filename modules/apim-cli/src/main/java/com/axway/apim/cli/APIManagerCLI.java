@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * This class implements a pluggable CLI interface that allows to dynamically add new
@@ -49,7 +46,7 @@ public class APIManagerCLI {
     public APIManagerCLI(String[] args) {
         super();
         ServiceLoader<APIMCLIServiceProvider> loader = ServiceLoader
-                .load(APIMCLIServiceProvider.class);
+            .load(APIMCLIServiceProvider.class);
         for (APIMCLIServiceProvider cliService : loader) {
             List<APIMCLIServiceProvider> providerList = servicesMappedByGroup.get(cliService.getGroupId());
             if (providerList == null) {
@@ -93,10 +90,10 @@ public class APIManagerCLI {
                         if (getMethodName(serviceMethod).equals(method)) {
                             this.selectedService = service;
                             this.selectedMethod = serviceMethod;
+                            break;
                         }
                     }
                 }
-                break;
             }
         }
     }
@@ -107,8 +104,9 @@ public class APIManagerCLI {
             Console.println("To get more information for each group, please run for instance: 'apim api'");
             Console.println();
             Console.println("Available command groups: ");
-            for (String key : servicesMappedByGroup.keySet()) {
-                Console.printf("%-20s %s \n", APIM_CLI_CDM + " " + key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
+            for (Map.Entry<String, List<APIMCLIServiceProvider>> entry : servicesMappedByGroup.entrySet()) {
+                String key = entry.getKey();
+                Console.printf("%-20s %s \n", APIM_CLI_CDM + " " + key, entry.getValue().get(0).getGroupDescription());
                 // We just take the first registered service for a group to retrieve the group description
             }
         } else {
@@ -128,7 +126,7 @@ public class APIManagerCLI {
             this.printUsage();
             return rc;
         } else {
-            LOG.info("Module: " + this.selectedService.getName() + " (" + this.selectedService.getVersion() + ")");
+            LOG.info("Module: {}  ({})", this.selectedService.getName(), this.selectedService.getVersion());
             try {
                 rc = (int) this.selectedMethod.invoke(this.selectedService, (Object) args);
                 return rc;
@@ -139,7 +137,7 @@ public class APIManagerCLI {
     }
 
     private String getMethodName(Method m) {
-        return (m.getAnnotation(CLIServiceMethod.class).name().equals("")) ? m.getName() : m.getAnnotation(CLIServiceMethod.class).name();
+        return (m.getAnnotation(CLIServiceMethod.class).name().isEmpty()) ? m.getName() : m.getAnnotation(CLIServiceMethod.class).name();
     }
 
 }

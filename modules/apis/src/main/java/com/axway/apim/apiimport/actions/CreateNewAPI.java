@@ -103,7 +103,10 @@ public class CreateNewAPI {
             new ManageClientApps(desiredAPI, createdAPI, actualAPI).execute(reCreation);
             // Provide the ID of the created API to the desired API just for logging purposes
             changes.getDesiredAPI().setId(createdAPI.getId());
-            LOG.info("{} Successfully created {} API: {} {} (ID: {})", changes.waiting4Approval(), createdAPI.getState(), createdAPI.getName(), createdAPI.getVersion(), createdAPI.getId());
+            LOG.info("Successfully created {} API: {} {} (ID: {})", createdAPI.getState(), createdAPI.getName(), createdAPI.getVersion(), createdAPI.getId());
+            if (!changes.waiting4Approval().isEmpty() && LOG.isInfoEnabled()) {
+                LOG.info("{}", changes.waiting4Approval());
+            }
         } finally {
             if (createdAPI == null) {
                 LOG.warn("Can't create PropertiesExport as createdAPI is null");

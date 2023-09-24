@@ -10,6 +10,7 @@ import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +44,11 @@ public class UpdateExistingAPI {
                 // Update the proxy
                 apiAdapter.updateAPIProxy(changes.getActualAPI());
             }
-            manageApiMethods.updateApiMethods(changes.getActualAPI().getId(),actualAPIMethods, desiredAPIMethods );
+            manageApiMethods.updateApiMethods(changes.getActualAPI().getId(), actualAPIMethods, desiredAPIMethods);
             // Handle backendBasePath update
-            if(changes.getBreakingChanges().contains("serviceProfiles")){
+            if (changes.getBreakingChanges().contains("serviceProfiles")) {
                 String backendBasePath = changes.getDesiredAPI().getServiceProfiles().get("_default").getBasePath();
-                if(backendBasePath != null && !CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                if (backendBasePath != null && !CoreParameters.getInstance().isOverrideSpecBasePath()) {
                     ServiceProfile actualServiceProfile = changes.getActualAPI().getServiceProfiles().get("_default");
                     LOG.info("Replacing existing API backendBasePath {} with new value : {}", actualServiceProfile.getBasePath(), backendBasePath);
                     actualServiceProfile.setBasePath(backendBasePath);
@@ -76,13 +77,16 @@ public class UpdateExistingAPI {
             // Handle subscription to applications
             new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
             if (actualAPI.getState().equals(API.STATE_DELETED)) {
-                LOG.info("{} successfully deleted API: {} {} (ID: {})", changes.waiting4Approval(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
+                LOG.info("Successfully deleted API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
             } else {
-                LOG.info("{} successfully updated {} API: {} {} (ID: {})", changes.waiting4Approval(), actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
+                LOG.info("Successfully updated {} API: {} {} (ID: {})", actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
+            }
+            if (!changes.waiting4Approval().isEmpty() && LOG.isInfoEnabled()) {
+                LOG.info("{}", changes.waiting4Approval());
             }
         } catch (Exception e) {
             LOG.error("Error updating existing API", e);
-            throw e;
+            throw new AppException("Error updating existing API", ErrorCode.UNXPECTED_ERROR);
         } finally {
             APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());
         }

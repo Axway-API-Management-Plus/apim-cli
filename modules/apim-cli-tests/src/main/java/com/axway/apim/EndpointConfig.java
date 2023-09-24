@@ -2,13 +2,11 @@ package com.axway.apim;
 
 import com.consol.citrus.dsl.endpoint.CitrusEndpoints;
 import com.consol.citrus.http.client.HttpClient;
-
 import com.consol.citrus.http.interceptor.LoggingClientInterceptor;
 import com.consol.citrus.variable.GlobalVariables;
 import com.consol.citrus.variable.GlobalVariablesPropertyLoader;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Value;

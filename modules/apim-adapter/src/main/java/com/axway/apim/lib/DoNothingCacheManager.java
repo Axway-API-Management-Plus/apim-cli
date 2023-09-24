@@ -23,7 +23,7 @@ public class DoNothingCacheManager implements CacheManager {
 	public static class DoNothingCache<K, V> implements Cache<K, V> {
 
 		@Override
-		public void clear() {
+		public void clear() { // Ignore
 		}
 		@Override
 		public boolean containsKey(Object arg0) {

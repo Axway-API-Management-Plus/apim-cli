@@ -6,6 +6,7 @@ import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
             }
         } catch (Exception e) {
             LOG.error("Error while deleting BE-API with ID: {} to roll it back", rollbackAPI.getApiId(), e);
-            throw e;
+            throw new AppException("Rollback as Error while deleting BE-API", ErrorCode.UNXPECTED_ERROR);
         }
 
     }
