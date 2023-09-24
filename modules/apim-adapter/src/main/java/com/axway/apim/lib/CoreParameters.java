@@ -172,7 +172,7 @@ public class CoreParameters implements Parameters {
     }
 
     public boolean isForce() {
-        return Boolean.parseBoolean(getFromProperties("force"));
+        return force;
     }
 
     public void setForce(boolean force) {
@@ -184,7 +184,7 @@ public class CoreParameters implements Parameters {
     }
 
     public boolean isIgnoreQuotas() {
-        return Boolean.parseBoolean(getFromProperties("ignoreQuotas"));
+        return ignoreQuotas;
     }
 
     public Mode getQuotaMode() {
