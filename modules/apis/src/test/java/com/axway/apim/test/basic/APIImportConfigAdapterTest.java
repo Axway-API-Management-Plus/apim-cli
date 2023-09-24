@@ -2,7 +2,6 @@ package com.axway.apim.test.basic;
 
 import com.axway.apim.TestSetup;
 import com.axway.apim.WiremockWrapper;
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.OutboundProfile;

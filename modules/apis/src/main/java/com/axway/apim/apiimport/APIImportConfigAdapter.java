@@ -99,7 +99,7 @@ public class APIImportConfigAdapter {
             ObjectReader reader = mapper.reader();
             API baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {
-                readConfig(mapper, baseConfig, apiConfigFile, stage);
+                readConfig(mapper, baseConfig, stageConfigFile, stage);
             } else {
                 apiConfig = baseConfig;
             }
