@@ -7,6 +7,7 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collections;
 
 public class ExportOrganization {
 
@@ -50,7 +51,7 @@ public class ExportOrganization {
 
     @JsonProperty("apis")
     public List<APIAccess> getAPIAccess() {
-        if (org.getApiAccess() == null || org.getApiAccess().isEmpty()) return null;
+        if (org.getApiAccess() == null || org.getApiAccess().isEmpty()) return Collections.emptyList();
         return org.getApiAccess();
     }
 }

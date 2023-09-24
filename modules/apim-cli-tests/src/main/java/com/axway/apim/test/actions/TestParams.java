@@ -2,6 +2,10 @@ package com.axway.apim.test.actions;
 
 public final class TestParams {
 
+    private TestParams() {
+        throw new IllegalStateException("constant class");
+    }
+
     public static final String PARAM_EXPECTED_RC = "expectedReturnCode";
     public static final String PARAM_STAGE = "stage";
     public static final String PARAM_HOSTNAME = "apiManagerHost";

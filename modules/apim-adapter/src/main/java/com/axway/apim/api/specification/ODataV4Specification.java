@@ -473,10 +473,7 @@ public class ODataV4Specification extends ODataSpecification {
                 return getSchemaForType(edm, type, true, isCollection);
             }
         } catch (EdmException e) {
-            try {
-                logger.error("Error getting schema for type: {}", type.getName());
-            } catch (EdmException e1) {
-            }
+            logger.error("Error getting schema for type: {}", type.getName());
             return null;
         }
     }
@@ -510,7 +507,7 @@ public class ODataV4Specification extends ODataSpecification {
                     Schema<Object> propSchema = getSchemaForType(edm, property.getType(), true, property.isCollection());
                     logger.debug("propSchema : {}", propSchema);
 
-                    if(propSchema != null) {
+                    if (propSchema != null) {
                         propSchema.setMaxLength(property.getMaxLength());
                         propSchema.setDefault(property.getDefaultValue());
                         propSchema.setNullable(property.isNullable());
