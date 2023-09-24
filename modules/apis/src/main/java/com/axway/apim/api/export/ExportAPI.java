@@ -93,10 +93,8 @@ public class ExportAPI {
 
 
     public List<AuthenticationProfile> getAuthenticationProfiles() {
-        if (this.actualAPIProxy.getAuthenticationProfiles().size() == 1) {
-            if (this.actualAPIProxy.getAuthenticationProfiles().get(0).getType() == AuthType.none)
-                return null;
-        }
+        if (this.actualAPIProxy.getAuthenticationProfiles().size() == 1 && this.actualAPIProxy.getAuthenticationProfiles().get(0).getType() == AuthType.none)
+            return null;
         for (AuthenticationProfile profile : this.actualAPIProxy.getAuthenticationProfiles()) {
             if (profile.getType() == AuthType.oauth) {
                 String providerProfile = (String) profile.getParameters().get("providerProfile");
@@ -212,7 +210,7 @@ public class ExportAPI {
     }
 
     public Map<String, String> getCustomProperties() {
-        if (this.actualAPIProxy.getCustomProperties() == null || this.actualAPIProxy.getCustomProperties().size() == 0)
+        if (this.actualAPIProxy.getCustomProperties() == null || this.actualAPIProxy.getCustomProperties().isEmpty())
             return null;
         Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
         boolean propertyFound = false;
@@ -346,7 +344,7 @@ public class ExportAPI {
             apiMethod.setName(actualMethod.getName());
             apiMethod.setSummary(actualMethod.getSummary());
             TagMap tagMap = actualMethod.getTags();
-            if (tagMap != null && tagMap.size() > 0)
+            if (tagMap != null && !tagMap.isEmpty())
                 apiMethod.setTags(actualMethod.getTags());
             apiMethodsTransformed.add(apiMethod);
             String descriptionType = actualMethod.getDescriptionType();
@@ -359,6 +357,8 @@ public class ExportAPI {
                     break;
                 case "markdown":
                     apiMethod.setDescriptionMarkdown(actualMethod.getDescriptionMarkdown());
+                    break;
+                default:
                     break;
             }
             apiMethod.setDescriptionType(descriptionType);

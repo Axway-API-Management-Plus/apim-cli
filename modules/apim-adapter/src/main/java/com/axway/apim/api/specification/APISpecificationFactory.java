@@ -99,7 +99,7 @@ public class APISpecificationFactory {
     static String getContentStart(byte[] apiSpecificationContent) {
         try {
             if (apiSpecificationContent == null) return "API-Specification is null";
-            return (apiSpecificationContent.length < 200) ? new String(apiSpecificationContent, 0, apiSpecificationContent.length) : new String(apiSpecificationContent, 0, 200) + "...";
+            return (apiSpecificationContent.length < 200) ? new String(apiSpecificationContent) : new String(apiSpecificationContent, 0, 200) + "...";
         } catch (Exception e) {
             return "Cannot get content from API-Specification. " + e.getMessage();
         }

@@ -11,7 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class WADLSpecification extends APISpecification {
-    private final Logger LOG = LoggerFactory.getLogger(WADLSpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WADLSpecification.class);
 
     String wadl = null;
 
@@ -35,7 +35,7 @@ public class WADLSpecification extends APISpecification {
         try {
             if (backendBasePath != null) {
                 URL url = new URL(backendBasePath); // Parse it to make sure it is valid
-                if (url.getPath() != null && !url.getPath().equals("") && !backendBasePath.endsWith("/")) { // See issue #178
+                if (url.getPath() != null && !url.getPath().isEmpty() && !backendBasePath.endsWith("/")) { // See issue #178
                     backendBasePath += "/";
                 }
                 // The WADL has the base path configured like so: <resources base="http://customer-api.ddns.net:8099/">

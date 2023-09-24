@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class Swagger1xSpecification extends APISpecification {
 
-    private final Logger LOG = LoggerFactory.getLogger(Swagger1xSpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Swagger1xSpecification.class);
 
     private JsonNode swagger = null;
 

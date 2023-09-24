@@ -291,7 +291,7 @@ public class ODataV4Specification extends ODataSpecification {
         String operationDescription = "Returns the entity: " + entityName + ". "
             + "For more information on how to access entities visit: <a target=\"_blank\" href=\"https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingEntities\">Addressing Entities</a>";
         List<String> structProperties = entityType.getPropertyNames();
-        if (entityType.getNavigationPropertyNames() != null && entityType.getNavigationPropertyNames().size() > 0) {
+        if (entityType.getNavigationPropertyNames() != null && !entityType.getNavigationPropertyNames().isEmpty()) {
             List<String> navProperties = new ArrayList<>(entityType.getNavigationPropertyNames());
             operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: " + navProperties;
             operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
