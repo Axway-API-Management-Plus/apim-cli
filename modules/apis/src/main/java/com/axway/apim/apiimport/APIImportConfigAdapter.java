@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
@@ -84,50 +83,31 @@ public class APIImportConfigAdapter {
      * @throws AppException if the config-file can't be parsed for some reason
      */
     public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, String stageConfig) throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper;
         SimpleModule module = new SimpleModule();
-        API baseConfig;
         try {
             this.pathToAPIDefinition = pathToAPIDefinition;
             this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
             File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
             // Validate organization for the base config, if no staged-config is given
             boolean validateOrganization = stageConfigFile == null;
-            try {
-                // Check the config file is json file
-                mapper.readTree(this.apiConfigFile);
-                LOG.debug("Handling JSON Configuration file : {}", apiConfigFile);
-            } catch (IOException ioException) {
-                //Handle Yaml config
-                mapper = new ObjectMapper(new YAMLFactory());
-                LOG.debug("Handling Yaml Configuration file: {}", apiConfigFile);
-            }
+            mapper = Utils.createObjectMapper(apiConfigFile);
             module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, false));
             // We would like to get back the original AppExcepption instead of a JsonMappingException
             mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
             mapper.registerModule(module);
             ObjectReader reader = mapper.reader();
-            baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
+            API baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {
-                try {
-                    // If the baseConfig doesn't have a valid organization, the stage config must
-                    validateOrganization = baseConfig.getOrganization() == null;
-                    ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute(VALIDATE_ORGANIZATION, validateOrganization);
-                    // Organization must be valid in staged configuration
-                    apiConfig = updater.withAttribute(VALIDATE_ORGANIZATION, true).readValue(Utils.substituteVariables(stageConfigFile));
-                    LOG.info("Loaded stage API-Config from file: {}", stageConfigFile);
-                } catch (FileNotFoundException e) {
-                    LOG.warn("No config file found for stage: {}", stage);
-                    apiConfig = baseConfig;
-                }
+                readConfig(mapper, baseConfig, apiConfigFile, stage);
             } else {
                 apiConfig = baseConfig;
             }
         } catch (MismatchedInputException e) {
             if (e.getMessage().contains("com.axway.apim.api.model.APISpecIncludeExcludeFilter")) {
                 throw new AppException("An error occurred while reading the API specification filters. Please note that the filter structure has changed "
-                        + "between version 1.8.0 and 1.9.0. You can find more information here: "
-                        + "https://github.com/Axway-API-Management-Plus/apim-cli/wiki/2.1.10-API-Specification#filter-api-specifications", ErrorCode.CANT_READ_CONFIG_FILE, e);
+                    + "between version 1.8.0 and 1.9.0. You can find more information here: "
+                    + "https://github.com/Axway-API-Management-Plus/apim-cli/wiki/2.1.10-API-Specification#filter-api-specifications", ErrorCode.CANT_READ_CONFIG_FILE, e);
             } else {
                 throw new AppException("Error reading API-Config file(s)", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
             }
@@ -243,7 +223,7 @@ public class APIImportConfigAdapter {
             List<Organization> foundOrgs = new ArrayList<>();
             while (it.hasNext()) {
                 Organization desiredOrg = it.next();
-                Organization org =organizationAdapter.getOrgForName(desiredOrg.getName());
+                Organization org = organizationAdapter.getOrgForName(desiredOrg.getName());
                 if (org == null) {
                     LOG.warn("Unknown organization with name: {} configured. Ignoring this organization.", desiredOrg.getName());
                     invalidClientOrgs = invalidClientOrgs == null ? desiredOrg.getName() : invalidClientOrgs + ", " + desiredOrg.getName();
@@ -441,12 +421,11 @@ public class APIImportConfigAdapter {
                         continue;
                     }
                 }
-                if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
-                    if (!apiConfig.getOrganization().equals(loadedApp != null ? loadedApp.getOrganization() : null)) {
-                        LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.", loadedApp != null ? loadedApp.getName() : null);
-                        it.remove();
-                        continue;
-                    }
+                if (!APIManagerAdapter.getInstance().hasAdminAccount() && (!apiConfig.getOrganization().equals(loadedApp != null ? loadedApp.getOrganization() : null))) {
+                    LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.", loadedApp != null ? loadedApp.getName() : null);
+                    it.remove();
+                    continue;
+
                 }
                 it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
             }
@@ -471,7 +450,8 @@ public class APIImportConfigAdapter {
                 if (cert.getCertBlob() == null) {
                     try (InputStream is = getInputStreamForCertFile(cert)) {
                         String certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
-                        List<CaCert> completedCerts = mapper.readValue(certInfo, new TypeReference<List<CaCert>>() {});
+                        List<CaCert> completedCerts = mapper.readValue(certInfo, new TypeReference<List<CaCert>>() {
+                        });
                         completedCaCerts.addAll(completedCerts);
                     } catch (Exception e) {
                         throw new AppException("Can't initialize given certificate.", ErrorCode.CANT_READ_CONFIG_FILE, e);
@@ -635,7 +615,7 @@ public class APIImportConfigAdapter {
             }
             // Check the referenced authentication profile exists
             if (!profile.getAuthenticationProfile().equals(DEFAULT) && (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null)) {
-                    throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '" + profile.getAuthenticationProfile() + "'", ErrorCode.REFERENCED_PROFILE_INVALID);
+                throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '" + profile.getAuthenticationProfile() + "'", ErrorCode.REFERENCED_PROFILE_INVALID);
 
             }
             // Check a routingPolicy is given, if routeType is policy
@@ -669,11 +649,11 @@ public class APIImportConfigAdapter {
         if (!authnProfile.getType().equals(AuthType.oauth)) return;
         String providerProfile = (String) authnProfile.getParameters().get("providerProfile");
         if (providerProfile != null && providerProfile.startsWith("<key")) return;
-        APIManagerOAuthClientProfilesAdapter oAuthClientProfilesAdapter =  APIManagerAdapter.getInstance().getOauthClientAdapter();
+        APIManagerOAuthClientProfilesAdapter oAuthClientProfilesAdapter = APIManagerAdapter.getInstance().getOauthClientAdapter();
         OAuthClientProfile clientProfile = oAuthClientProfilesAdapter.getOAuthClientProfile(providerProfile);
         if (clientProfile == null) {
             List<String> knownProfiles = new ArrayList<>();
-            for (OAuthClientProfile profile :oAuthClientProfilesAdapter.getOAuthClientProfiles()) {
+            for (OAuthClientProfile profile : oAuthClientProfilesAdapter.getOAuthClientProfiles()) {
                 knownProfiles.add(profile.getName());
             }
             throw new AppException("The OAuth provider profile is unkown: '" + providerProfile + "'. Known profiles: " + knownProfiles, ErrorCode.REFERENCED_PROFILE_INVALID);
@@ -726,7 +706,7 @@ public class APIImportConfigAdapter {
     private void validateHasQueryStringKey(API importApi) throws AppException {
         if (importApi.getApiRoutingKey() == null) return; // Nothing to check
         if (APIManagerAdapter.getInstance().hasAdminAccount()) {
-            Boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(true).getApiRoutingKeyEnabled();
+            boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(true).getApiRoutingKeyEnabled();
             if (!apiRoutingKeyEnabled) {
                 throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
             }
@@ -802,6 +782,20 @@ public class APIImportConfigAdapter {
         // Consider an empty VHost as not set, as it is logically not possible to have an empty VHost.
         if ("".equals(apiConfig.getVhost())) {
             apiConfig.setVhost(null);
+        }
+    }
+
+    public void readConfig(ObjectMapper mapper, API baseConfig, File stageConfigFile, String stage) {
+        try {
+            // If the baseConfig doesn't have a valid organization, the stage config must
+            boolean validateOrganization = baseConfig.getOrganization() == null;
+            ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute(VALIDATE_ORGANIZATION, validateOrganization);
+            // Organization must be valid in staged configuration
+            apiConfig = updater.withAttribute(VALIDATE_ORGANIZATION, true).readValue(Utils.substituteVariables(stageConfigFile));
+            LOG.info("Loaded stage API-Config from file: {}", stageConfigFile);
+        } catch (IOException e) {
+            LOG.warn("No config file found for stage: {}", stage);
+            apiConfig = baseConfig;
         }
     }
 }

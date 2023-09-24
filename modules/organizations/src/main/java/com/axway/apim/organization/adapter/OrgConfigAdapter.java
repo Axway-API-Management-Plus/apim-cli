@@ -3,7 +3,6 @@ package com.axway.apim.organization.adapter;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
@@ -22,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,7 +38,7 @@ public class OrgConfigAdapter extends OrgAdapter {
     }
 
     public void readConfig() throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = null;
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -50,14 +48,7 @@ public class OrgConfigAdapter extends OrgAdapter {
         List<Organization> baseOrgs;
         // Try to read a list of organizations
         try {
-            try {
-                // Check the config file is json
-                mapper.readTree(configFile);
-                LOG.debug("Handling JSON Configuration file: {}", configFile);
-            } catch (IOException ioException) {
-                mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-                LOG.debug("Handling Yaml Configuration file: {}", configFile);
-            }
+            mapper = Utils.createObjectMapper(configFile);
             baseOrgs = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<Organization>>() {
             });
             if (stageConfig != null) {
@@ -69,14 +60,7 @@ public class OrgConfigAdapter extends OrgAdapter {
         } catch (MismatchedInputException me) {
             try {
                 Organization org = mapper.readValue(Utils.substituteVariables(configFile), Organization.class);
-                if (stageConfig != null) {
-                    try {
-                        ObjectReader updater = mapper.readerForUpdating(org);
-                        org = updater.readValue(Utils.substituteVariables(stageConfig));
-                    } catch (FileNotFoundException e) {
-                        LOG.warn("No config file found for stage: {}", stage);
-                    }
-                }
+                org = readOrganization(mapper, org, stageConfig, stage);
                 this.orgs = new ArrayList<>();
                 this.orgs.add(org);
             } catch (Exception pe) {
@@ -139,5 +123,17 @@ public class OrgConfigAdapter extends OrgAdapter {
         for (Organization org : orgs) {
             Utils.validateCustomProperties(org.getCustomProperties(), Type.organization);
         }
+    }
+
+    public Organization readOrganization(ObjectMapper mapper, Organization org, File stageConfig, String stage){
+        if (stageConfig != null) {
+            try {
+                ObjectReader updater = mapper.readerForUpdating(org);
+                return updater.readValue(Utils.substituteVariables(stageConfig));
+            } catch (IOException e) {
+                LOG.warn("No config file found for stage: {}", stage);
+            }
+        }
+        return null;
     }
 }

@@ -1,6 +1,5 @@
 package com.axway.apim.users.adapter;
 
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
@@ -29,7 +28,7 @@ public class UserConfigAdapter extends UserAdapter {
     }
 
     public void readConfig() throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = null;
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -39,14 +38,7 @@ public class UserConfigAdapter extends UserAdapter {
         List<User> baseUsers;
         // Try to read a list of users
         try {
-            try {
-                // Check the config file is json
-                mapper.readTree(configFile);
-                LOG.debug("Handling JSON Configuration file: {}", configFile);
-            } catch (IOException ioException) {
-                mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-                LOG.debug("Handling Yaml Configuration file: {}", configFile);
-            }
+            mapper = Utils.createObjectMapper(configFile);
             baseUsers = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<User>>() {
             });
             if (stageConfig != null) {
@@ -57,15 +49,7 @@ public class UserConfigAdapter extends UserAdapter {
             // Try to read single user
         } catch (MismatchedInputException me) {
             try {
-                User user = mapper.readValue(Utils.substituteVariables(configFile), User.class);
-                if (stageConfig != null) {
-                    try {
-                        ObjectReader updater = mapper.readerForUpdating(user);
-                        user = updater.readValue(Utils.substituteVariables(stageConfig));
-                    } catch (FileNotFoundException e) {
-                        LOG.warn("No config file found for stage: {}", stage);
-                    }
-                }
+                User user = readUser(mapper, configFile, stageConfig, stage);
                 this.users = new ArrayList<>();
                 this.users.add(user);
             } catch (Exception pe) {
@@ -86,7 +70,7 @@ public class UserConfigAdapter extends UserAdapter {
     public void addImage(List<User> users, File parentFolder) throws AppException {
         for (User user : users) {
             String imageUrl = user.getImageUrl();
-            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl == null || imageUrl.isEmpty()) continue;
             if (imageUrl.startsWith("data:")) {
                 user.setImage(Image.createImageFromBase64(imageUrl));
             } else {
@@ -105,5 +89,18 @@ public class UserConfigAdapter extends UserAdapter {
         for (User user : users) {
             user.setType("internal"); // Default to internal, as external makes no sense using the CLI
         }
+    }
+
+    public User readUser(ObjectMapper mapper, File configFile, File stageConfig, String stage) throws IOException {
+        User user = mapper.readValue(Utils.substituteVariables(configFile), User.class);
+        if (stageConfig != null) {
+            try {
+                ObjectReader updater = mapper.readerForUpdating(user);
+                user = updater.readValue(Utils.substituteVariables(stageConfig));
+            } catch (FileNotFoundException e) {
+                LOG.warn("No config file found for stage: {}", stage);
+            }
+        }
+        return user;
     }
 }

@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
@@ -91,14 +90,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
             try {
                 LOG.debug("Error reading array of applications, hence trying to read single application now.");
                 ClientApplication app = mapper.readValue(Utils.substituteVariables(configFile), ClientApplication.class);
-                if (stageConfig != null) {
-                    try {
-                        ObjectReader updater = mapper.readerForUpdating(app);
-                        app = updater.readValue(Utils.substituteVariables(stageConfig));
-                    } catch (FileNotFoundException e) {
-                        LOG.warn("No config file found for stage: {}", stage);
-                    }
-                }
+                app = readClientApplication(mapper, app, stageConfig, stage);
                 this.apps = new ArrayList<>();
                 this.apps.add(app);
             } catch (Exception pe) {
@@ -228,5 +220,17 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
                 permission.setUser(user);
             }
         }
+    }
+
+    public ClientApplication readClientApplication(ObjectMapper mapper, ClientApplication app, File stageConfig, String stage){
+        if (stageConfig != null) {
+            try {
+                ObjectReader updater = mapper.readerForUpdating(app);
+                return updater.readValue(Utils.substituteVariables(stageConfig));
+            } catch (IOException e) {
+                LOG.warn("No config file found for stage: {}", stage);
+            }
+        }
+        return null;
     }
 }

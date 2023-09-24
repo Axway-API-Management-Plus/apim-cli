@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.Console;
@@ -430,5 +431,18 @@ public class Utils {
     public static void deleteInstance(APIManagerAdapter apiManagerAdapter){
         if(apiManagerAdapter != null)
             apiManagerAdapter.deleteInstance();
+    }
+
+    public static ObjectMapper createObjectMapper(File configFile){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // Check the config file is json
+            mapper.readTree(configFile);
+            LOG.debug("Handling JSON Configuration file: {}", configFile);
+        } catch (IOException ioException) {
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
+            LOG.debug("Handling Yaml Configuration file: {}", configFile);
+        }
+        return mapper;
     }
 }
