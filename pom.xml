@@ -55,6 +55,9 @@
         <sonar.organization>axway-api-management-plus</sonar.organization>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <sonar.test.exclusions>**/*.java</sonar.test.exclusions>
+        <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>
+        <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S115</sonar.issue.ignore.multicriteria.e1.ruleKey>
+        <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <wiremock.version>2.35.0</wiremock.version>
         <citrus.version>3.4.0</citrus.version>
