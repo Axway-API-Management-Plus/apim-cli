@@ -3,6 +3,16 @@
 [![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 ![Latest Release](https://img.shields.io/github/v/release/Axway-API-Management-Plus/apim-cli)
 
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Axway-API-Management-Plus_apim-cli)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Axway-API-Management-Plus_apim-cli)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Axway-API-Management-Plus_apim-cli)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Axway-API-Management-Plus_apim-cli)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Axway-API-Management-Plus_apim-cli)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Axway-API-Management-Plus_apim-cli)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Axway-API-Management-Plus_apim-cli&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Axway-API-Management-Plus_apim-cli)
+
+
 ![downloads](https://img.shields.io/github/downloads/Axway-API-Management-Plus/apim-cli/total)
 
 
