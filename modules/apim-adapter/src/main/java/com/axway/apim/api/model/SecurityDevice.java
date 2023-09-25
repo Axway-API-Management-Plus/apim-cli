@@ -50,7 +50,7 @@ public class SecurityDevice {
         ObjectMapper mapper = new ObjectMapper();
         HashMap<String, String> policyMap = new HashMap<>();
         CoreParameters cmd = CoreParameters.getInstance();
-        JsonNode jsonResponse = null;
+        JsonNode jsonResponse;
         URI uri;
         try {
             if (type.equals(TOKENSTORES)) {
@@ -62,14 +62,21 @@ public class SecurityDevice {
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                jsonResponse = mapper.readTree(response);
-                for (JsonNode node : jsonResponse) {
-                    policyMap.put(node.get("name").asText(), node.get("id").asText());
+                LOG.debug("Status code : {}", httpResponse.getStatusLine());
+                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    jsonResponse = mapper.readTree(response);
+                    for (JsonNode node : jsonResponse) {
+                        policyMap.put(node.get("name").asText(), node.get("id").asText());
+                    }
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Response : {}", response);
+                    }
+                    throw new AppException("Error reading data from api manager", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
         } catch (Exception e) {
-            throw new AppException("Can't read " + type + " from response: '" + jsonResponse + "'. "
-                + "Please make sure that you use an Admin-Role user.",
+            throw new AppException("Can't read " + type + " from response Please make sure that you use an Admin-Role user.",
                 ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
         return policyMap;
@@ -118,9 +125,9 @@ public class SecurityDevice {
             if (tokenStore.startsWith("<key")) return properties;
             String esTokenStore = oauthTokenStores.get(tokenStore);
             if (esTokenStore == null) {
-                LOG.error("The tokenstore: {} is not configured in this API-Manager", tokenStore);
+                LOG.error("The token store: {} is not configured in this API-Manager", tokenStore);
                 LOG.error("Available token stores: {}", oauthTokenStores.keySet());
-                throw new AppException("The tokenstore: '" + tokenStore + NOT_CONFIGURED_IN_THIS_API_MANAGER, ErrorCode.UNKNOWN_CUSTOM_POLICY);
+                throw new AppException("The token store: '" + tokenStore + NOT_CONFIGURED_IN_THIS_API_MANAGER, ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
                 properties.put(TOKEN_STORE, esTokenStore);
             }

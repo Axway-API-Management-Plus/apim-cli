@@ -86,7 +86,7 @@ public class UpdateExistingAPI {
             }
         } catch (Exception e) {
             LOG.error("Error updating existing API", e);
-            throw new AppException("Error updating existing API", ErrorCode.UNXPECTED_ERROR);
+            throw new AppException("Error updating existing API", ErrorCode.BREAKING_CHANGE_DETECTED);
         } finally {
             APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());
         }
