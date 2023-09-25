@@ -47,7 +47,7 @@ public class APIImportParams extends StandardImportParams implements Parameters 
     public void setUpdateOnly(boolean updateOnly) {
         this.updateOnly = updateOnly;
     }
-    public Boolean isChangeOrganization() {
+    public boolean isChangeOrganization() {
         return changeOrganization;
     }
     public void setChangeOrganization(boolean changeOrganization) {

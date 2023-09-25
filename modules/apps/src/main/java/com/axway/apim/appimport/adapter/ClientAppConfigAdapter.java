@@ -5,7 +5,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;

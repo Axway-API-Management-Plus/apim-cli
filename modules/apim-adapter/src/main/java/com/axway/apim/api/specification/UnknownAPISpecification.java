@@ -31,7 +31,10 @@ public class UnknownAPISpecification extends APISpecification {
 
     @Override
     public byte[] getApiSpecificationContent() {
-        LOG.error("API: {} has a unknown/invalid API-Specification: {}", this.apiName, APISpecificationFactory.getContentStart(this.apiSpecificationContent));
+        LOG.error("API: {} has a unknown/invalid API-Specification" , apiName);
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Specification {}",  APISpecificationFactory.getContentStart(apiSpecificationContent));
+        }
         return this.apiSpecificationContent;
     }
 

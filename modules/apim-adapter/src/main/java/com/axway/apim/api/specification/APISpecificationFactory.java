@@ -89,10 +89,15 @@ public class APISpecificationFactory {
             }
         }
         if (!failOnError) {
-            LOG.error("API: {} has a unknown/invalid API-Specification: {}" , apiName, getContentStart(apiSpecificationContent));
+            LOG.error("API: {} has a unknown/invalid API-Specification" , apiName);
+            if(LOG.isDebugEnabled()){
+                LOG.debug("Specification {}",  getContentStart(apiSpecificationContent));
+            }
             return new UnknownAPISpecification(apiName);
         }
-        LOG.error("API: {} has a unknown/invalid API-Specification: {}" , apiName, getContentStart(apiSpecificationContent));
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("API: {} has a unknown/invalid API-Specification: {}", apiName, getContentStart(apiSpecificationContent));
+        }
         throw new AppException("Can't handle API specification. No suitable API-Specification implementation available.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
     }
 
