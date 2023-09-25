@@ -61,7 +61,7 @@ public class APIQuota {
         this.id = id;
     }
 
-    public boolean getSystem() {
+    public Boolean getSystem() {
         return system;
     }
 
