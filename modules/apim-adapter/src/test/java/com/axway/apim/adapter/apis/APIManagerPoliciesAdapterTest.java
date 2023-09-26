@@ -16,6 +16,7 @@ import java.util.List;
 public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
 
     private APIManagerPoliciesAdapter apiManagerPoliciesAdapter;
+    private APIManagerAdapter apiManagerAdapter;
 
     @BeforeClass
     public void init() {
@@ -25,7 +26,8 @@ public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerPoliciesAdapter = APIManagerAdapter.getInstance().getPoliciesAdapter();
+            apiManagerAdapter =  APIManagerAdapter.getInstance();
+            apiManagerPoliciesAdapter = apiManagerAdapter.getPoliciesAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -33,6 +35,7 @@ public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
 
     @AfterClass
     public void close() {
+        Utils.deleteInstance(apiManagerAdapter);
         super.close();
     }
 

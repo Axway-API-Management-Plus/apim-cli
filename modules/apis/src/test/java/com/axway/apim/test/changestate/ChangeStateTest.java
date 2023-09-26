@@ -1,12 +1,16 @@
 package com.axway.apim.test.changestate;
 
+import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,7 +18,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChangeStateTest {
+public class ChangeStateTest extends WiremockWrapper {
+
+    private APIManagerAdapter apiManagerAdapter;
+
+    @BeforeClass
+    public void init() {
+        try {
+            initWiremock();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apiManagerAdapter =  APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @AfterClass
+    public void close() {
+        Utils.deleteInstance(apiManagerAdapter);
+        super.close();
+    }
 
     @Test
     public void testOrderMakesNoChange() throws IOException {
@@ -74,7 +100,7 @@ public class ChangeStateTest {
         Assert.assertEquals(changeState.getAllChanges().get(0), "state", "The state should be included");
     }
 
-    private static API getTestAPI() throws AppException {
+    private static API getTestAPI() {
         API testAPI = new ActualAPI();
         testAPI.setOrganization(new Organization.Builder().hasName("123").hasId("123").build());
         testAPI.setState(API.STATE_PUBLISHED);
