@@ -167,7 +167,7 @@ public class APIManagerPoliciesAdapter {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 JsonNode jsonResponse = objectMapper.readTree(response);
                 for (JsonNode node : jsonResponse) {
-                    if (node.get("name").asText().equals(TOKEN_STORE))
+                    if (node.get("name").asText().equals("OAuth Access Token Store"))
                         return node.get("id").asText();
                 }
             }
