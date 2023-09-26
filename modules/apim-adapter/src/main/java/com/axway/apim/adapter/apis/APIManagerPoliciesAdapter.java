@@ -191,7 +191,7 @@ public class APIManagerPoliciesAdapter {
                         String oauthTokenStore = getOauthTokenStore();
                         securityDevice.getProperties().put(TOKEN_STORE, oauthTokenStore);
                     } else if (securityDevice.getType() == DeviceType.oauthExternal) {
-                        String oauthTokenInfo = securityDevice.getProperties().get("oauthtokeninfo");
+                        String oauthTokenInfo = securityDevice.getProperties().get(TOKEN_STORE);
                         String entityStoreOauthTokenInfo = getEntityStorePolicyFormat(PolicyType.OAUTH_TOKEN_INFO, oauthTokenInfo);
                         Map<String, String>  properties = securityDevice.getProperties();
                         properties.put(TOKEN_STORE, entityStoreOauthTokenInfo);
