@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     private APIManagerOrganizationAdapter organizationAdapter;
+    private APIManagerAdapter apiManagerAdapter;
     String orgName = "orga";
 
     @BeforeClass
@@ -24,7 +25,8 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            organizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
+            apiManagerAdapter = APIManagerAdapter.getInstance();
+            organizationAdapter = apiManagerAdapter.getOrgAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -33,6 +35,7 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     @AfterClass
     public void close() {
+        Utils.deleteInstance(apiManagerAdapter);
         super.close();
     }
 
@@ -67,42 +70,32 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void updateOrganization() {
-
+    public void updateOrganization() throws AppException {
+        OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
+        Organization organization = organizationAdapter.getOrg(orgFilter);
+        Organization updateOrganization = organizationAdapter.getOrg(orgFilter);
+        organization.setImageUrl("com/axway/apim/images/API-Logo.jpg");
+        organizationAdapter.createOrUpdateOrganization(updateOrganization, organization);
     }
 
-    //    @Test
-//    public void updateUserCreateNewUserFlow() throws AppException {
-//        setupParameters();
-//        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//        User user = new User();
-//        user.setEmail("updated@axway.com");
-//        user.setName("usera");
-//        user.setLoginName("usera");
-//        User newUser = apiManagerUserAdapter.updateUser(user, null);
-//        Assert.assertEquals(newUser.getEmail(), "updated@axway.com");
-//    }
-//
-//    @Test
-//    public void changePassword() throws AppException {
-//        setupParameters();
-//        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//        UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
-//        User user = apiManagerUserAdapter.getUser(userFilter);
-//        try {
-//            apiManagerUserAdapter.changePassword(Utils.getEncryptedPassword(), user);
-//        } catch (AppException appException) {
-//            Assert.fail("unable to change user password", appException);
-//        }
-//    }
-//
+
+
+
+    @Test
+    public void addAPIAccess() throws AppException {
+        OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
+        Organization organization = organizationAdapter.getOrg(orgFilter);
+        organizationAdapter.addAPIAccess(organization, true);
+       Assert.assertEquals( organization.getApiAccess().size(), 1);
+    }
+
+
+
     @Test
     public void addImage() throws AppException {
         OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
         Organization organization = organizationAdapter.getOrg(orgFilter);
-        organization.setImageUrl("https://axway.com/favicon.ico");
+        organization.setImageUrl("com/axway/apim/images/API-Logo.jpg");
         try {
             organizationAdapter.addImage(organization, true);
         } catch (Exception appException) {
