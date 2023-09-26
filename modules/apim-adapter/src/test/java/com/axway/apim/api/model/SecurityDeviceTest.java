@@ -15,30 +15,31 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-public class SecurityDeviceTest extends WiremockWrapper {
-
-    private APIManagerAdapter apiManagerAdapter;
-
-    @BeforeClass
-    public void initWiremock() {
-        super.initWiremock();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
-        try {
-            apiManagerAdapter = APIManagerAdapter.getInstance();
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @AfterClass
-    public void close() {
-        Utils.deleteInstance(apiManagerAdapter);
-
-        super.close();
-    }
+public class SecurityDeviceTest {
+    //extends WiremockWrapper {
+//
+//    private APIManagerAdapter apiManagerAdapter;
+//
+//    @BeforeClass
+//    public void initWiremock() {
+//        super.initWiremock();
+//        CoreParameters coreParameters = new CoreParameters();
+//        coreParameters.setHostname("localhost");
+//        coreParameters.setUsername("test");
+//        coreParameters.setPassword(Utils.getEncryptedPassword());
+//        try {
+//            apiManagerAdapter = APIManagerAdapter.getInstance();
+//        } catch (AppException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    @AfterClass
+//    public void close() {
+//        Utils.deleteInstance(apiManagerAdapter);
+//
+//        super.close();
+//    }
 
     @Test
     public void compareSecurityDevice() throws JsonProcessingException {

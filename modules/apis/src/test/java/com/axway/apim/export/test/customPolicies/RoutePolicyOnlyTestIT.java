@@ -44,6 +44,7 @@ public class RoutePolicyOnlyTestIT extends TestNGCitrusTestRunner {
 		swaggerExport = new ExportTestAction();
 		swaggerImport = new ImportTestAction();
 		description("Import an API including a Routing-Policy to export it afterwards");
+        createVariable("useApiAdmin", "true");
 
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/api/test/"+this.getClass().getSimpleName()+"-${apiNumber}");
@@ -81,8 +82,7 @@ public class RoutePolicyOnlyTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("version").asText(), 			"v1");
 		assertEquals(exportedAPIConfig.get("organization").asText(),		"API Development "+context.getVariable("orgNumber"));
 
-        mapper.writeValue(System.out, exportedAPIConfig);
-        mapper.writeValue(System.out, importedAPIConfig);
+
 		List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
 		List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
 		assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
