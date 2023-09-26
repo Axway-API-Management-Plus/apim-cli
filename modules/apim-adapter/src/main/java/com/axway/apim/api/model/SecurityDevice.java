@@ -3,6 +3,7 @@ package com.axway.apim.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -12,7 +13,7 @@ public class SecurityDevice {
     private String name;
     private DeviceType type;
     int order;
-    private Map<String, String> properties;
+    private Map<String, String> properties = new HashMap<>();
 
     /**
      * Flag to control if Policy-Names should be translated or not - Currently used by the API-Export
