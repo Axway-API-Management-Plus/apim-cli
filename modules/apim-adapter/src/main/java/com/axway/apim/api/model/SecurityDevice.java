@@ -42,7 +42,6 @@ public class SecurityDevice {
     boolean convertPolicies = true;
 
     public SecurityDevice() {
-        super();
         this.properties = new LinkedHashMap<>();
     }
 
@@ -76,8 +75,7 @@ public class SecurityDevice {
                 }
             }
         } catch (Exception e) {
-            throw new AppException("Can't read " + type + " from response Please make sure that you use an Admin-Role user.",
-                ErrorCode.API_MANAGER_COMMUNICATION, e);
+            throw new AppException("Can't read " + type + " from response ", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
         return policyMap;
     }

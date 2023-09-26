@@ -42,10 +42,7 @@ public class SecurityDeviceTest extends WiremockWrapper {
 
     @Test
     public void compareSecurityDevice() throws JsonProcessingException {
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
+
         String request = "[ {\n" +
             "      \"name\" : \"Invoke Policy\",\n" +
             "      \"type\" : \"authPolicy\",\n" +
@@ -59,6 +56,34 @@ public class SecurityDeviceTest extends WiremockWrapper {
             "        \"descriptionMarkdown\" : \"\",\n" +
             "        \"description\" : \"\"\n" +
             "      }\n" +
+            "    } ]\n" +
+            "  } ]";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<SecurityDevice> securityDevices = objectMapper.readValue(request, new TypeReference<List<SecurityDevice>>() {
+        });
+        Assert.assertTrue(Utils.compareValues(securityDevices, securityDevices));
+    }
+
+    @Test
+    public void compareTwoSecurityDevice() throws JsonProcessingException {
+
+
+
+        String request = "[ {\n" +
+            "      \"name\" : \"Invoke Policy\",\n" +
+            "      \"type\" : \"authPolicy\",\n" +
+            "      \"order\" : 1,\n" +
+            "      \"properties\" : {\n" +
+            "        \"authenticationPolicy\" : \"Inbound security policy 1\",\n" +
+            "        \"useClientRegistry\" : \"false\",\n" +
+            "        \"subjectSelector\" : \"${authentication.subject.id}\",\n" +
+            "        \"descriptionType\" : \"original\",\n" +
+            "        \"descriptionUrl\" : \"\",\n" +
+            "        \"descriptionMarkdown\" : \"\",\n" +
+            "        \"description\" : \"\"\n" +
+            "      },\n" +
+            "      \"convertPolicies\" : \"true\"\n" +
             "    } ]\n" +
             "  } ]";
 
