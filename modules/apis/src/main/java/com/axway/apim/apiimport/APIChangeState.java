@@ -53,10 +53,6 @@ public class APIChangeState {
     public APIChangeState(API actualAPI, API desiredAPI) throws AppException {
         this.actualAPI = actualAPI;
         this.desiredAPI = desiredAPI;
-        if (actualAPI == null) { // No existing API found, just create a new one and that's all
-            LOG.debug("No existing API found. Creating  complete new API");
-            return;
-        }
         getChanges();
     }
 
@@ -69,8 +65,10 @@ public class APIChangeState {
      * actual API.
      */
     private void getChanges() throws AppException {
-        if (actualAPI == null) {
-            return; //Nothing to do, as we don't have an existing API
+        APIManagerAdapter.getInstance().getPoliciesAdapter().updateSecurityProfiles(desiredAPI);
+        if (actualAPI == null) { // No existing API found, just create a new one and that's all
+            LOG.debug("No existing API found. Creating  complete new API");
+            return;
         }
         if (!desiredAPI.getOrganization().equals(actualAPI.getOrganization()) && !APIImportParams.getInstance().isChangeOrganization()) {
             LOG.debug("You may set the toggle: changeOrganization=true to allow to changing the organization of an existing API.");
@@ -159,7 +157,7 @@ public class APIChangeState {
                         if (desiredObject == null) continue;
                         Method setMethod = targetAPI.getClass().getMethod(setterMethodName, field.getType());
                         setMethod.invoke(targetAPI, desiredObject);
-                        message.append(fieldName + " ");
+                        message.append(fieldName).append(" ");
                         hasProperyCopied = true;
                     }
                 } catch (Exception e) {
@@ -210,12 +208,6 @@ public class APIChangeState {
         return desiredAPI;
     }
 
-    /**
-     * @param desiredAPI overwrites the desired API.
-     */
-    public void setDesiredAPI(API desiredAPI) {
-        this.desiredAPI = desiredAPI;
-    }
 
     /**
      * @return true, if a breakingChange or a nonBreakingChange was found otherwise false.

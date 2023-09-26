@@ -5,7 +5,6 @@ import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.Utils.FedKeyType;
 import org.apache.commons.lang3.StringUtils;
@@ -362,6 +361,11 @@ public class APIFilter implements CustomPropertiesFilter {
         return createdOn;
     }
 
+    public void setCreatedOn(String createdOn) {
+        this.createdOn = createdOn;
+    }
+
+
     public List<String> getCustomProperties() {
         return customProperties;
     }
@@ -451,12 +455,8 @@ public class APIFilter implements CustomPropertiesFilter {
             && this.getTag() == null && this.getInboundSecurity() == null && this.getOutboundAuthentication() == null && this.getOrganization() == null) { // Nothing given to filter out.
             return false;
         }
-        if (this.getPolicyName() != null) {
-            try {
-                if (!isPolicyUsed(api, this.getPolicyName())) return true;
-            } catch (AppException e) {
-                LOG.error("Error filtering API policies", e);
-            }
+        if (this.getPolicyName() != null && (!isPolicyUsed(api, this.getPolicyName()))) {
+            return true;
         }
         if (this.getInboundSecurity() != null) {
             boolean match = false;
@@ -476,11 +476,7 @@ public class APIFilter implements CustomPropertiesFilter {
                 }
             }
             if (!match) { // No match found so far, check policy names
-                try {
-                    match = isPolicyUsed(api, this.getInboundSecurity());
-                } catch (AppException e) {
-                    LOG.error("Error filtering API policies", e);
-                }
+                match = isPolicyUsed(api, this.getInboundSecurity());
             }
             if (!match) return true; // Requested security is finally not found, return true
         }
@@ -868,7 +864,7 @@ public class APIFilter implements CustomPropertiesFilter {
         }
     }
 
-    private static boolean isPolicyUsed(API api, String policyName) throws AppException {
+    private static boolean isPolicyUsed(API api, String policyName) {
         // pattern for escaping special regex characters (except *)
         String escaped = SPECIAL_REGEX_CHARS.matcher(policyName).replaceAll("\\\\$0");
         Pattern pattern = Pattern.compile(escaped.toLowerCase().replace("*", ".*"));

@@ -44,14 +44,19 @@ public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
     }
 
     @Test(expectedExceptions = AppException.class)
-    public void getPolicyForNameNegative()throws AppException {
+    public void getPolicyForNameNegative() throws AppException {
         Policy policy = apiManagerPoliciesAdapter.getPolicyForName(APIManagerPoliciesAdapter.PolicyType.REQUEST, "test");
         Assert.assertNotNull(policy);
     }
 
     @Test
-    public void getPolicyForName()throws AppException {
+    public void getPolicyForName() throws AppException {
         Policy policy = apiManagerPoliciesAdapter.getPolicyForName(APIManagerPoliciesAdapter.PolicyType.REQUEST, "Validate Size & Token");
         Assert.assertNotNull(policy);
+    }
+
+    @Test
+    public void getOauthTokenStore() throws AppException {
+        Assert.assertNotNull(apiManagerPoliciesAdapter.getOauthTokenStore());
     }
 }

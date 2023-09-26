@@ -23,17 +23,14 @@ import java.util.*;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class ExportAPI {
     public static final String DEFAULT = "_default";
-    API actualAPIProxy = null;
+    API actualAPIProxy;
 
     public String getPath() {
         return this.actualAPIProxy.getPath();
     }
 
-    public ExportAPI() {
-    }
 
     public ExportAPI(API actualAPIProxy) {
-        super();
         this.actualAPIProxy = actualAPIProxy;
     }
 
@@ -65,7 +62,7 @@ public class ExportAPI {
     }
 
 
-    public List<SecurityProfile> getSecurityProfiles() throws AppException {
+    public List<SecurityProfile> getSecurityProfiles() {
         if (this.actualAPIProxy.getSecurityProfiles().size() == 1) {
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().isEmpty())
                 return null;

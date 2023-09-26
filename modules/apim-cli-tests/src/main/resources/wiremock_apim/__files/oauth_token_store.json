@@ -1,0 +1,6 @@
+[
+  {
+    "name": "OAuth Access Token Store",
+    "id": "<key type='OAuth2StoresGroup'><id field='name' value='OAuth2 Stores'/><key type='AccessTokenStoreGroup'><id field='name' value='Access Token Stores'/><key type='AccessTokenPersist'><id field='name' value='OAuth Access Token Store'/></key></key></key>"
+  }
+]
