@@ -32,6 +32,11 @@ public class APIManagerPoliciesAdapter {
     public static final String AUTHENTICATION_POLICY = "authenticationPolicy";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    public final Map<PolicyType, String> apiManagerResponse = new EnumMap<>(PolicyType.class);
+
+    private final Map<PolicyType, List<Policy>> mappedPolicies = new EnumMap<>(PolicyType.class);
+    private final List<Policy> allPolicies = new ArrayList<>();
+
     public enum PolicyType {
         ROUTING("routing", "routePolicy", "Routing policy"),
         REQUEST("request", "requestPolicy", "Request policy"),
@@ -83,15 +88,6 @@ public class APIManagerPoliciesAdapter {
     }
 
 
-    public APIManagerPoliciesAdapter() {
-        super();
-    }
-
-    public final Map<PolicyType, String> apiManagerResponse = new EnumMap<>(PolicyType.class);
-
-    private final Map<PolicyType, List<Policy>> mappedPolicies = new EnumMap<>(PolicyType.class);
-    private final List<Policy> allPolicies = new ArrayList<>();
-
     private void readPoliciesFromAPIManager(PolicyType type) throws AppException {
         if (apiManagerResponse.get(type) != null) return;
         CoreParameters cmd = CoreParameters.getInstance();
@@ -141,8 +137,8 @@ public class APIManagerPoliciesAdapter {
 
     public String getEntityStorePolicyFormat(PolicyType type, String name) throws AppException {
         String response = apiManagerResponse.get(type);
-        if (apiManagerResponse.get(type) != null) return response;
-        readPoliciesFromAPIManager(type);
+        if (response == null)
+            readPoliciesFromAPIManager(type);
         response = apiManagerResponse.get(type);
         try {
             JsonNode jsonResponse = objectMapper.readTree(response);
@@ -157,7 +153,7 @@ public class APIManagerPoliciesAdapter {
         return null;
     }
 
-    public String getOauthTokenStore() throws AppException {
+    public String getOauthTokenStore(String name) throws AppException {
         CoreParameters cmd = CoreParameters.getInstance();
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/tokenstores").build();
@@ -167,7 +163,7 @@ public class APIManagerPoliciesAdapter {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 JsonNode jsonResponse = objectMapper.readTree(response);
                 for (JsonNode node : jsonResponse) {
-                    if (node.get("name").asText().equals("OAuth Access Token Store"))
+                    if (node.get("name").asText().equals(name))
                         return node.get("id").asText();
                 }
             }
@@ -185,15 +181,23 @@ public class APIManagerPoliciesAdapter {
                     if (securityDevice.getType() == DeviceType.authPolicy) {
                         String authPolicy = securityDevice.getProperties().get(AUTHENTICATION_POLICY);
                         String entityStorePolicy = getEntityStorePolicyFormat(APIManagerPoliciesAdapter.PolicyType.AUTHENTICATION, authPolicy);
+                        if (entityStorePolicy == null)
+                            throw new AppException("Invalid authentication policy : " + authPolicy, ErrorCode.INVALID_SECURITY_PROFILE_CONFIG);
                         LOG.debug("Changing Auth policy : {} with {}", authPolicy, entityStorePolicy);
                         securityDevice.getProperties().put(AUTHENTICATION_POLICY, entityStorePolicy);
                     } else if (securityDevice.getType() == DeviceType.oauth) {
-                        String oauthTokenStore = getOauthTokenStore();
+                        String tokenStore = securityDevice.getProperties().get(TOKEN_STORE);
+                        String oauthTokenStore = getOauthTokenStore(tokenStore);
+                        if (oauthTokenStore == null)
+                            throw new AppException("Oauth auth store is not configured", ErrorCode.UNXPECTED_ERROR);
                         securityDevice.getProperties().put(TOKEN_STORE, oauthTokenStore);
                     } else if (securityDevice.getType() == DeviceType.oauthExternal) {
                         String oauthTokenInfo = securityDevice.getProperties().get(TOKEN_STORE);
                         String entityStoreOauthTokenInfo = getEntityStorePolicyFormat(PolicyType.OAUTH_TOKEN_INFO, oauthTokenInfo);
-                        Map<String, String>  properties = securityDevice.getProperties();
+                        if (entityStoreOauthTokenInfo == null)
+                            throw new AppException("Invalid Oauth token info policy : " + oauthTokenInfo, ErrorCode.INVALID_SECURITY_PROFILE_CONFIG);
+                        LOG.debug("Changing Auth policy : {} with {}", oauthTokenInfo, entityStoreOauthTokenInfo);
+                        Map<String, String> properties = securityDevice.getProperties();
                         properties.put(TOKEN_STORE, entityStoreOauthTokenInfo);
                         properties.put("oauth.token.client_id", "${oauth.token.client_id}");
                         properties.put("oauth.token.scopes", "${oauth.token.scopes}");

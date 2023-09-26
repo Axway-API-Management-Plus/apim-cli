@@ -77,7 +77,6 @@ public class SecurityProfileTest {
             "  } ]\n" +
             "} ]";
 
-        System.out.println(newConfig);
         ObjectMapper objectMapper = new ObjectMapper();
         List<SecurityProfile> securityProfiles = objectMapper.readValue(newConfig, new TypeReference<List<SecurityProfile>>() {
         });
@@ -113,9 +112,6 @@ public class SecurityProfileTest {
             "    }\n" +
             "  } ]\n" +
             "} ]";
-
-        System.out.println(actualConfig);
-
 
         List<SecurityProfile> actualSecurityProfiles = objectMapper.readValue(actualConfig, new TypeReference<List<SecurityProfile>>() {
         });
