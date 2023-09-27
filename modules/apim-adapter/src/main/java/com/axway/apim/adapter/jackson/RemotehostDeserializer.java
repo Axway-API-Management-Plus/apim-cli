@@ -1,19 +1,17 @@
 package com.axway.apim.adapter.jackson;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 
@@ -35,7 +33,7 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 
 	@Override
 	public RemoteHost deserialize(JsonParser jp, DeserializationContext ctxt)
-			throws IOException, JsonProcessingException {
+			throws IOException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		String remoteHostName;
 		int remoteHostPort;

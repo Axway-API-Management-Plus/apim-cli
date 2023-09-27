@@ -6,7 +6,6 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -27,7 +26,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 
     @Override
     public Organization deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerOrganizationAdapter organizationAdapter = apiManagerAdapter.getOrgAdapter();
         JsonNode node = jp.getCodec().readTree(jp);

@@ -1,7 +1,6 @@
 package com.axway.apim.adapter.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -10,6 +9,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
@@ -28,7 +28,7 @@ public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
 
 	@Override
 	public List<String> deserialize(JsonParser jp, DeserializationContext ctxt)
-			throws IOException, JsonProcessingException {
+			throws IOException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		List<String> markdownLocal = new ArrayList<>();
 		if(node instanceof TextNode) {
@@ -38,7 +38,7 @@ public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
 				markdownLocal.add(items.asText());
 			}
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 		return markdownLocal;
 	}
