@@ -113,6 +113,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(Include.NON_NULL);
+        mapper.setSerializationInclusion(Include.NON_EMPTY);
         FilterProvider filters = new SimpleFilterProvider()
             .addFilter("CaCertFilter",
                 SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))
