@@ -403,7 +403,6 @@ public class ODataV4Specification extends ODataSpecification {
         }
         operation.setTags(tag);
         operation.setOperationId(function.getName());
-        // setFunctionDocumentation(function, operation);
         for (String parameterName : function.getParameterNames()) {
             EdmParameter param = function.getParameter(parameterName);
             operation.addParametersItem(createParameter(edm, param));
@@ -467,11 +466,7 @@ public class ODataV4Specification extends ODataSpecification {
 
     private Schema<?> getSchemaForType(Edm edm, EdmType type, boolean isCollection) {
         try {
-            if (type.getKind() == EdmTypeKind.PRIMITIVE) {
-                return getSchemaForType(edm, type, false, isCollection);
-            } else {
-                return getSchemaForType(edm, type, true, isCollection);
-            }
+            return type.getKind() == EdmTypeKind.PRIMITIVE ? getSchemaForType(edm, type, false, isCollection) :  getSchemaForType(edm, type, true, isCollection);
         } catch (EdmException e) {
             logger.error("Error getting schema for type: {}", type.getName());
             return null;
