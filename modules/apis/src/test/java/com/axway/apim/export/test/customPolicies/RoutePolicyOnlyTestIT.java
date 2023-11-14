@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -40,7 +41,8 @@ public class RoutePolicyOnlyTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
-
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 		swaggerExport = new ExportTestAction();
 		swaggerImport = new ImportTestAction();
 		description("Import an API including a Routing-Policy to export it afterwards");
@@ -84,6 +86,10 @@ public class RoutePolicyOnlyTestIT extends TestNGCitrusTestRunner {
 
 
 		List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
+
+        // ignore empty values in properties
+        importedSecurityProfiles =  mapper.readValue(mapper.writeValueAsString(importedSecurityProfiles), new TypeReference<List<SecurityProfile>>() {
+        });
 		List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
 		assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
 
