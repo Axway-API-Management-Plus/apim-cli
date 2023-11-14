@@ -18,7 +18,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,19 +83,19 @@ public class APIImportConfigAdapter {
      * @throws AppException if the config-file can't be parsed for some reason
      */
     public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, String stageConfig) throws AppException {
-        ObjectMapper mapper;
-        SimpleModule module = new SimpleModule();
         try {
             this.pathToAPIDefinition = pathToAPIDefinition;
             this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
             File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
             // Validate organization for the base config, if no staged-config is given
             boolean validateOrganization = stageConfigFile == null;
-            mapper = Utils.createObjectMapper(apiConfigFile);
+            ObjectMapper mapper = Utils.createObjectMapper(apiConfigFile);
+            SimpleModule module = new SimpleModule();
             module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, false));
             // We would like to get back the original AppExcepption instead of a JsonMappingException
             mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
             mapper.registerModule(module);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
             ObjectReader reader = mapper.reader();
             API baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {
@@ -111,10 +111,8 @@ public class APIImportConfigAdapter {
             } else {
                 throw new AppException("Error reading API-Config file(s)", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
             }
-        } catch (JsonParseException e) {
+        } catch (IOException e) {
             throw new AppException("Cannot parse API-Config file(s).", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
-        } catch (Exception e) {
-            throw new AppException("Error reading API-Config file(s)", EXCEPTION + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
         }
     }
 

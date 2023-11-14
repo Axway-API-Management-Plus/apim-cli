@@ -23,6 +23,7 @@ import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.Console;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.HttpResponse;
@@ -435,6 +436,8 @@ public class Utils {
 
     public static ObjectMapper createObjectMapper(File configFile){
         ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         try {
             // Check the config file is json
             mapper.readTree(configFile);
