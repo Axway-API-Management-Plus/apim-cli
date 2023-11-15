@@ -16,40 +16,24 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 
     private static final long serialVersionUID = 1L;
 
-    public OrganizationDeserializer() {
-        this(null);
-    }
-
     public OrganizationDeserializer(Class<Organization> organization) {
         super(organization);
     }
 
     @Override
-    public Organization deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException {
+    public Organization deserialize(JsonParser jp, DeserializationContext context)
+        throws IOException {
         APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerOrganizationAdapter organizationAdapter = apiManagerAdapter.getOrgAdapter();
         JsonNode node = jp.getCodec().readTree(jp);
         // Deserialization depends on the direction
         if ("organizationId".equals(jp.currentName())) {
-            // APIManagerAdapter is not yet initialized
-            if (!apiManagerAdapter.isInitialized()) {
-                Organization organization = new Organization();
-                organization.setId(node.asText());
-                return organization;
-            }
             // organizationId is given by API-Manager
             return organizationAdapter.getOrgForId(node.asText());
         } else {
-            // APIManagerAdapter is not yet initialized
-            if (!apiManagerAdapter.isInitialized()) {
-                Organization organization = new Organization();
-                organization.setName(node.asText());
-                return organization;
-            }
             // Otherwise make sure the organization exists and try to load it
-            Organization organization =organizationAdapter.getOrgForName(node.asText());
-            if (organization == null && validateOrganization(ctxt)) {
+            Organization organization = organizationAdapter.getOrgForName(node.asText());
+            if (organization == null && validateOrganization(context)) {
                 throw new AppException("The given organization: '" + node.asText() + "' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
             }
             return organization;

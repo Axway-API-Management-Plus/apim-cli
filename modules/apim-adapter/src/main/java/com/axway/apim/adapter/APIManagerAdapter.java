@@ -72,7 +72,6 @@ public class APIManagerAdapter {
     private static APIManagerAdapter instance;
     private String apiManagerVersion = null;
     private String apiManagerName = null;
-    private boolean initialized;
     public static final ObjectMapper mapper = new ObjectMapper();
     private static final Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
     private boolean usingOrgAdmin = false;
@@ -122,7 +121,6 @@ public class APIManagerAdapter {
             instance = null;
             APIMHttpClient.deleteInstances();
         }
-        initialized = false;
     }
 
     private void setApiManagerVersion() throws AppException {
@@ -152,11 +150,6 @@ public class APIManagerAdapter {
         this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter(this);
         this.appAdapter = new APIMgrAppsAdapter(this);
         this.userAdapter = new APIManagerUserAdapter(this);
-        initialized = true;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
     }
 
     public APIMCLICacheManager getCacheManager() {
