@@ -73,7 +73,7 @@ public class UpdateExistingAPI {
                 apiAdapter.updateAPIProxy(changes.getActualAPI());
             }
             new APIQuotaManager(changes.getDesiredAPI(), changes.getActualAPI()).execute(changes.getActualAPI());
-            new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
+            new ManageClientOrganization(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
             // Handle subscription to applications
             new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
             if (actualAPI.getState().equals(API.STATE_DELETED)) {

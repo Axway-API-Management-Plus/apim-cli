@@ -1,21 +1,19 @@
 package com.axway.apim.apiimport;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-import com.axway.apim.lib.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is key, as the desired and actual API comes together.
@@ -39,8 +37,8 @@ public class APIChangeState {
     private boolean updateExistingAPI = true;
     private boolean recreateAPI = false;
     private boolean proxyUpdateRequired = false;
-    private final List<String> breakingChanges = new Vector<>();
-    private final List<String> nonBreakingChanges = new Vector<>();
+    private final List<String> breakingChanges = new ArrayList<>();
+    private final List<String> nonBreakingChanges = new ArrayList<>();
 
 
     /**

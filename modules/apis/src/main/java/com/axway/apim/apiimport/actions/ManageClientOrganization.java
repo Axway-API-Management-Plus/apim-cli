@@ -13,16 +13,16 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 
-public class ManageClientOrgs {
+public class ManageClientOrganization {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ManageClientOrgs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ManageClientOrganization.class);
 
     APIManagerAdapter apiManager;
 
     private final API desiredState;
     private final API actualState;
 
-    public ManageClientOrgs(API desiredState, API actualState) throws AppException {
+    public ManageClientOrganization(API desiredState, API actualState) throws AppException {
         this.desiredState = desiredState;
         this.actualState = actualState;
         apiManager = APIManagerAdapter.getInstance();
@@ -30,6 +30,7 @@ public class ManageClientOrgs {
     }
 
     public void execute(boolean reCreation) throws AppException {
+        LOG.info("reCreation : {}", reCreation);
         if (CoreParameters.getInstance().isIgnoreClientOrgs()) {
             LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
             return;
@@ -51,14 +52,15 @@ public class ManageClientOrgs {
                     LOG.info("All desired organizations: {} have already access. Nothing to do.", desiredState.getClientOrganizations());
                 }
             } else {
+                LOG.info("Granting access for organizations : {} to API : {}", missingDesiredOrgs, actualState.getName());
                 apiManager.getApiAdapter().grantClientOrganization(missingDesiredOrgs, actualState, false);
             }
             if (!removingActualOrgs.isEmpty()) {
                 if (CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.Mode.replace)) {
-                    LOG.info("Removing access for orgs: {} from API: {}", removingActualOrgs, actualState.getName());
+                    LOG.info("Removing access for organizations: {} from API: {}", removingActualOrgs, actualState.getName());
                     apiManager.getAccessAdapter().removeClientOrganization(removingActualOrgs, actualState.getId());
                 } else {
-                    LOG.info("NOT removing access for existing orgs: {} from API: {} as clientOrgsMode NOT set to replace.",removingActualOrgs,actualState.getName());
+                    LOG.info("NOT removing access for existing organizations: {} from API: {} as clientOrgsMode NOT set to replace.",removingActualOrgs,actualState.getName());
                 }
             }
         }
