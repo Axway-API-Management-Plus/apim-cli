@@ -23,8 +23,8 @@ public abstract class APISpecification {
 
 
     public enum APISpecType {
-        SWAGGER_API_1x("Swagger 1.x", JSON),
-        SWAGGER_API_1x_YAML("Swagger 1.x (YAML)", YAML),
+        SWAGGER_API_1X("Swagger 1.x", JSON),
+        SWAGGER_API_1X_YAML("Swagger 1.x (YAML)", YAML),
         SWAGGER_API_20("Swagger 2.0", JSON),
         SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", YAML),
         OPEN_API_30("Open API 3.0", JSON),
@@ -35,6 +35,7 @@ public abstract class APISpecification {
             "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
         ODATA_V3("OData V4", METADATA),
         ODATA_V4("OData V4", METADATA),
+        GRAPHQL("Graphql", "graphql"),
         UNKNOWN("Unknown", ".txt");
 
         final String niceName;
@@ -125,10 +126,7 @@ public abstract class APISpecification {
 
     public abstract APISpecType getAPIDefinitionType() throws AppException;
 
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
-        this.apiSpecificationContent = apiSpecificationContent;
-        return true;
-    }
+    public abstract boolean parse(byte[] apiSpecificationContent) throws AppException;
 
     protected void setMapperForDataFormat() {
         try {

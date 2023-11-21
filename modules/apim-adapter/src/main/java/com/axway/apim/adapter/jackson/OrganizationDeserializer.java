@@ -16,6 +16,10 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 
     private static final long serialVersionUID = 1L;
 
+    public OrganizationDeserializer() {
+        this(null);
+    }
+
     public OrganizationDeserializer(Class<Organization> organization) {
         super(organization);
     }

@@ -64,6 +64,7 @@
         <wiremock.version>2.35.0</wiremock.version>
         <citrus.version>3.4.0</citrus.version>
         <failsafe.version>3.3.2</failsafe.version>
+        <graphql.version>21.3</graphql.version>
     </properties>
     <scm>
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
@@ -245,6 +246,11 @@
                 <groupId>dev.failsafe</groupId>
                 <artifactId>failsafe</artifactId>
                 <version>${failsafe.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.graphql-java</groupId>
+                <artifactId>graphql-java</artifactId>
+                <version>${graphql.version}</version>
             </dependency>
 
             <dependency>

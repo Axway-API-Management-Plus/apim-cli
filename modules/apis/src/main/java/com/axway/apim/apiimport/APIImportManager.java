@@ -59,7 +59,7 @@ public class APIImportManager {
             LOG.info("Recognized the following changes. Potentially Breaking: {} plus Non-Breaking: {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges());
             LOG.info("Is Breaking changes : {} Enforce Breaking changes : {}", changeState.isBreaking(), enforceBreakingChange);
             if (changeState.isBreaking() && (!enforceBreakingChange)) {
-                    throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
+                throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
             }
             LOG.debug("Apply breaking changes: {} & and Non-Breaking: {}, for {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges(), changeState.getActualAPI().getState());
             if (changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
@@ -80,9 +80,8 @@ public class APIImportManager {
                 republish.execute(changeState);
             }
         }
-        if (!APIManagerAdapter.getInstance().hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
-            LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
-                    + "You may update the pending API as often as you want before it is finally published.");
+        if (!APIManagerAdapter.getInstance().hasAdminAccount() && changeState.isAdminAccountNeeded()) {
+            LOG.info("Actual API has been created and is waiting for an approval by an administrator. You may update the pending API as often as you want before it is finally published.");
         }
     }
 }

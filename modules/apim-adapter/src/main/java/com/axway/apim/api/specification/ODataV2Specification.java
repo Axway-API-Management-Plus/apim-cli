@@ -66,9 +66,9 @@ public class ODataV2Specification extends ODataSpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             edm = EntityProvider.readMetadata(new ByteArrayInputStream(apiSpecificationContent), false);
             this.openAPI = new OpenAPI();
             Info info = new Info();

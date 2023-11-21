@@ -25,7 +25,7 @@ public class UnknownAPISpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent)  {
         return false;
     }
 

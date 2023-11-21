@@ -12,11 +12,11 @@ public class ODataV3Specification extends ODataSpecification {
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
-		return APISpecType.ODATA_V4;
+		return APISpecType.ODATA_V3;
 	}
 
 	@Override
-	public boolean parse(byte[] apiSpecificationContent) throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException{
 		String specStart = new String(apiSpecificationContent, 0, 500).toLowerCase();
 		if(specStart.contains("edmx") && specStart.contains("3.0")) {
 			throw new AppException("Detected OData V3 specification, which is not yet supported by the APIM-CLI.\n"

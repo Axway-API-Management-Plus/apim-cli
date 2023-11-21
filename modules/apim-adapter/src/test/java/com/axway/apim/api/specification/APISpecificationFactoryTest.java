@@ -1,6 +1,5 @@
 package com.axway.apim.api.specification;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -62,16 +61,25 @@ public class APISpecificationFactoryTest {
     public void getAPISpecificationSwagger12() throws AppException {
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("swagger12.json", specDirPath, "petstore");
-        Assert.assertEquals(APISpecification.APISpecType.valueOf("SWAGGER_API_1x"), apiSpecification.getAPIDefinitionType());
+        Assert.assertEquals(APISpecification.APISpecType.SWAGGER_API_1X, apiSpecification.getAPIDefinitionType());
         Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
     }
     @Test
     public void getAPISpecificationSwagger11() throws AppException {
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("swagger11.json", specDirPath, "petstore");
-        Assert.assertEquals(APISpecification.APISpecType.valueOf("SWAGGER_API_1x"), apiSpecification.getAPIDefinitionType());
+        Assert.assertEquals(APISpecification.APISpecType.SWAGGER_API_1X, apiSpecification.getAPIDefinitionType());
         Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
     }
+
+    @Test
+    public void getAPISpecificationGraphql() throws AppException {
+        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
+        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("starwars.graphqls", specDirPath, "starwars");
+        Assert.assertEquals(APISpecification.APISpecType.GRAPHQL, apiSpecification.getAPIDefinitionType());
+        Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
+    }
+
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Can't handle API specification. No suitable API-Specification implementation available.")
     public void getAPISpecificationUnknown() throws AppException {
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();

@@ -49,9 +49,9 @@ public class ODataV4Specification extends ODataSpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             ODataClient client = ODataClientFactory.getClient();
             Edm edm = client.getReader().readMetadata(new ByteArrayInputStream(apiSpecificationContent));
             this.openAPI = new OpenAPI();

@@ -52,7 +52,7 @@ public class WADLSpecification extends APISpecification {
 
     @Override
     public boolean parse(byte[] apiSpecificationContent) throws AppException {
-        super.parse(apiSpecificationContent);
+        this.apiSpecificationContent = apiSpecificationContent;
         if (apiSpecificationFile.toLowerCase().endsWith(".url")) {
             apiSpecificationFile = Utils.getAPIDefinitionUriFromFile(apiSpecificationFile);
         }

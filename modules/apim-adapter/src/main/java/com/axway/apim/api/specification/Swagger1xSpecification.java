@@ -2,7 +2,6 @@ package com.axway.apim.api.specification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,9 +18,9 @@ public class Swagger1xSpecification extends APISpecification {
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
         if (this.mapper.getFactory() instanceof YAMLFactory) {
-            return APISpecType.SWAGGER_API_1x_YAML;
+            return APISpecType.SWAGGER_API_1X_YAML;
         }
-        return APISpecType.SWAGGER_API_1x;
+        return APISpecType.SWAGGER_API_1X;
     }
 
     @Override
@@ -33,7 +32,7 @@ public class Swagger1xSpecification extends APISpecification {
     public void updateBasePath(String basePath, String host) {
         try {
             String url = Utils.handleOpenAPIServerUrl(host, basePath);
-            ((ObjectNode)swagger).put("basePath", url);
+            ((ObjectNode) swagger).put("basePath", url);
             this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
         } catch (Exception e) {
             LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
@@ -55,18 +54,13 @@ public class Swagger1xSpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             setMapperForDataFormat();
             if (this.mapper == null) return false;
             swagger = this.mapper.readTree(apiSpecificationContent);
             return swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1.");
-        } catch (AppException e) {
-            if (e.getError() == ErrorCode.UNSUPPORTED_FEATURE) {
-                throw e;
-            }
-            return false;
         } catch (Exception e) {
             LOG.trace("No Swagger 1.x specification.", e);
             return false;

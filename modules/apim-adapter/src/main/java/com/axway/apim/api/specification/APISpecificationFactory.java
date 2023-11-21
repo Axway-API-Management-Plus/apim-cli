@@ -37,6 +37,7 @@ public class APISpecificationFactory {
             add(Swagger1xSpecification.class);
             add(OAS3xSpecification.class);
             add(WSDLSpecification.class);
+            add(GraphqlSpecification.class);
             add(WADLSpecification.class);
             add(ODataV2Specification.class);
             add(ODataV3Specification.class);

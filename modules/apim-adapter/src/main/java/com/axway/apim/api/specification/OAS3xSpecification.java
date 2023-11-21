@@ -145,19 +145,14 @@ public class OAS3xSpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             setMapperForDataFormat();
             if (this.mapper == null) return false;
             openApiNode = this.mapper.readTree(apiSpecificationContent);
             LOG.debug("openapi tag value : {}", openApiNode.get(OPENAPI));
             return openApiNode.has(OPENAPI) && openApiNode.get(OPENAPI).asText().startsWith("3.0.");
-        } catch (AppException e) {
-            if (e.getError() == ErrorCode.UNSUPPORTED_FEATURE) {
-                throw e;
-            }
-            return false;
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("No OpenAPI 3.0 specification.", e);

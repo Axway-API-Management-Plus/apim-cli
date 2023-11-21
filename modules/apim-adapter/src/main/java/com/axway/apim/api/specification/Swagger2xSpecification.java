@@ -117,7 +117,7 @@ public class Swagger2xSpecification extends APISpecification {
                     if (StringUtils.isNotEmpty(basePath)) {
                         LOG.debug("Overriding Swagger basePath with value : {}", basePath);
                         ((ObjectNode) swagger).put(BASE_PATH, basePath);
-                    }else {
+                    } else {
                         LOG.debug("Not updating basePath value in swagger 2 as BackendBasePath : {}  has empty basePath", backendBasePath);
                     }
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
@@ -135,18 +135,13 @@ public class Swagger2xSpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             setMapperForDataFormat();
             if (this.mapper == null) return false;
             swagger = this.mapper.readTree(apiSpecificationContent);
             return swagger.has("swagger") && swagger.get("swagger").asText().startsWith("2.");
-        } catch (AppException e) {
-            if (e.getError() == ErrorCode.UNSUPPORTED_FEATURE) {
-                throw e;
-            }
-            return false;
         } catch (Exception e) {
             LOG.trace("Could load specification as Swagger 2.0", e);
             return false;
