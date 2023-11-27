@@ -87,9 +87,8 @@ public class JsonAPIExporter extends APIResultHandler {
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
-                    writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-                    exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
-
+                writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+                exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
             }
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
@@ -104,8 +103,7 @@ public class JsonAPIExporter extends APIResultHandler {
         }
         Image image = exportAPI.getAPIImage();
         if (image != null && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
-                writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
-
+            writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
         }
         if (exportAPI.getCaCerts() != null && !exportAPI.getCaCerts().isEmpty()) {
             storeCaCerts(localFolder, exportAPI.getCaCerts());

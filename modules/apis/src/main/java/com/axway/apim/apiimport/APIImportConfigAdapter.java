@@ -290,7 +290,7 @@ public class APIImportConfigAdapter {
                             if (!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
                                 LOG.trace("Error reading markdown description file (absolute): {}", markdownFile.getCanonicalPath());
                                 String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-                                markdownFile = new File(baseDir + "/" + markdownFilename);
+                                markdownFile = new File(baseDir, markdownFilename);
                             }
                             if (!markdownFile.exists()) {
                                 LOG.trace("Error reading markdown description file (relative): {}", markdownFile.getCanonicalPath());
@@ -455,6 +455,7 @@ public class APIImportConfigAdapter {
                         throw new AppException("Can't initialize given certificate.", ErrorCode.CANT_READ_CONFIG_FILE, e);
                     }
                 }
+
             }
             apiConfig.getCaCerts().clear();
             apiConfig.getCaCerts().addAll(completedCaCerts);
@@ -463,9 +464,13 @@ public class APIImportConfigAdapter {
 
     private InputStream getInputStreamForCertFile(CaCert cert) throws AppException {
         InputStream is;
-        File file;
+        // Handel base64 encoded inline certificate
+        if (cert.getCertFile().startsWith("data:")) {
+            byte[] data = Base64.getDecoder().decode(cert.getCertFile().replaceFirst("data:.+,", ""));
+            return new ByteArrayInputStream(data);
+        }
         // Certificates might be stored somewhere else, so try to load them directly
-        file = new File(cert.getCertFile());
+        File file = new File(cert.getCertFile());
         if (file.exists()) {
             try {
                 is = new FileInputStream(file);
@@ -672,7 +677,7 @@ public class APIImportConfigAdapter {
             if (!clientCertFile.exists()) {
                 // Try to find file using a relative path to the config file
                 String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-                clientCertFile = new File(baseDir + "/" + keystore);
+                clientCertFile = new File(baseDir, keystore);
             }
             if (!clientCertFile.exists()) {
                 // If not found absolute & relative - Try to load it from ClassPath
@@ -721,7 +726,7 @@ public class APIImportConfigAdapter {
             file = new File(importApi.getImage().getFilename());
             if (!file.exists()) { // The image isn't provided with an absolute path, try to read it relative to the config file
                 String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-                file = new File(baseDir + "/" + importApi.getImage().getFilename());
+                file = new File(baseDir, importApi.getImage().getFilename());
             }
             importApi.getImage().setBaseFilename(file.getName());
             if (file.exists()) {
