@@ -26,11 +26,11 @@ public class UpdateExistingAPITest  extends WiremockWrapper {
 
     @Test
     public void testUpdateExistingApi() throws AppException {
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         Organization organization = apiManagerAdapter.getOrgAdapter().getOrgForName("orga");
         UpdateExistingAPI updateExistingAPI = new UpdateExistingAPI();
         API actualAPI = new API();
