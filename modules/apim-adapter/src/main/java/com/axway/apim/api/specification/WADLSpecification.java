@@ -56,6 +56,8 @@ public class WADLSpecification extends APISpecification {
         if (apiSpecificationFile.toLowerCase().endsWith(".url")) {
             apiSpecificationFile = Utils.getAPIDefinitionUriFromFile(apiSpecificationFile);
         }
+        if(apiSpecificationContent.length < 500)
+            return false;
         if (!apiSpecificationFile.toLowerCase().endsWith(".wadl") && !new String(this.apiSpecificationContent, 0, 500).contains("wadl.dev.java.net")) {
             LOG.debug("No WADL specification. Specification doesn't contain WADL namespace: wadl.dev.java.net in the first 500 characters.");
             return false;

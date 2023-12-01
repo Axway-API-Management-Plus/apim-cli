@@ -30,11 +30,6 @@ public class APISpecificationFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
 
-    private static final List<APISpecification> specificationTypes = Arrays.asList(new Swagger2xSpecification(), new Swagger1xSpecification(),
-        new OAS3xSpecification(), new WSDLSpecification(), new GraphqlSpecification(), new WADLSpecification(), new ODataV2Specification(),
-        new ODataV3Specification(), new ODataV4Specification());
-
-
     public static APISpecification getAPISpecification(DesiredAPISpecification desiredAPISpec, String configBaseDir, String apiName) throws AppException {
         APISpecification spec = getAPISpecification(getAPIDefinitionContent(desiredAPISpec.getResource(), configBaseDir), desiredAPISpec.getResource(), apiName, true, true);
         spec.setFilterConfig(desiredAPISpec.getFilter()).filterAPISpecification();
@@ -51,11 +46,15 @@ public class APISpecificationFactory {
 
 
     public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError, boolean logDetectedVersion) throws AppException {
+        List<APISpecification> specificationTypes = Arrays.asList(new Swagger2xSpecification(), new Swagger1xSpecification(),
+            new OAS3xSpecification(), new WSDLSpecification(), new GraphqlSpecification(), new WADLSpecification(), new ODataV2Specification(),
+            new ODataV3Specification(), new ODataV4Specification());
         if (LOG.isDebugEnabled()) {
             LOG.debug("Handle API-Specification: {} , apiDefinitionFile: {} , API Name : {} ", getContentStart(apiSpecificationContent), apiDefinitionFile, apiName);
         }
         for (APISpecification spec : specificationTypes) {
             spec.setApiSpecificationFile(apiDefinitionFile);
+
             if (!spec.parse(apiSpecificationContent)) {
                 LOG.debug("Can't handle API specification with class: {} ", spec.getClass().getName());
             } else {
@@ -68,17 +67,13 @@ public class APISpecificationFactory {
                 }
                 return spec;
             }
+
         }
         if (!failOnError) {
             LOG.error("API: {} has a unknown/invalid API-Specification", apiName);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Specification {}", getContentStart(apiSpecificationContent));
-            }
             return new UnknownAPISpecification(apiName);
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("API: {} has a unknown/invalid API-Specification: {}", apiName, getContentStart(apiSpecificationContent));
-        }
+        LOG.debug("API: {} has a unknown/invalid API-Specification", apiName);
         throw new AppException("Can't handle API specification. No suitable API-Specification implementation available.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
     }
 
