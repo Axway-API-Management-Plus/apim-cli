@@ -172,9 +172,9 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             }
             if (desiredConfig.getQuotas() != null) {
                 updatedAssets.append("GlobalQuotas");
-                upsertGlobalQuota(desiredConfig.getQuotas());
+                upsertGlobalSystemQuota(desiredConfig.getQuotas());
+                upsertGlobalApplicationQuota(desiredConfig.getQuotas());
                 LOG.debug("API-Manager Global Quotas successfully updated.");
-
             }
             LOG.info("API-Manager configuration {} successfully updated.", updatedAssets);
             return result;
@@ -191,7 +191,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         }
     }
 
-    public void upsertGlobalQuota(Quotas quotas) throws AppException {
+    public void upsertGlobalSystemQuota(Quotas quotas) throws AppException {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
         APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction systemQuotaRestriction = quotas.getSystemQuota();
@@ -211,6 +211,11 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
             LOG.debug("System Global Quota is updated");
         }
+    }
+
+    public void upsertGlobalApplicationQuota(Quotas quotas) throws AppException {
+        APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+        APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
         if (applicationQuotaRestriction != null) {
             LOG.debug("Updating Application Global Quota : {}", applicationQuotaRestriction);

@@ -119,7 +119,7 @@ public class OutboundProfile extends Profile {
             // We need to inject the format as default
             for (Object params : parameters) {
                 if (params instanceof Map<?, ?> && (!((Map<?, ?>) params).containsKey("format"))) {
-                        ((Map<String, ?>) params).put("format", null);
+                    ((Map<String, ?>) params).put("format", null);
                 }
             }
         }
@@ -135,13 +135,13 @@ public class OutboundProfile extends Profile {
             List<Object> otherParameters = otherOutboundProfile.getParameters();
             List<Object> thisParameters = this.getParameters();
             return policiesAreEqual(this.getFaultHandlerPolicy(), otherOutboundProfile.getFaultHandlerPolicy())
-                    && policiesAreEqual(this.getRequestPolicy(), otherOutboundProfile.getRequestPolicy())
-                    && policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy())
-                    && policiesAreEqual(this.getRoutePolicy(), otherOutboundProfile.getRoutePolicy())
-                    && StringUtils.equalsIgnoreCase(this.getRouteType(), otherOutboundProfile.getRouteType())
-                    && StringUtils.equalsIgnoreCase(this.getAuthenticationProfile(),
-                    otherOutboundProfile.getAuthenticationProfile())
-                    && (thisParameters == null || thisParameters.equals(otherParameters));
+                && policiesAreEqual(this.getRequestPolicy(), otherOutboundProfile.getRequestPolicy())
+                && policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy())
+                && policiesAreEqual(this.getRoutePolicy(), otherOutboundProfile.getRoutePolicy())
+                && StringUtils.equalsIgnoreCase(this.getRouteType(), otherOutboundProfile.getRouteType())
+                && StringUtils.equalsIgnoreCase(this.getAuthenticationProfile(),
+                otherOutboundProfile.getAuthenticationProfile())
+                && (thisParameters == null || thisParameters.equals(otherParameters));
         } else {
             return false;
         }
@@ -155,14 +155,14 @@ public class OutboundProfile extends Profile {
     @Override
     public String toString() {
         return "OutboundProfile{" +
-                "routeType='" + routeType + '\'' +
-                ", requestPolicy=" + requestPolicy +
-                ", responsePolicy=" + responsePolicy +
-                ", routePolicy=" + routePolicy +
-                ", faultHandlerPolicy=" + faultHandlerPolicy +
-                ", authenticationProfile='" + authenticationProfile + '\'' +
-                ", parameters=" + parameters +
-                '}';
+            "routeType='" + routeType + '\'' +
+            ", requestPolicy=" + requestPolicy +
+            ", responsePolicy=" + responsePolicy +
+            ", routePolicy=" + routePolicy +
+            ", faultHandlerPolicy=" + faultHandlerPolicy +
+            ", authenticationProfile='" + authenticationProfile + '\'' +
+            ", parameters=" + parameters +
+            '}';
     }
 
     private boolean policiesAreEqual(Policy policyA, Policy policyB) {

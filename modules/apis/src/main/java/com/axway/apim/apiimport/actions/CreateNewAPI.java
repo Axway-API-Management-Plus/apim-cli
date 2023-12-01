@@ -43,8 +43,8 @@ public class CreateNewAPI {
         APIManagerAPIAdapter apiAdapter = apiManagerAdapter.getApiAdapter();
         APIManagerAPIMethodAdapter methodAdapter = apiManagerAdapter.getMethodAdapter();
         RollbackHandler rollback = RollbackHandler.getInstance();
-
-        API createdBEAPI = apiAdapter.importBackendAPI(desiredAPI);
+        String backendBasePath = ((DesiredAPI) desiredAPI).getBackendBasepath();
+        API createdBEAPI = apiAdapter.importBackendAPI(desiredAPI, backendBasePath);
         rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));
         LOG.info("Create {} API: {} {}  based on {} specification.", desiredAPI.getState(), desiredAPI.getName(), desiredAPI.getVersion(), desiredAPI.getApiDefinition().getAPIDefinitionType().getNiceName());
         try {
@@ -67,7 +67,6 @@ public class CreateNewAPI {
             // ... here we basically need to add all props to initially bring the API in sync!
             APIChangeState.initCreatedAPI(desiredAPI, createdAPI);
             //handle backend base path update
-            String backendBasePath = ((DesiredAPI) desiredAPI).getBackendBasepath();
             LOG.debug("backendBasePath from config : {}", backendBasePath);
             if (backendBasePath != null && !CoreParameters.getInstance().isOverrideSpecBasePath()) {
                 Map<String, ServiceProfile> serviceProfiles = createdAPI.getServiceProfiles();

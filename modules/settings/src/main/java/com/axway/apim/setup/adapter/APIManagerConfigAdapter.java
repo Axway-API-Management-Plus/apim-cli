@@ -1,6 +1,5 @@
 package com.axway.apim.setup.adapter;
 
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.RemotehostDeserializer;
 import com.axway.apim.adapter.jackson.UserDeserializer;
 import com.axway.apim.lib.StandardImportParams;
@@ -28,7 +27,7 @@ public class APIManagerConfigAdapter {
     }
 
     private void readConfig() throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper;
         String config = importParams.getConfig();
         String stage = importParams.getStage();
         File configFile = Utils.locateConfigFile(config);
@@ -36,14 +35,7 @@ public class APIManagerConfigAdapter {
         File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
         APIManagerConfig baseConfig;
         try {
-            // Check the config file is json
-            mapper.readTree(configFile);
-            LOG.debug("Handling JSON Configuration file: {}", configFile);
-        } catch (IOException ioException) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            LOG.debug("Handling Yaml Configuration file: {}", configFile);
-        }
-        try {
+            mapper = Utils.createObjectMapper(configFile);
             mapper.configOverride(Map.class).setMergeable(true);
             baseConfig = mapper.reader()
                     .withAttribute(UserDeserializer.Params.USE_LOGIN_NAME, true)

@@ -86,4 +86,24 @@ public class APISpecificationFactoryTest {
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("unknown.txt", specDirPath, "petstore");
         Assert.assertEquals(APISpecification.APISpecType.valueOf("UNKNOWN"), apiSpecification.getAPIDefinitionType());
     }
+
+    @Test
+    public void downloadOpenApi(){
+
+    }
+
+    @Test
+    public void downloadWsdl(){
+
+    }
+
+    @Test
+    public void downloadGraphql(){
+
+    }
+
+    @Test
+    public void downloadGraphqlFromIntrospection(){
+
+    }
 }

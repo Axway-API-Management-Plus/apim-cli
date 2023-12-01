@@ -6,6 +6,7 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +53,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
                 }
             }
         } catch (Exception e) {
-            LOG.error("Error while deleting FE-API to roll it back", e);
-            throw e;
+            throw new AppException("Error while deleting FE-API to roll it back", ErrorCode.ERR_DELETING_API, e);
         }
     }
 }

@@ -364,7 +364,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("openapi.json", specDirPath, "petstore");
         api.setApiDefinition(apiSpecification);
-        API importedAPI = apiManagerAPIAdapter.importBackendAPI(api);
+        API importedAPI = apiManagerAPIAdapter.importBackendAPI(api, null);
         Assert.assertNotNull(importedAPI);
     }
 
@@ -383,7 +383,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("sample.wsdl", specDirPath, "wsdl");
         api.setApiDefinition(apiSpecification);
-        API importedAPI = apiManagerAPIAdapter.importBackendAPI(api);
+        API importedAPI = apiManagerAPIAdapter.importBackendAPI(api, null);
         Assert.assertNotNull(importedAPI);
     }
 

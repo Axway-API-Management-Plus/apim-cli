@@ -100,11 +100,11 @@ public abstract class APISpecification {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof ODataSpecification) {
                 ODataSpecification importSpec = (ODataSpecification) other;
-                OAS3xSpecification specFromGateway = (OAS3xSpecification) this;
+                OAS3xSpecification specFromGateway = (OAS3xSpecification) this; // Gateway stores as openapi
                 return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
             } else if (other instanceof Swagger1xSpecification) {
                 return compareJSON(otherSwagger, this);
-            } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
+            } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification || other instanceof GraphqlSpecification) {
                 return compareString(otherSwagger.apiSpecificationContent, apiSpecificationContent);
             } else {
                 LOG.info("Unhandled specification : {}", other.getClass().getName());

@@ -59,16 +59,16 @@ public class APIManagerAPIAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerAPIAdapter.class);
     private static final HttpHelper httpHelper = new HttpHelper();
-
     public static final String PROXIES = "/proxies/";
     public static final String APIREPO = "/apirepo/";
     public static final String UNKNOWN_API = "Unknown API";
     public static final String ORGANIZATION_ID = "organizationId";
     public static final String APPLICATIONS = "/applications/";
+    public static final String FILENAME = "filename";
+    public static final String CONTENT_TYPE = "text/plain";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
-
     private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228", "7.7.20230530", "7.7.20230830", "7.7.20231130");
 
     /**
@@ -687,7 +687,7 @@ public class APIManagerAPIAdapter {
         try {
             String locationHeader;
             List<NameValuePair> parameters = new ArrayList<>();
-            parameters.add(new BasicNameValuePair("filename", "api-export.dat"));
+            parameters.add(new BasicNameValuePair(FILENAME, "api-export.dat"));
             parameters.add(new BasicNameValuePair("password", password));
             parameters.add(new BasicNameValuePair("id", api.getId()));
             HttpEntity entity = new UrlEncodedFormEntity(parameters);
@@ -784,12 +784,14 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public API importBackendAPI(API api) throws AppException {
+    public API importBackendAPI(API api, String backendBasePath) throws AppException {
         LOG.debug("Import backend API: {} based on {} specification.", api.getName(), api.getApiDefinition().getAPIDefinitionType().getNiceName());
         JsonNode jsonNode;
         try {
             if (api.getApiDefinition().getAPIDefinitionType() == APISpecType.WSDL_API) {
                 jsonNode = importFromWSDL(api);
+            } else if (api.getApiDefinition().getAPIDefinitionType() == APISpecType.GRAPHQL) {
+                jsonNode = importGraphql(api, backendBasePath);
             } else {
                 jsonNode = importFromSwagger(api);
             }
@@ -843,15 +845,19 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private JsonNode importFromSwagger(API api) throws URISyntaxException, IOException {
-        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
+    private JsonNode importFromSwagger(API api) throws AppException {
+        HttpEntity entity = MultipartEntityBuilder.create()
+            .addTextBody("name", api.getName(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
+            .addTextBody("type", "swagger")
+            .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), FILENAME)
+            .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
+            .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+        return createBackend(entity, api);
+    }
+
+    public JsonNode createBackend(HttpEntity entity, API api) throws AppException {
         try {
-            HttpEntity entity = MultipartEntityBuilder.create()
-                .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
-                .addTextBody("type", "swagger")
-                .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
-                .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
-                .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
             RestAPICall importSwagger = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) importSwagger.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -867,6 +873,17 @@ public class APIManagerAPIAdapter {
         } catch (Exception e) {
             throw new AppException("Unexpected error creating Backend-API based on API-Specification. Error message: " + e.getMessage(), ErrorCode.CANT_CREATE_BE_API, e);
         }
+    }
+
+    public JsonNode importGraphql(API api, String backendBasePath) throws AppException {
+        HttpEntity entity = MultipartEntityBuilder.create()
+            .addTextBody("name", api.getName(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
+            .addTextBody("type", "swagger")
+            .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/octet-stream"), FILENAME)
+            .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
+            .addTextBody("backendUrl", backendBasePath)
+            .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+        return createBackend(entity, api);
     }
 
     public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
@@ -937,7 +954,7 @@ public class APIManagerAPIAdapter {
             return false;
         }
         if (apiToUpgradeAccess.getId().equals(referenceAPI.getId())) {
-            if(LOG.isWarnEnabled()) {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn("API to upgrade access: {} and reference/old API: {} are the same. Skip upgrade access to newer API.", Utils.getAPILogString(apiToUpgradeAccess), Utils.getAPILogString(referenceAPI));
             }
             return false;
