@@ -805,7 +805,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private JsonNode importFromWSDL(API api) throws IOException {
+    public JsonNode importFromWSDL(API api) throws IOException {
         String completeWsdlUrl;
         if (api.getApiDefinition().getApiSpecificationFile().endsWith(".url")) {
             completeWsdlUrl = Utils.getAPIDefinitionUriFromFile(api.getApiDefinition().getApiSpecificationFile());
@@ -845,7 +845,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private JsonNode importFromSwagger(API api) throws AppException {
+    public JsonNode importFromSwagger(API api) throws AppException {
         HttpEntity entity = MultipartEntityBuilder.create()
             .addTextBody("name", api.getName(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
             .addTextBody("type", "swagger")
@@ -878,7 +878,7 @@ public class APIManagerAPIAdapter {
     public JsonNode importGraphql(API api, String backendBasePath) throws AppException {
         HttpEntity entity = MultipartEntityBuilder.create()
             .addTextBody("name", api.getName(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
-            .addTextBody("type", "swagger")
+            .addTextBody("type", "graphql")
             .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/octet-stream"), FILENAME)
             .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
             .addTextBody("backendUrl", backendBasePath)

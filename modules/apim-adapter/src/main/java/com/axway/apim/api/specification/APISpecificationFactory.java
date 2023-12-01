@@ -46,8 +46,8 @@ public class APISpecificationFactory {
 
 
     public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError, boolean logDetectedVersion) throws AppException {
-        List<APISpecification> specificationTypes = Arrays.asList(new Swagger2xSpecification(), new Swagger1xSpecification(),
-            new OAS3xSpecification(), new WSDLSpecification(), new GraphqlSpecification(), new WADLSpecification(), new ODataV2Specification(),
+        List<APISpecification> specificationTypes = Arrays.asList(new OAS3xSpecification(), new Swagger2xSpecification(), new Swagger1xSpecification(),
+            new GraphqlSpecification(), new WSDLSpecification(), new WADLSpecification(), new ODataV2Specification(),
             new ODataV3Specification(), new ODataV4Specification());
         if (LOG.isDebugEnabled()) {
             LOG.debug("Handle API-Specification: {} , apiDefinitionFile: {} , API Name : {} ", getContentStart(apiSpecificationContent), apiDefinitionFile, apiName);

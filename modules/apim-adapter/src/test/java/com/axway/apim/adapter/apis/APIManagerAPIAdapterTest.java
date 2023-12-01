@@ -11,6 +11,7 @@ import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -651,6 +652,140 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         API api = new API();
         api.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150-not");
         Assert.assertFalse(apiManagerAPIAdapter.isFrontendApiExists(api));
+    }
+
+
+    @Test
+    public void importFromWSDL() throws IOException {
+        API api = new API();
+        api.setName("wsdl");
+        api.setApiDefinition(new APISpecification() {
+
+            public String getApiSpecificationFile() {
+                return "https://localhost/services/test.wsdl";
+            }
+
+            @Override
+            public byte[] getApiSpecificationContent() {
+                return  "test".getBytes();
+            }
+
+            @Override
+            public void updateBasePath(String basePath, String host) {
+
+            }
+
+            @Override
+            public void configureBasePath(String backendBasePath, API api) throws AppException {
+
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public APISpecType getAPIDefinitionType() throws AppException {
+                return null;
+            }
+
+            @Override
+            public boolean parse(byte[] apiSpecificationContent) throws AppException {
+                return false;
+            }
+        });
+        Organization organization = new Organization();
+        organization.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        api.setOrganization(organization);
+        JsonNode jsonNode = apiManagerAPIAdapter.importFromWSDL(api);
+        System.out.println(jsonNode);
+        Assert.assertEquals("Test-App-API1-2285", jsonNode.get("name").asText());
+    }
+
+    @Test
+    public void importFromSwagger() throws AppException {
+        API api = new API();
+        api.setName("Test-App-API1-2285");
+        api.setApiDefinition(new APISpecification() {
+            @Override
+            public byte[] getApiSpecificationContent() {
+                return  "test".getBytes();
+            }
+
+            @Override
+            public void updateBasePath(String basePath, String host) {
+
+            }
+
+            @Override
+            public void configureBasePath(String backendBasePath, API api) throws AppException {
+
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public APISpecType getAPIDefinitionType() throws AppException {
+                return null;
+            }
+
+            @Override
+            public boolean parse(byte[] apiSpecificationContent) throws AppException {
+                return false;
+            }
+        });
+        Organization organization = new Organization();
+        organization.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        api.setOrganization(organization);
+        JsonNode jsonNode = apiManagerAPIAdapter.importFromSwagger(api);
+        Assert.assertEquals("Test-App-API1-2285", jsonNode.get("name").asText());
+    }
+
+
+    @Test
+    public void importGraphql() throws AppException {
+        API api = new API();
+        api.setName("graph");
+        api.setApiDefinition(new APISpecification() {
+            @Override
+            public byte[] getApiSpecificationContent() {
+                return  "test".getBytes();
+            }
+
+            @Override
+            public void updateBasePath(String basePath, String host) {
+
+            }
+
+            @Override
+            public void configureBasePath(String backendBasePath, API api) throws AppException {
+
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public APISpecType getAPIDefinitionType() throws AppException {
+                return null;
+            }
+
+            @Override
+            public boolean parse(byte[] apiSpecificationContent) throws AppException {
+                return false;
+            }
+        });
+        Organization organization = new Organization();
+        organization.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        api.setOrganization(organization);
+        JsonNode jsonNode = apiManagerAPIAdapter.importGraphql(api, "https://localhost/graphql");
+        Assert.assertEquals("graph", jsonNode.get("name").asText());
     }
 
 

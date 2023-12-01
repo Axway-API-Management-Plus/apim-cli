@@ -35,7 +35,7 @@ public abstract class APISpecification {
             "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
         ODATA_V3("OData V4", METADATA),
         ODATA_V4("OData V4", METADATA),
-        GRAPHQL("Graphql", "graphql"),
+        GRAPHQL("Graphql", ".graphqls"),
         UNKNOWN("Unknown", ".txt");
 
         final String niceName;

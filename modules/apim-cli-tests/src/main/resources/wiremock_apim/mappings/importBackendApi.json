@@ -1,13 +1,47 @@
 {
-  "request": {
-    "method": "POST",
-    "url": "/api/portal/v1.4/apirepo/import/"
-  },
-  "response": {
-    "status": 201,
-    "bodyFileName": "backend_api.json",
-    "headers": {
-      "Content-Type": "application/json"
+  "mappings": [
+    {
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "url": "/api/portal/v1.4/apirepo/import/"
+      },
+      "response": {
+        "status": 201,
+        "bodyFileName": "backend_api.json",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "url": "/api/portal/v1.4/apirepo/import/",
+        "multipartPatterns": [
+          {
+            "matchingType" : "ANY",
+            "headers" : {
+              "Content-Disposition" : {
+                "contains" : "name=\"type\""
+              }
+            },
+            "bodyPatterns": [
+              {
+                "contains": "graphql"
+              }
+            ]
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "bodyFileName": "backend_api_graphql.json",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
-  }
+  ]
 }

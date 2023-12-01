@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/graphql/introspection"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "starwars_introspection_graphql.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

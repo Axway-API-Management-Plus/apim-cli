@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/sample.wsdl"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "sample.wsdl",
+    "headers": {
+      "Content-Type": "text/xml"
+    }
+  }
+}
