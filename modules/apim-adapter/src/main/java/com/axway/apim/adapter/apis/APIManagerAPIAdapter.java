@@ -945,6 +945,17 @@ public class APIManagerAPIAdapter {
         }
     }
 
+    public List<NameValuePair> addParam(API apiToUpgradeAccess, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) {
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
+        if (deprecateRefApi != null) params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
+        if (retireRefApi != null) params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
+        if (retirementDateRefAPI != null)
+            params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
+        return params;
+
+    }
+
     public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
         if (apiToUpgradeAccess.getState().equals(API.STATE_UNPUBLISHED)) {
             LOG.info("API to upgrade access has state unpublished.");
@@ -959,12 +970,7 @@ public class APIManagerAPIAdapter {
         LOG.debug("Upgrade access & subscriptions to API: {} {}  ({})", apiToUpgradeAccess.getName(), apiToUpgradeAccess.getVersion(), apiToUpgradeAccess.getId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/upgrade/" + referenceAPI.getId()).build();
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
-            if (deprecateRefApi != null) params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
-            if (retireRefApi != null) params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
-            if (retirementDateRefAPI != null)
-                params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
+            List<NameValuePair> params = addParam(apiToUpgradeAccess, deprecateRefApi, retireRefApi, retirementDateRefAPI);
 
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
             RestAPICall request = new POSTRequest(entity, uri);

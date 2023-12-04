@@ -119,6 +119,17 @@ public class JsonAPIExporter extends APIResultHandler {
                 SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
             .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
         mapper.setFilterProvider(filters);
+        writeContent(mapper, exportAPI, localFolder, configFile);
+        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
+            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+            LOG.warn("- No Quotas has been exported for the API");
+            LOG.warn("- No Client-Organizations");
+            LOG.warn("- Only subscribed applications from the Org-Admins organization");
+        }
+    }
+
+    public void writeContent(ObjectMapper mapper, ExportAPI exportAPI, File localFolder, String configFile) throws AppException {
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
@@ -128,14 +139,6 @@ public class JsonAPIExporter extends APIResultHandler {
             }
         } catch (Exception e) {
             throw new AppException("Can't create API-Configuration file for API: '" + exportAPI.getName() + "' exposed on path: '" + exportAPI.getPath() + "'.", ErrorCode.UNXPECTED_ERROR, e);
-        }
-
-        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
-        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
-            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
-            LOG.warn("- No Quotas has been exported for the API");
-            LOG.warn("- No Client-Organizations");
-            LOG.warn("- Only subscribed applications from the Org-Admins organization");
         }
     }
 

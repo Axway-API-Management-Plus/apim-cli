@@ -43,25 +43,25 @@ public class ManageClientOrganization {
         if ((desiredState).isRequestForAllOrgs()) {
             LOG.info("Granting permission to all organizations");
             apiManager.getApiAdapter().grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState, true);
-        } else {
-            List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
-            List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
-            removingActualOrgs.remove(desiredState.getOrganization());// Don't try to remove the Owning-Organization
-            if (missingDesiredOrgs.isEmpty()) {
-                if (desiredState.getClientOrganizations() != null) {
-                    LOG.info("All desired organizations: {} have already access. Nothing to do.", desiredState.getClientOrganizations());
-                }
-            } else {
-                LOG.info("Granting access for organizations : {} to API : {}", missingDesiredOrgs, actualState.getName());
-                apiManager.getApiAdapter().grantClientOrganization(missingDesiredOrgs, actualState, false);
+            return;
+        }
+        List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
+        List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
+        removingActualOrgs.remove(desiredState.getOrganization());// Don't try to remove the Owning-Organization
+        if (missingDesiredOrgs.isEmpty()) {
+            if (desiredState.getClientOrganizations() != null) {
+                LOG.info("All desired organizations: {} have already access. Nothing to do.", desiredState.getClientOrganizations());
             }
-            if (!removingActualOrgs.isEmpty()) {
-                if (CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.Mode.replace)) {
-                    LOG.info("Removing access for organizations: {} from API: {}", removingActualOrgs, actualState.getName());
-                    apiManager.getAccessAdapter().removeClientOrganization(removingActualOrgs, actualState.getId());
-                } else {
-                    LOG.info("NOT removing access for existing organizations: {} from API: {} as clientOrgsMode NOT set to replace.",removingActualOrgs,actualState.getName());
-                }
+        } else {
+            LOG.info("Granting access for organizations : {} to API : {}", missingDesiredOrgs, actualState.getName());
+            apiManager.getApiAdapter().grantClientOrganization(missingDesiredOrgs, actualState, false);
+        }
+        if (!removingActualOrgs.isEmpty()) {
+            if (CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.Mode.replace)) {
+                LOG.info("Removing access for organizations: {} from API: {}", removingActualOrgs, actualState.getName());
+                apiManager.getAccessAdapter().removeClientOrganization(removingActualOrgs, actualState.getId());
+            } else {
+                LOG.info("NOT removing access for existing organizations: {} from API: {} as clientOrgsMode NOT set to replace.", removingActualOrgs, actualState.getName());
             }
         }
     }

@@ -233,10 +233,10 @@ public class APIManagerAdapter {
             User user = getCurrentUser();
             String role = getHigherRole(user);
             if (role.equals(ADMIN)) {
-                this.hasAdminAccount = true;
+                hasAdminAccount = true;
                 // Also register this client as an Admin-Client
             } else if (role.equals(OADMIN)) {
-                this.usingOrgAdmin = true;
+                usingOrgAdmin = true;
             }
         } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);

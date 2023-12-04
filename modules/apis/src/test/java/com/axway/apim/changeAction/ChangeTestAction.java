@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChangeTestAction extends AbstractTestAction {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ChangeTestAction.class);
 
 	@Override
@@ -31,7 +31,7 @@ public class ChangeTestAction extends AbstractTestAction {
 		try {
 			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
 		} catch (Exception ignore) {}
-		
+
 		boolean enforce = false;
 		boolean ignoreQuotas = false;
 		boolean ignoreCache = false;
@@ -39,12 +39,14 @@ public class ChangeTestAction extends AbstractTestAction {
 		String clientOrgsMode = null;
 		String clientAppsMode = null;
 		String quotaMode = null;
-		
+
 		String newBackend = null;
 		String oldBackend = null;
 		String name = null;
-		
-		try {
+        boolean useApiAdmin = false;
+
+
+        try {
 			enforce = Boolean.parseBoolean(context.getVariable("enforce"));
 		} catch (Exception ignore) {}
 		try {
@@ -74,12 +76,15 @@ public class ChangeTestAction extends AbstractTestAction {
 		try {
 			oldBackend = context.getVariable("oldBackend");
 		} catch (Exception ignore) {}
-		
-		
+        try {
+            useApiAdmin = Boolean.parseBoolean(context.getVariable("useApiAdmin"));
+        } catch (Exception ignore) {
+        }
+
 		if(stage==null) {
 			stage = "NOT_SET";
 		}
-		
+
 		List<String> args = new ArrayList<>();
 		if(useEnvironmentOnly) {
 			args.add("-s");
@@ -88,9 +93,19 @@ public class ChangeTestAction extends AbstractTestAction {
 			args.add("-h");
 			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
 			args.add("-u");
-			args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
-			args.add("-p");
-			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
+            if (useApiAdmin) {
+                LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${apiManagerUser}") + "'");
+                args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
+            }
+            else {
+                LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${oadminUsername1}") + "'");
+                args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
+            }
+            args.add("-p");
+            if (useApiAdmin)
+                args.add(context.replaceDynamicContentInString("${apiManagerPass}"));
+            else
+                args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
 			if(quotaMode!=null) {
