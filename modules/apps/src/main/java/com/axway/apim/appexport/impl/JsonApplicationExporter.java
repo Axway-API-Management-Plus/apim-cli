@@ -15,6 +15,7 @@ import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +59,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
             LOG.info("Going to export applications into folder: {}", localFolder);
             if (localFolder.exists()) {
                 if (AppExportParams.getInstance().isDeleteTarget()) {
-                    LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-                    try {
-                        FileUtils.deleteDirectory(localFolder);
-                    } catch (IOException e) {
-                        throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-                    }
+                    Utils.deleteDirectory(localFolder);
                 } else {
                     LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
                     this.hasError = true;
@@ -96,17 +91,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
             .addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "uriprefix", "scopes", "enabled"));
         mapper.setFilterProvider(filter);
         mapper.setSerializationInclusion(Include.NON_NULL);
-        try {
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                mapper.writeValue(System.out, app);
-            } else {
-                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
-                this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
-            }
-        } catch (Exception e) {
-            throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
-        }
+        writeContent(app, mapper, localFolder, configFile);
         if (app.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             writeBytesToFile(app.getImage().getImageContent(), localFolder + File.separator + app.getImage().getBaseFilename());
         }
@@ -119,6 +104,19 @@ public class JsonApplicationExporter extends ApplicationExporter {
         }
     }
 
+    public void writeContent(ExportApplication app, ObjectMapper mapper, File localFolder, String configFile) throws AppException {
+        try {
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                mapper.writeValue(System.out, app);
+            } else {
+                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
+                this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
+            }
+        } catch (Exception e) {
+            throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
     private String getExportFolder(ExportApplication app) {
         String appName = app.getName();
         appName = appName.replace(" ", "-");

@@ -93,7 +93,7 @@ public class OrgConfigAdapter extends OrgAdapter {
     private void addAPIAccess(List<Organization> orgs, Result result) throws AppException {
         APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         for (Organization org : orgs) {
-            if (org.getApiAccess() == null) continue;
+            if (org.getApiAccess() != null) continue;
             Iterator<APIAccess> it = org.getApiAccess().iterator();
             while (it.hasNext()) {
                 APIAccess apiAccess = it.next();

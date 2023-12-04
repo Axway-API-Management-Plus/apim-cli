@@ -24,6 +24,7 @@ import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.Console;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.HttpResponse;
@@ -47,6 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+    public static final String MASKED_PASSWORD = "********";
 
     public enum FedKeyType {
         FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>");
@@ -176,8 +178,6 @@ public class Utils {
                     return stageFile;
                 } else if (subDirStageFile.exists()) {
                     return subDirStageFile;
-                } else {
-                    return null;
                 }
             }
         }
@@ -368,7 +368,7 @@ public class Utils {
     }
 
     public static String getEncryptedPassword() {
-        return "********";
+        return MASKED_PASSWORD;
     }
 
     public static String createFileName(String host, String stage, String prefix) throws AppException {
@@ -385,9 +385,10 @@ public class Utils {
         if (source == null || target == null)
             return false;
         if (source.size() != target.size()) return false;
-        for (String tagName : target.keySet()) {
+        for (Map.Entry<String, String[]> entry : target.entrySet()) {
+            String tagName = entry.getKey();
             if (!source.containsKey(tagName)) return false;
-            String[] myTags = target.get(tagName);
+            String[] myTags = entry.getValue();
             String[] otherTags = source.get(tagName);
             if (!Objects.deepEquals(myTags, otherTags)) return false;
         }
@@ -421,7 +422,7 @@ public class Utils {
         }
     }
 
-    public static void sleep(int retryDelay){
+    public static void sleep(int retryDelay) {
         try {
             Thread.sleep(retryDelay);
         } catch (InterruptedException e) {
@@ -429,12 +430,12 @@ public class Utils {
         }
     }
 
-    public static void deleteInstance(APIManagerAdapter apiManagerAdapter){
-        if(apiManagerAdapter != null)
+    public static void deleteInstance(APIManagerAdapter apiManagerAdapter) {
+        if (apiManagerAdapter != null)
             apiManagerAdapter.deleteInstance();
     }
 
-    public static ObjectMapper createObjectMapper(File configFile){
+    public static ObjectMapper createObjectMapper(File configFile) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
@@ -447,5 +448,14 @@ public class Utils {
             LOG.debug("Handling Yaml Configuration file: {}", configFile);
         }
         return mapper;
+    }
+
+    public static void deleteDirectory(File localFolder) throws AppException {
+        LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
+        try {
+            FileUtils.deleteDirectory(localFolder);
+        } catch (IOException e) {
+            throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+        }
     }
 }

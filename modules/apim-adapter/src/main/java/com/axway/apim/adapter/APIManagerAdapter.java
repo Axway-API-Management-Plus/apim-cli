@@ -320,43 +320,42 @@ public class APIManagerAdapter {
     private APIMCLICacheManager initCacheManager() {
         APIMCLICacheManager apimcliCacheManager = null;
         if (CoreParameters.getInstance().isIgnoreCache()) {
-            apimcliCacheManager = new APIMCLICacheManager(new DoNothingCacheManager());
-        } else {
-            URL cacheConfigUrl;
-            File cacheConfigFile = null;
-            try {
-                cacheConfigFile = new File(Utils.getInstallFolder() + "/conf/cacheConfig.xml");
-                if (cacheConfigFile.exists()) {
-                    LOG.debug("Using customer cache configuration file: {}", cacheConfigFile);
-                    cacheConfigUrl = cacheConfigFile.toURI().toURL();
-                } else {
-                    cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
-                }
-            } catch (MalformedURLException e1) {
-                LOG.trace("Error reading customer cache config file: {} Using default configuration.", cacheConfigFile);
+            return new APIMCLICacheManager(new DoNothingCacheManager());
+        }
+        URL cacheConfigUrl;
+        File cacheConfigFile = null;
+        try {
+            cacheConfigFile = new File(Utils.getInstallFolder() + "/conf/cacheConfig.xml");
+            if (cacheConfigFile.exists()) {
+                LOG.debug("Using customer cache configuration file: {}", cacheConfigFile);
+                cacheConfigUrl = cacheConfigFile.toURI().toURL();
+            } else {
                 cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
             }
-            XmlConfiguration xmlConfig = new XmlConfiguration(cacheConfigUrl);
-            // The Cache-Manager creates an exclusive lock on the Cache-Directory, which means only on APIM-CLI can initialize it at a time
-            // When running in a CI/CD pipeline, multiple CPIM-CLIs might be executed
-            int initAttempts = 1;
-            int maxAttempts = 100;
-            do {
-                try {
-                    CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);//NOSONAR
-                    apimcliCacheManager = new APIMCLICacheManager(ehcacheManager);//NOSONAR
-                    apimcliCacheManager.init();
-                } catch (StateTransitionException e) {
-                    LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}", initAttempts, maxAttempts);
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException ignore) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-                initAttempts++;
-            } while (apimcliCacheManager != null && apimcliCacheManager.getStatus() == Status.UNINITIALIZED && initAttempts <= maxAttempts);
+        } catch (MalformedURLException e1) {
+            LOG.trace("Error reading customer cache config file: {} Using default configuration.", cacheConfigFile);
+            cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
         }
+        XmlConfiguration xmlConfig = new XmlConfiguration(cacheConfigUrl);
+        // The Cache-Manager creates an exclusive lock on the Cache-Directory, which means only on APIM-CLI can initialize it at a time
+        // When running in a CI/CD pipeline, multiple CPIM-CLIs might be executed
+        int initAttempts = 1;
+        int maxAttempts = 100;
+        do {
+            try {
+                CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);//NOSONAR
+                apimcliCacheManager = new APIMCLICacheManager(ehcacheManager);//NOSONAR
+                apimcliCacheManager.init();
+            } catch (StateTransitionException e) {
+                LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}", initAttempts, maxAttempts);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ignore) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            initAttempts++;
+        } while (apimcliCacheManager != null && apimcliCacheManager.getStatus() == Status.UNINITIALIZED && initAttempts <= maxAttempts);
         return apimcliCacheManager;
     }
 
@@ -476,10 +475,6 @@ public class APIManagerAdapter {
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     response = EntityUtils.toString(httpResponse.getEntity());
                     JsonNode clientIds = mapper.readTree(response);
-                    if (clientIds.isEmpty()) {
-                        LOG.debug("No credentials (Type: {}) found for application: {}", type, app.getName());
-                        continue;
-                    }
                     for (JsonNode clientId : clientIds) {
                         String key;
                         if (type.equals(CREDENTIAL_TYPE_API_KEY)) {

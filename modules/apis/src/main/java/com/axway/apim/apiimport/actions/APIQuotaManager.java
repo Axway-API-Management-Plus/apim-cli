@@ -33,7 +33,7 @@ public class APIQuotaManager {
 
     public void execute(API createdAPI) throws AppException {
         if (desiredState.getApplicationQuota() == null && desiredState.getSystemQuota() == null
-                && (actualState == null || (actualState.getApplicationQuota() == null && actualState.getSystemQuota() == null)))
+            && (actualState == null || (actualState.getApplicationQuota() == null && actualState.getSystemQuota() == null)))
             return;
         if (CoreParameters.getInstance().isIgnoreQuotas() || CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.ignore)) {
             LOG.info("Configured quotas will be ignored, as ignoreQuotas is true or QuotaMode has been set to ignore.");
@@ -55,30 +55,32 @@ public class APIQuotaManager {
         if (actualRestrictions == null && desiredRestrictions == null) return;
         if (desiredRestrictions != null && desiredRestrictions.equals(actualRestrictions) && sameAPI) {
             LOG.info("{} quota for API: {} is UN-CHANGED. Nothing to do.", type.getFriendlyName(), createdAPI.getName());
-        } else {
-            APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
-            APIManagerQuotaAdapter quotaManager =  APIManagerAdapter.getInstance().getQuotaAdapter();
-            LOG.info("Updating {} quota for API: {}", type.getFriendlyName(), createdAPI.getName());
-            LOG.debug("{}-Restrictions: Desired: {}, Actual: {}", type.getFriendlyName(), desiredRestrictions, actualRestrictions);
-            // In order to compare/merge the restrictions, we must translate the desired API-Method-Names, if not a "*", into the methodId of the createdAPI
-            if (desiredRestrictions != null) {
-                for (QuotaRestriction desiredRestriction : desiredRestrictions) {
-                    if ("*".equals(desiredRestriction.getMethod())) continue;
-                    desiredRestriction.setMethod(methodAdapter.getMethodForName(createdAPI.getId(), desiredRestriction.getMethod()).getId());
-                }
-            }
-            // Load the entire current default quota
-            APIQuota currentDefaultQuota = quotaManager.getDefaultQuota(type);
-            List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
-            populateMethodId(createdAPI, mergedRestrictions);
-            // If there is an actual API, remove the restrictions for the current actual API
-            if (actualState != null) {
-                currentDefaultQuota.getRestrictions().removeIf(restriction -> restriction.getApiId().equals(actualState.getId()));
-            }
-            // Add all new desired restrictions to the Default-Quota
-            currentDefaultQuota.getRestrictions().addAll(mergedRestrictions);
-            quotaManager.saveQuota(currentDefaultQuota, currentDefaultQuota.getId());
+            return;
         }
+        APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
+        APIManagerQuotaAdapter quotaManager = APIManagerAdapter.getInstance().getQuotaAdapter();
+        LOG.info("Updating {} quota for API: {}", type.getFriendlyName(), createdAPI.getName());
+        LOG.debug("{}-Restrictions: Desired: {}, Actual: {}", type.getFriendlyName(), desiredRestrictions, actualRestrictions);
+        // In order to compare/merge the restrictions, we must translate the desired API-Method-Names, if not a "*", into the methodId of the createdAPI
+        if (desiredRestrictions != null) {
+            for (QuotaRestriction desiredRestriction : desiredRestrictions) {
+                if ("*".equals(desiredRestriction.getMethod()))
+                    continue;
+                desiredRestriction.setMethod(methodAdapter.getMethodForName(createdAPI.getId(), desiredRestriction.getMethod()).getId());
+            }
+        }
+        // Load the entire current default quota
+        APIQuota currentDefaultQuota = quotaManager.getDefaultQuota(type);
+        LOG.debug("Default Quota : {}", currentDefaultQuota);
+        List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
+        populateMethodId(createdAPI, mergedRestrictions);
+        // If there is an actual API, remove the restrictions for the current actual API
+        if (actualState != null) {
+            currentDefaultQuota.getRestrictions().removeIf(restriction -> restriction.getApiId().equals(actualState.getId()));
+        }
+        // Add all new desired restrictions to the Default-Quota
+        currentDefaultQuota.getRestrictions().addAll(mergedRestrictions);
+        quotaManager.saveQuota(currentDefaultQuota, currentDefaultQuota.getId());
     }
 
     public List<QuotaRestriction> addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> desiredRestrictions) {
@@ -116,7 +118,7 @@ public class APIQuotaManager {
         return mergedRestrictions;
     }
 
-    public void populateMethodId(API createdAPI, List<QuotaRestriction> mergedRestrictions) throws AppException{
+    public void populateMethodId(API createdAPI, List<QuotaRestriction> mergedRestrictions) throws AppException {
         APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
         for (QuotaRestriction restriction : mergedRestrictions) {
             // Update the API-ID for the API-Restrictions as the API might be re-created.

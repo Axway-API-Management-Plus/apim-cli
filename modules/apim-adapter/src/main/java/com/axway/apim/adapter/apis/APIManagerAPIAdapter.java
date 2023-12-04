@@ -470,9 +470,6 @@ public class APIManagerAPIAdapter {
                             break;
                         }
                     }
-                    if (filter.isUseFEAPIDefinition()) {
-                        LOG.info("Successfully downloaded API-Specification with version {} from Frontend-API.", specVersion);
-                    }
                     String res = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
                     String origFilename = "Unknown filename";
                     if (httpResponse.containsHeader("Content-Disposition")) {
@@ -983,9 +980,8 @@ public class APIManagerAPIAdapter {
                     if (statusCode != 204) {
                         LOG.error("Error upgrading access to newer API. Received Status-Code:{} Response: {}", statusCode, httpResponse.getResponseBody());
                         throw new AppException("Error upgrading access to newer API. Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_BE_API);
-                    } else {
-                        LOG.info("Successfully granted access to newer API on retry. Received Status-Code: {}", statusCode);
                     }
+                    LOG.info("Successfully granted access to newer API on retry. Received Status-Code: {}", statusCode);
                 } else {
                     LOG.error("Error upgrading access to newer API. Received Status-Code: {} Response: {}", statusCode, response);
                     throw new AppException("Error upgrading access to newer API. Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_BE_API);
@@ -1079,9 +1075,8 @@ public class APIManagerAPIAdapter {
                     if (statusCode != 204) {
                         LOG.error("Error granting access to API: {}  (ID: {}) Received Status-Code: {} Response: {}", api.getName(), api.getId(), statusCode, httpResponse.getResponseBody());
                         throw new AppException("Error granting API access. Received Status-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
-                    } else {
-                        LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
                     }
+                    LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
                 }
             }
             // Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
