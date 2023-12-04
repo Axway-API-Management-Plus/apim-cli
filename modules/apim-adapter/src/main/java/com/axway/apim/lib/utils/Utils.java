@@ -48,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
-    public static final String MASKED_PASSWORD = "********";
+    public static final String MASKED_VALUE = "********";
 
     public enum FedKeyType {
         FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>");
@@ -368,7 +368,7 @@ public class Utils {
     }
 
     public static String getEncryptedPassword() {
-        return MASKED_PASSWORD;
+        return MASKED_VALUE;
     }
 
     public static String createFileName(String host, String stage, String prefix) throws AppException {

@@ -1,9 +1,15 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.error.AppException;
+
+import java.util.List;
 
 public class OutboundProfileTest {
 	@Test
@@ -146,4 +152,31 @@ public class OutboundProfileTest {
 		actualProfile.setRoutePolicy(null);
 		Assert.assertEquals(actualProfile.getRouteType(), "proxy", "The route type is proxy");
 	}
+
+    @Test
+    public void equalOutboundProfileWithMethod() throws JsonProcessingException {
+        String  source = "{\n" +
+            "        \"7024b732-4c36-4583-a122-4f2da87d5ff3\": {\n" +
+            "            \"apiId\": \"fb7ff6b2-406d-4063-ab0a-9e06d1480ec3\",\n" +
+            "            \"apiMethodId\": \"a03014c4-de43-4b9c-be05-10f09e5b33ff\",\n" +
+            "            \"authenticationProfile\": \"HTTP Basic outbound Test 193\",\n" +
+            "            \"parameters\": [\n" +
+            "                {\n" +
+            "                    \"additional\": true,\n" +
+            "                    \"exclude\": false,\n" +
+            "                    \"name\": \"additionalOutboundParam\",\n" +
+            "                    \"paramType\": \"header\",\n" +
+            "                    \"required\": false,\n" +
+            "                    \"type\": \"string\",\n" +
+            "                    \"value\": \"Test-Value\"\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            \"routeType\": \"proxy\"\n" +
+            "        }\n" +
+            "    }";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        OutboundProfile outboundProfiles = objectMapper.readValue(source, OutboundProfile.class);
+        Assert.assertTrue(Utils.compareValues(outboundProfiles, outboundProfiles));
+    }
 }

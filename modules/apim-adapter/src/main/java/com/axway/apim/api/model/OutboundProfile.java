@@ -2,6 +2,7 @@ package com.axway.apim.api.model;
 
 import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang3.StringUtils;
@@ -132,7 +133,7 @@ public class OutboundProfile extends Profile {
                 && StringUtils.equalsIgnoreCase(this.getRouteType(), otherOutboundProfile.getRouteType())
                 && StringUtils.equalsIgnoreCase(this.getAuthenticationProfile(),
                 otherOutboundProfile.getAuthenticationProfile())
-                && (thisParameters == null || thisParameters.equals(otherParameters));
+                && Utils.compareValues(thisParameters, otherParameters);
         } else {
             return false;
         }

@@ -25,6 +25,7 @@
                "name":"additionalOutboundParam",
                "required":false,
                "type":"string",
+              "format": null,
                "paramType":"header",
                "value":"Test-Value",
                "exclude":false,
