@@ -1,6 +1,5 @@
 package com.axway.apim.api.model;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,8 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class OutboundProfile extends Profile {
@@ -95,8 +94,8 @@ public class OutboundProfile extends Profile {
     }
 
     public List<Object> getParameters() {
-        if (parameters == null || parameters.isEmpty())
-            return null;
+        if (parameters == null)
+            return Collections.emptyList();
         return parameters;
     }
 
@@ -115,14 +114,6 @@ public class OutboundProfile extends Profile {
     }
 
     public void setParameters(List<Object> parameters) {
-        if (APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-            // We need to inject the format as default
-            for (Object params : parameters) {
-                if (params instanceof Map<?, ?> && (!((Map<?, ?>) params).containsKey("format"))) {
-                    ((Map<String, ?>) params).put("format", null);
-                }
-            }
-        }
         this.parameters = parameters;
     }
 

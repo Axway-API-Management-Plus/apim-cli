@@ -41,7 +41,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
         try {
             params = (APIExportParams) CLIAPIExportOptions.create(args).getParams();
             errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
-            return APIExportApp.exportAPI(params);
+            return exportAPI(params);
         } catch (AppException e) {
             return Utils.handleAppException(e, LOG, errorCodeMapper);
         }

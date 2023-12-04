@@ -1,14 +1,13 @@
 package com.axway.apim.lib;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Comparator;
-
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.*;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.error.ErrorCode;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public abstract class CLIOptions {
 
@@ -95,6 +94,13 @@ public abstract class CLIOptions {
     }
 
     public void printUsage(String message, String[] args) {
+        Console.println("-----------------------------------------Command----------------------------------------");
+        for (String arg:args) {
+            Console.print(arg + " ");
+        }
+        Console.println("\n");
+        Console.println("----------------------------------------------------------------------------------------");
+
         HelpFormatter formatter = new HelpFormatter();
         formatter.setOptionComparator(new OptionsComparator());
         formatter.setWidth(140);
