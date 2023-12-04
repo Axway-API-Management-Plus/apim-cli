@@ -119,6 +119,8 @@ public class APIManagerAdapter {
             }
             instance.apiManagerVersion = null;
             instance = null;
+            usingOrgAdmin = false;
+            hasAdminAccount = false;
             APIMHttpClient.deleteInstances();
         }
     }
