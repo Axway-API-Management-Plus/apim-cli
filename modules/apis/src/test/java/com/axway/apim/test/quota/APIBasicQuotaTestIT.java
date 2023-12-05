@@ -106,6 +106,7 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 
+        sleep(5000);
 		echo("####### Check Application-Quotas have been updated #######");
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 

@@ -121,7 +121,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 
 		echo("####### Validate all previously configured SYSTEM quotas (manually configured) do exists #######");
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
-		sleep(10000);
+		sleep(12000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.per", "3")
