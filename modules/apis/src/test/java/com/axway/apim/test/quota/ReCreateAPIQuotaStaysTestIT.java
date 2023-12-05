@@ -106,7 +106,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "25")
 			//.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
-		sleep(5000);
+		sleep(12000);
 		echo("####### Validate the application 1 SPECIFIC quota override is set for the API as before #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${testAppId}/quota").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
