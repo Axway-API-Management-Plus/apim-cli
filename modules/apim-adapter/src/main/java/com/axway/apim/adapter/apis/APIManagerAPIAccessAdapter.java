@@ -195,7 +195,8 @@ public class APIManagerAPIAccessAdapter {
 
     public void createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
         List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
-        if (existingAPIAccess != null && existingAPIAccess.contains(apiAccess)) {
+        if (existingAPIAccess != null &&
+                existingAPIAccess.stream().anyMatch(existingAPIAccessElement -> existingAPIAccessElement.getApiId().equals(apiAccess.getApiId()))) {
             apiAccess.setId(existingAPIAccess.get(0).getId());
             return;
         }
