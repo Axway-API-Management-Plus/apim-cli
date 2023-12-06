@@ -308,6 +308,7 @@
                         <exclude>**/ValidateAppQuotaStaysTestIT.java</exclude>
                         <exclude>**/DontOverwriteManualQuotaTestIT.java</exclude>
                         <exclude>**/QuotaModeReplaceTestIT.java</exclude>
+                        <exclude>**/ReCreateAPIQuotaStaysTestIT.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
