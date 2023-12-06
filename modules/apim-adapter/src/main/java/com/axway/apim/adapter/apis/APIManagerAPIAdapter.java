@@ -80,6 +80,15 @@ public class APIManagerAPIAdapter {
         cmd = CoreParameters.getInstance();
     }
 
+    public List<API> getAPIs(APIFilter filter) throws AppException {
+        try {
+            readAPIsFromAPIManager(filter);
+            return filterAPIs(filter);
+        } catch (IOException e) {
+            throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
+    }
+
     public List<API> getAPIs(APIFilter filter, boolean logProgress) throws AppException {
         List<API> apis;
         try {

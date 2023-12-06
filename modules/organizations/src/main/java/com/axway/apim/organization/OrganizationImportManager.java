@@ -11,29 +11,29 @@ import com.axway.apim.lib.error.ErrorCode;
 
 public class OrganizationImportManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(OrganizationImportManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OrganizationImportManager.class);
 
-	private final APIManagerOrganizationAdapter orgAdapter;
+    private final APIManagerOrganizationAdapter orgAdapter;
 
-	public OrganizationImportManager() throws AppException {
-		super();
-		this.orgAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
-	}
+    public OrganizationImportManager() throws AppException {
+        super();
+        this.orgAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
+    }
 
-	public void replicate(Organization desiredOrg, Organization actualOrg) throws AppException {
-		if(actualOrg==null) {
-			orgAdapter.createOrganization(desiredOrg);
-		} else if(orgsAreEqual(desiredOrg, actualOrg)) {
-			LOG.debug("No changes detected between Desired- and Actual-Organization: {}" , desiredOrg.getName());
-			throw new AppException("No changes detected between Desired- and Actual-Org: "+desiredOrg.getName()+".", ErrorCode.NO_CHANGE);
-		} else {
-			LOG.debug("Update existing organization: {}" , desiredOrg.getName());
-			orgAdapter.updateOrganization(desiredOrg, actualOrg);
-			LOG.info("Successfully replicated organization: {} into API-Manager", desiredOrg.getName());
-		}
-	}
+    public void replicate(Organization desiredOrg, Organization actualOrg) throws AppException {
+        if (actualOrg == null) {
+            orgAdapter.createOrganization(desiredOrg);
+        } else if (orgsAreEqual(desiredOrg, actualOrg)) {
+            LOG.debug("No changes detected between Desired- and Actual-Organization: {}", desiredOrg.getName());
+            throw new AppException("No changes detected between Desired- and Actual-Org: " + desiredOrg.getName() + ".", ErrorCode.NO_CHANGE);
+        } else {
+            LOG.debug("Update existing organization: {}", desiredOrg.getName());
+            orgAdapter.updateOrganization(desiredOrg, actualOrg);
+            LOG.info("Successfully replicated organization: {} into API-Manager", desiredOrg.getName());
+        }
+    }
 
-	private static boolean orgsAreEqual(Organization desiredOrg, Organization actualOrg) {
-		return desiredOrg.deepEquals(actualOrg);
-	}
+    private static boolean orgsAreEqual(Organization desiredOrg, Organization actualOrg) {
+        return desiredOrg.deepEquals(actualOrg);
+    }
 }

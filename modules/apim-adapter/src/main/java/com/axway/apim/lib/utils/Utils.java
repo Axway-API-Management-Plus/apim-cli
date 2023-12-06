@@ -1,10 +1,32 @@
 package com.axway.apim.lib.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FilePermission;
-import java.io.FileReader;
-import java.io.IOException;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.model.CustomPropertiesEntity;
+import com.axway.apim.api.model.CustomProperty;
+import com.axway.apim.api.model.CustomProperty.Option;
+import com.axway.apim.api.model.TagMap;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.CustomPropertiesFilter;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
+import com.axway.apim.lib.utils.rest.Console;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -17,33 +39,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
-
-import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
-import com.axway.apim.api.model.TagMap;
-import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.Console;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringSubstitutor;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.API;
-import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.CustomPropertiesEntity;
-import com.axway.apim.api.model.CustomProperty;
-import com.axway.apim.api.model.CustomProperty.Option;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.error.ErrorCode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
 

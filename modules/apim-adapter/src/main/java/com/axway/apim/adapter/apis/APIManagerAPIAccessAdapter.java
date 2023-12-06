@@ -57,9 +57,10 @@ public class APIManagerAPIAccessAdapter {
     private final Map<Type, Cache<String, String>> caches = new EnumMap<>(Type.class);
     private static final HttpHelper httpHelper = new HttpHelper();
 
-
+    private final APIManagerAdapter apiManagerAdapter;
 
     public APIManagerAPIAccessAdapter(APIManagerAdapter apiManagerAdapter) {
+        this.apiManagerAdapter = apiManagerAdapter;
         cmd = CoreParameters.getInstance();
         caches.put(Type.applications, apiManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
         caches.put(Type.organizations, apiManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
@@ -156,10 +157,39 @@ public class APIManagerAPIAccessAdapter {
         List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
         List<APIAccess> toBeAddedAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
         for (APIAccess access : toBeRemovedAccesses) {
+            populateApiId(access);
             deleteAPIAccess(access, entity, type);
         }
         for (APIAccess access : toBeAddedAccesses) {
+            populateApiId(access);
             createAPIAccess(access, entity, type);
+        }
+    }
+
+    public void populateApiId(APIAccess apiAccess) throws AppException {
+
+        if (apiAccess.getApiId() == null) {
+            LOG.debug("fetching Frontend Api id from API manager");
+            APIManagerAPIAdapter apiAdapter = apiManagerAdapter.getApiAdapter();
+            APIFilter apiFilter = new APIFilter.Builder().hasName(apiAccess.getApiName()).hasState(apiAccess.getState())
+                .build();
+            List<API> apis = apiAdapter.getAPIs(apiFilter);
+            if (apis.size() > 1) {
+                LOG.info("More than one version of Api available : {}", apis);
+                LOG.info("API will be matched based on  API Version, If version is not available in config file, first api will be selected");
+            }
+            if (apiAccess.getApiVersion() == null) {
+                apiAccess.setApiId(apis.get(0).getId());
+                return;
+            }
+            for (API api : apis) {
+                if (api.getVersion().equals(apiAccess.getApiVersion())) {
+                    LOG.debug("Setting Front end API id : {} to API Access", api.getApiId());
+                    apiAccess.setApiId(api.getId());
+                    return;
+                }
+            }
+            throw new AppException("Unable to find API", ErrorCode.UNKNOWN_API);
         }
     }
 
