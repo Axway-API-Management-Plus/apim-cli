@@ -7,7 +7,6 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
-import com.beust.ah.A;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -167,7 +166,6 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         List<APIAccess> otherApiAccess = new ArrayList<>();
         otherApiAccess.add(apiAccess);
         List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
-        System.out.println(missingApiAccesses);
         Assert.assertTrue(missingApiAccesses.isEmpty());
     }
 
@@ -180,8 +178,7 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         List<APIAccess> otherApiAccess = new ArrayList<>();
         otherApiAccess.add(apiAccess);
         List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
-        System.out.println(missingApiAccesses);
-        Assert.assertEquals(0,missingApiAccesses.size());
+        Assert.assertEquals(missingApiAccesses.size(), 0);
     }
 
     @Test
@@ -195,7 +192,7 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         apiAccess2.setApiName("12345");
         otherApiAccess.add(apiAccess2);
         List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
-        Assert.assertEquals("1235",missingApiAccesses.get(0).getApiName());
+        Assert.assertEquals(missingApiAccesses.get(0).getApiName(), "1235");
     }
 
     @Test
@@ -209,7 +206,7 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         apiAccess2.setApiName("12345");
         otherApiAccess.add(apiAccess2);
         List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(otherApiAccess, apiAccesses);
-        Assert.assertEquals("12345",missingApiAccesses.get(0).getApiName());
+        Assert.assertEquals(missingApiAccesses.get(0).getApiName(), "12345");
     }
 
 

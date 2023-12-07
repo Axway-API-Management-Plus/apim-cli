@@ -13,7 +13,6 @@ public class TestSetup {
 
     @BeforeSuite
     public void initCliHome() throws IOException, URISyntaxException {
-        System.out.println("init cli");
         URI uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
         String path = Paths.get(uri) + File.separator + "apimcli";
         System.out.println(path);

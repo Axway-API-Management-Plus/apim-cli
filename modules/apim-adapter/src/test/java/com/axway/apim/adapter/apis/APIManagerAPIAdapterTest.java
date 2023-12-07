@@ -399,7 +399,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         try {
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
             String filePath = this.getClass().getClassLoader().getResource("com/axway/apim/images/API-Logo.jpg").getFile();
-            System.out.println(filePath);
             Image image = Image.createImageFromFile(new File(filePath));
             apiManagerAPIAdapter.updateAPIImage(api, image);
         }catch (AppException e){
@@ -699,7 +698,6 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         organization.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
         api.setOrganization(organization);
         JsonNode jsonNode = apiManagerAPIAdapter.importFromWSDL(api);
-        System.out.println(jsonNode);
         Assert.assertEquals("Test-App-API1-2285", jsonNode.get("name").asText());
     }
 

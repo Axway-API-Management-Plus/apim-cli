@@ -14,9 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CLIAPIFilterOptions extends CLIOptions {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(CLIAPIFilterOptions.class);
-	
+
 	private final CLIOptions cliOptions;
 
 	public CLIAPIFilterOptions(CLIOptions cliOptions) {
@@ -41,7 +41,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		parseCreatedOnFilter(params);
 		return (Parameters) params;
 	}
-	
+
 	private void parseCreatedOnFilter(APIFilterParams params) throws AppException {
 		try {
 			List<String> dateFormats = Arrays.asList("yyyy-MM-dd", "yyyy-MM", "yyyy"); // "dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy"
@@ -81,7 +81,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 			throw e;
 		}
 	}
-	
+
 	private static Date parseDate(String inputDate, String pattern, int endOrStart) {
 		if(inputDate.equals("now")) return new Date();
 		Calendar cal = Calendar.getInstance(Locale.ENGLISH);
@@ -120,7 +120,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		cliOptions.addOption(option);
 	}
 
-	
+
 	@Override
 	public String getValue(String key) {
 		return cliOptions.getValue(key);
@@ -153,22 +153,22 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("/api/v1/my/great/api");
 		cliOptions.addOption(option);
-		
+
 		option = new Option("n", "name", true, "Filter APIs with the given name. Wildcards at the beginning/end are supported.");
 		option.setRequired(false);
 		option.setArgName("*MyName*");
 		cliOptions.addOption(option);
-		
+
 		option = new Option("org", true, "Filter APIs with the given organization. Wildcards at the beginning/end are supported.");
 		option.setRequired(false);
 		option.setArgName("*MyOrg*");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("id", true, "Filter the API with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-API");
 		cliOptions.addOption(option);
-		
+
 		option = new Option("policy", true, "Filter APIs with the given policy name. This is includes all policy types.");
 		option.setRequired(false);
 		option.setArgName("*Policy1*");
@@ -178,38 +178,38 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("vhost.customer.com");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("state", true, "Filter APIs with specific state: unpublished | pending | published");
 		option.setRequired(false);
 		option.setArgName("published");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("backend", true, "Filter APIs with specific backendBasepath. Wildcards are supported.");
 		option.setRequired(false);
 		option.setArgName("*mybackhost.com*");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("createdOn", true, "Filter APIs based on their creation date. It's a range start:end. You see more examples when you provide an invalid range");
 		option.setRequired(false);
 		option.setArgName("2020-08:now");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("inboundsecurity", true, "Filter APIs with specific Inbound-Security. Wildcards are supported when filtering for APIs using a custom security policy.");
 		option.setRequired(false);
 		option.setArgName("oauth-ext|api-key|*my-security-pol*|...");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("outboundauthn", true, "Filter APIs with specific Outbound-Authentication. Wildcards are supported when filtering for an OAuth Provider profile.");
 		option.setRequired(false);
 		option.setArgName("oauth|api-key|My provider profile*|...");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("tag", true, "Filter APIs with a specific tag. Use either \"*myTagValueOrGroup*\" or \"tagGroup=*myTagValue*\"");
 		option.setRequired(false);
 		option.setArgName("tagGroup=*myTagValue*");
 		cliOptions.addOption(option);
 	}
-	
+
 	@Override
 	public EnvironmentProperties getEnvProperties() {
 		return cliOptions.getEnvProperties();

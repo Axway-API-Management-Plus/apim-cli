@@ -245,7 +245,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
     @Test
     public void createUpsertUriPostWithNoQuota() throws AppException, URISyntaxException {
-        System.out.println(UUID.randomUUID());
         String json ="";
         HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         CoreParameters cmd = CoreParameters.getInstance();

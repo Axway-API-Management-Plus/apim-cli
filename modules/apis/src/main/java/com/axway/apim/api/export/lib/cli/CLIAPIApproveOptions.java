@@ -10,11 +10,11 @@ import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 
 public class CLIAPIApproveOptions extends CLIOptions {
-	
+
 	private CLIAPIApproveOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIApproveOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);

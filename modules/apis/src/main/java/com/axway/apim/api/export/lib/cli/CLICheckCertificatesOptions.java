@@ -45,7 +45,7 @@ public class CLICheckCertificatesOptions extends CLIOptions {
     }
 
     @Override
-    protected String getAppName() {
+    public String getAppName() {
         return "API Check certificates";
     }
 

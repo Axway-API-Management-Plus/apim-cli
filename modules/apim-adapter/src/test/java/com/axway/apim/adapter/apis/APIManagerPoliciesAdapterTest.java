@@ -71,7 +71,6 @@ public class APIManagerPoliciesAdapterTest extends WiremockWrapper {
     @Test
     public void getEntityStorePolicyFormat() throws AppException {
         String entityStorePolicy = apiManagerPoliciesAdapter.getEntityStorePolicyFormat(APIManagerPoliciesAdapter.PolicyType.AUTHENTICATION, "Inbound security policy 1");
-        System.out.println(entityStorePolicy);
         Assert.assertTrue(entityStorePolicy.startsWith("<key"));
     }
 

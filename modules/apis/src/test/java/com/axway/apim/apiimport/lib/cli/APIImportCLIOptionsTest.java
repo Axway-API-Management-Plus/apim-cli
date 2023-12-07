@@ -1,23 +1,17 @@
-package com.axway.apim.cli;
+package com.axway.apim.apiimport.lib.cli;
 
-import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class APIImportCLIOptionsTest {
-	private String apimCliHome;
-	@BeforeClass
-	private void initCommandParameters() {
-		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
-	}
+
 	@Test
 	public void testWithoutAdminUser() throws AppException {
-		String[] args = {"-u", "myUser", "-p", "myPassword", "-port", "8175", "-c", "myConfig.json", "-apimCLIHome", apimCliHome};
+		String[] args = {"-u", "myUser", "-p", "myPassword", "-port", "8175", "-c", "myConfig.json"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "myUser");        // Taken from cmd directly
@@ -27,7 +21,7 @@ public class APIImportCLIOptionsTest {
 
 	@Test
 	public void testUserDetailsFromStage() throws AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-apimCLIHome", apimCliHome};
+		String[] args = {"-s", "prod", "-c", "myConfig.json"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
@@ -38,7 +32,7 @@ public class APIImportCLIOptionsTest {
 
 	@Test
 	public void testAPIImportParameter() throws AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt", "-stageConfig", "myStageConfigFile.json", "-enabledCaches", "applicationsQuotaCache,*API*", "-apimCLIHome", apimCliHome};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt", "-stageConfig", "myStageConfigFile.json", "-enabledCaches", "applicationsQuotaCache,*API*"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");

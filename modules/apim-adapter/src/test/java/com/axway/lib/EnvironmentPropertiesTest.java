@@ -31,7 +31,6 @@ public class EnvironmentPropertiesTest {
     public void testNoStageFromConfDir() throws URISyntaxException {
         // A given path should be used to load the Environment-Config file from
         String path = EnvironmentPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-        System.out.println(path);
         path += "envPropertiesTest/swaggerPromoteHome";
         EnvironmentProperties properties = new EnvironmentProperties("fromSwaggerPromoteHome", path);
         Assert.assertEquals(properties.containsKey("thisKeyExists"), true);

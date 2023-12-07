@@ -11,11 +11,11 @@ import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
 
 public class CLIAPIExportOptions extends CLIOptions {
-	
+
 	private CLIAPIExportOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIExportOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
@@ -25,7 +25,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 		cliOptions.parse();
 		return cliOptions;
 	}
-	
+
 	@Override
 	public Parameters getParams() {
 		APIExportParams params = new APIExportParams();
@@ -41,7 +41,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 				+ "from the FE-API instead of the original imported API. But the specification contains the host, basePath and scheme from the backend.");
 		option.setRequired(false);
 		addOption(option);
-		
+
 		option = new Option("datPassword", true, "Password used when exporting APIs in a DAT-Format.");
 		option.setRequired(false);
 		option.setArgName("myExportPassword");
@@ -51,7 +51,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 		option.setRequired(false);
 		addOption(option);
 	}
-	
+
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);

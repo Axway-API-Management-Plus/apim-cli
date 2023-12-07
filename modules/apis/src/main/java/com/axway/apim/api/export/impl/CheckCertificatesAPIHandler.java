@@ -44,22 +44,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
         cal.add(Calendar.DAY_OF_YEAR, checkCertParams.getNumberOfDays());
         if (LOG.isDebugEnabled())
             LOG.debug("Going to check certificate expiration of: {} selected API(s) within the next {} days (Not valid after: {})", apis.size(), checkCertParams.getNumberOfDays(), formatDate(cal.getTime().getTime()));
-        List<ApiPlusCert> expiredCerts = new ArrayList<>();
-        for (API api : apis) {
-            if (api.getCaCerts() == null) continue;
-            List<CaCert> certificates = api.getCaCerts();
-            for (CaCert certificate : certificates) {
-                try {
-                    Date notValidAfter = new Date(certificate.getNotValidAfter());
-                    if (notValidAfter.before(cal.getTime())) {
-                        expiredCerts.add(new ApiPlusCert(api, certificate));
-                    }
-                } catch (Exception e) {
-                    LOG.error("Error checking certificate: " + certificate.getAlias() + " expiration date used by API: " + api.toStringHuman() + ".", e);
-                    this.result.setError(ErrorCode.CHECK_CERTS_UNXPECTED_ERROR);
-                }
-            }
-        }
+        List<ApiPlusCert> expiredCerts = getExpiredCerts(apis);
         if (!expiredCerts.isEmpty()) {
             this.result.setError(ErrorCode.CHECK_CERTS_FOUND_CERTS);
             this.result.setResultDetails(expiredCerts);
@@ -77,25 +62,50 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
                     new Column().header("MD5-Fingerprint").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.certificate.getMd5Fingerprint())
                 )));
             } else if (outputFormat.equals(StandardExportParams.OutputFormat.json)) {
-                List<APICert> apiCerts = new ArrayList<>();
-                for (ApiPlusCert apiPlusCert : expiredCerts) {
-                    String id = apiPlusCert.api.getId();
-                    String apiName = apiPlusCert.api.getName();
-                    String path = apiPlusCert.api.getPath();
-                    String version = apiPlusCert.api.getVersion();
-                    String commonName = apiPlusCert.certificate.getName();
-                    long validAfter = apiPlusCert.certificate.getNotValidAfter();
-                    long validBefore = apiPlusCert.certificate.getNotValidBefore();
-                    String md5 = apiPlusCert.certificate.getMd5Fingerprint();
-                    APICert apiCert = new APICert(id, apiName, path, version, commonName, validAfter, validBefore, md5);
-                    apiCerts.add(apiCert);
-                }
+                List<APICert> apiCerts = getApiCerts(expiredCerts);
                 writeJSON(apiCerts);
             }
         } else {
             LOG.info("No certificates found that will expire within the next {} days.", checkCertParams.getNumberOfDays());
         }
         LOG.info("Done!");
+    }
+
+    public List<ApiPlusCert> getExpiredCerts(List<API> apis){
+        List<ApiPlusCert> expiredCerts = new ArrayList<>();
+        for (API api : apis) {
+            if (api.getCaCerts() == null) continue;
+            List<CaCert> certificates = api.getCaCerts();
+            for (CaCert certificate : certificates) {
+                try {
+                    Date notValidAfter = new Date(certificate.getNotValidAfter());
+                    if (notValidAfter.before(cal.getTime())) {
+                        expiredCerts.add(new ApiPlusCert(api, certificate));
+                    }
+                } catch (Exception e) {
+                    LOG.error("Error checking certificate: {} expiration date used by API: {}", certificate.getAlias(), api.toStringHuman(), e);
+                    this.result.setError(ErrorCode.CHECK_CERTS_UNXPECTED_ERROR);
+                }
+            }
+        }
+        return expiredCerts;
+    }
+
+    private static List<APICert> getApiCerts(List<ApiPlusCert> expiredCerts) {
+        List<APICert> apiCerts = new ArrayList<>();
+        for (ApiPlusCert apiPlusCert : expiredCerts) {
+            String id = apiPlusCert.api.getId();
+            String apiName = apiPlusCert.api.getName();
+            String path = apiPlusCert.api.getPath();
+            String version = apiPlusCert.api.getVersion();
+            String commonName = apiPlusCert.certificate.getName();
+            long validAfter = apiPlusCert.certificate.getNotValidAfter();
+            long validBefore = apiPlusCert.certificate.getNotValidBefore();
+            String md5 = apiPlusCert.certificate.getMd5Fingerprint();
+            APICert apiCert = new APICert(id, apiName, path, version, commonName, validAfter, validBefore, md5);
+            apiCerts.add(apiCert);
+        }
+        return apiCerts;
     }
 
     public void writeJSON(List<APICert> apiCerts) throws AppException {

@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -101,8 +100,6 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
         });
         List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {
         });
-        System.out.println(importedSecurityProfiles);
-        System.out.println(exportedSecurityProfiles);
         assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
         ;
         Map<String, OutboundProfile> importedOutboundProfiles = mapper.readValue(mapper.writeValueAsString(importedAPIConfig.get("outboundProfiles")), new TypeReference<Map<String, OutboundProfile>>() {
