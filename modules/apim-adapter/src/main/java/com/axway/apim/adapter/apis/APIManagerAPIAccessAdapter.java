@@ -153,7 +153,7 @@ public class APIManagerAPIAccessAdapter {
     }
 
     public void saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
-        List<APIAccess> existingAPIAccess = getAPIAccess(entity, type);
+        List<APIAccess> existingAPIAccess = getAPIAccess(entity, type, true);
         List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
         List<APIAccess> toBeAddedAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
         for (APIAccess access : toBeRemovedAccesses) {
@@ -194,7 +194,7 @@ public class APIManagerAPIAccessAdapter {
     }
 
     public void createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
-        List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
+        List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type, true);
         if (existingAPIAccess != null && existingAPIAccess.contains(apiAccess)) {
             apiAccess.setId(existingAPIAccess.get(0).getId());
             return;
@@ -242,11 +242,6 @@ public class APIManagerAPIAccessAdapter {
     }
 
     public void deleteAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
-        List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
-        // Nothing to delete
-        if (existingAPIAccess != null && !existingAPIAccess.contains(apiAccess)) {
-            return;
-        }
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis/" + apiAccess.getId()).build();
             // Use an admin account for this request
