@@ -188,28 +188,28 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
     public void getMissingAPIAccessesWithUnique(){
         List<APIAccess> apiAccesses = new ArrayList<>();
         APIAccess apiAccess = new APIAccess();
-        apiAccess.setApiId("1235");
+        apiAccess.setApiName("1235");
         apiAccesses.add(apiAccess);
         List<APIAccess> otherApiAccess = new ArrayList<>();
         APIAccess apiAccess2 = new APIAccess();
-        apiAccess2.setApiId("12345");
+        apiAccess2.setApiName("12345");
         otherApiAccess.add(apiAccess2);
         List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
-        Assert.assertEquals("1235",missingApiAccesses.get(0).getApiId());
+        Assert.assertEquals("1235",missingApiAccesses.get(0).getApiName());
     }
 
     @Test
     public void getMissingAPIAccessesWithUniqueReverse(){
         List<APIAccess> apiAccesses = new ArrayList<>();
         APIAccess apiAccess = new APIAccess();
-        apiAccess.setApiId("1235");
+        apiAccess.setApiName("1235");
         apiAccesses.add(apiAccess);
         List<APIAccess> otherApiAccess = new ArrayList<>();
         APIAccess apiAccess2 = new APIAccess();
-        apiAccess2.setApiId("12345");
+        apiAccess2.setApiName("12345");
         otherApiAccess.add(apiAccess2);
         List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(otherApiAccess, apiAccesses);
-        Assert.assertEquals("12345",missingApiAccesses.get(0).getApiId());
+        Assert.assertEquals("12345",missingApiAccesses.get(0).getApiName());
     }
 
 
