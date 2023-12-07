@@ -556,7 +556,7 @@ public class APIMgrAppsAdapter {
 
     private void saveAPIAccess(ClientApplication app, ClientApplication actualApp) throws AppException {
         if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return;
-        if (actualApp != null && app.getApiAccess().equals(actualApp.getApiAccess())) return;
+        if (actualApp != null && Utils.compareValues(app.getApiAccess(),(actualApp.getApiAccess()))) return;
         APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().getAccessAdapter();
         accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
     }

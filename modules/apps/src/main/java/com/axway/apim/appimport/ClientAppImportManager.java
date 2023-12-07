@@ -6,6 +6,7 @@ import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +52,8 @@ public class ClientAppImportManager {
 
     public static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
         boolean application = desiredApp.equals(actualApp);
-        boolean apiAccess = (desiredApp.getApiAccess() == null || desiredApp.getApiAccess().equals(actualApp.getApiAccess()));
-        boolean permission = (desiredApp.getPermissions() == null || desiredApp.getPermissions().containsAll(actualApp.getPermissions()));
+        boolean apiAccess = (desiredApp.getApiAccess() == null || Utils.compareValues(desiredApp.getApiAccess(), actualApp.getApiAccess()));
+        boolean permission = (desiredApp.getPermissions() == null || Utils.compareValues(desiredApp.getPermissions(), actualApp.getPermissions()));
         boolean quota = (desiredApp.getAppQuota() == null || desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
         LOG.debug("apps Not changed: {}", application);
         LOG.debug("api access Not changed: {}", apiAccess);

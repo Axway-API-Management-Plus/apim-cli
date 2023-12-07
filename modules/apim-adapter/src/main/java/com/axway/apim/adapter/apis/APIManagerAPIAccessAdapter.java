@@ -196,7 +196,7 @@ public class APIManagerAPIAccessAdapter {
     public void createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
         List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
         if (existingAPIAccess != null &&
-                existingAPIAccess.stream().anyMatch(existingAPIAccessElement -> existingAPIAccessElement.getApiId().equals(apiAccess.getApiId()))) {
+            existingAPIAccess.stream().anyMatch(existingAPIAccessElement -> existingAPIAccessElement.getApiId().equals(apiAccess.getApiId()))) {
             apiAccess.setId(existingAPIAccess.get(0).getId());
             return;
         }
@@ -282,15 +282,17 @@ public class APIManagerAPIAccessAdapter {
         }
     }
 
-    private List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) {
-        List<APIAccess> missingAccess = new ArrayList<>();
+    public List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) {
         if (otherApiAccess == null) otherApiAccess = new ArrayList<>();
         if (apiAccess == null) apiAccess = new ArrayList<>();
+        List<APIAccess> missingAccess = new ArrayList<>();
         for (APIAccess access : apiAccess) {
-            if (otherApiAccess.contains(access)) {
-                continue;
+            for (APIAccess otherAccess : otherApiAccess) {
+                if (access.getApiId().equals(otherAccess.getApiId())) {
+                    break;
+                }
+                missingAccess.add(access);
             }
-            missingAccess.add(access);
         }
         return missingAccess;
     }
