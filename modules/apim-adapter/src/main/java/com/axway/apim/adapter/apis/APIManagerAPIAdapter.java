@@ -649,7 +649,7 @@ public class APIManagerAPIAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
-                    LOG.error("Error getting Backend-API  Response-Code: {}", statusCode);
+                    LOG.warn("Error getting Backend-API  Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
                     return false;
                 }
