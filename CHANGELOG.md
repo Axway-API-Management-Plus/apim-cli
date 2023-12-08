@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.3] In progress
+# [1.14.3] 2023-12-07
 ### Fixed
 - APIM CLI to check/skip already removed API (See issue [#417](https://github.com/Axway-API-Management-Plus/apim-cli/issues/417))
 - Error mapping is not applied when importing "app" (See issue [#437](https://github.com/Axway-API-Management-Plus/apim-cli/issues/437))
