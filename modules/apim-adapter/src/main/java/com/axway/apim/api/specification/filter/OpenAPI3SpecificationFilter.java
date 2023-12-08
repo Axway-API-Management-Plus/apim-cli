@@ -12,10 +12,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OpenAPI3SpecificationFilter {
 
-    static Logger LOG = LoggerFactory.getLogger(OpenAPI3SpecificationFilter.class);
+    private OpenAPI3SpecificationFilter() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpenAPI3SpecificationFilter.class);
 
     public static void filter(OpenAPI openAPI, APISpecificationFilter filterConfig) {
         Paths paths = openAPI.getPaths();
@@ -26,9 +31,10 @@ public class OpenAPI3SpecificationFilter {
         List<String> modelsToBeRemoved = new ArrayList<>();
         // Iterate over the API specification and create a list of all paths
         // that must to be removed because they were not configured as included
-        for (String s : paths.keySet()) {
+        for (Map.Entry<String, PathItem> entry : paths.entrySet()) {
+            String s = entry.getKey();
             boolean removePath = true;
-            PathItem operations = paths.get(s);
+            PathItem operations = entry.getValue();
             for (HttpMethod next : operations.readOperationsMap().keySet()) {
                 String httpMethod = next.toString().toLowerCase();
                 Operation operation = getOperation4HttpMethod(operations, httpMethod);
@@ -76,6 +82,8 @@ public class OpenAPI3SpecificationFilter {
                 case "head":
                     pathItem.setHead(null);
                     break;
+                default:
+                    break;
             }
         }
         if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null) {
@@ -106,7 +114,8 @@ public class OpenAPI3SpecificationFilter {
                 return operations.getPatch();
             case "head":
                 return operations.getHead();
+            default:
+                return null;
         }
-        return null;
     }
 }

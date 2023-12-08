@@ -86,11 +86,9 @@ public class JsonAPIExporter extends APIResultHandler {
         String configFile;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
-            if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL)) {
-                if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                    writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-                    exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
-                }
+            if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
+                writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+                exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
             }
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
@@ -104,10 +102,8 @@ public class JsonAPIExporter extends APIResultHandler {
             configFile = "/api-config.json";
         }
         Image image = exportAPI.getAPIImage();
-        if (image != null) {
-            if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
-            }
+        if (image != null && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
+            writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
         }
         if (exportAPI.getCaCerts() != null && !exportAPI.getCaCerts().isEmpty()) {
             storeCaCerts(localFolder, exportAPI.getCaCerts());
@@ -115,6 +111,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(Include.NON_NULL);
+        mapper.setSerializationInclusion(Include.NON_EMPTY);
         FilterProvider filters = new SimpleFilterProvider()
             .addFilter("CaCertFilter",
                 SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))
@@ -122,6 +119,17 @@ public class JsonAPIExporter extends APIResultHandler {
                 SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
             .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
         mapper.setFilterProvider(filters);
+        writeContent(mapper, exportAPI, localFolder, configFile);
+        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
+            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+            LOG.warn("- No Quotas has been exported for the API");
+            LOG.warn("- No Client-Organizations");
+            LOG.warn("- Only subscribed applications from the Org-Admins organization");
+        }
+    }
+
+    public void writeContent(ObjectMapper mapper, ExportAPI exportAPI, File localFolder, String configFile) throws AppException {
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
@@ -132,19 +140,11 @@ public class JsonAPIExporter extends APIResultHandler {
         } catch (Exception e) {
             throw new AppException("Can't create API-Configuration file for API: '" + exportAPI.getName() + "' exposed on path: '" + exportAPI.getPath() + "'.", ErrorCode.UNXPECTED_ERROR, e);
         }
-
-        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
-        if (!APIManagerAdapter.hasAdminAccount()) {
-            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
-            LOG.warn("- No Quotas has been exported for the API");
-            LOG.warn("- No Client-Organizations");
-            LOG.warn("- Only subscribed applications from the Org-Admins organization");
-        }
     }
 
     private String getVHost(ExportAPI exportAPI) throws AppException {
         if (exportAPI.getVhost() != null) return exportAPI.getVhost().replace(":", "_") + File.separator;
-        String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
+        String orgVHost = APIManagerAdapter.getInstance().getOrgAdapter().getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
         if (orgVHost != null) return orgVHost.replace(":", "_") + File.separator;
         return "";
     }

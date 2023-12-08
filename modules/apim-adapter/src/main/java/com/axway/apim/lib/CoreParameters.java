@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 public class CoreParameters implements Parameters {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
+    public static final String CLIENT_APPS_MODE = "clientAppsMode";
+    public static final String CLIENT_ORGS_MODE = "clientOrgsMode";
 
     public enum Mode {
         replace,
@@ -34,7 +37,7 @@ public class CoreParameters implements Parameters {
         }
     }
 
-    public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
+    public static final String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
     private static final String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
     private URI apiManagerUrl = null;
     private static CoreParameters instance;
@@ -52,15 +55,15 @@ public class CoreParameters implements Parameters {
     private int port = -1;
     private String username;
     private String password;
-    private Boolean force;
-    private Boolean ignoreQuotas;
-    private Boolean zeroDowntimeUpdate;
+    private boolean force;
+    private boolean ignoreQuotas;
+    private boolean zeroDowntimeUpdate;
     private Mode quotaMode;
     private Mode clientAppsMode;
     private Mode clientOrgsMode;
     private String detailsExportFile;
-    private Boolean rollback = true;
-    private Boolean ignoreCache = false;
+    private boolean rollback = true;
+    private boolean ignoreCache = false;
     private String apimCLIHome;
     private String proxyHost;
     private Integer proxyPort;
@@ -168,24 +171,20 @@ public class CoreParameters implements Parameters {
         this.password = password;
     }
 
-    public Boolean isForce() {
-        if (force != null) return force;
-        return Boolean.parseBoolean(getFromProperties("force"));
+    public boolean isForce() {
+        return force;
     }
 
-    public void setForce(Boolean force) {
-        if (force == null) return;
+    public void setForce(boolean force) {
         this.force = force;
     }
 
-    public void setIgnoreQuotas(Boolean ignoreQuotas) {
-        if (ignoreQuotas == null) return;
+    public void setIgnoreQuotas(boolean ignoreQuotas) {
         this.ignoreQuotas = ignoreQuotas;
     }
 
-    public Boolean isIgnoreQuotas() {
-        if (ignoreQuotas != null) return ignoreQuotas;
-        return Boolean.parseBoolean(getFromProperties("ignoreQuotas"));
+    public boolean isIgnoreQuotas() {
+        return ignoreQuotas;
     }
 
     public Mode getQuotaMode() {
@@ -201,18 +200,18 @@ public class CoreParameters implements Parameters {
         this.quotaMode = quotaMode;
     }
 
-    public Boolean isIgnoreClientApps() {
+    public boolean isIgnoreClientApps() {
         if (clientAppsMode == Mode.ignore) return true;
-        if (getFromProperties("clientAppsMode") != null) {
-            return Boolean.parseBoolean(getFromProperties("clientAppsMode"));
+        if (getFromProperties(CLIENT_APPS_MODE) != null) {
+            return Boolean.parseBoolean(getFromProperties(CLIENT_APPS_MODE));
         }
         return false;
     }
 
     public Mode getClientAppsMode() {
         if (clientAppsMode != null) return clientAppsMode;
-        if (getFromProperties("clientAppsMode") != null) {
-            return Mode.valueOf(getFromProperties("clientAppsMode"));
+        if (getFromProperties(CLIENT_APPS_MODE) != null) {
+            return Mode.valueOf(getFromProperties(CLIENT_APPS_MODE));
         }
         return Mode.add;
     }
@@ -222,18 +221,18 @@ public class CoreParameters implements Parameters {
         this.clientAppsMode = clientAppsMode;
     }
 
-    public Boolean isIgnoreClientOrgs() {
+    public boolean isIgnoreClientOrgs() {
         if (clientOrgsMode == Mode.ignore) return true;
-        if (getFromProperties("clientOrgsMode") != null) {
-            return Boolean.parseBoolean(getFromProperties("clientOrgsMode"));
+        if (getFromProperties(CLIENT_ORGS_MODE) != null) {
+            return Boolean.parseBoolean(getFromProperties(CLIENT_ORGS_MODE));
         }
         return false;
     }
 
     public Mode getClientOrgsMode() {
         if (clientOrgsMode != null) return clientOrgsMode;
-        if (getFromProperties("clientOrgsMode") != null) {
-            return Mode.valueOf(getFromProperties("clientOrgsMode"));
+        if (getFromProperties(CLIENT_ORGS_MODE) != null) {
+            return Mode.valueOf(getFromProperties(CLIENT_ORGS_MODE));
         }
         return Mode.add;
     }
@@ -271,12 +270,11 @@ public class CoreParameters implements Parameters {
         this.detailsExportFile = detailsExportFile;
     }
 
-    public Boolean isRollback() {
+    public boolean isRollback() {
         return rollback;
     }
 
-    public void setRollback(Boolean rollback) {
-        if (rollback == null) return;
+    public void setRollback(boolean rollback) {
         this.rollback = rollback;
     }
 
@@ -285,8 +283,7 @@ public class CoreParameters implements Parameters {
         return ignoreCache;
     }
 
-    public void setIgnoreCache(Boolean ignoreCache) {
-        if (ignoreCache == null) return;
+    public void setIgnoreCache(boolean ignoreCache) {
         this.ignoreCache = ignoreCache;
     }
 
@@ -366,17 +363,16 @@ public class CoreParameters implements Parameters {
         }
     }
 
-    public Boolean isZeroDowntimeUpdate() {
-        if (zeroDowntimeUpdate == null) return false;
+    public boolean isZeroDowntimeUpdate() {
         return zeroDowntimeUpdate;
     }
 
-    public void setZeroDowntimeUpdate(Boolean zeroDowntimeUpdate) {
+    public void setZeroDowntimeUpdate(boolean zeroDowntimeUpdate) {
         this.zeroDowntimeUpdate = zeroDowntimeUpdate;
     }
 
     public List<CacheType> clearCaches() {
-        if (getClearCache() == null) return null;
+        if (getClearCache() == null) return Collections.emptyList();
         if (cachesToClear != null) return cachesToClear;
         cachesToClear = createCacheList(getClearCache());
         return cachesToClear;

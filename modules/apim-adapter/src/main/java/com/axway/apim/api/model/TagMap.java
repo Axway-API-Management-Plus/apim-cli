@@ -1,6 +1,7 @@
 package com.axway.apim.api.model;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class TagMap extends LinkedHashMap<String, String[]> {
@@ -15,9 +16,10 @@ public class TagMap extends LinkedHashMap<String, String[]> {
         if (!(o instanceof TagMap)) return false;
         TagMap otherTagMap = (TagMap) o;
         if (otherTagMap.size() != size()) return false;
-        for (String tagName : this.keySet()) {
+        for (Map.Entry<String, String[]> entry : this.entrySet()) {
+            String tagName = entry.getKey();
             if (!otherTagMap.containsKey(tagName)) return false;
-            String[] myTags = this.get(tagName);
+            String[] myTags = entry.getValue();
             String[] otherTags = otherTagMap.get(tagName);
             if (!Objects.deepEquals(myTags, otherTags)) return false;
         }

@@ -19,11 +19,11 @@ import org.ehcache.spi.loaderwriter.CacheLoadingException;
 import org.ehcache.spi.loaderwriter.CacheWritingException;
 
 public class DoNothingCacheManager implements CacheManager {
-	
+
 	public static class DoNothingCache<K, V> implements Cache<K, V> {
 
 		@Override
-		public void clear() {
+		public void clear() { // Ignore
 		}
 		@Override
 		public boolean containsKey(Object arg0) {
@@ -35,7 +35,7 @@ public class DoNothingCacheManager implements CacheManager {
 		}
 		@Override
 		public Map getAll(Set arg0) throws BulkCacheLoadingException {
-			return null;
+			return Collections.emptyMap();
 		}
 		@Override
 		public CacheRuntimeConfiguration getRuntimeConfiguration() {
@@ -46,27 +46,27 @@ public class DoNothingCacheManager implements CacheManager {
 			return Collections.emptyIterator();
 		}
 		@Override
-		public void put(Object arg0, Object arg1) throws CacheWritingException {
-			
+		public void put(Object arg0, Object arg1) throws CacheWritingException { // Ignore
+
 		}
 		@Override
-		public void putAll(Map arg0) throws BulkCacheWritingException {
-			
+		public void putAll(Map arg0) throws BulkCacheWritingException { // Ignore
+
 		}
 		@Override
 		public Object putIfAbsent(Object arg0, Object arg1) throws CacheLoadingException, CacheWritingException {
 			return null;
 		}
 		@Override
-		public void remove(Object arg0) throws CacheWritingException {
-			
+		public void remove(Object arg0) throws CacheWritingException { // Ignore
+
 		}
 		@Override
 		public boolean remove(Object arg0, Object arg1) throws CacheWritingException {
 			return false;
 		}
 		@Override
-		public void removeAll(Set arg0) throws BulkCacheWritingException {
+		public void removeAll(Set arg0) throws BulkCacheWritingException { // Ignore
 		}
 		@Override
 		public Object replace(Object arg0, Object arg1) throws CacheLoadingException, CacheWritingException {
@@ -80,7 +80,7 @@ public class DoNothingCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void close() throws StateTransitionException {
+	public void close() throws StateTransitionException { // Ignore
 	}
 
 	@Override
@@ -109,11 +109,11 @@ public class DoNothingCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void init() throws StateTransitionException {
-		
+	public void init() throws StateTransitionException { // Ignore
+
 	}
 
 	@Override
-	public void removeCache(String arg0) {
+	public void removeCache(String arg0) { // Ignore
 	}
 }

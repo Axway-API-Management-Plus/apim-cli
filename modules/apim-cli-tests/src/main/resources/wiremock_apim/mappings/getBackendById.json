@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/api/portal/v1.4/apirepo/1f4263ca-7f03-41d9-9d34-9eff79d29bd8"
+    "url": "/api/portal/v1.4/apirepo/1f4263ca-7f03-41d9-9d34-9eff79d29bd8"
   },
   "response": {
     "status": 200,

@@ -13,18 +13,17 @@ import org.testng.annotations.Test;
 
 public class APIStatusManagerTest extends WiremockWrapper {
 
-    private APIManagerAdapter apiManagerAdapter;
+    private APIManagerAPIAdapter apiAdapter;
 
     @BeforeClass
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerAdapter = APIManagerAdapter.getInstance();
+            apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -38,18 +37,16 @@ public class APIStatusManagerTest extends WiremockWrapper {
     @Test
     public void updateStateUnpublished() throws AppException {
         APIStatusManager apiStatusManager = new APIStatusManager();
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter apiFilter = new APIFilter.Builder().hasName("petstore").build();
-        API api = apiManagerAPIAdapter.getAPI(apiFilter, false);
+        API api = apiAdapter.getAPI(apiFilter, false);
         apiStatusManager.update(api, "unpublished", true);
     }
 
     @Test
     public void updateStateUnpublishedAndVhost() throws AppException {
         APIStatusManager apiStatusManager = new APIStatusManager();
-        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter apiFilter = new APIFilter.Builder().hasName("petstore").build();
-        API api = apiManagerAPIAdapter.getAPI(apiFilter, false);
+        API api = apiAdapter.getAPI(apiFilter, false);
         apiStatusManager.update(api, "published", "api.axway.com", true);
     }
 }

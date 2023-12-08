@@ -28,6 +28,8 @@ import com.axway.apim.lib.error.ErrorCode;
 public class ClientAppFilter implements CustomPropertiesFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
+    public static final String FIELD = "field";
+    public static final String VALUE = "value";
 
     boolean includeQuota;
 
@@ -132,9 +134,9 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     public void setOrganization(Organization organization) {
         if (organization == null) return;
         this.organization = organization;
-        filters.add(new BasicNameValuePair("field", "orgid"));
+        filters.add(new BasicNameValuePair(FIELD, "orgid"));
         filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", organization.getId()));
+        filters.add(new BasicNameValuePair(VALUE, organization.getId()));
     }
 
     public Organization getOrganization() {
@@ -144,9 +146,9 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     public void setCreatedBy(User createdBy) {
         if (createdBy == null) return;
         this.createdBy = createdBy;
-        filters.add(new BasicNameValuePair("field", "userid"));
+        filters.add(new BasicNameValuePair(FIELD, "userid"));
         filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", createdBy.getId()));
+        filters.add(new BasicNameValuePair(VALUE, createdBy.getId()));
     }
 
     public User getCreatedBy() {
@@ -196,9 +198,9 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     public void setState(String state) {
         if (state == null) return;
         this.state = state;
-        filters.add(new BasicNameValuePair("field", "state"));
+        filters.add(new BasicNameValuePair(FIELD, "state"));
         filters.add(new BasicNameValuePair("op", "eq"));
-        filters.add(new BasicNameValuePair("value", state));
+        filters.add(new BasicNameValuePair(VALUE, state));
     }
 
     public String getState() {
@@ -387,7 +389,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
         public Builder hasName(String name) throws AppException {
             if (name == null) return this;
             if (name.contains("|")) {
-                Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(name.substring(name.indexOf("|") + 1));
+                Organization org = APIManagerAdapter.getInstance().getOrgAdapter().getOrgForName(name.substring(name.indexOf("|") + 1));
                 hasOrganization(org);
                 this.applicationName = name.substring(0, name.indexOf("|"));
             } else {
@@ -410,7 +412,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         public Builder hasOrganizationName(String organizationName) throws AppException {
             if (organizationName == null) return this;
-            Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(organizationName);
+            Organization org = APIManagerAdapter.getInstance().getOrgAdapter().getOrgForName(organizationName);
             if (org == null) {
                 throw new AppException("The organization with name: '" + organizationName + "' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
             }
@@ -424,7 +426,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         public Builder hasCreatedByLoginName(String loginName) throws AppException {
             if (loginName == null) return this;
-            User user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(loginName);
+            User user = APIManagerAdapter.getInstance().getUserAdapter().getUserForLoginName(loginName);
             if (user == null) {
                 throw new AppException("The user with login name: '" + loginName + "' is unknown.", ErrorCode.UNKNOWN_USER);
             }

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class UnknownAPISpecification extends APISpecification {
 
-    private final Logger LOG = LoggerFactory.getLogger(UnknownAPISpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UnknownAPISpecification.class);
     String apiName;
 
     public UnknownAPISpecification(String apiName) {
@@ -25,13 +25,16 @@ public class UnknownAPISpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent)  {
         return false;
     }
 
     @Override
     public byte[] getApiSpecificationContent() {
-        LOG.error("API: {} has a unknown/invalid API-Specification: {}", this.apiName, APISpecificationFactory.getContentStart(this.apiSpecificationContent));
+        LOG.error("API: {} has a unknown/invalid API-Specification" , apiName);
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Specification {}",  APISpecificationFactory.getContentStart(apiSpecificationContent));
+        }
         return this.apiSpecificationContent;
     }
 

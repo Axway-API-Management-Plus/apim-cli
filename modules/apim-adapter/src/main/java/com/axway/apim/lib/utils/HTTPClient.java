@@ -27,62 +27,57 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 public class HTTPClient implements AutoCloseable {
-	private static final Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+    private final URI url;
+    private final String password;
+    private final String username;
+    private CloseableHttpClient closeableHttpClient = null;
+    private HttpClientContext clientContext;
 
-	private final URI url;
-	private final String password;
-	private final String username;
-	
-	private CloseableHttpClient closeableHttpClient = null;
-	
-	private HttpClientContext clientContext;
-	
-	public HTTPClient(String url, String username, String password) throws AppException {
-		try {
-			this.url = new URI(url);
-			this.password = password;
-			this.username = username;
-			getClient();
-		} catch (URISyntaxException e) {
-			throw new AppException("Error creating HTTP-Client.", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}
+    public HTTPClient(String url, String username, String password) throws AppException {
+        try {
+            this.url = new URI(url);
+            this.password = password;
+            this.username = username;
+            getClient();
+        } catch (URISyntaxException e) {
+            throw new AppException("Error creating HTTP-Client.", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
 
-	public void getClient() throws AppException {
-		try {
-			SSLContextBuilder builder = SSLContextBuilder.create();
-			builder.loadTrustMaterial(null, new TrustAllStrategy());
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
-			HttpClientBuilder httpClientBuilder = HttpClients.custom()
-					.setSSLSocketFactory(sslsf);
-			
-			if(this.username!=null) {
-				CredentialsProvider credsProvider = new BasicCredentialsProvider();
-				credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
-				AuthCache authCache = new BasicAuthCache();
-				BasicScheme basicAuth = new BasicScheme();
-				authCache.put( new HttpHost(url.getHost(), url.getPort(), url.getScheme()), basicAuth );
-				clientContext = HttpClientContext.create();
-				clientContext.setAuthCache(authCache);
-				httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
-			}
-			this.closeableHttpClient = httpClientBuilder.build();
-		} catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-			throw new AppException("Error creating HTTP-Client.", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}
-	
-	public CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
-		return closeableHttpClient.execute(request, clientContext);
-	}
+    public void getClient() throws AppException {
+        try {
+            SSLContextBuilder builder = SSLContextBuilder.create();
+            builder.loadTrustMaterial(null, new TrustAllStrategy());
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
+            HttpClientBuilder httpClientBuilder = HttpClients.custom()
+                .setSSLSocketFactory(sslsf);
+            if (this.username != null) {
+                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+                AuthCache authCache = new BasicAuthCache();
+                BasicScheme basicAuth = new BasicScheme();
+                authCache.put(new HttpHost(url.getHost(), url.getPort(), url.getScheme()), basicAuth);
+                clientContext = HttpClientContext.create();
+                clientContext.setAuthCache(authCache);
+                httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
+            }
+            this.closeableHttpClient = httpClientBuilder.build();
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new AppException("Error creating HTTP-Client.", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
 
+    public CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
+        return closeableHttpClient.execute(request, clientContext);
+    }
 
-	@Override
-	public void close() throws Exception {
-		try {
-			this.closeableHttpClient.close();
-		} catch (IOException e) {
-			LOG.error("error closing http client", e);
-		}
-	}
+    @Override
+    public void close() throws Exception {
+        try {
+            this.closeableHttpClient.close();
+        } catch (IOException e) {
+            LOG.error("error closing http client", e);
+        }
+    }
 }

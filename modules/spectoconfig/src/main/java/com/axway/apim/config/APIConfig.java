@@ -3,26 +3,22 @@ package com.axway.apim.config;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.config.model.APISecurity;
-import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JsonPropertyOrder({"name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
-        "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
-        "corsProfiles", "caCerts"})
+    "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
+    "corsProfiles", "caCerts"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class APIConfig {
 
     public static final String DEFAULT = "_default";
-    private API api;
-    private String apiDefinition;
-    private Map<String, Object> securityProfiles;
+    private final API api;
+    private final String apiDefinition;
+    private final Map<String, Object> securityProfiles;
 
     public APIConfig(API api, String apiDefinition, Map<String, Object> securityProfiles) {
         this.api = api;
@@ -30,16 +26,16 @@ public class APIConfig {
         this.securityProfiles = securityProfiles;
     }
 
-    public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
-        if (api.getOutboundProfiles() == null) return null;
-        if (api.getOutboundProfiles().isEmpty()) return null;
+    public Map<String, OutboundProfile> getOutboundProfiles() {
+        if (api.getOutboundProfiles() == null) return Collections.emptyMap();
+        if (api.getOutboundProfiles().isEmpty()) return Collections.emptyMap();
         if (api.getOutboundProfiles().size() == 1) {
             OutboundProfile defaultProfile = api.getOutboundProfiles().get(DEFAULT);
             if (defaultProfile.getRouteType().equals("proxy")
-                    && defaultProfile.getAuthenticationProfile().equals(DEFAULT)
-                    && defaultProfile.getRequestPolicy() == null
-                    && defaultProfile.getResponsePolicy() == null
-            ) return null;
+                && defaultProfile.getAuthenticationProfile().equals(DEFAULT)
+                && defaultProfile.getRequestPolicy() == null
+                && defaultProfile.getResponsePolicy() == null
+            ) return Collections.emptyMap();
         }
         for (OutboundProfile profile : api.getOutboundProfiles().values()) {
             profile.setApiId(null);
@@ -56,7 +52,7 @@ public class APIConfig {
         if (securityProfiles.size() == 1) {
             List<APISecurity> apiSecurities = (List<APISecurity>) securityProfiles.get("devices");
             if (apiSecurities.get(0).getType().equals(DeviceType.passThrough.getName()))
-                return null;
+                return Collections.emptyList();
         }
         List<Map<String, Object>> list = new ArrayList<>();
         list.add(securityProfiles);
@@ -70,18 +66,18 @@ public class APIConfig {
 
     public List<AuthenticationProfile> getAuthenticationProfiles() {
         if (api.getAuthenticationProfiles().size() == 1 && api.getAuthenticationProfiles().get(0).getType() == AuthType.none) {
-            return null;
+            return Collections.emptyList();
         }
         return api.getAuthenticationProfiles();
     }
 
     public Map<String, InboundProfile> getInboundProfiles() {
-        if (api.getInboundProfiles() == null) return null;
-        if (api.getInboundProfiles().isEmpty()) return null;
+        if (api.getInboundProfiles() == null) return Collections.emptyMap();
+        if (api.getInboundProfiles().isEmpty()) return Collections.emptyMap();
         if (api.getInboundProfiles().size() == 1) {
             InboundProfile defaultProfile = api.getInboundProfiles().get(DEFAULT);
             if (defaultProfile.getSecurityProfile().equals(DEFAULT)
-                    && defaultProfile.getCorsProfile().equals(DEFAULT)) return null;
+                && defaultProfile.getCorsProfile().equals(DEFAULT)) return Collections.emptyMap();
         }
         return api.getInboundProfiles();
     }
@@ -151,8 +147,8 @@ public class APIConfig {
 
 
     public List<CaCert> getCaCerts() {
-        if (api.getCaCerts() == null) return null;
-        if (api.getCaCerts().size() == 0) return null;
+        if (api.getCaCerts() == null) return Collections.emptyList();
+        if (api.getCaCerts().isEmpty()) return Collections.emptyList();
         return api.getCaCerts();
     }
 

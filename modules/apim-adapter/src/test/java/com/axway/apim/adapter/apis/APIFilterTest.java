@@ -30,11 +30,10 @@ public class APIFilterTest extends WiremockWrapper {
     public void init() {
         try {
             super.initWiremock();
-            CoreParameters coreParameters = new CoreParameters();
+            CoreParameters coreParameters = CoreParameters.getInstance();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            APIManagerAdapter.deleteInstance();
             apiManagerAdapter = APIManagerAdapter.getInstance();
         } catch (AppException e) {
             throw new RuntimeException(e);

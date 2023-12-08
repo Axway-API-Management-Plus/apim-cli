@@ -57,11 +57,13 @@ public class APIManagerAPIAccessAdapter {
     private final Map<Type, Cache<String, String>> caches = new EnumMap<>(Type.class);
     private static final HttpHelper httpHelper = new HttpHelper();
 
+    private final APIManagerAdapter apiManagerAdapter;
 
-    public APIManagerAPIAccessAdapter() {
+    public APIManagerAPIAccessAdapter(APIManagerAdapter apiManagerAdapter) {
+        this.apiManagerAdapter = apiManagerAdapter;
         cmd = CoreParameters.getInstance();
-        caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
-        caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
+        caches.put(Type.applications, apiManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
+        caches.put(Type.organizations, apiManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
     }
 
     Map<Type, Map<String, String>> apiManagerResponse = new EnumMap<>(Type.class);
@@ -111,7 +113,7 @@ public class APIManagerAPIAccessAdapter {
             });
             if (includeAPIName) {
                 for (APIAccess apiAccess : allApiAccess) {
-                    API api = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
+                    API api = APIManagerAdapter.getInstance().getApiAdapter().getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
                     if (api == null) {
                         throw new AppException("Unable to find API with ID: " + apiAccess.getApiId() + " referenced by " + type.niceName + ": " + entity.getName() + ". You may try again with -clearCache", ErrorCode.UNKNOWN_API);
                     }
@@ -151,19 +153,48 @@ public class APIManagerAPIAccessAdapter {
     }
 
     public void saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
-        List<APIAccess> existingAPIAccess = getAPIAccess(entity, type);
+        List<APIAccess> existingAPIAccess = getAPIAccess(entity, type, true);
         List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
         List<APIAccess> toBeAddedAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
         for (APIAccess access : toBeRemovedAccesses) {
+            populateApiId(access);
             deleteAPIAccess(access, entity, type);
         }
         for (APIAccess access : toBeAddedAccesses) {
+            populateApiId(access);
             createAPIAccess(access, entity, type);
         }
     }
 
+    public void populateApiId(APIAccess apiAccess) throws AppException {
+
+        if (apiAccess.getApiId() == null) {
+            LOG.debug("fetching Frontend Api id from API manager");
+            APIManagerAPIAdapter apiAdapter = apiManagerAdapter.getApiAdapter();
+            APIFilter apiFilter = new APIFilter.Builder().hasName(apiAccess.getApiName()).hasState(apiAccess.getState())
+                .build();
+            List<API> apis = apiAdapter.getAPIs(apiFilter);
+            if (apis.size() > 1) {
+                LOG.info("More than one version of Api available : {}", apis);
+                LOG.info("API will be matched based on  API Version, If version is not available in config file, first api will be selected");
+            }
+            if (apiAccess.getApiVersion() == null) {
+                apiAccess.setApiId(apis.get(0).getId());
+                return;
+            }
+            for (API api : apis) {
+                if (api.getVersion().equals(apiAccess.getApiVersion())) {
+                    LOG.debug("Setting Front end API id : {} to API Access", api.getApiId());
+                    apiAccess.setApiId(api.getId());
+                    return;
+                }
+            }
+            throw new AppException("Unable to find API", ErrorCode.UNKNOWN_API);
+        }
+    }
+
     public void createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
-        List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
+        List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type, true);
         if (existingAPIAccess != null && existingAPIAccess.contains(apiAccess)) {
             apiAccess.setId(existingAPIAccess.get(0).getId());
             return;
@@ -211,11 +242,6 @@ public class APIManagerAPIAccessAdapter {
     }
 
     public void deleteAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
-        List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
-        // Nothing to delete
-        if (existingAPIAccess != null && !existingAPIAccess.contains(apiAccess)) {
-            return;
-        }
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis/" + apiAccess.getId()).build();
             // Use an admin account for this request
@@ -250,7 +276,7 @@ public class APIManagerAPIAccessAdapter {
         }
     }
 
-    private List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) {
+    public List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) {
         List<APIAccess> missingAccess = new ArrayList<>();
         if (otherApiAccess == null) otherApiAccess = new ArrayList<>();
         if (apiAccess == null) apiAccess = new ArrayList<>();

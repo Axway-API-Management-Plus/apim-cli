@@ -17,40 +17,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DeleteOrgHandler extends OrgResultHandler {
-	private static final Logger LOG = LoggerFactory.getLogger(DeleteOrgHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeleteOrgHandler.class);
 
 
-	public DeleteOrgHandler(OrgExportParams params, ExportResult result) {
-		super(params, result);
-	}
+    public DeleteOrgHandler(OrgExportParams params, ExportResult result) {
+        super(params, result);
+    }
 
-	@Override
-	public void export(List<Organization> orgs) throws AppException {
-		Console.println(orgs.size() + " selected for deletion.");
-		if(CoreParameters.getInstance().isForce()) {
-			Console.println("Force flag given to delete: "+orgs.size()+" Organization(s)");
-		} else {
-			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			} else {
-				Console.println("Canceled.");
-				return;
-			}
-		}
-		Console.println("Okay, going to delete: " + orgs.size() + " Organization(s)");
-		for(Organization org : orgs) {
-			try {
-				APIManagerAdapter.getInstance().orgAdapter.deleteOrganization(org);
-			} catch(Exception e) {
-				result.setError(ErrorCode.ERR_DELETING_ORG);
-				LOG.error("Error deleting Organization: {}" , org.getName());
-			}
-		}
-		Console.println("Done!");
-	}
+    @Override
+    public void export(List<Organization> orgs) throws AppException {
+        Console.println(orgs.size() + " selected for deletion.");
+        if (CoreParameters.getInstance().isForce()) {
+            Console.println("Force flag given to delete: " + orgs.size() + " Organization(s)");
+        } else {
+            if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+                Console.println("Okay, going to delete: " + orgs.size() + " Organization(s)");
+            } else {
+                Console.println("Canceled.");
+                return;
+            }
+        }
+        for (Organization org : orgs) {
+            try {
+                APIManagerAdapter.getInstance().getOrgAdapter().deleteOrganization(org);
+            } catch (Exception e) {
+                result.setError(ErrorCode.ERR_DELETING_ORG);
+                LOG.error("Error deleting Organization: {}", org.getName());
+            }
+        }
+        Console.println("Done!");
+    }
 
-	@Override
-	public OrgFilter getFilter() {
-		Builder builder = getBaseOrgFilterBuilder();
-		return builder.build();
-	}
+    @Override
+    public OrgFilter getFilter() {
+        Builder builder = getBaseOrgFilterBuilder();
+        return builder.build();
+    }
 }

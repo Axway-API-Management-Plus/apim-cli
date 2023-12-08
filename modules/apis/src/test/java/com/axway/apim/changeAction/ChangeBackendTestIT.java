@@ -28,7 +28,7 @@ public class ChangeBackendTestIT extends TestNGCitrusTestRunner {
 
         description("This test imports an API including quota, subscription and granted access to some org the it changes the backend URL of it and validates it.");
 
-        variable("useApiAdmin", "true");
+        createVariable("useApiAdmin", "true");
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/change-backend-${apiNumber}");
         variable("apiName", "Change-Backend-${apiNumber}");

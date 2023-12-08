@@ -57,7 +57,7 @@ public class StandardExportParams extends CoreParameters {
         this.outputFormat = outputFormat;
     }
 
-    public Boolean isDeleteTarget() {
+    public boolean isDeleteTarget() {
         if (deleteTarget == null) return false;
         return deleteTarget;
     }

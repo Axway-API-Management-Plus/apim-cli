@@ -71,7 +71,7 @@ public class APIQuota {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) return false;
+        if (other == null && this.getRestrictions().isEmpty()) return true;
         if (other instanceof APIQuota) {
             APIQuota apiQuota = (APIQuota) other;
             return Utils.compareValues(apiQuota.getRestrictions(), this.getRestrictions());

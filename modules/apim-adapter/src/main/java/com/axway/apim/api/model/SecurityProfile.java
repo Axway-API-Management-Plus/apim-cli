@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.axway.apim.lib.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 
 public class SecurityProfile {
@@ -44,10 +45,10 @@ public class SecurityProfile {
     @Override
     public String toString() {
         return "SecurityProfile{" +
-                "name='" + name + '\'' +
-                ", isDefault=" + isDefault +
-                ", devices=" + devices +
-                '}';
+            "name='" + name + '\'' +
+            ", isDefault=" + isDefault +
+            ", devices=" + devices +
+            '}';
     }
 
     @Override
@@ -56,9 +57,9 @@ public class SecurityProfile {
         if (other instanceof SecurityProfile) {
             SecurityProfile securityProfile = (SecurityProfile) other;
             return
-                    StringUtils.equals(securityProfile.getName(), this.getName()) &&
-                            securityProfile.getIsDefault() == this.getIsDefault() &&
-                            securityProfile.getDevices().equals(this.getDevices());
+                StringUtils.equals(securityProfile.getName(), this.getName()) &&
+                    securityProfile.getIsDefault() == this.getIsDefault() &&
+                    Utils.compareValues(securityProfile.getDevices(), this.getDevices());
         } else {
             return false;
         }

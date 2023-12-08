@@ -9,6 +9,7 @@ import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.lib.ExportUser;
 import com.axway.apim.users.lib.params.UserExportParams;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -18,7 +19,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonUserExporter extends UserResultHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(JsonUserExporter.class);
 
     public JsonUserExporter(UserExportParams params, ExportResult result) {
         super(params, result);
@@ -49,12 +52,7 @@ public class JsonUserExporter extends UserResultHandler {
             LOG.info("Going to export users into folder: {}", localFolder);
             if (localFolder.exists()) {
                 if (UserExportParams.getInstance().isDeleteTarget()) {
-                    LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-                    try {
-                        FileUtils.deleteDirectory(localFolder);
-                    } catch (IOException e) {
-                        throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-                    }
+                    Utils.deleteDirectory(localFolder);
                 } else {
                     LOG.warn("Local export folder: {} already exists. User will not be exported. (You may set -deleteTarget)", localFolder);
                     this.hasError = true;
@@ -79,6 +77,14 @@ public class JsonUserExporter extends UserResultHandler {
             .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
         mapper.setFilterProvider(filters);
         mapper.setSerializationInclusion(Include.NON_NULL);
+        writeContent(mapper, user, configFile, localFolder);
+        if (user.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            writeBytesToFile(user.getImage().getImageContent(), localFolder + File.separator + user.getImage().getBaseFilename());
+        }
+        LOG.info("Successfully exported user into folder: {}", localFolder);
+    }
+
+    public void writeContent(ObjectMapper mapper, ExportUser user, String configFile, File localFolder) throws AppException {
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
@@ -90,10 +96,6 @@ public class JsonUserExporter extends UserResultHandler {
         } catch (Exception e) {
             throw new AppException("Can't write configuration file for user: '" + user.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }
-        if (user.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-            writeBytesToFile(user.getImage().getImageContent(), localFolder + File.separator + user.getImage().getBaseFilename());
-        }
-        LOG.info("Successfully exported user into folder: {}", localFolder);
     }
 
     private String getExportFolder(ExportUser user) {

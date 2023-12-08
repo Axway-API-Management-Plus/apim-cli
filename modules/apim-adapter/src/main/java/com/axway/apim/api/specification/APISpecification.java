@@ -16,21 +16,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public abstract class APISpecification {
-    private final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
+    public static final String JSON = ".json";
+    public static final String YAML = ".yaml";
+    public static final String METADATA = "$metadata";
+
 
     public enum APISpecType {
-        SWAGGER_API_1x("Swagger 1.x", ".json"),
-        SWAGGER_API_1x_YAML("Swagger 1.x (YAML)", ".yaml"),
-        SWAGGER_API_20("Swagger 2.0", ".json"),
-        SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
-        OPEN_API_30("Open API 3.0", ".json"),
-        OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
+        SWAGGER_API_1X("Swagger 1.x", JSON),
+        SWAGGER_API_1X_YAML("Swagger 1.x (YAML)", YAML),
+        SWAGGER_API_20("Swagger 2.0", JSON),
+        SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", YAML),
+        OPEN_API_30("Open API 3.0", JSON),
+        OPEN_API_30_YAML("Open API 3.0 (YAML)", YAML),
         WSDL_API("WSDL", ".xml"),
         WADL_API("Web Application Description Language (WADL)", ".wadl"),
-        ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", "$metadata", "Given OData specification is converted into an OpenAPI 3 specification.",
+        ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", METADATA, "Given OData specification is converted into an OpenAPI 3 specification.",
             "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
-        ODATA_V3("OData V4", "$metadata"),
-        ODATA_V4("OData V4", "$metadata"),
+        ODATA_V3("OData V4", METADATA),
+        ODATA_V4("OData V4", METADATA),
+        GRAPHQL("Graphql", ".graphqls"),
         UNKNOWN("Unknown", ".txt");
 
         final String niceName;
@@ -95,11 +100,11 @@ public abstract class APISpecification {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof ODataSpecification) {
                 ODataSpecification importSpec = (ODataSpecification) other;
-                OAS3xSpecification specFromGateway = (OAS3xSpecification) this;
+                OAS3xSpecification specFromGateway = (OAS3xSpecification) this; // Gateway stores as openapi
                 return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
             } else if (other instanceof Swagger1xSpecification) {
                 return compareJSON(otherSwagger, this);
-            } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
+            } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification || other instanceof GraphqlSpecification) {
                 return compareString(otherSwagger.apiSpecificationContent, apiSpecificationContent);
             } else {
                 LOG.info("Unhandled specification : {}", other.getClass().getName());
@@ -121,12 +126,9 @@ public abstract class APISpecification {
 
     public abstract APISpecType getAPIDefinitionType() throws AppException;
 
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
-        this.apiSpecificationContent = apiSpecificationContent;
-        return true;
-    }
+    public abstract boolean parse(byte[] apiSpecificationContent) throws AppException;
 
-    protected void setMapperForDataFormat() throws AppException {
+    protected void setMapperForDataFormat() {
         try {
             JsonFactory jsonFactory = new JsonFactory();
             mapper = new ObjectMapper(jsonFactory);
@@ -153,8 +155,10 @@ public abstract class APISpecification {
             boolean rc = swaggerFromImport.equals(swaggerFromGateway);
             if (!rc) {
                 LOG.info("Detected API-Definition-File sizes: API-Manager: {} vs Import: {}", gatewayApiSpecification.apiSpecificationContent.length, apiSpecification.apiSpecificationContent.length);
-                LOG.debug("Specification from Gateway : {}", new String(gatewayApiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
-                LOG.debug("Specification from Source : {}", new String(apiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Specification from Gateway : {}", new String(gatewayApiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                    LOG.debug("Specification from Source : {}", new String(apiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                }
             }
             return rc;
         } catch (IOException e) {

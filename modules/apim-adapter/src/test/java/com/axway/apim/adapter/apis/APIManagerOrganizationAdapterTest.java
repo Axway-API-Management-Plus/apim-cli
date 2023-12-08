@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
+    private APIManagerOrganizationAdapter organizationAdapter;
     private APIManagerAdapter apiManagerAdapter;
     String orgName = "orga";
 
@@ -20,12 +21,12 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
     public void init() {
         try {
             initWiremock();
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("apiadmin");
             coreParameters.setPassword(Utils.getEncryptedPassword());
             apiManagerAdapter = APIManagerAdapter.getInstance();
+            organizationAdapter = apiManagerAdapter.getOrgAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -34,23 +35,22 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     @AfterClass
     public void close() {
+        Utils.deleteInstance(apiManagerAdapter);
         super.close();
     }
 
 
     @Test
     public void getOrgForName() throws AppException {
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
-        Organization organization = apiManagerOrganizationAdapter.getOrgForName(orgName);
+        Organization organization = organizationAdapter.getOrgForName(orgName);
         Assert.assertEquals(organization.getName(), orgName);
     }
 
     @Test
     public void deleteOrganization() throws AppException {
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
-        Organization organization = apiManagerOrganizationAdapter.getOrgForName(orgName);
+        Organization organization = organizationAdapter.getOrgForName(orgName);
         try {
-            apiManagerOrganizationAdapter.deleteOrganization(organization);
+            organizationAdapter.deleteOrganization(organization);
         } catch (AppException appException) {
             Assert.fail("unable to delete organization", appException);
         }
@@ -58,59 +58,46 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     @Test
     public void createOrganization() {
-
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         Organization organization = new Organization();
         organization.setName(orgName);
         organization.setDevelopment(true);
         organization.setEmail("orga@axway.com");
         try {
-            apiManagerOrganizationAdapter.createOrganization(organization);
+            organizationAdapter.createOrganization(organization);
         } catch (AppException appException) {
             Assert.fail("unable to Create organization", appException);
         }
     }
 
     @Test
-    public void updateOrganization() {
-
+    public void updateOrganization() throws AppException {
+        OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
+        Organization organization = organizationAdapter.getOrg(orgFilter);
+        Organization updateOrganization = organizationAdapter.getOrg(orgFilter);
+        organization.setImageUrl("com/axway/apim/images/API-Logo.jpg");
+        organizationAdapter.createOrUpdateOrganization(updateOrganization, organization);
     }
 
-    //    @Test
-//    public void updateUserCreateNewUserFlow() throws AppException {
-//        setupParameters();
-//        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//        User user = new User();
-//        user.setEmail("updated@axway.com");
-//        user.setName("usera");
-//        user.setLoginName("usera");
-//        User newUser = apiManagerUserAdapter.updateUser(user, null);
-//        Assert.assertEquals(newUser.getEmail(), "updated@axway.com");
-//    }
-//
-//    @Test
-//    public void changePassword() throws AppException {
-//        setupParameters();
-//        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//        APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//        UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
-//        User user = apiManagerUserAdapter.getUser(userFilter);
-//        try {
-//            apiManagerUserAdapter.changePassword(Utils.getEncryptedPassword(), user);
-//        } catch (AppException appException) {
-//            Assert.fail("unable to change user password", appException);
-//        }
-//    }
-//
+
+
+
+    @Test
+    public void addAPIAccess() throws AppException {
+        OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
+        Organization organization = organizationAdapter.getOrg(orgFilter);
+        organizationAdapter.addAPIAccess(organization, true);
+       Assert.assertEquals( organization.getApiAccess().size(), 1);
+    }
+
+
+
     @Test
     public void addImage() throws AppException {
-        APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
-        Organization organization = apiManagerOrganizationAdapter.getOrg(orgFilter);
-        organization.setImageUrl("https://axway.com/favicon.ico");
+        Organization organization = organizationAdapter.getOrg(orgFilter);
+        organization.setImageUrl("com/axway/apim/images/API-Logo.jpg");
         try {
-            apiManagerOrganizationAdapter.addImage(organization, true);
+            organizationAdapter.addImage(organization, true);
         } catch (Exception appException) {
             Assert.fail("unable to add Image", appException);
         }

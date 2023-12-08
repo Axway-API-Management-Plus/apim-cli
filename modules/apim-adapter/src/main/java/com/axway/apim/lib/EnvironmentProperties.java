@@ -1,6 +1,5 @@
 package com.axway.apim.lib;
 
-import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -20,19 +19,19 @@ import java.util.regex.Pattern;
 
 public class EnvironmentProperties implements Map<String, String> {
 
-    public static final boolean RETAIN_BACKEND_URL = Boolean.parseBoolean(System.getenv().getOrDefault("retain.backend.url","false"));
-    public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_console","false"));
-
+    public static final String FALSE = "false";
+    public static final boolean RETAIN_BACKEND_URL = Boolean.parseBoolean(System.getenv().getOrDefault("retain.backend.url", FALSE));
+    public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_console", FALSE));
+    public static final boolean CHECK_CATALOG = Boolean.parseBoolean(System.getenv().getOrDefault("check_catalog", FALSE));
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 
     private final String stage;
     private String swaggerPromoteHome;
-
     private Properties mainProperties = new Properties();
     private Properties stageProperties = new Properties();
     private final Properties systemProperties = System.getProperties();
 
-    public EnvironmentProperties(String stage) throws AppException {
+    public EnvironmentProperties(String stage) {
         this(stage, null);
     }
 
@@ -74,7 +73,7 @@ public class EnvironmentProperties implements Map<String, String> {
                 pathToUse = (stage == null) ? "env.properties" : "env." + stage + ".properties";
                 is = APIMHttpClient.class.getClassLoader().getResourceAsStream(pathToUse);
             }
-            if(is == null){
+            if (is == null) {
                 LOG.debug("Trying to load environment properties from file: {} ... not found.", pathToUse);
                 return props;
             }

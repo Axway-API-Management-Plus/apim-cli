@@ -23,12 +23,11 @@ public class APIManagerQuotaAdapterTest extends WiremockWrapper {
     public void initWiremock() {
         super.initWiremock();
         try {
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("test");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerQuotaAdapter = APIManagerAdapter.getInstance().quotaAdapter;
+            apiManagerQuotaAdapter = APIManagerAdapter.getInstance().getQuotaAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -42,8 +41,6 @@ public class APIManagerQuotaAdapterTest extends WiremockWrapper {
     @Test
     public void saveQuota() throws AppException {
         APIQuota applicationQuota = apiManagerQuotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), null, false, false); // Get the Application-Default-Quota
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerQuotaAdapter apiManagerQuotaAdapter = apiManagerAdapter.quotaAdapter;
         try {
             apiManagerQuotaAdapter.saveQuota(applicationQuota, "00000000-0000-0000-0000-000000000001");
         } catch (AppException appException) {

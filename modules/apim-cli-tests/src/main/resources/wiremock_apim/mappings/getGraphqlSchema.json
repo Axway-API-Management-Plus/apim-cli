@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/graphql/starwars.graphqls"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "starwars.graphqls",
+    "headers": {
+      "Content-Type": "application/octet-stream"
+    }
+  }
+}

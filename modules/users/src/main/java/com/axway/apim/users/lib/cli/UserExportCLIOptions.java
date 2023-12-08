@@ -13,7 +13,7 @@ public class UserExportCLIOptions extends CLIOptions {
 	private UserExportCLIOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new UserExportCLIOptions(args);
 		cliOptions = new CLIUserFilterOptions(cliOptions);
@@ -25,8 +25,7 @@ public class UserExportCLIOptions extends CLIOptions {
 	}
 
 	@Override
-	public void addOptions() {
-
+	public void addOptions() { // implementation ignored
 	}
 
 	@Override
@@ -53,7 +52,7 @@ public class UserExportCLIOptions extends CLIOptions {
 	protected String getAppName() {
 		return "User-Management";
 	}
-	
+
 	@Override
 	public Parameters getParams() {
 		return new UserExportParams();

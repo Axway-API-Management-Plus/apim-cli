@@ -17,11 +17,10 @@ public class RollbackHandler {
     private final List<RollbackAction> rollbackActions;
 
     private RollbackHandler() {
-        super();
         rollbackActions = new ArrayList<>();
     }
 
-    public static RollbackHandler getInstance() {
+    public static synchronized RollbackHandler getInstance() {
         if (instance == null) {
             instance = new RollbackHandler();
         }
@@ -29,7 +28,7 @@ public class RollbackHandler {
     }
 
     public static synchronized void deleteInstance() {
-        RollbackHandler.instance = null;
+        instance = null;
     }
 
     public void addRollbackAction(RollbackAction action) {

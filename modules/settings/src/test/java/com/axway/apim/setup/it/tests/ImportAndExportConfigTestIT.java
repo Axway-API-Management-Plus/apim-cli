@@ -1,6 +1,7 @@
 package com.axway.apim.setup.it.tests;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.setup.it.ExportManagerConfigTestAction;
 import com.axway.apim.setup.it.ImportManagerConfigTestAction;
 import com.axway.apim.test.actions.TestParams;
@@ -53,7 +54,7 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner {
     @CitrusTest
     @Test
     @Parameters("context")
-    public void runUpdateConfiguration(@Optional @CitrusResource TestContext context) {
+    public void runUpdateConfiguration(@Optional @CitrusResource TestContext context) throws AppException {
         description("Update API-Configuration with custom config file");
         ImportManagerConfigTestAction configImport = new ImportManagerConfigTestAction(context);
         echo("####### Import configuration #######");
@@ -77,6 +78,7 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner {
         createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "apimanager-config.json");
         createVariable(TestParams.PARAM_EXPECTED_RC, "17");
         createVariable("useApiAdmin", "false"); // Use oadmin account
+        APIManagerAdapter.getInstance().deleteInstance();
         configImport.doExecute(context);
     }
 }

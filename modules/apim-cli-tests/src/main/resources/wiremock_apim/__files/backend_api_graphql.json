@@ -1,0 +1,24 @@
+{
+  "id": "24e302a8-630b-4dec-b378-e6a0e441872e",
+  "name": "graph",
+  "summary": "",
+  "description": "",
+  "version": "",
+  "basePath": "https://swapi-graphql.netlify.app/.netlify/functions/index",
+  "resourcePath": "/",
+  "models": {},
+  "consumes": [],
+  "produces": [],
+  "integral": true,
+  "createdOn": 1701453313780,
+  "createdBy": "f685545f-4f9d-4cf0-b1ac-7589e4eb7067",
+  "organizationId": "116c7ff9-f8d1-40de-bf17-ff095d416799",
+  "serviceType": "graphql",
+  "hasOriginalDefinition": true,
+  "importUrl": "https://swapi-graphql.netlify.app/.netlify/functions/index",
+  "properties": {
+    "ResourceUri": "https://swapi-graphql.netlify.app/.netlify/functions/index",
+    "ResourceIdentifier": "VD4BA7RRQO4QJJAOAQW2J23VGKSXCFMH",
+    "ResourceType": "graphql"
+  }
+}

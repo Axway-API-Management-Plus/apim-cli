@@ -13,76 +13,78 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.ClientApplication.ApplicationState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.Collections;
 
-@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "apis", "customProperties" })
+@JsonPropertyOrder({"name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "apis", "customProperties"})
 public class ExportApplication {
-	
-	ClientApplication clientApp;
 
-	public ExportApplication(ClientApplication clientApp) {
-		super();
-		this.clientApp = clientApp;
-	}
-	
-	public String getOrganization() {
-		return this.clientApp.getOrganization().getName();
-	}
+    ClientApplication clientApp;
 
-	public String getName() {
-		return clientApp.getName();
-	}
+    public ExportApplication(ClientApplication clientApp) {
+        super();
+        this.clientApp = clientApp;
+    }
 
-	public List<ClientAppCredential> getCredentials() {
-		if(clientApp.getCredentials()==null || clientApp.getCredentials().size()==0) return null;
-		return clientApp.getCredentials();
-	}
+    public String getOrganization() {
+        return this.clientApp.getOrganization().getName();
+    }
 
-	public String getDescription() {
-		return clientApp.getDescription();
-	}
+    public String getName() {
+        return clientApp.getName();
+    }
 
-	public String getEmail() {
-		return clientApp.getEmail();
-	}
+    public List<ClientAppCredential> getCredentials() {
+        if (clientApp.getCredentials() == null || clientApp.getCredentials().isEmpty()) return Collections.emptyList();
+        return clientApp.getCredentials();
+    }
 
-	public String getPhone() {
-		return clientApp.getPhone();
-	}
+    public String getDescription() {
+        return clientApp.getDescription();
+    }
 
-	public boolean isEnabled() {
-		return clientApp.isEnabled();
-	}
+    public String getEmail() {
+        return clientApp.getEmail();
+    }
 
-	public ApplicationState getState() {
-		return clientApp.getState();
-	}
+    public String getPhone() {
+        return clientApp.getPhone();
+    }
 
-	public Image getImage() {
-		return clientApp.getImage();
-	}
-	
-	public List<ApplicationPermission> getPermissions() {
-		return clientApp.getPermissions();
-	}
+    public boolean isEnabled() {
+        return clientApp.isEnabled();
+    }
 
-	public APIQuota getAppQuota() {
-		if(clientApp.getAppQuota()==null || clientApp.getAppQuota().getRestrictions()==null || clientApp.getAppQuota().getRestrictions().size()==0) return null;
-		return clientApp.getAppQuota();
-	}
-	
-	@JsonProperty("apis")
-	public List<APIAccess> getAPIAccess() {
-		if(clientApp.getApiAccess()==null || clientApp.getApiAccess().size()==0) return null;
-		return clientApp.getApiAccess();
-	}
+    public ApplicationState getState() {
+        return clientApp.getState();
+    }
 
-	public Map<String, String> getCustomProperties() {
-		return clientApp.getCustomProperties();
-	}
-	
-	@JsonProperty("appScopes")
-	public List<ClientAppOauthResource> getOauthResources() {
-		if(clientApp.getOauthResources()==null || clientApp.getOauthResources().size()==0) return null;
-		return clientApp.getOauthResources();
-	}
+    public Image getImage() {
+        return clientApp.getImage();
+    }
+
+    public List<ApplicationPermission> getPermissions() {
+        return clientApp.getPermissions();
+    }
+
+    public APIQuota getAppQuota() {
+        if (clientApp.getAppQuota() == null || clientApp.getAppQuota().getRestrictions() == null || clientApp.getAppQuota().getRestrictions().isEmpty())
+            return null;
+        return clientApp.getAppQuota();
+    }
+
+    @JsonProperty("apis")
+    public List<APIAccess> getAPIAccess() {
+        if (clientApp.getApiAccess() == null || clientApp.getApiAccess().isEmpty()) return Collections.emptyList();
+        return clientApp.getApiAccess();
+    }
+
+    public Map<String, String> getCustomProperties() {
+        return clientApp.getCustomProperties();
+    }
+
+    @JsonProperty("appScopes")
+    public List<ClientAppOauthResource> getOauthResources() {
+        if (clientApp.getOauthResources() == null || clientApp.getOauthResources().isEmpty()) return Collections.emptyList();
+        return clientApp.getOauthResources();
+    }
 }

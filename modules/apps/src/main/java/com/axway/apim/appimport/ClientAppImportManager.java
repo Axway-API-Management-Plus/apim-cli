@@ -6,6 +6,7 @@ import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public class ClientAppImportManager {
     private ClientApplication actualApp;
 
     public ClientAppImportManager() throws AppException {
-        this.apiMgrAppAdapter = APIManagerAdapter.getInstance().appAdapter;
+        this.apiMgrAppAdapter = APIManagerAdapter.getInstance().getAppAdapter();
     }
 
     public void replicate() throws AppException {
@@ -49,12 +50,16 @@ public class ClientAppImportManager {
         this.actualApp = actualApp;
     }
 
-    private static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
-        return
-            desiredApp.equals(actualApp) &&
-                (desiredApp.getApiAccess() == null || desiredApp.getApiAccess().equals(actualApp.getApiAccess())) &&
-                (desiredApp.getPermissions() == null || desiredApp.getPermissions().containsAll(actualApp.getPermissions())) &&
-                (desiredApp.getAppQuota() == null ||  desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
+    public static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
+        boolean application = desiredApp.equals(actualApp);
+        boolean apiAccess = (desiredApp.getApiAccess() == null || Utils.compareValues(desiredApp.getApiAccess(), actualApp.getApiAccess()));
+        boolean permission = (desiredApp.getPermissions() == null || Utils.compareValues(desiredApp.getPermissions(), actualApp.getPermissions()));
+        boolean quota = (desiredApp.getAppQuota() == null || desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
+        LOG.debug("apps Not changed: {}", application);
+        LOG.debug("api access Not changed: {}", apiAccess);
+        LOG.debug("Permission Not changed: {}", permission);
+        LOG.debug("Quota Not changed: {}", quota);
+        return application && apiAccess && permission && quota;
     }
 
     private void copyAppCreatedByPermission(ClientApplication desiredApp, ClientApplication actualApp) {

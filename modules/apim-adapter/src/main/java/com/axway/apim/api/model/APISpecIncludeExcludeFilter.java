@@ -1,21 +1,17 @@
 package com.axway.apim.api.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class APISpecIncludeExcludeFilter {
-	
+
 	private Map<String, List<String>> pathMap;
-	
+
 	private List<String> paths = new ArrayList<>();
-	
+
 	private List<String> tags = new ArrayList<>();
-	
+
 	private List<String> models = new ArrayList<>();
-	
+
 	public List<String> getPaths() {
 		return paths;
 	}
@@ -39,17 +35,14 @@ public class APISpecIncludeExcludeFilter {
 	public void setModels(List<String> models) {
 		this.models = models;
 	}
-	
+
 	public List<String> getHttpMethods(String path, boolean includeWildcard) {
 		if(pathMap==null) {
 			pathMap = new HashMap<>();
 			for(String pathAndMethod : paths) {
 				String p = pathAndMethod.split(":")[0];
 				String v = pathAndMethod.split(":")[1];
-				List<String> verbs = pathMap.get(p);
-				if(verbs == null) {
-					verbs = new ArrayList<>();
-				}
+				List<String> verbs = pathMap.getOrDefault(p, new ArrayList<>());
 				verbs.add(v.toLowerCase());
 				pathMap.put(p, verbs);
 			}
@@ -59,10 +52,10 @@ public class APISpecIncludeExcludeFilter {
 		} else if(includeWildcard && pathMap.containsKey("*")) {
 			return pathMap.get("*");
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 	}
-	
+
 	public boolean filter(String path, String httpMethod, List<String> tags, boolean useWildcard, boolean pathAndTags) {
 		List<String> httpMethods4Path = getHttpMethods(path, useWildcard);
 		// If filter has both configured check them in combination
@@ -71,7 +64,7 @@ public class APISpecIncludeExcludeFilter {
 			return (httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*")) && containsTags(tags);
 		}
 		if(pathAndTags) return false;
-		// 
+		//
 		if(pathMap!=null && !pathMap.isEmpty()) {
 			if(httpMethods4Path==null) return false;
 			return httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*");
@@ -90,7 +83,7 @@ public class APISpecIncludeExcludeFilter {
 	public void addPath(String[] pathAndVerbs) {
 		this.paths.addAll(Arrays.asList(pathAndVerbs));
 	}
-	
+
 	/**
 	 * This method is used for tests only
 	 * @param tags a list of tags to include or exclude
@@ -98,7 +91,7 @@ public class APISpecIncludeExcludeFilter {
 	public void addTag(String[] tags) {
 		this.tags.addAll(Arrays.asList(tags));
 	}
-	
+
 	/**
 	 * This method is used for tests only
 	 * @param models a list of models to include or exclude
@@ -106,7 +99,7 @@ public class APISpecIncludeExcludeFilter {
 	public void addModel(String[] models) {
 		this.models.addAll(Arrays.asList(models));
 	}
-	
+
 	private boolean containsTags(List<String> tags) {
 		for(String tag : tags) {
 			if(this.tags.contains(tag)) return true;

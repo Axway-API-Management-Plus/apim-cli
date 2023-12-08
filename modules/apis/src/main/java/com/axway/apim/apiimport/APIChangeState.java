@@ -1,21 +1,19 @@
 package com.axway.apim.apiimport;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-import com.axway.apim.lib.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is key, as the desired and actual API comes together.
@@ -39,8 +37,8 @@ public class APIChangeState {
     private boolean updateExistingAPI = true;
     private boolean recreateAPI = false;
     private boolean proxyUpdateRequired = false;
-    private final List<String> breakingChanges = new Vector<>();
-    private final List<String> nonBreakingChanges = new Vector<>();
+    private final List<String> breakingChanges = new ArrayList<>();
+    private final List<String> nonBreakingChanges = new ArrayList<>();
 
 
     /**
@@ -53,10 +51,6 @@ public class APIChangeState {
     public APIChangeState(API actualAPI, API desiredAPI) throws AppException {
         this.actualAPI = actualAPI;
         this.desiredAPI = desiredAPI;
-        if (actualAPI == null) { // No existing API found, just create a new one and that's all
-            LOG.debug("No existing API found. Creating  complete new API");
-            return;
-        }
         getChanges();
     }
 
@@ -69,8 +63,10 @@ public class APIChangeState {
      * actual API.
      */
     private void getChanges() throws AppException {
-        if (actualAPI == null) {
-            return; //Nothing to do, as we don't have an existing API
+        APIManagerAdapter.getInstance().getPoliciesAdapter().updateSecurityProfiles(desiredAPI);
+        if (actualAPI == null) { // No existing API found, just create a new one and that's all
+            LOG.debug("No existing API found. Creating  complete new API");
+            return;
         }
         if (!desiredAPI.getOrganization().equals(actualAPI.getOrganization()) && !APIImportParams.getInstance().isChangeOrganization()) {
             LOG.debug("You may set the toggle: changeOrganization=true to allow to changing the organization of an existing API.");
@@ -91,11 +87,11 @@ public class APIChangeState {
                     Object actualValue = method2.invoke(actualAPI, null);
                     if (desiredValue == null && actualValue == null) continue;
                     if (desiredValue == null) {
-                        LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), desiredValue, actualValue);
+                        LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), null, actualValue);
                         continue; // No change, if nothing is provided!
                     }
                     // desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
-                    if ((desiredValue != null && actualValue == null) || !(Utils.compareValues(actualValue, desiredValue))) {
+                    if (actualValue == null || !Utils.compareValues(actualValue, desiredValue)) {
                         APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
                         // Property change requires proxy update
                         if (property.copyProp()) this.proxyUpdateRequired = true;
@@ -144,8 +140,8 @@ public class APIChangeState {
         Field field;
         Class clazz = (sourceAPI.getClass().equals(API.class)) ? sourceAPI.getClass() : sourceAPI.getClass().getSuperclass();
         boolean hasProperyCopied = false;
-        if (propsToCopy.size() != 0) {
-            String message = "Updating Frontend-API (Proxy) for the following properties: ";
+        if (!propsToCopy.isEmpty()) {
+            StringBuilder message = new StringBuilder("Updating Frontend-API (Proxy) for the following properties: ");
             for (String fieldName : propsToCopy) {
                 try {
                     field = clazz.getDeclaredField(fieldName);
@@ -159,7 +155,7 @@ public class APIChangeState {
                         if (desiredObject == null) continue;
                         Method setMethod = targetAPI.getClass().getMethod(setterMethodName, field.getType());
                         setMethod.invoke(targetAPI, desiredObject);
-                        message = message + fieldName + " ";
+                        message.append(fieldName).append(" ");
                         hasProperyCopied = true;
                     }
                 } catch (Exception e) {
@@ -168,7 +164,7 @@ public class APIChangeState {
             }
             if (logMessage) {
                 if (hasProperyCopied) {
-                    LOG.info(message);
+                    LOG.info("{}", message);
                 } else {
                     LOG.debug("API-Proxy requires no updates");
                 }
@@ -210,18 +206,12 @@ public class APIChangeState {
         return desiredAPI;
     }
 
-    /**
-     * @param desiredAPI overwrites the desired API.
-     */
-    public void setDesiredAPI(API desiredAPI) {
-        this.desiredAPI = desiredAPI;
-    }
 
     /**
      * @return true, if a breakingChange or a nonBreakingChange was found otherwise false.
      */
     public boolean hasAnyChanges() {
-        return this.breakingChanges.size() != 0 || this.nonBreakingChanges.size() != 0;
+        return !this.breakingChanges.isEmpty() || !this.nonBreakingChanges.isEmpty();
     }
 
     /**
@@ -295,19 +285,15 @@ public class APIChangeState {
 
 
     public boolean isAdminAccountNeeded() throws AppException {
-        boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()).getOadminSelfServiceEnabled();
+        boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
         if (orgAdminSelfServiceEnabled) return false;
-        if ((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) &&
-                (getActualAPI() == null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
-            return false;
-        } else {
-            return true;
-        }
+        return (!getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && !getDesiredAPI().getState().equals(API.STATE_DELETED)) ||
+                (getActualAPI() != null && !getActualAPI().getState().equals(API.STATE_UNPUBLISHED));
     }
 
     public String waiting4Approval() throws AppException {
         String isWaitingMsg = "";
-        if (isAdminAccountNeeded() && !APIManagerAdapter.hasAdminAccount()) {
+        if (isAdminAccountNeeded() && !APIManagerAdapter.getInstance().hasAdminAccount()) {
             isWaitingMsg = "Waiting for approval ... ";
         }
         return isWaitingMsg;

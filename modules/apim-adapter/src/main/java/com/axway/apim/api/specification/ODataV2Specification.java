@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ODataV2Specification extends ODataSpecification {
-    private final Logger LOG = LoggerFactory.getLogger(ODataV2Specification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ODataV2Specification.class);
+    public static final String ENTITY_SET = "EntitySet ";
+    public static final String UNEXPECTED_ERROR = "Unexpected error";
 
     Edm edm;
     @SuppressWarnings("rawtypes")
@@ -49,7 +51,7 @@ public class ODataV2Specification extends ODataSpecification {
 
     @Override
     public void updateBasePath(String basePath, String host) {
-
+        // not supported.
     }
 
     @Override
@@ -64,9 +66,9 @@ public class ODataV2Specification extends ODataSpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             edm = EntityProvider.readMetadata(new ByteArrayInputStream(apiSpecificationContent), false);
             this.openAPI = new OpenAPI();
             Info info = new Info();
@@ -132,14 +134,14 @@ public class ODataV2Specification extends ODataSpecification {
                 .addApiResponse("200", createResponse(
                     function.getReturnType().getType().getName(),
                     getSchemaForType(function.getReturnType().getType(), function.getReturnType().getMultiplicity())))
-                ._default(createResponse("Unexpected error"));
+                ._default(createResponse(UNEXPECTED_ERROR));
             operation.setResponses(responses);
         } catch (Exception e) {
             // Happens for instance, when the given returnType cannot be resolved
             LOG.error("Error setting response for function: {} Creating standard response.", function.getName(), e);
             ApiResponses responses = new ApiResponses()
                 .addApiResponse("200", createResponse(function.getName(), new StringSchema()))
-                ._default(createResponse("Unexpected error"));
+                ._default(createResponse(UNEXPECTED_ERROR));
             operation.setResponses(responses);
         }
         return pathItem;
@@ -190,7 +192,7 @@ public class ODataV2Specification extends ODataSpecification {
         List<String> navProperties = new ArrayList<>();
         List<String> structProperties = entityType.getPropertyNames();
 
-        if (entityType.getNavigationPropertyNames() != null && entityType.getNavigationPropertyNames().size() > 0) {
+        if (entityType.getNavigationPropertyNames() != null && !entityType.getNavigationPropertyNames().isEmpty()) {
             navProperties.addAll(entityType.getNavigationPropertyNames());
             operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: " + navProperties;
             operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
@@ -217,9 +219,9 @@ public class ODataV2Specification extends ODataSpecification {
         operation.addParametersItem(createParameter("$format", "Response format if supported by the backend service.", getSchemaAllowedValues(FormatValues.values())));
 
         responses = new ApiResponses()
-            .addApiResponse("200", createResponse("EntitySet " + entityName,
+            .addApiResponse("200", createResponse(ENTITY_SET + entityName,
                 getSchemaForType(entity.getEntityType(), (idPath) ? EdmMultiplicity.ONE : EdmMultiplicity.MANY)))
-            ._default(createResponse("Unexpected error"));
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.GET, operation);
         operation.setDescription(operationDescription);
@@ -235,8 +237,8 @@ public class ODataV2Specification extends ODataSpecification {
         operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to create", true));
 
         responses = new ApiResponses()
-            .addApiResponse("201", createResponse("EntitySet " + entityName))
-            ._default(createResponse("Unexpected error"));
+            .addApiResponse("201", createResponse(ENTITY_SET + entityName))
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.POST, operation);
 
@@ -249,8 +251,8 @@ public class ODataV2Specification extends ODataSpecification {
         operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to update", true));
 
         responses = new ApiResponses()
-            .addApiResponse("200", createResponse("EntitySet " + entityName))
-            ._default(createResponse("Unexpected error"));
+            .addApiResponse("200", createResponse(ENTITY_SET + entityName))
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.PATCH, operation);
 
@@ -262,8 +264,8 @@ public class ODataV2Specification extends ODataSpecification {
         operation.setDescription("Delete entity in EntitySet " + entityName);
 
         responses = new ApiResponses()
-            .addApiResponse("204", createResponse("EntitySet " + entityName + " successfully deleted"))
-            ._default(createResponse("Unexpected error"));
+            .addApiResponse("204", createResponse(ENTITY_SET + entityName + " successfully deleted"))
+            ._default(createResponse(UNEXPECTED_ERROR));
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.DELETE, operation);
 
@@ -416,6 +418,7 @@ public class ODataV2Specification extends ODataSpecification {
                 }
             }
         } catch (EdmException e) {
+            LOG.error("Error", e);
         }
     }
 
@@ -448,9 +451,9 @@ public class ODataV2Specification extends ODataSpecification {
             if (summary == null && longDescription == null && quickInfo == null) return null;
             String description = "";
             if (quickInfo != null) description = quickInfo;
-            if (!description.equals("") && summary != null) description += "<br />";
+            if (!description.isEmpty() && summary != null) description += "<br />";
             if (summary != null) description += summary;
-            if (!description.equals("") && longDescription != null) description += "<br />";
+            if (!description.isEmpty() && longDescription != null) description += "<br />";
             if (longDescription != null) description += longDescription;
             return description;
         } catch (EdmException e) {

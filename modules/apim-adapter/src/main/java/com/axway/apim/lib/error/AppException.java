@@ -36,7 +36,7 @@ public class AppException extends JsonProcessingException {
     }
 
     public ErrorCode getError() {
-        if (this.getCause() != null && this.getCause() instanceof AppException) {
+        if (this.getCause() instanceof AppException) {
             return ((AppException) this.getCause()).getError();
         } else {
             if (this.getCause() != null && this.getCause().getCause() != null && this.getCause().getCause() instanceof AppException) {
@@ -46,27 +46,27 @@ public class AppException extends JsonProcessingException {
         return error;
     }
 
-    public void logException(Logger LOG) {
+    public void logException(Logger logger) {
         if (error == ErrorCode.SUCCESS)
             return;
         Throwable cause = null;
-        if (error.getPrintStackTrace() || LOG.isDebugEnabled()) {
+        if (error.getPrintStackTrace().booleanValue() || logger.isDebugEnabled()) {
             cause = this;
         } else {
-            LOG.info("You may enable debug to get more details. See: https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.1.-Enable-Debug");
+            logger.info("You may enable debug to get more details. See: https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.1.-Enable-Debug");
         }
         switch (error.getLogLevel()) {
             case INFO:
-                LOG.info(getAllMessages(), cause);
+                logger.info(getAllMessages(), cause);
                 break;
             case WARN:
-                LOG.warn(getAllMessages(), cause);
+                logger.warn(getAllMessages(), cause);
                 break;
             case DEBUG:
-                LOG.debug(getAllMessages(), cause);
+                logger.debug(getAllMessages(), cause);
                 break;
             default:
-                LOG.error(getAllMessages(), cause);
+                logger.error(getAllMessages(), cause);
         }
     }
 
@@ -78,7 +78,7 @@ public class AppException extends JsonProcessingException {
         String message = getMessage();
         String secondMessageLocal = getSecondMessage();
 
-        if (this.getCause() != null && this.getCause() instanceof AppException) {
+        if (this.getCause() instanceof AppException) {
             message += "\n                                 | " + ((AppException) this.getCause()).getAllMessages();
         }
         if (secondMessageLocal != null) {

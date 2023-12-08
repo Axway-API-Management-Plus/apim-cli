@@ -95,7 +95,7 @@ public class APIManagerConfigAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error loading configuration from API-Manager. Response-Code: {} Got response: {}", statusCode, response);
-                    throw new AppException("Error loading configuration from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error loading configuration from API-Manager. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 apiManagerResponse.put(useAdmin, response);
             }
@@ -118,7 +118,7 @@ public class APIManagerConfigAdapter {
 
     public void updateConfiguration(Config desiredConfig) throws AppException {
         try {
-            if (!APIManagerAdapter.hasAdminAccount()) {
+            if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
                 throw new AppException("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
@@ -136,7 +136,7 @@ public class APIManagerConfigAdapter {
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Error updating API-Manager configuration. Response-Code: {} Got response: {}", statusCode, errorResponse);
-                    throw new AppException("Error updating API-Manager configuration. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error updating API-Manager configuration. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
         } catch (IOException | URISyntaxException e) {

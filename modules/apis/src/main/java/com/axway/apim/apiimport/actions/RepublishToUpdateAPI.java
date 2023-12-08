@@ -1,17 +1,16 @@
 package com.axway.apim.apiimport.actions;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.error.AppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RepublishToUpdateAPI {
 
@@ -50,6 +49,8 @@ public class RepublishToUpdateAPI {
         }
         APIStatusManager statusManager = new APIStatusManager();
         statusManager.update(actualAPI, API.STATE_UNPUBLISHED, true);
+        actualAPI.setClientOrganizations(new ArrayList<>()); // remove all client organizations
+        actualAPI.setApplications(new ArrayList<>()); // remove all consumer applications
         UpdateExistingAPI updateExistingAPI = new UpdateExistingAPI();
         updateExistingAPI.execute(changes);
         LOG.debug("Existing API successfully updated: {} (ID: {})", actualAPI.getName(), actualAPI.getId());

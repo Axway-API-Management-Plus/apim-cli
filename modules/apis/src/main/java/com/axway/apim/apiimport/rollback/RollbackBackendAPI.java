@@ -3,8 +3,10 @@ package com.axway.apim.apiimport.rollback;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,8 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
     @Override
     public void rollback() throws AppException {
         try {
-            APIManagerAdapter.getInstance().apiAdapter.deleteBackendAPI(rollbackAPI);
+            APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
+            apiAdapter.deleteBackendAPI(rollbackAPI);
             /*
              * API-Manager 7.7 creates unfortunately two APIs at the same time, when importing a backend-API
              * having both schemas: https & http.
@@ -43,15 +46,15 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
                         .hasName(rollbackAPI.getName().replace(" HTTPS", " HTTP"))
                         .isCreatedOnAfter((beAPICreatedOn).toString())
                         .build();
-                API existingBEAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(filter, false);
+                API existingBEAPI = apiAdapter.getAPI(filter, false);
                 if (existingBEAPI != null && existingBEAPI.getId() != null) {
                     existingBEAPI.setApiId(existingBEAPI.getId());
-                    APIManagerAdapter.getInstance().apiAdapter.deleteBackendAPI(existingBEAPI);
+                    apiAdapter.deleteBackendAPI(existingBEAPI);
                 }
             }
         } catch (Exception e) {
             LOG.error("Error while deleting BE-API with ID: {} to roll it back", rollbackAPI.getApiId(), e);
-            throw e;
+            throw new AppException("Rollback as Error while deleting BE-API", ErrorCode.UNXPECTED_ERROR);
         }
 
     }

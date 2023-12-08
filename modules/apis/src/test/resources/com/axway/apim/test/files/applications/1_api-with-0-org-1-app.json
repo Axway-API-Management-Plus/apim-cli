@@ -1,10 +1,12 @@
 {
-   "name":"${apiName}",
-   "path":"${apiPath}",
-   "state":"${state}",
-   "version":"1.0.1",
-   "organization":"API Development ${orgNumber}",
-   "applications":[
-      { "name":"${consumingTestAppName}" }
-   ]
+  "name": "${apiName}",
+  "path": "${apiPath}",
+  "state": "${state}",
+  "version": "1.0.1",
+  "organization": "API Development ${orgNumber}",
+  "applications": [
+    {
+      "name": "${consumingTestAppName}"
+    }
+  ]
 }

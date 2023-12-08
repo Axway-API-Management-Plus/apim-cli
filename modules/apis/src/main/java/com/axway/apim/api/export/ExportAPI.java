@@ -22,17 +22,15 @@ import java.util.*;
     "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class ExportAPI {
-    API actualAPIProxy = null;
+    public static final String DEFAULT = "_default";
+    API actualAPIProxy;
 
     public String getPath() {
         return this.actualAPIProxy.getPath();
     }
 
-    public ExportAPI() {
-    }
 
     public ExportAPI(API actualAPIProxy) {
-        super();
         this.actualAPIProxy = actualAPIProxy;
     }
 
@@ -42,21 +40,21 @@ public class ExportAPI {
     }
 
     public Map<String, OutboundProfile> getOutboundProfiles() {
-        if (this.actualAPIProxy.getOutboundProfiles() == null) return null;
-        if (this.actualAPIProxy.getOutboundProfiles().isEmpty()) return null;
+        if (this.actualAPIProxy.getOutboundProfiles() == null) return Collections.emptyMap();
+        if (this.actualAPIProxy.getOutboundProfiles().isEmpty()) return Collections.emptyMap();
         if (this.actualAPIProxy.getOutboundProfiles().size() == 1) {
-            OutboundProfile defaultProfile = this.actualAPIProxy.getOutboundProfiles().get("_default");
+            OutboundProfile defaultProfile = this.actualAPIProxy.getOutboundProfiles().get(DEFAULT);
             if (defaultProfile.getRouteType().equals("proxy")
-                && defaultProfile.getAuthenticationProfile().equals("_default")
+                && defaultProfile.getAuthenticationProfile().equals(DEFAULT)
                 && defaultProfile.getRequestPolicy() == null
                 && defaultProfile.getResponsePolicy() == null
                 && defaultProfile.getFaultHandlerPolicy() == null)
-                return null;
+                return Collections.emptyMap();
         }
         for (OutboundProfile profile : this.actualAPIProxy.getOutboundProfiles().values()) {
             profile.setApiId(null);
             // If the AuthenticationProfile is _default there is no need to export it, hence null is returned
-            if ("_default".equals(profile.getAuthenticationProfile())) {
+            if (DEFAULT.equals(profile.getAuthenticationProfile())) {
                 profile.setAuthenticationProfile(null);
             }
         }
@@ -64,12 +62,12 @@ public class ExportAPI {
     }
 
 
-    public List<SecurityProfile> getSecurityProfiles() throws AppException {
+    public List<SecurityProfile> getSecurityProfiles() {
         if (this.actualAPIProxy.getSecurityProfiles().size() == 1) {
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().isEmpty())
-                return null;
+                return Collections.emptyList();
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
-                return null;
+                return Collections.emptyList();
         }
         for (SecurityProfile profile : this.actualAPIProxy.getSecurityProfiles()) {
             for (SecurityDevice device : profile.getDevices()) {
@@ -92,10 +90,8 @@ public class ExportAPI {
 
 
     public List<AuthenticationProfile> getAuthenticationProfiles() {
-        if (this.actualAPIProxy.getAuthenticationProfiles().size() == 1) {
-            if (this.actualAPIProxy.getAuthenticationProfiles().get(0).getType() == AuthType.none)
-                return null;
-        }
+        if (this.actualAPIProxy.getAuthenticationProfiles().size() == 1 && this.actualAPIProxy.getAuthenticationProfiles().get(0).getType() == AuthType.none)
+            return Collections.emptyList();
         for (AuthenticationProfile profile : this.actualAPIProxy.getAuthenticationProfiles()) {
             if (profile.getType() == AuthType.oauth) {
                 String providerProfile = (String) profile.getParameters().get("providerProfile");
@@ -110,18 +106,18 @@ public class ExportAPI {
     }
 
     public Map<String, InboundProfile> getInboundProfiles() {
-        if (actualAPIProxy.getInboundProfiles() == null) return null;
-        if (actualAPIProxy.getInboundProfiles().isEmpty()) return null;
+        if (actualAPIProxy.getInboundProfiles() == null) return Collections.emptyMap();
+        if (actualAPIProxy.getInboundProfiles().isEmpty()) return Collections.emptyMap();
         return actualAPIProxy.getInboundProfiles();
     }
 
 
     public List<CorsProfile> getCorsProfiles() {
-        if (this.actualAPIProxy.getCorsProfiles() == null) return null;
-        if (this.actualAPIProxy.getCorsProfiles().isEmpty()) return null;
+        if (this.actualAPIProxy.getCorsProfiles() == null) return Collections.emptyList();
+        if (this.actualAPIProxy.getCorsProfiles().isEmpty()) return Collections.emptyList();
         if (this.actualAPIProxy.getCorsProfiles().size() == 1) {
             CorsProfile corsProfile = this.actualAPIProxy.getCorsProfiles().get(0);
-            if (corsProfile.equals(CorsProfile.getDefaultCorsProfile())) return null;
+            if (corsProfile.equals(CorsProfile.getDefaultCorsProfile())) return Collections.emptyList();
         }
         return this.actualAPIProxy.getCorsProfiles();
     }
@@ -143,8 +139,8 @@ public class ExportAPI {
 
 
     public TagMap getTags() {
-        if (this.actualAPIProxy.getTags() == null) return null;
-        if (this.actualAPIProxy.getTags().isEmpty()) return null;
+        if (this.actualAPIProxy.getTags() == null) return new TagMap();
+        if (this.actualAPIProxy.getTags().isEmpty()) return new TagMap();
         return this.actualAPIProxy.getTags();
     }
 
@@ -211,8 +207,8 @@ public class ExportAPI {
     }
 
     public Map<String, String> getCustomProperties() {
-        if (this.actualAPIProxy.getCustomProperties() == null || this.actualAPIProxy.getCustomProperties().size() == 0)
-            return null;
+        if (this.actualAPIProxy.getCustomProperties() == null || this.actualAPIProxy.getCustomProperties().isEmpty())
+            return Collections.emptyMap();
         Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
         boolean propertyFound = false;
         while (it.hasNext()) {
@@ -222,7 +218,7 @@ public class ExportAPI {
                 break;
             }
         }
-        if (!propertyFound) return null; // If no property is declared for this API return null
+        if (!propertyFound) return Collections.emptyMap(); // If no property is declared for this API return null
         return this.actualAPIProxy.getCustomProperties();
     }
 
@@ -248,8 +244,8 @@ public class ExportAPI {
 
 
     public List<CaCert> getCaCerts() {
-        if (this.actualAPIProxy.getCaCerts() == null) return null;
-        if (this.actualAPIProxy.getCaCerts().isEmpty()) return null;
+        if (this.actualAPIProxy.getCaCerts() == null) return Collections.emptyList();
+        if (this.actualAPIProxy.getCaCerts().isEmpty()) return Collections.emptyList();
         return this.actualAPIProxy.getCaCerts();
     }
 
@@ -267,7 +263,7 @@ public class ExportAPI {
         if (apiQuota == null || apiQuota.getRestrictions() == null) return apiQuota;
         for (QuotaRestriction restriction : apiQuota.getRestrictions()) {
             if ("*".equals(restriction.getMethod())) continue;
-            restriction.setMethod(APIManagerAdapter.getInstance().methodAdapter.getMethodForId(this.actualAPIProxy.getId(), restriction.getMethod()).getName());
+            restriction.setMethod(APIManagerAdapter.getInstance().getMethodAdapter().getMethodForId(this.actualAPIProxy.getId(), restriction.getMethod()).getName());
         }
         return apiQuota;
     }
@@ -278,11 +274,11 @@ public class ExportAPI {
     }
 
     public List<String> getClientOrganizations() throws AppException {
-        if (!APIManagerAdapter.hasAdminAccount()) return null;
-        if (this.actualAPIProxy.getClientOrganizations().isEmpty()) return null;
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return Collections.emptyList();
+        if (this.actualAPIProxy.getClientOrganizations().isEmpty()) return Collections.emptyList();
         if (this.actualAPIProxy.getClientOrganizations().size() == 1 &&
             this.actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization()))
-            return null;
+            return Collections.emptyList();
         List<String> orgs = new ArrayList<>();
         for (Organization org : this.actualAPIProxy.getClientOrganizations()) {
             orgs.add(org.getName());
@@ -291,7 +287,7 @@ public class ExportAPI {
     }
 
     public List<ClientApplication> getApplications() {
-        if (this.actualAPIProxy.getApplications().isEmpty()) return null;
+        if (this.actualAPIProxy.getApplications().isEmpty()) return Collections.emptyList();
         List<ClientApplication> exportApps = new ArrayList<>();
         for (ClientApplication app : this.actualAPIProxy.getApplications()) {
             ClientApplication exportApp = new ClientApplication();
@@ -329,7 +325,7 @@ public class ExportAPI {
     public String getBackendBasepath() {
         //ISSUE-299
         // Resource path is part of API specification (like open api servers.url or swagger basePath) and we don't need to manage it in config file.
-        String backendBasePath = this.getServiceProfiles().get("_default").getBasePath();
+        String backendBasePath = this.getServiceProfiles().get(DEFAULT).getBasePath();
         if (CoreParameters.getInstance().isOverrideSpecBasePath() && this.actualAPIProxy.getResourcePath() != null) { //Issue 354
             backendBasePath = backendBasePath + this.actualAPIProxy.getResourcePath();
         }
@@ -338,14 +334,14 @@ public class ExportAPI {
 
     public List<APIMethod> getApiMethods() {
         List<APIMethod> apiMethods = this.actualAPIProxy.getApiMethods();
-        if (apiMethods == null || apiMethods.isEmpty()) return null;
+        if (apiMethods == null || apiMethods.isEmpty()) return Collections.emptyList();
         List<APIMethod> apiMethodsTransformed = new ArrayList<>();
         for (APIMethod actualMethod : apiMethods) {
             APIMethod apiMethod = new APIMethod();
             apiMethod.setName(actualMethod.getName());
             apiMethod.setSummary(actualMethod.getSummary());
             TagMap tagMap = actualMethod.getTags();
-            if (tagMap != null && tagMap.size() > 0)
+            if (tagMap != null && !tagMap.isEmpty())
                 apiMethod.setTags(actualMethod.getTags());
             apiMethodsTransformed.add(apiMethod);
             String descriptionType = actualMethod.getDescriptionType();
@@ -358,6 +354,8 @@ public class ExportAPI {
                     break;
                 case "markdown":
                     apiMethod.setDescriptionMarkdown(actualMethod.getDescriptionMarkdown());
+                    break;
+                default:
                     break;
             }
             apiMethod.setDescriptionType(descriptionType);

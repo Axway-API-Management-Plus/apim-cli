@@ -22,8 +22,8 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 
     private boolean exportQuotas = true;
 
-    private String RemoteHostName;
-    private String RemoteHostId;
+    private String remoteHostName;
+    private String remoteHostId;
 
     public APIManagerSetupExportParams() {
         super();
@@ -33,40 +33,40 @@ public class APIManagerSetupExportParams extends StandardExportParams {
         return (APIManagerSetupExportParams) CoreParameters.getInstance();
     }
 
-    public Boolean isExportConfig() {
+    public boolean isExportConfig() {
         return exportConfig;
     }
 
-    public Boolean isExportAlerts() {
+    public boolean isExportAlerts() {
         return exportAlerts;
     }
 
-    public Boolean isExportRemoteHosts() {
+    public boolean isExportRemoteHosts() {
         return exportRemoteHosts;
     }
 
-    public Boolean isExportPolicies() {
+    public boolean isExportPolicies() {
         return exportPolicies;
     }
 
-    public Boolean isExportCustomProperties() {
+    public boolean isExportCustomProperties() {
         return exportCustomProperties;
     }
 
     public String getRemoteHostName() {
-        return RemoteHostName;
+        return remoteHostName;
     }
 
     public void setRemoteHostName(String remoteHostName) {
-        RemoteHostName = remoteHostName;
+        this.remoteHostName = remoteHostName;
     }
 
     public String getRemoteHostId() {
-        return RemoteHostId;
+        return remoteHostId;
     }
 
     public void setRemoteHostId(String remoteHostId) {
-        RemoteHostId = remoteHostId;
+        this.remoteHostId = remoteHostId;
     }
 
     public boolean isExportQuotas() {

@@ -13,20 +13,16 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class ClientAppImportManagerTest  extends WiremockWrapper {
+public class ClientAppImportManagerTest extends WiremockWrapper {
 
     @BeforeClass
     public void init() {
-        try {
-            initWiremock();
-            APIManagerAdapter.deleteInstance();
-            CoreParameters coreParameters = new CoreParameters();
-            coreParameters.setHostname("localhost");
-            coreParameters.setUsername("apiadmin");
-            coreParameters.setPassword(Utils.getEncryptedPassword());
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+        initWiremock();
+        CoreParameters coreParameters = new CoreParameters();
+        coreParameters.setHostname("localhost");
+        coreParameters.setUsername("apiadmin");
+        coreParameters.setPassword(Utils.getEncryptedPassword());
+
     }
 
     @AfterClass
@@ -34,9 +30,9 @@ public class ClientAppImportManagerTest  extends WiremockWrapper {
         super.close();
     }
 
-    @Test (expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "No changes detected between Desired- and Actual-App\\.")
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "No changes detected between Desired- and Actual-App\\.")
     public void replicateNoChangeApplication() throws JsonProcessingException {
-        String applicationRequest ="{\n" +
+        String applicationRequest = "{\n" +
             "  \"name\": \"TestApp\",\n" +
             "  \"organization\": \"orga\",\n" +
             "  \"state\": \"approved\",\n" +

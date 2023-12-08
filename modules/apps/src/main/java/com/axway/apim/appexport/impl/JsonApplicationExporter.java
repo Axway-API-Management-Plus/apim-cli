@@ -15,6 +15,7 @@ import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +34,7 @@ import java.util.List;
 public class JsonApplicationExporter extends ApplicationExporter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonApplicationExporter.class);
+    public static final String CREATED_BY = "createdBy";
 
 
     public JsonApplicationExporter(AppExportParams params, ExportResult result) {
@@ -58,12 +59,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
             LOG.info("Going to export applications into folder: {}", localFolder);
             if (localFolder.exists()) {
                 if (AppExportParams.getInstance().isDeleteTarget()) {
-                    LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-                    try {
-                        FileUtils.deleteDirectory(localFolder);
-                    } catch (IOException e) {
-                        throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-                    }
+                    Utils.deleteDirectory(localFolder);
                 } else {
                     LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
                     this.hasError = true;
@@ -87,14 +83,28 @@ public class JsonApplicationExporter extends ApplicationExporter {
         mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
 
         FilterProvider filter = new SimpleFilterProvider()
-            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", "createdBy", "createdOn", "enabled"))
+            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", CREATED_BY, "createdOn", "enabled"))
             .addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("api", "apiId")) // Is handled in ExportApplication
             .addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept("apiName", "apiVersion"))
-            .addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", "createdBy", "id"))
-            .addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", "createdBy"))
+            .addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", CREATED_BY, "id"))
+            .addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", CREATED_BY))
             .addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "uriprefix", "scopes", "enabled"));
         mapper.setFilterProvider(filter);
         mapper.setSerializationInclusion(Include.NON_NULL);
+        writeContent(app, mapper, localFolder, configFile);
+        if (app.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            writeBytesToFile(app.getImage().getImageContent(), localFolder + File.separator + app.getImage().getBaseFilename());
+        }
+        LOG.info("Successfully exported application to folder: {}", localFolder);
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
+            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+            LOG.warn("- No Quotas has been exported for the API");
+            LOG.warn("- No Client-Organizations");
+            LOG.warn("- Only subscribed applications from the Org-Admins organization");
+        }
+    }
+
+    public void writeContent(ExportApplication app, ObjectMapper mapper, File localFolder, String configFile) throws AppException {
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
@@ -106,18 +116,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
         } catch (Exception e) {
             throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }
-        if (app.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-            writeBytesToFile(app.getImage().getImageContent(), localFolder + File.separator + app.getImage().getBaseFilename());
-        }
-        LOG.info("Successfully exported application to folder: {}", localFolder);
-        if (!APIManagerAdapter.hasAdminAccount()) {
-            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
-            LOG.warn("- No Quotas has been exported for the API");
-            LOG.warn("- No Client-Organizations");
-            LOG.warn("- Only subscribed applications from the Org-Admins organization");
-        }
     }
-
     private String getExportFolder(ExportApplication app) {
         String appName = app.getName();
         appName = appName.replace(" ", "-");

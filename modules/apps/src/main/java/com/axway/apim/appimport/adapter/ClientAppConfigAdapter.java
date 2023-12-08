@@ -5,7 +5,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
@@ -34,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
@@ -59,7 +57,6 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
 
     @Override
     protected void readConfig() throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -68,14 +65,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
         File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
         List<ClientApplication> baseApps;
         // Try to read a list of applications
-        try {
-            // Check the config file is json
-            mapper.readTree(configFile);
-            LOG.debug("Handling JSON Configuration file: {}", configFile);
-        } catch (IOException ioException) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            LOG.debug("Handling Yaml Configuration file: {}", configFile);
-        }
+        ObjectMapper mapper = Utils.createObjectMapper(configFile);
         try {
             mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
             mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile)));
@@ -91,14 +81,9 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
             try {
                 LOG.debug("Error reading array of applications, hence trying to read single application now.");
                 ClientApplication app = mapper.readValue(Utils.substituteVariables(configFile), ClientApplication.class);
-                if (stageConfig != null) {
-                    try {
-                        ObjectReader updater = mapper.readerForUpdating(app);
-                        app = updater.readValue(Utils.substituteVariables(stageConfig));
-                    } catch (FileNotFoundException e) {
-                        LOG.warn("No config file found for stage: {}", stage);
-                    }
-                }
+                LOG.info("{}", app);
+                app = readClientApplication(mapper, app, stageConfig, stage);
+                LOG.info("{}", app);
                 this.apps = new ArrayList<>();
                 this.apps.add(app);
             } catch (Exception pe) {
@@ -156,7 +141,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
     }
 
     private void addAPIAccess(List<ClientApplication> apps, Result result) throws AppException {
-        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         for (ClientApplication app : apps) {
             if (app.getApiAccess() == null) continue;
             Iterator<APIAccess> it = app.getApiAccess().iterator();
@@ -191,7 +176,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
     }
 
     private void validateAppPermissions(List<ClientApplication> apps) throws AppException {
-        APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().userAdapter;
+        APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().getUserAdapter();
         for (ClientApplication app : apps) {
             if (app.getPermissions() == null || app.getPermissions().isEmpty()) continue;
             // First check, if there is an ALL User
@@ -228,5 +213,17 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
                 permission.setUser(user);
             }
         }
+    }
+
+    public ClientApplication readClientApplication(ObjectMapper mapper, ClientApplication app, File stageConfig, String stage){
+        if (stageConfig != null) {
+            try {
+                ObjectReader updater = mapper.readerForUpdating(app);
+                return updater.readValue(Utils.substituteVariables(stageConfig));
+            } catch (IOException e) {
+                LOG.warn("No config file found for stage: {}", stage);
+            }
+        }
+        return app;
     }
 }

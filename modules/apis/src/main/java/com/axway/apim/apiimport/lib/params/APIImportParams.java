@@ -6,66 +6,51 @@ import com.axway.apim.lib.StandardImportParams;
 
 public class APIImportParams extends StandardImportParams implements Parameters {
 
-    private Boolean forceUpdate;
-    private Boolean useFEAPIDefinition;
-    private Boolean validateRemoteHost;
-    private Boolean updateOnly = false;
-    private Boolean changeOrganization = false;
+    private boolean forceUpdate;
+    private boolean useFEAPIDefinition;
+    private boolean validateRemoteHost;
+    private boolean updateOnly = false;
+    private boolean changeOrganization = false;
+
+
     private String apiDefinition;
     public static synchronized APIImportParams getInstance() {
         return (APIImportParams) CoreParameters.getInstance();
     }
-
-    public Boolean isUseFEAPIDefinition() {
-        if (useFEAPIDefinition == null) return false;
+    public boolean isUseFEAPIDefinition() {
         return useFEAPIDefinition;
     }
-
-    public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {
-        if (useFEAPIDefinition == null) return;
+    public void setUseFEAPIDefinition(boolean useFEAPIDefinition) {
         this.useFEAPIDefinition = useFEAPIDefinition;
     }
-
-    public Boolean isForceUpdate() {
-        if (forceUpdate == null) return false;
+    public boolean isForceUpdate() {
         return forceUpdate;
     }
-
-    public void setForceUpdate(Boolean forceUpdate) {
-        if (forceUpdate == null) return;
+    public void setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
     }
-
-    public Boolean isValidateRemoteHost() {
+    public boolean isValidateRemoteHost() {
         return validateRemoteHost;
     }
-
-    public void setValidateRemoteHost(Boolean validateRemoteHost) {
+    public void setValidateRemoteHost(boolean validateRemoteHost) {
         this.validateRemoteHost = validateRemoteHost;
     }
-
     public String getApiDefinition() {
         return apiDefinition;
     }
-
     public void setApiDefinition(String apiDefinition) {
         this.apiDefinition = apiDefinition;
     }
-
     public Boolean isUpdateOnly() {
         return updateOnly;
     }
-
-    public void setUpdateOnly(Boolean updateOnly) {
+    public void setUpdateOnly(boolean updateOnly) {
         this.updateOnly = updateOnly;
     }
-
-    public Boolean isChangeOrganization() {
+    public boolean isChangeOrganization() {
         return changeOrganization;
     }
-
-    public void setChangeOrganization(Boolean changeOrganization) {
-        if (changeOrganization == null) return;
+    public void setChangeOrganization(boolean changeOrganization) {
         this.changeOrganization = changeOrganization;
     }
 }

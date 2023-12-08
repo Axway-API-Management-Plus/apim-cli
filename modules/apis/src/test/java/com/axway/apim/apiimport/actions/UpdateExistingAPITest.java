@@ -26,12 +26,12 @@ public class UpdateExistingAPITest  extends WiremockWrapper {
 
     @Test
     public void testUpdateExistingApi() throws AppException {
-        APIManagerAdapter.deleteInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
-        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        Organization organization = apiManagerAdapter.getOrgAdapter().getOrgForName("orga");
         UpdateExistingAPI updateExistingAPI = new UpdateExistingAPI();
         API actualAPI = new API();
         actualAPI.setName("petstore");
@@ -52,5 +52,6 @@ public class UpdateExistingAPITest  extends WiremockWrapper {
         desiredAPI.setState("unpublished");
         APIChangeState apiChangeState = new APIChangeState(actualAPI, desiredAPI);
         updateExistingAPI.execute(apiChangeState);
+        apiManagerAdapter.deleteInstance();
     }
 }

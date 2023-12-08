@@ -27,23 +27,28 @@ import java.util.List;
 
 public class CSVAPIExporter extends APIResultHandler {
     private static final Logger LOG = LoggerFactory.getLogger(CSVAPIExporter.class);
+    public static final String API_ID = "API ID";
+    public static final String API_NAME = "API Name";
+    public static final String API_PATH = "API Path";
+    public static final String API_VERSION = "API Version";
+    public static final String CREATED_ON = "Created on";
 
     DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private enum HeaderFields {
         standard(new String[]{
-                "API ID",
-                "API Name",
-                "API Path",
-                "API Version",
-                "Created on"
+            API_ID,
+            API_NAME,
+            API_PATH,
+            API_VERSION,
+            CREATED_ON
         }),
         wide(new String[]{
-                "API ID",
+            API_ID,
                 "API Organization",
-                "API Name",
-                "API Path",
-                "API Version",
+            API_NAME,
+            API_PATH,
+            API_VERSION,
                 "API V-Host",
                 "API State",
                 "Backend",
@@ -51,14 +56,14 @@ public class CSVAPIExporter extends APIResultHandler {
                 "Routing Policy",
                 "Response Policy",
                 "Fault-Handler Policy",
-                "Created on"
+            CREATED_ON
         }),
         ultra(new String[]{
-                "API ID",
+            API_ID,
                 "API Organization",
-                "API Name",
-                "API Path",
-                "API Version",
+            API_NAME,
+            API_PATH,
+            API_VERSION,
                 "API V-Host",
                 "API State",
                 "Backend",
@@ -72,13 +77,13 @@ public class CSVAPIExporter extends APIResultHandler {
                 "Granted Organization",
                 "Application Name",
                 "Application Organization",
-                "Created on"
+            CREATED_ON
         });
 
-        final String[] headerFields;
+        final String[] fields;
 
         HeaderFields(String[] headerFields) {
-            this.headerFields = headerFields;
+            this.fields = headerFields;
         }
     }
 
@@ -99,7 +104,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
             }
             try (FileWriter appendable = new FileWriter(target)) {
-                try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
+                try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.Builder.create().setHeader(HeaderFields.valueOf(wide.name()).fields).build())) {
                     writeRecords(csvPrinter, apis, wide);
                     LOG.info("API export successfully written to file: {}", target.getCanonicalPath());
                 }

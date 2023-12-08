@@ -50,7 +50,6 @@ public class ImportTestAction extends AbstractTestAction {
         String configFile = replaceDynamicContentInFile(origConfigFile, context, createTempFilename(origConfigFile));
         LOG.info("Using Replaced Swagger-File: " + apiDefinition);
         LOG.info("Using Replaced configFile-File: " + configFile);
-        LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${oadminUsername1}") + "'");
         int expectedReturnCode = 0;
         try {
             expectedReturnCode = Integer.parseInt(context.getVariable("expectedReturnCode"));
@@ -135,10 +134,14 @@ public class ImportTestAction extends AbstractTestAction {
             args.add("-h");
             args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
             args.add("-u");
-            if (useApiAdmin)
+            if (useApiAdmin) {
+                LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${apiManagerUser}") + "'");
                 args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
-            else
+            }
+            else {
+                LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${oadminUsername1}") + "'");
                 args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
+            }
             args.add("-p");
             if (useApiAdmin)
                 args.add(context.replaceDynamicContentInString("${apiManagerPass}"));

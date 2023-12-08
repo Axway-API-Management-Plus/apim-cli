@@ -29,12 +29,12 @@ public class DeleteAPIHandler extends APIResultHandler {
 			Console.println("Force flag given to delete: "+apis.size()+" API(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			} else {
+                Console.println("Okay, going to delete: " + apis.size() + " API(s)");
+            } else {
 				Console.println("Canceled.");
 				return;
 			}
 		}
-		Console.println("Okay, going to delete: " + apis.size() + " API(s)");
 		for(API api : apis) {
 			try {
 				statusManager.update(api, API.STATE_DELETED, true);

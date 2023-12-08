@@ -97,6 +97,7 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
         createVariable(TestParams.PARAM_EXPECTED_RC, "0");
         importApp.doExecute(context);
 
+
         echo("####### Validate application: '${appName}' has been imported now having access to two APIs #######");
         http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));
 

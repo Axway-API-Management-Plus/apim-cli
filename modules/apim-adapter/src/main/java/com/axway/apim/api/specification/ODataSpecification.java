@@ -21,7 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public abstract class ODataSpecification extends APISpecification {
-    private final Logger LOG = LoggerFactory.getLogger(ODataSpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ODataSpecification.class);
     protected OpenAPI openAPI;
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
@@ -31,7 +31,7 @@ public abstract class ODataSpecification extends APISpecification {
             try {
                 String backend = getBasePath(apiSpecificationFile);
                 Server server = new Server();
-                LOG.info("Set backend server: " + backend + " based on given Metadata URL");
+                LOG.info("Set backend server: {} based on given Metadata URL", backend);
                 server.setUrl(backend);
                 openAPI.addServersItem(server);
             } catch (MalformedURLException e) {
@@ -42,7 +42,7 @@ public abstract class ODataSpecification extends APISpecification {
             // Otherwise we are using the configured backendBasePath
             try {
                 URL url = new URL(backendBasePath); // Parse it to make sure it is valid
-                if (url.getPath() != null && !url.getPath().equals("") && !backendBasePath.endsWith("/")) { // See issue #178
+                if (url.getPath() != null && !url.getPath().isEmpty() && !backendBasePath.endsWith("/")) { // See issue #178
                     backendBasePath += "/";
                 }
                 Server server = new Server();
@@ -121,7 +121,8 @@ public abstract class ODataSpecification extends APISpecification {
                 return new BinarySchema();
             case "Boolean":
                 return new BooleanSchema();
+            default:
+                return null;
         }
-        return null;
     }
 }

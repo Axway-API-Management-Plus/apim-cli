@@ -18,7 +18,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Swagger2xSpecification extends APISpecification {
-    private final Logger LOG = LoggerFactory.getLogger(Swagger2xSpecification.class);
+    public static final String BASE_PATH = "basePath";
+    public static final String SCHEMES = "schemes";
+    private static final Logger LOG = LoggerFactory.getLogger(Swagger2xSpecification.class);
     private JsonNode swagger = null;
 
     public Swagger2xSpecification() {
@@ -51,11 +53,11 @@ public class Swagger2xSpecification extends APISpecification {
                 URL url = new URL(host);
                 String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
                 if (port.equals(":443") || port.equals(":80")) port = "";
-                ((ObjectNode) swagger).put("basePath", basePath);
+                ((ObjectNode) swagger).put(BASE_PATH, basePath);
                 ((ObjectNode) swagger).put("host", url.getHost() + port);
                 ArrayNode newSchemes = this.mapper.createArrayNode();
                 newSchemes.add(url.getProtocol());
-                ((ObjectNode) swagger).set("schemes", newSchemes);
+                ((ObjectNode) swagger).set(SCHEMES, newSchemes);
                 this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
             }
         } catch (JsonProcessingException e) {
@@ -99,29 +101,29 @@ public class Swagger2xSpecification extends APISpecification {
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
                     LOG.info("Used the backendBasePath: {} to adjust host the API-Specification.", backendBasePath);
                 }
-                if (swagger.get("schemes") == null) {
+                if (swagger.get(SCHEMES) == null) {
                     ArrayNode newSchemes = this.mapper.createArrayNode();
                     newSchemes.add(url.getProtocol());
                     LOG.debug("Adding protocol: {} to Swagger-Definition", url.getProtocol());
-                    ((ObjectNode) swagger).set("schemes", newSchemes);
+                    ((ObjectNode) swagger).set(SCHEMES, newSchemes);
                 }
-                if (swagger.get("basePath") == null) {
+                if (swagger.get(BASE_PATH) == null) {
                     LOG.info("Adding default basePath / to swagger");
-                    ((ObjectNode) swagger).put("basePath", "/"); // to adhere the spec - if basePath is empty, serve the traffic on / - Ref -> https://swagger.io/specification/v2/
+                    ((ObjectNode) swagger).put(BASE_PATH, "/"); // to adhere the spec - if basePath is empty, serve the traffic on / - Ref -> https://swagger.io/specification/v2/
                 }
                 if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
                     LOG.info("Overriding host scheme and basePath with value : {}", backendBasePath);
                     String basePath = url.getPath();
                     if (StringUtils.isNotEmpty(basePath)) {
                         LOG.debug("Overriding Swagger basePath with value : {}", basePath);
-                        ((ObjectNode) swagger).put("basePath", basePath);
-                    }else {
+                        ((ObjectNode) swagger).put(BASE_PATH, basePath);
+                    } else {
                         LOG.debug("Not updating basePath value in swagger 2 as BackendBasePath : {}  has empty basePath", backendBasePath);
                     }
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
                     ArrayNode newSchemes = this.mapper.createArrayNode();
                     newSchemes.add(url.getProtocol());
-                    ((ObjectNode) swagger).set("schemes", newSchemes);
+                    ((ObjectNode) swagger).set(SCHEMES, newSchemes);
                 }
                 this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
             }
@@ -133,18 +135,13 @@ public class Swagger2xSpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) throws AppException {
+    public boolean parse(byte[] apiSpecificationContent) {
         try {
-            super.parse(apiSpecificationContent);
+            this.apiSpecificationContent = apiSpecificationContent;
             setMapperForDataFormat();
             if (this.mapper == null) return false;
             swagger = this.mapper.readTree(apiSpecificationContent);
             return swagger.has("swagger") && swagger.get("swagger").asText().startsWith("2.");
-        } catch (AppException e) {
-            if (e.getError() == ErrorCode.UNSUPPORTED_FEATURE) {
-                throw e;
-            }
-            return false;
         } catch (Exception e) {
             LOG.trace("Could load specification as Swagger 2.0", e);
             return false;

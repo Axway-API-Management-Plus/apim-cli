@@ -1,6 +1,7 @@
 package com.axway.apim.users.impl;
 
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,18 +18,18 @@ import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.users.lib.params.UserExportParams;
 
 public abstract class UserResultHandler {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(UserResultHandler.class);
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserResultHandler.class);
+
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonUserExporter.class),
 		YAML_EXPORTER(YamlUserExporter.class),
 		CONSOLE_EXPORTER(ConsoleUserExporter.class),
 		USER_DELETE_HANDLER(DeleteUserHandler.class),
 		USER_CHANGE_PASSWORD_HANDLER(UserChangePasswordHandler.class);
-		
+
 		private final Class<UserResultHandler> implClass;
-		
+
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		ResultHandler(Class clazz) {
 			this.implClass = clazz;
@@ -38,12 +39,12 @@ public abstract class UserResultHandler {
 			return implClass;
 		}
 	}
-	
+
 	UserExportParams params;
 	ExportResult result;
-	
+
 	boolean hasError = false;
-	
+
 	public static UserResultHandler create(ResultHandler exportImpl, UserExportParams params, ExportResult result) throws AppException {
 		try {
 			Object[] intArgs = new Object[] { params, result };
@@ -59,13 +60,13 @@ public abstract class UserResultHandler {
 		this.params = params;
 		this.result = result;
 	}
-	
+
 	public abstract void export(List<User> users) throws AppException;
-	
+
 	public boolean hasError() {
 		return this.hasError;
 	}
-	
+
 	protected Builder getBaseFilterBuilder() {
 		return new Builder()
 				.hasId(params.getId())
@@ -78,15 +79,15 @@ public abstract class UserResultHandler {
 				.includeCustomProperties(getAPICustomProperties())
 				.isEnabled(params.isEnabled());
 	}
-	
+
 	protected List<String> getAPICustomProperties() {
 		try {
-			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user);
+			return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.user);
 		} catch (AppException e) {
 			LOG.error("Error reading custom properties user configuration from API-Manager");
-			return null;
+			return Collections.emptyList();
 		}
 	}
-	
+
 	public abstract UserFilter getFilter() throws AppException;
 }

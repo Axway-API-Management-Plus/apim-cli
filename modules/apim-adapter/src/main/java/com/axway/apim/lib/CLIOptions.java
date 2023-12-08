@@ -1,17 +1,17 @@
 package com.axway.apim.lib;
 
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.rest.Console;
+import org.apache.commons.cli.*;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.axway.apim.lib.utils.rest.Console;
-import org.apache.commons.cli.*;
-
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.error.ErrorCode;
-
 public abstract class CLIOptions {
 
+    public static final String VERSION = "version";
     private final CommandLineParser parser = new RelaxedParser();
 
     private String[] args;
@@ -48,7 +48,7 @@ public abstract class CLIOptions {
         option.setRequired(false);
         optionalOptions.addOption(option);
 
-        option = new Option("version", "Print the APIM CLI Version number");
+        option = new Option(VERSION, "Print the APIM CLI Version number");
         option.setRequired(false);
         optionalOptions.addOption(option);
     }
@@ -81,9 +81,9 @@ public abstract class CLIOptions {
             if (commandLine.hasOption("help")) {
                 printUsage("Usage information", args);
                 throw new AppException("help", ErrorCode.SUCCESS);
-            } else if (commandLine.hasOption("version")) {
+            } else if (commandLine.hasOption(VERSION)) {
                 Console.println(CLIOptions.class.getPackage().getImplementationVersion());
-                throw new AppException("version", ErrorCode.SUCCESS);
+                throw new AppException(VERSION, ErrorCode.SUCCESS);
             }
             cmd = parser.parse(options, args);
             this.envProperties = new EnvironmentProperties(cmd.getOptionValue("stage"), getValue("apimCLIHome"));
@@ -94,6 +94,13 @@ public abstract class CLIOptions {
     }
 
     public void printUsage(String message, String[] args) {
+        Console.println("-----------------------------------------Command----------------------------------------");
+        for (String arg:args) {
+            Console.print(arg + " ");
+        }
+        Console.println("\n");
+        Console.println("----------------------------------------------------------------------------------------");
+
         HelpFormatter formatter = new HelpFormatter();
         formatter.setOptionComparator(new OptionsComparator());
         formatter.setWidth(140);

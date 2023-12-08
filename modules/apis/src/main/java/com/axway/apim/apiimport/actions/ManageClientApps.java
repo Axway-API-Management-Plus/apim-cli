@@ -27,7 +27,7 @@ public class ManageClientApps {
     private final API actualState;
     private final API oldAPI;
 
-    APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
+    APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().getAccessAdapter();
 
     /**
      * In case, the API has been re-created, this is object contains the API how it was before
@@ -100,7 +100,7 @@ public class ManageClientApps {
         LOG.info("Organization  : {}", app.getOrganization());
 
         String appsOrgId = app.getOrganization().getId();
-        Organization appsOrgs = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
+        Organization appsOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
         if (appsOrgs == null) return true;
         // If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
         if (app.getOrganization().equals((actualState).getOrganization())) return false;

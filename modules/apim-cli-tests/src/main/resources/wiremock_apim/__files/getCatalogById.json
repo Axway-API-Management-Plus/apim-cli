@@ -1,0 +1,1177 @@
+{
+  "id": "e4ded8c8-0a40-4b50-bc13-552fb7209150",
+  "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+  "deprecated": false,
+  "apiVersion": "1.0.0",
+  "swaggerVersion": "1.1",
+  "basePath": "https://172.17.0.1:8065",
+  "resourcePath": "/test-app-api2-4618",
+  "models": {
+    "Order": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "petId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "shipDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Order Status",
+          "enum": [
+            "placed",
+            "approved",
+            "delivered"
+          ]
+        },
+        "complete": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "xml": {
+        "name": "Order"
+      },
+      "id": "Order"
+    },
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Category"
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "userStatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "User Status"
+        }
+      },
+      "xml": {
+        "name": "User"
+      },
+      "id": "User"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Tag"
+      }
+    },
+    "Pet": {
+      "type": "object",
+      "required": [
+        "name",
+        "photoUrls"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "category": {
+          "$ref": "#/definitions/Category"
+        },
+        "name": {
+          "type": "string",
+          "example": "doggie"
+        },
+        "photoUrls": {
+          "type": "array",
+          "xml": {
+            "name": "photoUrl",
+            "wrapped": true
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "xml": {
+            "name": "tag",
+            "wrapped": true
+          },
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "pet status in the store",
+          "enum": [
+            "available",
+            "pending",
+            "sold"
+          ]
+        }
+      },
+      "xml": {
+        "name": "Pet"
+      },
+      "id": "Pet"
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "consumes": [],
+  "produces": [],
+  "authorizations": {},
+  "name": "Test-App-API2-4618",
+  "securityProfile": {
+    "devices": []
+  },
+  "basePaths": [
+    "https://172.17.0.1:8065"
+  ],
+  "state": "published",
+  "cors": true,
+  "expired": false,
+  "retirementDate": 0,
+  "retired": false,
+  "tags": {},
+  "availableApiDefinitions": {
+    "Swagger 1.1": "/discovery/swagger/api/id/d90122a7-9f47-420c-85ca-926125ea7bf6?swaggerVersion=1.1&filename=Test-App-API2-4618.json",
+    "Swagger 2.0": "/discovery/swagger/api/id/d90122a7-9f47-420c-85ca-926125ea7bf6?swaggerVersion=2.0&filename=Test-App-API2-4618.json"
+  },
+  "availableSDK": {
+    "ios-swift": "/discovery/sdk/d90122a7-9f47-420c-85ca-926125ea7bf6/ios-swift",
+    "android": "/discovery/sdk/d90122a7-9f47-420c-85ca-926125ea7bf6/android",
+    "nodejs": "/discovery/sdk/d90122a7-9f47-420c-85ca-926125ea7bf6/nodejs"
+  },
+  "apis": [
+    {
+      "path": "/test-app-api2-4618/pet",
+      "name": "/pet",
+      "operations": [
+        {
+          "id": "49870064-78db-4197-8fa6-35ebdfaa1b41",
+          "description": "",
+          "httpMethod": "PUT",
+          "nickname": "updatePet",
+          "summary": "Update an existing pet",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "Invalid ID supplied"
+            },
+            {
+              "code": 404,
+              "reason": "Pet not found"
+            },
+            {
+              "code": 405,
+              "reason": "Validation exception"
+            },
+            {
+              "code": 200,
+              "reason": "OK"
+            }
+          ],
+          "consumes": [
+            "application/json",
+            "application/xml"
+          ],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "Pet object that needs to be added to the store",
+              "required": true,
+              "name": "body",
+              "dataType": "Pet",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        },
+        {
+          "id": "f4bb6bbc-e3bc-4835-84ea-baf529034f87",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "addPet",
+          "summary": "Add a new pet to the store",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 405,
+              "reason": "Invalid input"
+            },
+            {
+              "code": 201,
+              "reason": "Created"
+            }
+          ],
+          "consumes": [
+            "application/json",
+            "application/xml"
+          ],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "Pet object that needs to be added to the store",
+              "required": true,
+              "name": "body",
+              "dataType": "Pet",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/user/{username}",
+      "name": "/user/{username}",
+      "operations": [
+        {
+          "id": "5a3c0158-7849-4968-a75e-02f0df461d30",
+          "description": "",
+          "httpMethod": "PUT",
+          "nickname": "updateUser",
+          "summary": "Updated user",
+          "notes": "This can only be done by the logged in user.",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "Invalid user supplied"
+            },
+            {
+              "code": 404,
+              "reason": "User not found"
+            },
+            {
+              "code": 200,
+              "reason": "OK"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "name that need to be updated",
+              "required": true,
+              "name": "username",
+              "dataType": "string",
+              "paramType": "path",
+              "allowMultiple": false
+            },
+            {
+              "description": "Updated user object",
+              "required": true,
+              "name": "body",
+              "dataType": "User",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        },
+        {
+          "id": "d08c4901-6027-4de6-b3c2-436d8f7f4080",
+          "description": "",
+          "httpMethod": "DELETE",
+          "nickname": "deleteUser",
+          "summary": "Delete user",
+          "notes": "This can only be done by the logged in user.",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "Invalid username supplied"
+            },
+            {
+              "code": 404,
+              "reason": "User not found"
+            },
+            {
+              "code": 204,
+              "reason": "No Content"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "The name that needs to be deleted",
+              "required": true,
+              "name": "username",
+              "dataType": "string",
+              "paramType": "path",
+              "allowMultiple": false
+            }
+          ]
+        },
+        {
+          "id": "2d9fade9-1e8d-4ce9-8f9b-2a3288df1aa2",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "getUserByName",
+          "summary": "Get user by user name",
+          "notes": "",
+          "responseClass": "User",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid username supplied"
+            },
+            {
+              "code": 404,
+              "reason": "User not found"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "The name that needs to be fetched. Use user1 for testing. ",
+              "required": true,
+              "name": "username",
+              "dataType": "string",
+              "paramType": "path",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/pet/findByStatus",
+      "name": "/pet/findByStatus",
+      "operations": [
+        {
+          "id": "d6333b17-0533-4a02-af9b-5373689ad1b9",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "findPetsByStatus",
+          "summary": "Finds Pets by status",
+          "notes": "Multiple status values can be provided with comma separated strings",
+          "responseClass": "array",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid status value"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "Status values that need to be considered for filter",
+              "required": true,
+              "items": {
+                "default": "available",
+                "type": "string",
+                "enum": [
+                  "available",
+                  "pending",
+                  "sold"
+                ]
+              },
+              "collectionFormat": "multi",
+              "name": "status",
+              "dataType": "Array",
+              "paramType": "query",
+              "allowMultiple": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/user/createWithList",
+      "name": "/user/createWithList",
+      "operations": [
+        {
+          "id": "3456887e-483e-43f0-b245-4e66be11dca5",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "createUsersWithListInput",
+          "summary": "Creates list of users with given input array",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 999,
+              "reason": "successful operation"
+            },
+            {
+              "code": 201,
+              "reason": "Created"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "List of user object",
+              "required": true,
+              "items": {
+                "$ref": "#/definitions/User"
+              },
+              "name": "body",
+              "dataType": "Array",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/pet/{petId}/uploadImage",
+      "name": "/pet/{petId}/uploadImage",
+      "operations": [
+        {
+          "id": "12b60cee-bc94-4c43-8986-4fb34c644175",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "uploadFile",
+          "summary": "uploads an image",
+          "notes": "",
+          "responseClass": "ApiResponse",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            }
+          ],
+          "consumes": [
+            "multipart/form-data"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "ID of pet to update",
+              "format": "int64",
+              "required": true,
+              "name": "petId",
+              "dataType": "long",
+              "paramType": "path",
+              "allowMultiple": false
+            },
+            {
+              "description": "Additional data to pass to server",
+              "required": false,
+              "name": "additionalMetadata",
+              "dataType": "string",
+              "paramType": "form",
+              "allowMultiple": false
+            },
+            {
+              "description": "file to upload",
+              "required": false,
+              "name": "file",
+              "dataType": "File",
+              "paramType": "form",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/store/inventory",
+      "name": "/store/inventory",
+      "operations": [
+        {
+          "id": "1d69b3e1-75ef-4e23-afb3-b4b37f8c31bf",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "getInventory",
+          "summary": "Returns pet inventories by status",
+          "notes": "Returns a map of status codes to quantities",
+          "responseClass": "object",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/user/login",
+      "name": "/user/login",
+      "operations": [
+        {
+          "id": "d00ac3d9-89bf-4535-afa3-dbf0f48d081e",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "loginUser",
+          "summary": "Logs user into the system",
+          "notes": "",
+          "responseClass": "string",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid username/password supplied"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "The user name for login",
+              "required": true,
+              "name": "username",
+              "dataType": "string",
+              "paramType": "query",
+              "allowMultiple": false
+            },
+            {
+              "description": "The password for login in clear text",
+              "required": true,
+              "name": "password",
+              "dataType": "string",
+              "paramType": "query",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/user",
+      "name": "/user",
+      "operations": [
+        {
+          "id": "8e40f08f-08fe-4117-bda1-a7c51017cf99",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "createUser",
+          "summary": "Create user",
+          "notes": "This can only be done by the logged in user.",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 999,
+              "reason": "successful operation"
+            },
+            {
+              "code": 201,
+              "reason": "Created"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "Created user object",
+              "required": true,
+              "name": "body",
+              "dataType": "User",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/user/createWithArray",
+      "name": "/user/createWithArray",
+      "operations": [
+        {
+          "id": "68a6b687-df42-4516-8720-52686482dcde",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "createUsersWithArrayInput",
+          "summary": "Creates list of users with given input array",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 999,
+              "reason": "successful operation"
+            },
+            {
+              "code": 201,
+              "reason": "Created"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "List of user object",
+              "required": true,
+              "items": {
+                "$ref": "#/definitions/User"
+              },
+              "name": "body",
+              "dataType": "Array",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/pet/findByTags",
+      "name": "/pet/findByTags",
+      "operations": [
+        {
+          "id": "92f4e7d2-e771-40f9-82ab-dac55cbd5526",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "findPetsByTags",
+          "summary": "Finds Pets by tags",
+          "notes": "Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+          "responseClass": "array",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid tag value"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "Tags to filter by",
+              "required": true,
+              "items": {
+                "type": "string"
+              },
+              "collectionFormat": "multi",
+              "name": "tags",
+              "dataType": "Array",
+              "paramType": "query",
+              "allowMultiple": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/user/logout",
+      "name": "/user/logout",
+      "operations": [
+        {
+          "id": "22e0102c-3b92-42b2-9bd1-8e317624eb38",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "logoutUser",
+          "summary": "Logs out current logged in user session",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 999,
+              "reason": "successful operation"
+            },
+            {
+              "code": 200,
+              "reason": "OK"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/store/order",
+      "name": "/store/order",
+      "operations": [
+        {
+          "id": "802d9a53-4275-495d-8c0d-0e710f669215",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "placeOrder",
+          "summary": "Place an order for a pet",
+          "notes": "",
+          "responseClass": "Order",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid Order"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "order placed for purchasing the pet",
+              "required": true,
+              "name": "body",
+              "dataType": "Order",
+              "paramType": "body",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/pet/{petId}",
+      "name": "/pet/{petId}",
+      "operations": [
+        {
+          "id": "e1fb171f-31fa-4058-9b97-1e22375733e3",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "getPetById",
+          "summary": "Find pet by ID",
+          "notes": "Returns a single pet",
+          "responseClass": "Pet",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid ID supplied"
+            },
+            {
+              "code": 404,
+              "reason": "Pet not found"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "ID of pet to return",
+              "format": "int64",
+              "required": true,
+              "name": "petId",
+              "dataType": "long",
+              "paramType": "path",
+              "allowMultiple": false
+            }
+          ]
+        },
+        {
+          "id": "be7b4b16-7495-418c-a8bf-58e8d3626092",
+          "description": "",
+          "httpMethod": "POST",
+          "nickname": "updatePetWithForm",
+          "summary": "Updates a pet in the store with form data",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 405,
+              "reason": "Invalid input"
+            },
+            {
+              "code": 201,
+              "reason": "Created"
+            }
+          ],
+          "consumes": [
+            "application/x-www-form-urlencoded"
+          ],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "ID of pet that needs to be updated",
+              "format": "int64",
+              "required": true,
+              "name": "petId",
+              "dataType": "long",
+              "paramType": "path",
+              "allowMultiple": false
+            },
+            {
+              "description": "Updated name of the pet",
+              "required": false,
+              "name": "name",
+              "dataType": "string",
+              "paramType": "form",
+              "allowMultiple": false
+            },
+            {
+              "description": "Updated status of the pet",
+              "required": false,
+              "name": "status",
+              "dataType": "string",
+              "paramType": "form",
+              "allowMultiple": false
+            }
+          ]
+        },
+        {
+          "id": "b153310f-fae3-44b7-b8e5-d1eb742bba9c",
+          "description": "",
+          "httpMethod": "DELETE",
+          "nickname": "deletePet",
+          "summary": "Deletes a pet",
+          "notes": "",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "Invalid ID supplied"
+            },
+            {
+              "code": 404,
+              "reason": "Pet not found"
+            },
+            {
+              "code": 204,
+              "reason": "No Content"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "",
+              "required": false,
+              "name": "api_key",
+              "dataType": "string",
+              "paramType": "header",
+              "allowMultiple": false
+            },
+            {
+              "description": "Pet id to delete",
+              "format": "int64",
+              "required": true,
+              "name": "petId",
+              "dataType": "long",
+              "paramType": "path",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/test-app-api2-4618/store/order/{orderId}",
+      "name": "/store/order/{orderId}",
+      "operations": [
+        {
+          "id": "8f3250a0-cd1a-4f49-8d10-529b18284955",
+          "description": "",
+          "httpMethod": "GET",
+          "nickname": "getOrderById",
+          "summary": "Find purchase order by ID",
+          "notes": "For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions",
+          "responseClass": "Order",
+          "errorResponses": [
+            {
+              "code": 200,
+              "reason": "successful operation"
+            },
+            {
+              "code": 400,
+              "reason": "Invalid ID supplied"
+            },
+            {
+              "code": 404,
+              "reason": "Order not found"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "ID of pet that needs to be fetched",
+              "format": "int64",
+              "required": true,
+              "name": "orderId",
+              "dataType": "long",
+              "paramType": "path",
+              "allowMultiple": false
+            }
+          ]
+        },
+        {
+          "id": "31ca2a88-6acb-462b-a385-aec3c9a9e763",
+          "description": "",
+          "httpMethod": "DELETE",
+          "nickname": "deleteOrder",
+          "summary": "Delete purchase order by ID",
+          "notes": "For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors",
+          "responseClass": "void",
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "Invalid ID supplied"
+            },
+            {
+              "code": 404,
+              "reason": "Order not found"
+            },
+            {
+              "code": 204,
+              "reason": "No Content"
+            }
+          ],
+          "consumes": [],
+          "produces": [
+            "application/xml",
+            "application/json"
+          ],
+          "tags": {},
+          "securityProfile": {
+            "devices": []
+          },
+          "cors": true,
+          "parameters": [
+            {
+              "description": "ID of the order that needs to be deleted",
+              "format": "int64",
+              "required": true,
+              "name": "orderId",
+              "dataType": "long",
+              "paramType": "path",
+              "allowMultiple": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createDate": 1694929033534,
+  "accessGrantedDate": 1694929033784,
+  "type": "rest"
+}

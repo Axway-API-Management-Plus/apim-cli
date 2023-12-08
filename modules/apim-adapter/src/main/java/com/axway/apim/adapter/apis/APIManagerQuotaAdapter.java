@@ -72,14 +72,14 @@ public class APIManagerQuotaAdapter {
     private final Map<String, String> apiManagerResponse = new HashMap<>();
 
 
-    public APIManagerQuotaAdapter() {
+    public APIManagerQuotaAdapter(APIManagerAdapter apiManagerAdapter) {
         cmd = CoreParameters.getInstance();
-        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
+        applicationsQuotaCache = apiManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
 
     private void readQuotaFromAPIManager(String quotaId) throws AppException {
-        if (!APIManagerAdapter.hasAdminAccount()) return;
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return;
         if (this.apiManagerResponse.get(quotaId) != null) return;
         URI uri;
         try {
@@ -87,7 +87,8 @@ public class APIManagerQuotaAdapter {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/" + quotaId).build();
             } else {
                 if (applicationsQuotaCache.containsKey(quotaId)) {
-                    LOG.debug("Found quota with ID: {} in cache: {}", quotaId, applicationsQuotaCache.get(quotaId));
+                    if(LOG.isDebugEnabled())
+                        LOG.debug("Found quota with ID: {} in cache: {}", quotaId, applicationsQuotaCache.get(quotaId));
                     this.apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
                     return;
                 }
@@ -122,7 +123,7 @@ public class APIManagerQuotaAdapter {
      * @throws AppException is something goes wrong.
      */
     public APIQuota getQuota(String quotaId, API api, boolean addRestrictedAPI, boolean ignoreSystemQuotas) throws AppException {
-        if (!APIManagerAdapter.hasAdminAccount()) return null;
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return null;
         readQuotaFromAPIManager(quotaId); // Quota-ID might be the System- or Application-Default Quota
         APIQuota quotaConfig;
         try {
@@ -139,7 +140,7 @@ public class APIManagerQuotaAdapter {
     }
 
     public void saveQuota(APIQuota quotaConfig, String quotaId) throws AppException {
-        if (!APIManagerAdapter.hasAdminAccount()) return;
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/" + quotaId).build();
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
@@ -176,7 +177,7 @@ public class APIManagerQuotaAdapter {
     }
 
     public APIQuota getDefaultQuota(Quota quotaType) throws AppException {
-        if (!APIManagerAdapter.hasAdminAccount()) return null;
+        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return null;
         readQuotaFromAPIManager(quotaType.getQuotaId());
         APIQuota quotaConfig;
         try {

@@ -3,7 +3,6 @@ package com.axway.apim.organization.adapter;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
@@ -18,15 +17,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class OrgConfigAdapter extends OrgAdapter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OrgConfigAdapter.class);
 
     OrgImportParams importParams;
 
@@ -36,7 +38,7 @@ public class OrgConfigAdapter extends OrgAdapter {
     }
 
     public void readConfig() throws AppException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = null;
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -46,14 +48,7 @@ public class OrgConfigAdapter extends OrgAdapter {
         List<Organization> baseOrgs;
         // Try to read a list of organizations
         try {
-            try {
-                // Check the config file is json
-                mapper.readTree(configFile);
-                LOG.debug("Handling JSON Configuration file: {}", configFile);
-            } catch (IOException ioException) {
-                mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-                LOG.debug("Handling Yaml Configuration file: {}", configFile);
-            }
+            mapper = Utils.createObjectMapper(configFile);
             baseOrgs = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<Organization>>() {
             });
             if (stageConfig != null) {
@@ -65,14 +60,7 @@ public class OrgConfigAdapter extends OrgAdapter {
         } catch (MismatchedInputException me) {
             try {
                 Organization org = mapper.readValue(Utils.substituteVariables(configFile), Organization.class);
-                if (stageConfig != null) {
-                    try {
-                        ObjectReader updater = mapper.readerForUpdating(org);
-                        org = updater.readValue(Utils.substituteVariables(stageConfig));
-                    } catch (FileNotFoundException e) {
-                        LOG.warn("No config file found for stage: {}", stage);
-                    }
-                }
+                org = readOrganization(mapper, org, stageConfig, stage);
                 this.orgs = new ArrayList<>();
                 this.orgs.add(org);
             } catch (Exception pe) {
@@ -93,7 +81,7 @@ public class OrgConfigAdapter extends OrgAdapter {
     private void addImage(List<Organization> orgs, File parentFolder) throws AppException {
         for (Organization org : orgs) {
             String imageUrl = org.getImageUrl();
-            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl == null || imageUrl.isEmpty()) continue;
             if (imageUrl.startsWith("data:")) {
                 org.setImage(Image.createImageFromBase64(imageUrl));
             } else {
@@ -103,9 +91,9 @@ public class OrgConfigAdapter extends OrgAdapter {
     }
 
     private void addAPIAccess(List<Organization> orgs, Result result) throws AppException {
-        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         for (Organization org : orgs) {
-            if (org.getApiAccess() == null) continue;
+            if (org.getApiAccess() != null) continue;
             Iterator<APIAccess> it = org.getApiAccess().iterator();
             while (it.hasNext()) {
                 APIAccess apiAccess = it.next();
@@ -113,7 +101,7 @@ public class OrgConfigAdapter extends OrgAdapter {
                         .hasName(apiAccess.getApiName())
                         .build()
                     , false);
-                if (apis == null || apis.size() == 0) {
+                if (apis == null || apis.isEmpty()) {
                     LOG.error("API with name: {} not found. Ignoring this APIs.", apiAccess.getApiName());
                     result.setError(ErrorCode.UNKNOWN_API);
                     it.remove();
@@ -135,5 +123,17 @@ public class OrgConfigAdapter extends OrgAdapter {
         for (Organization org : orgs) {
             Utils.validateCustomProperties(org.getCustomProperties(), Type.organization);
         }
+    }
+
+    public Organization readOrganization(ObjectMapper mapper, Organization org, File stageConfig, String stage){
+        if (stageConfig != null) {
+            try {
+                ObjectReader updater = mapper.readerForUpdating(org);
+                return updater.readValue(Utils.substituteVariables(stageConfig));
+            } catch (IOException e) {
+                LOG.warn("No config file found for stage: {}", stage);
+            }
+        }
+        return org;
     }
 }

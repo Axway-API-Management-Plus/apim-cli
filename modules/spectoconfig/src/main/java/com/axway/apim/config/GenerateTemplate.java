@@ -38,6 +38,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -75,8 +76,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
     public static int generate(String[] args) {
         ObjectMapper objectMapper;
         // Trust all certificate and hostname for openapi parser
-        System.setProperty("TRUST_ALL","true");
-        HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);//NOSONAR
+        System.setProperty("TRUST_ALL", "true");
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);//NOSONAR
         LOG.info("Generating APIM CLI configuration file");
         GenerateTemplateParameters params;
         try {
@@ -88,8 +89,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         GenerateTemplate app = new GenerateTemplate();
         try {
             APIConfig apiConfig = app.generateTemplate(params);
-            try(FileWriter fileWriter = new FileWriter(params.getConfig())) {
-                if(params.getOutputFormat().equals(StandardExportParams.OutputFormat.yaml))
+            try (FileWriter fileWriter = new FileWriter(params.getConfig())) {
+                if (params.getOutputFormat().equals(StandardExportParams.OutputFormat.yaml))
                     objectMapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
                 else
                     objectMapper = new ObjectMapper();
@@ -132,13 +133,13 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         SwaggerParseResult result = new OpenAPIV3Parser().readLocation(uri, authorizationValues, parseOptions);
         List<String> messages = result.getMessages();
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new AppException(messages.toString(), ErrorCode.UNSUPPORTED_API_SPECIFICATION);
         }
         OpenAPI openAPI = result.getOpenAPI();
         Info info = openAPI.getInfo();
         List<Server> servers = openAPI.getServers();
-        if (servers == null || servers.size() == 0) {
+        if (servers == null || servers.isEmpty()) {
             throw new AppException("servers element is not found", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
         }
         Server server = servers.get(0);
@@ -217,16 +218,16 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         String apiSpecLocation;
         if (uri.startsWith("https")) {
             apiSpecLocation = downloadCertificatesAndContent(api, parameters.getConfig(), uri);
-        }else if (uri.startsWith("http")){
+        } else if (uri.startsWith("http")) {
             apiSpecLocation = downloadContent(parameters.getConfig(), uri);
-        }else{
+        } else {
             apiSpecLocation = parameters.getApiDefinition();
         }
 
         return new APIConfig(api, apiSpecLocation, securityProfiles);
     }
 
-    public AuthType matchAuthType(String backendAuthType){
+    public AuthType matchAuthType(String backendAuthType) {
         AuthType authType = null;
         try {
             authType = AuthType.valueOf(backendAuthType);
@@ -251,6 +252,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         return authType;
     }
+
     private void addOutboundSecurityToAPI(API api, String backendAuthType) throws AppException {
         AuthType authType = matchAuthType(backendAuthType);
         if (authType == null) {
@@ -283,7 +285,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setAuthenticationProfiles(authnProfiles);
     }
 
-    public DeviceType matchDeviceType(String frontendAuthType){
+    public DeviceType matchDeviceType(String frontendAuthType) {
         DeviceType deviceType = null;
         try {
             deviceType = DeviceType.valueOf(frontendAuthType);
@@ -312,7 +314,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     private Map<String, Object> addInboundSecurityToAPI(String frontendAuthType) throws AppException {
         DeviceType deviceType = matchDeviceType(frontendAuthType);
-        LOG.info("Frontend Authentication type : {}", frontendAuthType );
+        LOG.info("Frontend Authentication type : {}", frontendAuthType);
         if (deviceType == null) {
             throw new AppException("frontendAuthType : " + frontendAuthType + "  is invalid", ErrorCode.INVALID_PARAMETER);
         }
@@ -374,7 +376,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         String filename;
         try {
             filename = new File(new URL(url).getPath()).getName();
-            String content = IOUtils.toString(inputStream, "UTF-8");
+            String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             File file = new File(configPath);
             String parent = file.getParent();
 
@@ -386,8 +388,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 fileWriter.write(content);
                 fileWriter.flush();
             }
-        }finally {
-            if(inputStream != null){
+        } finally {
+            if (inputStream != null) {
                 inputStream.close();
             }
         }
@@ -435,9 +437,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             if (certificate instanceof X509Certificate) {
                 X509Certificate publicCert = (X509Certificate) certificate;
                 int basicConstraints = publicCert.getBasicConstraints();
-                if (basicConstraints == -1) {
-                    if(caCerts.size() > 1) // ignore for self signed certs
-                        continue;
+                if (basicConstraints == -1 && (caCerts.size() > 1)) { // ignore for self signed certs
+                    continue;
                 }
                 CaCert caCert = new CaCert();
                 String encodedCertText = new String(encoder.encode(publicCert.getEncoded()));
@@ -480,7 +481,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         if (filename == null) {
             LOG.warn("No CN");
             filename = "UnknownCertificate_" + UUID.randomUUID();
-            LOG.warn("Created a random filename: {}" , filename );
+            LOG.warn("Created a random filename: {}", filename);
         } else {
             filename = filename.replace(" ", "");
             filename = filename.replace("*", "");

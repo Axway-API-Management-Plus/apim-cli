@@ -25,13 +25,12 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
     public void initWiremock() {
         super.initWiremock();
         try {
-            APIManagerAdapter.deleteInstance();
             CoreParameters coreParameters = new CoreParameters();
             coreParameters.setHostname("localhost");
             coreParameters.setUsername("test");
             coreParameters.setPassword(Utils.getEncryptedPassword());
-            apiManagerAPIAccessAdapter = APIManagerAdapter.getInstance().accessAdapter;
-            apiManagerOrganizationAdapter = APIManagerAdapter.getInstance().orgAdapter;
+            apiManagerAPIAccessAdapter = APIManagerAdapter.getInstance().getAccessAdapter();
+            apiManagerOrganizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
@@ -125,5 +124,92 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
             Assert.fail(e.getMessage());
         }
     }
+
+    @Test
+    public void getMissingAPIAccessesEmpty(){
+        List<APIAccess> apiAccess = new ArrayList<>();
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccess, otherApiAccess);
+        Assert.assertTrue(missingApiAccesses.isEmpty());
+    }
+
+
+    @Test
+    public void getMissingAPIAccessesSame(){
+        List<APIAccess> apiAccesses = new ArrayList<>();
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiId("1235");
+        apiAccesses.add(apiAccess);
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        otherApiAccess.add(apiAccess);
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
+        Assert.assertTrue(missingApiAccesses.isEmpty());
+    }
+
+
+    @Test
+    public void getMissingAPIAccessesSourceEmpty(){
+        List<APIAccess> apiAccesses = new ArrayList<>();
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiId("1235");
+        otherApiAccess.add(apiAccess);
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
+        Assert.assertTrue(missingApiAccesses.isEmpty());
+    }
+
+    @Test
+    public void getMissingAPIAccessesTargetEmpty(){
+        List<APIAccess> apiAccesses = new ArrayList<>();
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiId("1235");
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        otherApiAccess.add(apiAccess);
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
+        Assert.assertTrue(missingApiAccesses.isEmpty());
+    }
+
+    @Test
+    public void getMissingAPIAccessesWithDuplicates(){
+        List<APIAccess> apiAccesses = new ArrayList<>();
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiId("1235");
+        apiAccesses.add(apiAccess);
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        otherApiAccess.add(apiAccess);
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
+        Assert.assertEquals(missingApiAccesses.size(), 0);
+    }
+
+    @Test
+    public void getMissingAPIAccessesWithUnique(){
+        List<APIAccess> apiAccesses = new ArrayList<>();
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiName("1235");
+        apiAccesses.add(apiAccess);
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        APIAccess apiAccess2 = new APIAccess();
+        apiAccess2.setApiName("12345");
+        otherApiAccess.add(apiAccess2);
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(apiAccesses, otherApiAccess);
+        Assert.assertEquals(missingApiAccesses.get(0).getApiName(), "1235");
+    }
+
+    @Test
+    public void getMissingAPIAccessesWithUniqueReverse(){
+        List<APIAccess> apiAccesses = new ArrayList<>();
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiName("1235");
+        apiAccesses.add(apiAccess);
+        List<APIAccess> otherApiAccess = new ArrayList<>();
+        APIAccess apiAccess2 = new APIAccess();
+        apiAccess2.setApiName("12345");
+        otherApiAccess.add(apiAccess2);
+        List<APIAccess> missingApiAccesses = apiManagerAPIAccessAdapter.getMissingAPIAccesses(otherApiAccess, apiAccesses);
+        Assert.assertEquals(missingApiAccesses.get(0).getApiName(), "12345");
+    }
+
+
+
 
 }

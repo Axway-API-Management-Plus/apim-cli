@@ -22,7 +22,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
 		ImportTestAction swaggerImport = new ImportTestAction();
-		
+
 		description("Swagger-Promote Quota should only overwrite configured Quota-Information and leave manual Quota unchanged!");
 		/*
 		 * The Keys inside restrictions to identify an existing System- or Application-Default-Quota
@@ -31,7 +31,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		 * - the type (throttle or throttlemb), as you may have for one API/API-Method two different types
 		 * - the period, as you may want to configured a overall quota for a day and for one hour
 		 * - the per - You may want to configured 1 quota per 1 hour and another for 8 hours
-		 * 
+		 *
 		 * If all these keys are the same, the quota-setting is the same and should be overwritten!
 		 */
 
@@ -39,7 +39,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/dont-overwrite-quota-restriction-api-${apiNumber}");
 		variable("apiName", "Quota-${apiNumber}-Multi-Restriction-API");
-		
+
 		echo("####### Import a very basic API without any quota #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
@@ -47,24 +47,24 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		createVariable("version", "1.0.0");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
-		
+
 		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		echo("####### API: '${apiName}' on path: '${apiPath}' with ID: '${apiId}' imported #######");
-		
+
 		echo("####### Get the operations/methods for the created API #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
-		
+
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "testMethodId1")
 				.extractFromPayload("$.[?(@.name=='findPetsByStatus')].id", "testMethodId2")
 				.extractFromPayload("$.[?(@.name=='getPetById')].id", "testMethodId3")
 				.extractFromPayload("$.[?(@.name=='updateUser')].id", "testMethodId4"));
-		
-		echo("####### Define a manual application- and system-quotas for the API: ${apiId} on specific methods #######"); 
+
+		echo("####### Define a manual application- and system-quotas for the API: ${apiId} on specific methods #######");
 		http(builder -> builder.client("apiManager").send().put("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json")
 		.payload("{\"id\":\""+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA+"\", \"type\":\"APPLICATION\",\"name\":\"Application Default\","
 				+ "\"description\":\"Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured\","
@@ -73,7 +73,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId2}\",\"type\":\"throttle\",\"config\":{\"period\":\"day\",\"per\":2,\"messages\":100000}} "
 				+ "],"
 				+ "\"system\":true}"));
-		
+
 		http(builder -> builder.client("apiManager").send().put("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json")
 		.payload("{\"id\":\""+ APIManagerAdapter.SYSTEM_API_QUOTA+"\", \"type\":\"API\",\"name\":\"System\","
 				+ "\"description\":\"Maximum message rates aggregated across all client applications\","
@@ -82,55 +82,54 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId4}\",\"type\":\"throttlemb\",\"config\":{\"period\":\"day\",\"per\":4,\"mb\":500}} "
 				+ "],"
 				+ "\"system\":true}"));
-		
+
 		echo("####### RECREATE the same API without any configured quotas #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
-		
+
 		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		echo("####### API: '${apiName}' on path: '${apiPath}' with ID: '${apiId}' imported (RECREATED) #######");
-		
+
 		echo("####### Get the operations/methods for the RE-CREATED API #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
-		
+
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "testMethodId1")
 				.extractFromPayload("$.[?(@.name=='findPetsByStatus')].id", "testMethodId2")
 				.extractFromPayload("$.[?(@.name=='getPetById')].id", "testMethodId3")
 				.extractFromPayload("$.[?(@.name=='updateUser')].id", "testMethodId4"));
-		
+
 		echo("####### Validate all previously configured APPLICATION quotas (manually configured) do exists #######");
-		echo("####### ############ Sleep 2 seconds ##################### #######");
-		sleep(2000);
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		sleep(20000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.per", "1")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.mb", "700")
-			
+
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.per", "2")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.messages", "100000"));
-		
-		echo("####### Validate all previously configured SYSTEM quotas (manually configured) do exists #######");
+
+        echo("####### Validate all previously configured SYSTEM quotas (manually configured) do exists #######");
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
-		sleep(10000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.per", "3")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.messages", "1003")
-				
+
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].type", "throttlemb")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.per", "4")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.mb", "500"));
-		
+
 		echo("####### Replicate the same API with some Quotas configured, which are different to the one manually defined before #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
@@ -141,7 +140,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		createVariable("systemMessages", "666");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
-		
+
 		echo("####### Validate all APPLICATION quotas (manually configured & API-Config) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
 		sleep(5000);
@@ -151,17 +150,17 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 			//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.per", "1")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.mb", "700")
-			
+
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].type", "throttle")
 			//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.period", "day")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.per", "2")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.messages", "100000")
-			
+
 			// These quota settings are inserted by Swagger-Promote based on configuration
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.mb", "555")
 			//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.period", "day")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.per", "1"));
-		
+
 		echo("####### Validate all SYSTEM quotas (manually configured & API-Config) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
 		sleep(5000);
@@ -171,13 +170,13 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 				//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.period", "hour")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.per", "3")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.messages", "1003")
-				
+
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].type", "throttlemb")
 				//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.period", "day")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.per", "4")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.mb", "500")
-				
-				// These quota settings are inserted based on configuration by Swagger-Promote 
+
+				// These quota settings are inserted based on configuration by Swagger-Promote
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttle')].config.messages", "666")
 				//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttle')].config.period", "week")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttle')].config.per", "2"));

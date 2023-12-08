@@ -14,7 +14,7 @@ public class CLIChangeAPIOptions extends CLIOptions {
 	private CLIChangeAPIOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIChangeAPIOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
@@ -30,7 +30,7 @@ public class CLIChangeAPIOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("https://new.server.com:8080/api");
 		addOption(option);
-		
+
 		option = new Option("oldBackend", true, "If given, only APIs matching to this backend will be changed");
 		option.setRequired(false);
 		option.setArgName("https://old.server.com:8080/api");
@@ -57,7 +57,7 @@ public class CLIChangeAPIOptions extends CLIOptions {
 	protected String getAppName() {
 		return "Change API";
 	}
-	
+
 	@Override
 	public Parameters getParams() {
 		APIChangeParams params = new APIChangeParams();

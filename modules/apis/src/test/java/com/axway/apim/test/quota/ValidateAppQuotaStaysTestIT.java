@@ -21,14 +21,14 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
 		ImportTestAction swaggerImport = new ImportTestAction();
-		
+
 		description("Validates potentially configured application quota stay after re-importing an API.");
 
 		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/app-quota-check-${apiNumber}");
 		variable("apiName", "App Quota Check ${apiNumber}");
-		
+
 		createVariable("appName", "Test App with quota ${apiNumber}");
 		echo("####### Creating test a application: '${appName}' used to configure some sample quotas #######");
 		http(builder -> builder.client("apiManager").send().post("/applications").name("orgCreatedRequest")	.header("Content-Type", "application/json")
@@ -37,7 +37,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestAppId")
 			.extractFromPayload("$.name", "consumingTestAppName"));
-		
+
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/2_api-with-quota-app-subscription.json");
@@ -47,7 +47,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 		createVariable("systemPeriod", "day");
 		createVariable("ignoreQuotas", "true");
 		swaggerImport.doExecute(context);
-		
+
 		echo("####### Validate API: '${apiName}' has a been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
@@ -55,12 +55,12 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
-		
+
 		echo("####### Get the operations/methods for the created API #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
-		
+
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "testMethodId"));
-		
+
 		echo("####### Configure some Application-Quota for the imported API #######");
 		http(builder -> builder.client("apiManager").send()
 			.post("/applications/${consumingTestAppId}/quota")
@@ -73,7 +73,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 						+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId}\",\"type\":\"throttle\",\"config\":{\"period\":\"day\",\"per\":2,\"messages\":100000}} "
 					+ "],"
 					+ "\"system\":false}"));
-		
+
 		echo("####### Enforce Re-Creation of API - Application quotas must stay #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/2_api-with-quota-app-subscription.json");
@@ -84,7 +84,8 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 		createVariable("ignoreQuotas", "true");
 		createVariable("enforce", "true");
 		swaggerImport.doExecute(context);
-		
+        sleep(12000);
+
 		echo("####### The API has been updated - Reload the the API-ID #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 
@@ -92,16 +93,16 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"));
-		
+
 		echo("####### And reload the first methodId as we need it for validation #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${newApiId}/operations").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "newTestMethodId"));
-		
+
 		echo("####### Load the application quota and validate it is still present #######");
 		echo("####### newApiId: '${newApiId}' #######");
 		echo("####### newTestMethodId: '${newTestMethodId}' #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestAppId}/quota"));
-		
+
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.type", "APPLICATION")
 			// First validate the "All methods" quota is still there

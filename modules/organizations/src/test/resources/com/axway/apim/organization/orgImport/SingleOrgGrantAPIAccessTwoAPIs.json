@@ -6,11 +6,11 @@
   "development" : true,
   "apis" : [ {
   		 "apiName": "${apiName1}",
-  		 "apiVersion" : "1.0"
+  		 "apiVersion" : "1.0.0"
   	},
   	{
   		 "apiName": "${apiName2}",
-  		 "apiVersion" : "1.0"
+  		 "apiVersion" : "1.0.0"
   	}
   ]
 }

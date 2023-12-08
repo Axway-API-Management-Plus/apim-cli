@@ -1,6 +1,7 @@
 package com.axway.apim.organization.impl;
 
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -25,9 +26,9 @@ public abstract class OrgResultHandler {
 		YAML_EXPORTER(YamlOrgExporter.class),
 		CONSOLE_EXPORTER(ConsoleOrgExporter.class),
 		ORG_DELETE_HANDLER(DeleteOrgHandler.class);
-		
+
 		private final Class<OrgResultHandler> implClass;
-		
+
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		ResultHandler(Class clazz) {
 			this.implClass = clazz;
@@ -37,12 +38,12 @@ public abstract class OrgResultHandler {
 			return implClass;
 		}
 	}
-	
+
 	OrgExportParams params;
 	ExportResult result;
-	
+
 	boolean hasError = false;
-	
+
 	public static OrgResultHandler create(ResultHandler exportImpl, OrgExportParams params, ExportResult result) throws AppException {
 		try {
 			Object[] intArgs = new Object[] { params, result };
@@ -58,13 +59,13 @@ public abstract class OrgResultHandler {
 		this.params = params;
 		this.result = result;
 	}
-	
+
 	public abstract void export(List<Organization> apps) throws AppException;
-	
+
 	public boolean hasError() {
 		return this.hasError;
 	}
-	
+
 	protected Builder getBaseOrgFilterBuilder() {
 		return new Builder()
 				.hasId(params.getId())
@@ -72,15 +73,15 @@ public abstract class OrgResultHandler {
 				.includeCustomProperties(getCustomProperties())
 				.hasName(params.getName());
 	}
-	
+
 	protected List<String> getCustomProperties() {
 		try {
-			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.organization);
+			return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.organization);
 		} catch (AppException e) {
 			LOG.error("Error reading custom properties configuration for organization from API-Manager");
-			return null;
+			return Collections.emptyList();
 		}
 	}
-	
+
 	public abstract OrgFilter getFilter() throws AppException;
 }

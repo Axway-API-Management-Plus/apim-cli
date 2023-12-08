@@ -1,18 +1,17 @@
 package com.axway.apim.adapter.jackson;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class UserDeserializer extends StdDeserializer<User> {
 
@@ -34,7 +33,8 @@ public class UserDeserializer extends StdDeserializer<User> {
 
     @Override
     public User deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException, JsonProcessingException {
+        throws IOException {
+        APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().getUserAdapter();
         JsonNode node = jp.getCodec().readTree(jp);
         User user = null;
         // Deserialization depends on the direction
@@ -42,7 +42,7 @@ public class UserDeserializer extends StdDeserializer<User> {
         if (isUseLoginName(ctxt)) {
             // Try to initialize this user based on the loginname
             try {
-                user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(node.asText());
+                user = userAdapter.getUserForLoginName(node.asText());
             } catch (AppException e) {
                 LOG.error("Error reading user with loginName: {} from API-Manager.", node.asText());
             }
@@ -53,7 +53,7 @@ public class UserDeserializer extends StdDeserializer<User> {
         } else {
             // Try to initialize this user based on the User-ID
             try {
-                user = APIManagerAdapter.getInstance().userAdapter.getUserForId(node.asText());
+                user = userAdapter.getUserForId(node.asText());
             } catch (AppException e) {
                 LOG.error("Error reading user with ID: {} from API-Manager.", node.asText());
             }
@@ -66,8 +66,8 @@ public class UserDeserializer extends StdDeserializer<User> {
         return user;
     }
 
-    private Boolean isUseLoginName(DeserializationContext context) {
+    private boolean isUseLoginName(DeserializationContext context) {
         if (context.getAttribute(Params.USE_LOGIN_NAME) == null) return false;
-        return (Boolean) context.getAttribute(Params.USE_LOGIN_NAME);
+        return (boolean) context.getAttribute(Params.USE_LOGIN_NAME);
     }
 }

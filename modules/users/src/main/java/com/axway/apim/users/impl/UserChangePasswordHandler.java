@@ -13,10 +13,13 @@ import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserChangePasswordHandler extends UserResultHandler {
-	
-	String newPassword;
+    private static final Logger LOG = LoggerFactory.getLogger(UserChangePasswordHandler.class);
+
+    String newPassword;
 
 	public UserChangePasswordHandler(UserExportParams params, ExportResult result) {
 		super(params, result);
@@ -37,7 +40,7 @@ public class UserChangePasswordHandler extends UserResultHandler {
 		Console.println("Okay, going to change the password for: " + users.size() + " Users(s)");
 		for(User user : users) {
 			try {
-				APIManagerAdapter.getInstance().userAdapter.changePassword(newPassword, user);
+				APIManagerAdapter.getInstance().getUserAdapter().changePassword(newPassword, user);
 			} catch(Exception e) {
 				LOG.error("Error changing password of user: {}", user.getName());
 			}

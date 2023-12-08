@@ -30,11 +30,10 @@ public class JsonUserExporterTest extends WiremockWrapper {
     public void testJsonExport() throws AppException {
         String[] args = {"-h", "localhost", "-loginName", "usera"};
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.JSON_EXPORTER, params, result);
-        List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
+        List<User> users = apimanagerAdapter.getUserAdapter().getUsers(exporter.getFilter());
         exporter.export(users);
     }
 }

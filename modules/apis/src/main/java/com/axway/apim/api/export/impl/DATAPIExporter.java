@@ -52,7 +52,7 @@ public class DATAPIExporter extends APIResultHandler {
         File localFolder = new File(this.givenExportFolder + File.separator + vhost + File.separator + apiPath);
         LOG.debug("Going to export API: {} into folder: {}", api, localFolder);
         validateFolder(localFolder);
-        byte[] datFileContent = apiManager.apiAdapter.getAPIDatFile(api, datPassword);
+        byte[] datFileContent = apiManager.getApiAdapter().getAPIDatFile(api, datPassword);
         String targetFile = null;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + api.getName() + ".dat";
@@ -66,7 +66,7 @@ public class DATAPIExporter extends APIResultHandler {
 
     private String getVHost(API api) throws AppException {
         if (api.getVhost() != null) return api.getVhost();
-        String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(api.getOrganizationId()).build()).getVirtualHost();
+        String orgVHost = APIManagerAdapter.getInstance().getOrgAdapter().getOrg(new OrgFilter.Builder().hasId(api.getOrganizationId()).build()).getVirtualHost();
         if (orgVHost != null) return orgVHost;
         return "";
     }

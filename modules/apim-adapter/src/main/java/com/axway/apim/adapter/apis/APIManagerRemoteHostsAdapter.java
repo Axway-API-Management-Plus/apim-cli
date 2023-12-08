@@ -91,7 +91,7 @@ public class APIManagerRemoteHostsAdapter {
         if (remoteHosts.size() > 1) {
             throw new AppException("No unique Remote host found. Found " + remoteHosts.size() + " remote hosts based on filter: " + filter, ErrorCode.NO_UNIQUE_REMOTE_HOST);
         }
-        if (remoteHosts.size() == 0) return null;
+        if (remoteHosts.isEmpty()) return null;
         return remoteHosts.values().iterator().next();
     }
 

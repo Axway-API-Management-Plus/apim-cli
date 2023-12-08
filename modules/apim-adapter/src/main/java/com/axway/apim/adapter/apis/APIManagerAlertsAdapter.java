@@ -76,7 +76,7 @@ public class APIManagerAlertsAdapter {
 
     public void updateAlerts(Alerts alerts) throws AppException {
         try {
-            if (!APIManagerAdapter.hasAdminAccount()) {
+            if (!APIManagerAdapter.getInstance().hasAdminAccount()) {
                 throw new AppException("An Admin Account is required to update the API-Manager alerts configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/alerts").build();

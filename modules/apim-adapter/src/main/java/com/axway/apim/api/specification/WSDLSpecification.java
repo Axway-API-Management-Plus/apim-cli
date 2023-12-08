@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 
 public class WSDLSpecification extends APISpecification {
 
-    private final Logger LOG = LoggerFactory.getLogger(WSDLSpecification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WSDLSpecification.class);
 
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
@@ -51,7 +51,7 @@ public class WSDLSpecification extends APISpecification {
 
     @Override
     public boolean parse(byte[] apiSpecificationContent) throws AppException {
-        super.parse(apiSpecificationContent);
+        this.apiSpecificationContent = apiSpecificationContent;
         if (apiSpecificationFile.toLowerCase().endsWith(".url")) {
             apiSpecificationFile = Utils.getAPIDefinitionUriFromFile(apiSpecificationFile);
         }

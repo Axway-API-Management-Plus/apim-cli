@@ -1,24 +1,23 @@
 package com.axway.apim.adapter.jackson;
 
-import java.io.IOException;
-
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
+import java.io.IOException;
+
 public class AppCredentialsDeserializer extends StdDeserializer<ClientAppCredential> {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final ObjectMapper objectMapper = new ObjectMapper();
-	
+
 	public AppCredentialsDeserializer() {
 		this(null);
 	}
@@ -29,7 +28,7 @@ public class AppCredentialsDeserializer extends StdDeserializer<ClientAppCredent
 
 	@Override
 	public ClientAppCredential deserialize(JsonParser jp, DeserializationContext ctxt)
-			throws IOException, JsonProcessingException {
+			throws IOException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		String credentialType = node.get("credentialType").asText();
 		ClientAppCredential cred;

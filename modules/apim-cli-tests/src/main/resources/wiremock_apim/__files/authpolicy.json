@@ -1,0 +1,6 @@
+[
+  {
+    "name": "Inbound security policy 1",
+    "id": "<key type='CircuitContainer'><id field='name' value='Sample Policies'/><key type='CircuitContainer'><id field='name' value='API Management OAuth Token Info'/><key type='FilterCircuit'><id field='name' value='Inbound security policy 1'/></key></key></key>"
+  }
+]

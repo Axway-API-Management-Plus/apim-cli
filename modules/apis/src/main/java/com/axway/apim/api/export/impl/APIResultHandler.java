@@ -4,12 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -108,32 +103,32 @@ public abstract class APIResultHandler {
 
     protected Builder getBaseAPIFilterBuilder() {
         return new Builder(APIType.CUSTOM)
-                .hasVHost(params.getVhost())
-                .hasApiPath(params.getApiPath())
-                .hasPolicyName(params.getPolicy())
-                .hasId(params.getId())
-                .hasName(params.getName())
-                .hasOrganization(params.getOrganization())
-                .hasTag(params.getTag())
-                .hasState(params.getState())
-                .hasBackendBasepath(params.getBackend())
-                .hasInboundSecurity(params.getInboundSecurity())
-                .hasOutboundAuthentication(params.getOutboundAuthentication())
-                .includeCustomProperties(getAPICustomProperties())
-                .translateMethods(METHOD_TRANSLATION.AS_NAME)
-                .translatePolicies(POLICY_TRANSLATION.TO_NAME)
-                .useFEAPIDefinition(params.isUseFEAPIDefinition())
-                .isCreatedOnAfter(params.getCreatedOnAfter())
-                .isCreatedOnBefore(params.getCreatedOnBefore())
-                .failOnError(false);
+            .hasVHost(params.getVhost())
+            .hasApiPath(params.getApiPath())
+            .hasPolicyName(params.getPolicy())
+            .hasId(params.getId())
+            .hasName(params.getName())
+            .hasOrganization(params.getOrganization())
+            .hasTag(params.getTag())
+            .hasState(params.getState())
+            .hasBackendBasepath(params.getBackend())
+            .hasInboundSecurity(params.getInboundSecurity())
+            .hasOutboundAuthentication(params.getOutboundAuthentication())
+            .includeCustomProperties(getAPICustomProperties())
+            .translateMethods(METHOD_TRANSLATION.AS_NAME)
+            .translatePolicies(POLICY_TRANSLATION.TO_NAME)
+            .useFEAPIDefinition(params.isUseFEAPIDefinition())
+            .isCreatedOnAfter(params.getCreatedOnAfter())
+            .isCreatedOnBefore(params.getCreatedOnBefore())
+            .failOnError(false);
     }
 
     protected List<String> getAPICustomProperties() {
         try {
-            return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.api);
+            return APIManagerAdapter.getInstance().getCustomPropertiesAdapter().getCustomPropertyNames(Type.api);
         } catch (AppException e) {
             LOG.error("Error reading custom properties configuration from API-Manager");
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -145,31 +140,27 @@ public abstract class APIResultHandler {
     protected static String getUsedSecurity(API api) {
         List<String> usedSecurity = new ArrayList<>();
         Map<String, SecurityProfile> secProfilesMappedByName = new HashMap<>();
-        try {
-            for (SecurityProfile secProfile : api.getSecurityProfiles()) {
-                secProfilesMappedByName.put(secProfile.getName(), secProfile);
-            }
-            Iterator<InboundProfile> it;
-            it = api.getInboundProfiles().values().iterator();
-            while (it.hasNext()) {
-                InboundProfile profile = it.next();
-                SecurityProfile usedSecProfile = secProfilesMappedByName.get(profile.getSecurityProfile());
-                // If Security-Profile null only happens for method overrides, then they are using the API-Default --> Skip this InboundProfile
-                if (usedSecProfile == null) continue;
-                for (SecurityDevice device : usedSecProfile.getDevices()) {
-                    if (device.getType() == DeviceType.authPolicy) {
-                        String authenticationPolicy = device.getProperties().get("authenticationPolicy");
-                        usedSecurity.add(Utils.getExternalPolicyName(authenticationPolicy));
-                    } else {
-                        usedSecurity.add("" + device.getType().getName());
-                    }
+
+        for (SecurityProfile secProfile : api.getSecurityProfiles()) {
+            secProfilesMappedByName.put(secProfile.getName(), secProfile);
+        }
+        Iterator<InboundProfile> it;
+        it = api.getInboundProfiles().values().iterator();
+        while (it.hasNext()) {
+            InboundProfile profile = it.next();
+            SecurityProfile usedSecProfile = secProfilesMappedByName.get(profile.getSecurityProfile());
+            // If Security-Profile null only happens for method overrides, then they are using the API-Default --> Skip this InboundProfile
+            if (usedSecProfile == null) continue;
+            for (SecurityDevice device : usedSecProfile.getDevices()) {
+                if (device.getType() == DeviceType.authPolicy) {
+                    String authenticationPolicy = device.getProperties().get("authenticationPolicy");
+                    usedSecurity.add(Utils.getExternalPolicyName(authenticationPolicy));
+                } else {
+                    usedSecurity.add(device.getType().getName());
                 }
             }
-            return usedSecurity.toString().replace("[", "").replace("]", "");
-        } catch (AppException e) {
-            LOG.error("Error getting security information for API", e);
-            return "Err";
         }
+        return usedSecurity.toString().replace("[", "").replace("]", "");
     }
 
     protected static List<String> getUsedPolicies(API api, PolicyType type) {
@@ -178,7 +169,7 @@ public abstract class APIResultHandler {
 
     protected static Map<PolicyType, List<String>> getUsedPolicies(API api) {
         Iterator<OutboundProfile> it;
-        Map<PolicyType, List<String>> result = new HashMap<>();
+        Map<PolicyType, List<String>> result = new EnumMap<>(PolicyType.class);
         List<String> requestPolicies = new ArrayList<>();
         List<String> routingPolicies = new ArrayList<>();
         List<String> responsePolicies = new ArrayList<>();
@@ -282,7 +273,7 @@ public abstract class APIResultHandler {
         }
     }
 
-    protected APIFilter createFilter(){
+    protected APIFilter createFilter() {
         Builder builder = getBaseAPIFilterBuilder();
         switch (params.getWide()) {
             case standard:

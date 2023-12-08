@@ -101,7 +101,7 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusTestRunner {
         echo("####### Validate application: '${appName}' (${appId}) has permissions for ALL users #######");
         http(builder -> builder.client("apiManager").send().get("/applications/${appId}/permissions").header("Content-Type", "application/json"));
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+            http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
             .validate("$.*.id", "@assertThat(hasSize(4))@")   // Must be four, as the application is created by an OrgAdmin
             .validate("$.[?(@.userId=='${userId-1}')].permission", "view")
             .validate("$.[?(@.userId=='${userId-2}')].permission", "view")

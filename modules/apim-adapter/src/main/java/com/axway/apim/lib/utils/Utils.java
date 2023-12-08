@@ -1,10 +1,32 @@
 package com.axway.apim.lib.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FilePermission;
-import java.io.FileReader;
-import java.io.IOException;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.model.CustomPropertiesEntity;
+import com.axway.apim.api.model.CustomProperty;
+import com.axway.apim.api.model.CustomProperty.Option;
+import com.axway.apim.api.model.TagMap;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.CustomPropertiesFilter;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
+import com.axway.apim.lib.utils.rest.Console;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -18,30 +40,10 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
 
-import com.axway.apim.api.model.TagMap;
-import com.axway.apim.lib.error.ErrorCodeMapper;
-import com.axway.apim.lib.utils.rest.Console;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringSubstitutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.API;
-import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.CustomPropertiesEntity;
-import com.axway.apim.api.model.CustomProperty;
-import com.axway.apim.api.model.CustomProperty.Option;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.error.ErrorCode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+    public static final String MASKED_VALUE = "********";
 
     public enum FedKeyType {
         FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>");
@@ -171,8 +173,6 @@ public class Utils {
                     return stageFile;
                 } else if (subDirStageFile.exists()) {
                     return subDirStageFile;
-                } else {
-                    return null;
                 }
             }
         }
@@ -224,11 +224,13 @@ public class Utils {
     }
 
     public static void validateCustomProperties(Map<String, String> customProperties, Type type) throws AppException {
-        Map<String, CustomProperty> configuredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties(type);
-        Map<String, CustomProperty> requiredConfiguredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getRequiredCustomProperties(type);
+        APIManagerCustomPropertiesAdapter propertiesAdapter = APIManagerAdapter.getInstance().getCustomPropertiesAdapter();
+        Map<String, CustomProperty> configuredCustomProperties = propertiesAdapter.getCustomProperties(type);
+        Map<String, CustomProperty> requiredConfiguredCustomProperties = propertiesAdapter.getRequiredCustomProperties(type);
         if (customProperties != null) {
-            for (String desiredCustomProperty : customProperties.keySet()) {
-                String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
+            for (Map.Entry<String, String> entry : customProperties.entrySet()) {
+                String desiredCustomPropertyValue = entry.getValue();
+                String desiredCustomProperty = entry.getKey();
                 CustomProperty configuredCustomProperty = configuredCustomProperties.get(desiredCustomProperty);
                 if (configuredCustomProperty == null) {
                     throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -361,7 +363,7 @@ public class Utils {
     }
 
     public static String getEncryptedPassword() {
-        return "********";
+        return MASKED_VALUE;
     }
 
     public static String createFileName(String host, String stage, String prefix) throws AppException {
@@ -375,30 +377,80 @@ public class Utils {
 
     public static boolean equalsTagMap(TagMap source, TagMap target) {
         if (source == target) return true;
-        if( source == null || target == null)
+        if (source == null || target == null)
             return false;
         if (source.size() != target.size()) return false;
-        for (String tagName : target.keySet()) {
+        for (Map.Entry<String, String[]> entry : target.entrySet()) {
+            String tagName = entry.getKey();
             if (!source.containsKey(tagName)) return false;
-            String[] myTags = target.get(tagName);
+            String[] myTags = entry.getValue();
             String[] otherTags = source.get(tagName);
             if (!Objects.deepEquals(myTags, otherTags)) return false;
         }
         return true;
     }
 
-    public static int handleAppException(Exception e, Logger logger, ErrorCodeMapper errorCodeMapper){
-        if(e instanceof  AppException){
+    public static int handleAppException(Exception e, Logger logger, ErrorCodeMapper errorCodeMapper) {
+        if (e instanceof AppException) {
             ErrorCode errorCode = ((AppException) e).getError();
-            if(errorCode == ErrorCode.SUCCESS){
+            if (errorCode == ErrorCode.SUCCESS) {
                 return ErrorCode.SUCCESS.getCode();
-            }else {
+            } else {
                 logger.error("Unexpected error :", e);
                 return errorCodeMapper.getMapedErrorCode(errorCode).getCode();
             }
-        }else {
+        } else {
             logger.error("Unexpected error :", e);
             return errorCodeMapper.getMapedErrorCode(ErrorCode.UNXPECTED_ERROR).getCode();
+        }
+    }
+
+    public static void logPayload(Logger logger, HttpResponse httpResponse) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("APIManager Response : {}", EntityUtils.toString(httpResponse.getEntity()));
+        }
+    }
+
+    public static void logPayload(Logger logger, String httpResponse) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("APIManager Response : {}", httpResponse);
+        }
+    }
+
+    public static void sleep(int retryDelay) {
+        try {
+            Thread.sleep(retryDelay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public static void deleteInstance(APIManagerAdapter apiManagerAdapter) {
+        if (apiManagerAdapter != null)
+            apiManagerAdapter.deleteInstance();
+    }
+
+    public static ObjectMapper createObjectMapper(File configFile) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        try {
+            // Check the config file is json
+            mapper.readTree(configFile);
+            LOG.debug("Handling JSON Configuration file: {}", configFile);
+        } catch (IOException ioException) {
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
+            LOG.debug("Handling Yaml Configuration file: {}", configFile);
+        }
+        return mapper;
+    }
+
+    public static void deleteDirectory(File localFolder) throws AppException {
+        LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
+        try {
+            FileUtils.deleteDirectory(localFolder);
+        } catch (IOException e) {
+            throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 }

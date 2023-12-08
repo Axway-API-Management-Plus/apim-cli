@@ -194,15 +194,22 @@ public class User implements CustomPropertiesEntity {
         this.authNUserAttributes = authNUserAttributes;
     }
 
-    // This avoids, that custom properties are wrapped within customProperties { ... }
-    // See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+    /**
+     *  This avoids, that custom properties are wrapped within customProperties { ... }
+     *   See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+     * @return custom properties
+     */
     @JsonAnyGetter
     public Map<String, String> getCustomProperties() {
         return customProperties;
     }
 
-    // This avoids, that custom properties are wrapped within customProperties { ... }
-    // See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+
+    /**
+     * This avoids, that custom properties are wrapped within customProperties { ... }
+     *  See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+     * @param customProperties custom properties
+     */
     @JsonAnySetter
     public void setCustomProperties(Map<String, String> customProperties) {
         this.customProperties = customProperties;

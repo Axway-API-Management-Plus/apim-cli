@@ -2,13 +2,11 @@ package com.axway.apim;
 
 import com.consol.citrus.dsl.endpoint.CitrusEndpoints;
 import com.consol.citrus.http.client.HttpClient;
-
 import com.consol.citrus.http.interceptor.LoggingClientInterceptor;
 import com.consol.citrus.variable.GlobalVariables;
 import com.consol.citrus.variable.GlobalVariablesPropertyLoader;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,22 +35,21 @@ public class EndpointConfig {
     @Bean
     public HttpClient apiManager() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         return CitrusEndpoints
-                .http()
-                .client()
-                .requestUrl("https://" + host + ":" + port + "/api/portal/v1.4")
-                .requestFactory(sslRequestFactory())
-                .interceptors(interceptors())
-                .build();
+            .http()
+            .client()
+            .requestUrl("https://" + host + ":" + port + "/api/portal/v1.4")
+            .requestFactory(sslRequestFactory())
+            .interceptors(interceptors())
+            .build();
     }
 
     @Bean
     public org.apache.http.client.HttpClient httpClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .build();
-        return httpClient;
+        return HttpClientBuilder.create()
+            .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
+            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+            .build();
     }
 
     @Bean
@@ -60,7 +57,8 @@ public class EndpointConfig {
         return Arrays.asList(new LoggingClientInterceptor(), basicAuthInterceptor());
     }
 
-    @Bean BasicAuthInterceptor basicAuthInterceptor(){
+    @Bean
+    BasicAuthInterceptor basicAuthInterceptor() {
         return new BasicAuthInterceptor();
     }
 
