@@ -12,9 +12,9 @@ services:
     image: ${APIM_DOCKER_IMAGE}
     volumes:
       - ${GITHUB_WORKSPACE}/licenses:/opt/Axway/apigateway/conf/licenses
-      - ${GITHUB_WORKSPACE}/apim-cli/modules/apim-adapter/src/test/resources/apimanager/${FED_FILE}:/merge/fed
-      - ${GITHUB_WORKSPACE}/apim-cli/modules/apim-adapter/src/test/resources/apimanager/mandatoryFiles.yaml:/merge/mandatoryFiles
-      - ${GITHUB_WORKSPACE}/apim-cli/modules/apim-adapter/src/test/resources/apimanager/merge/apigateway:/merge/apigateway
+      - ${GITHUB_WORKSPACE}/modules/apim-adapter/src/test/resources/apimanager/${FED_FILE}:/merge/fed
+      - ${GITHUB_WORKSPACE}/modules/apim-adapter/src/test/resources/apimanager/mandatoryFiles.yaml:/merge/mandatoryFiles
+      - ${GITHUB_WORKSPACE}/modules/apim-adapter/src/test/resources/apimanager/merge/apigateway:/merge/apigateway
     environment:
       - ACCEPT_GENERAL_CONDITIONS=yes
     ports:
