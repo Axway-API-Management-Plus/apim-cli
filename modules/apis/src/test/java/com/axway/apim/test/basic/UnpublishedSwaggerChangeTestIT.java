@@ -22,12 +22,12 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		echo("####### Validates an updated Swagger-File is replicated while in 'Unpublished' state #######");
-		
+
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/swagger-is-changed-${apiNumber}");
 		variable("apiName", "Swagger-Is-Changed-${apiNumber}");
 
-		
+
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
@@ -51,7 +51,7 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
-		
+
 		echo("####### Validate the API has changed to the updated Swagger-Definition #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 
@@ -59,20 +59,20 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId")); // We have a new API-ID
-		
+
 		echo("####### Validate the updated Swagger-File has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/discovery/swagger/api/id/${newApiId}").header("Content-Type", "application/json"));
-		
+		sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
-		
+
 		echo("####### Validate the previous FE-API has been deleted #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
-		
+
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.FORBIDDEN));
-		
+
 		echo("####### Validate the previous BE-API has been deleted #######");
 		http(builder -> builder.client("apiManager").send().get("/apirepo/${beApiId}").header("Content-Type", "application/json"));
-		
+
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.FORBIDDEN));
 	}
 }
