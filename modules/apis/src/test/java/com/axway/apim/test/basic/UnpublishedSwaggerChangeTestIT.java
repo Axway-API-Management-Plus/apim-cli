@@ -61,8 +61,8 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId")); // We have a new API-ID
 
 		echo("####### Validate the updated Swagger-File has been imported #######");
-		http(builder -> builder.client("apiManager").send().get("/discovery/swagger/api/id/${newApiId}").header("Content-Type", "application/json"));
-		sleep(5000);
+        sleep(10000);
+        http(builder -> builder.client("apiManager").send().get("/discovery/swagger/api/id/${newApiId}").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
 
 		echo("####### Validate the previous FE-API has been deleted #######");
