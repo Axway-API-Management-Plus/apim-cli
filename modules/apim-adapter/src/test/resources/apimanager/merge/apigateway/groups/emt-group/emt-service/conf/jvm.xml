@@ -1,0 +1,5 @@
+<ConfigurationFragment>
+	<!-- Set the Default charset to UTF-8, otherwise existing WSDLs are exposed with the wrong encoding -->
+	<VMArg name="-Dfile.encoding=UTF-8" />
+	<VMArg name="-Dapi.manager.orgadmin.selfservice.enabled=true"/>
+</ConfigurationFragment>
