@@ -1,9 +1,10 @@
 package com.axway.apim;
 
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
-import com.consol.citrus.variable.GlobalVariables;
-import com.consol.citrus.variable.GlobalVariablesPropertyLoader;
+
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.citrusframework.variable.GlobalVariables;
+import org.citrusframework.variable.GlobalVariablesPropertyLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.testng.Assert;

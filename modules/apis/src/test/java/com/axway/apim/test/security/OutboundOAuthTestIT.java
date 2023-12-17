@@ -1,58 +1,65 @@
 package com.axway.apim.test.security;
 
+import com.axway.apim.EndpointConfig;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-@Test
-public class OutboundOAuthTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
-	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException {
-		ImportTestAction swaggerImport = new ImportTestAction();
-		description("Test to validate API-Outbound-AuthN set to OAuth works as expected.");
 
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/outbound-authn-oauth-test-${apiNumber}");
-		variable("apiName", "Outbound AuthN OAuth Test ${apiNumber}");
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with OAuth outbound config set #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/5_4_api_outbound-authn-oauth.json");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", "0");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to OAuth has been imported. #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class OutboundOAuthTestIT extends TestNGCitrusSpringSupport {
 
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[*].name", "@assertThat(hasSize(1))@") // Only one authn profile is expected!
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "oauth")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].isDefault", "true")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.providerProfile", "@assertThat(containsString(<key type='AuthProfilesGroup))@")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.ownerId", "TEST-SOMETHING")
-				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
-		
-		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/5_4_api_outbound-authn-oauth.json");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", "10");
-		swaggerImport.doExecute(context);
-	}
+    @Autowired
+    HttpClient apiManager;
+
+    @CitrusTest
+    @Test
+    public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        description("Test to validate API-Outbound-AuthN set to OAuth works as expected.");
+
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+        variable("apiPath", "/outbound-authn-oauth-test-${apiNumber}");
+        variable("apiName", "Outbound AuthN OAuth Test ${apiNumber}");
+
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' with OAuth outbound config set #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/security/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/security/5_4_api_outbound-authn-oauth.json");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
+
+        $(echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to OAuth has been imported. #######"));
+        $(http().client(apiManager).send().get("/proxies").name("api"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+            .expression("$.[?(@.path=='${apiPath}')].state", "unpublished")
+            .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[*].name", "@assertThat(hasSize(1))@") // Only one authn profile is expected!
+            .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
+            .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "oauth")
+            .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].isDefault", "true")
+            .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.providerProfile", "@assertThat(containsString(<key type='AuthProfilesGroup))@")
+            .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.ownerId", "TEST-SOMETHING")));
+
+        $(echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/security/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/security/5_4_api_outbound-authn-oauth.json");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", "10");
+        $(action(swaggerImport));
+    }
 }

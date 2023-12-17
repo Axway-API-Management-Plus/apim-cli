@@ -1,44 +1,51 @@
 package com.axway.apim.test.envProperties;
 
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
-@Test(testName="UsingEnvironmentTestIT")
-public class UsingEnvironmentTestIT extends TestNGCitrusTestDesigner {
-	
-	@Autowired
-	private ImportTestAction swaggerImport;
-	
-	@CitrusTest(name = "UsingEnvironmentTestIT")
-	public void run() {
-		description("Import an API using the API-Environment with a certain stage only.");
-		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/envrionment-stage-api-${apiNumber}");
-		variable("apiName", "envrionment-stage-API-${apiNumber}");
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class UsingEnvironmentTestIT extends TestNGCitrusSpringSupport {
 
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("state", "unpublished");
-		createVariable("stage", "localhost");
-		createVariable("useEnvironmentOnly", "true");
-		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
-		createVariable("state", "unpublished");
-		createVariable("stage", "localhost");
-		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
-	}
+    @Autowired
+    HttpClient apiManager;
+
+
+    @CitrusTest(name = "UsingEnvironmentTestIT")
+    @Test
+    public void run() {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        description("Import an API using the API-Environment with a certain stage only.");
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+        variable("apiPath", "/envrionment-stage-api-${apiNumber}");
+        variable("apiName", "envrionment-stage-API-${apiNumber}");
+
+
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######"));
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable("state", "unpublished");
+        variable("stage", "localhost");
+        variable("useEnvironmentOnly", "true");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
+
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######"));
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore2.json");
+        variable("state", "unpublished");
+        variable("stage", "localhost");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
+    }
 
 }

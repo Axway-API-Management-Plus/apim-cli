@@ -1,55 +1,56 @@
 package com.axway.apim.test.policies;
 
-import java.io.IOException;
-
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
+import java.io.IOException;
 
-@Test
-public class RoutingPolicyTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
-	private ImportTestAction swaggerImport;
-	
-	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();	
-		description("Test a Routing-Policy");
-		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/routing-policy-test-${apiNumber}");
-		variable("apiName", "Routing Policy Test ${apiNumber}");
-		variable("status", "unpublished");
-		
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class RoutingPolicyTestIT extends TestNGCitrusSpringSupport {
 
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("routePolicy", "Routing policy 1");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/policies/1_routing-policy.json");
-		createVariable("expectedReturnCode", "0");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
-		http(builder -> builder.client("apiManager").send()	.get("/proxies").header("Content-Type", "application/json"));
+    @Autowired
+    HttpClient apiManager;
 
-		http(builder -> builder.client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.routePolicy", "@assertThat(containsString(Routing policy 1))@")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
-	}
+    @CitrusTest
+    @Test
+    public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        description("Test a Routing-Policy");
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+        variable("apiPath", "/routing-policy-test-${apiNumber}");
+        variable("apiName", "Routing Policy Test ${apiNumber}");
+        variable("status", "unpublished");
+
+
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######"));
+        variable("routePolicy", "Routing policy 1");
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/security/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/policies/1_routing-policy.json");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
+
+        $(echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######"));
+        $(http().client(apiManager).send().get("/proxies"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+                .expression("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+                .expression("$.[?(@.path=='${apiPath}')].state", "unpublished")
+                .expression("$.[?(@.path=='${apiPath}')].outboundProfiles._default.routePolicy", "@assertThat(containsString(Routing policy 1))@"))
+            .extract(fromBody()
+                .expression("$.[?(@.path=='${apiPath}')].id", "apiId")));
+    }
 }

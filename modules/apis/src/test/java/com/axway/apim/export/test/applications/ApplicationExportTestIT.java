@@ -1,20 +1,23 @@
 package com.axway.apim.export.test.applications;
 
+import com.axway.apim.EndpointConfig;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.export.test.ExportTestAction;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -22,14 +25,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 import static org.testng.Assert.*;
 
-@Test
-public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
+
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
+
+    @Autowired
+    HttpClient apiManager;
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run(@Optional @CitrusResource TestContext context) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         ExportTestAction swaggerExport = new ExportTestAction();
@@ -48,28 +58,28 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
         variable("exportAPIName", "${apiName}.json");
 
         // ############## Creating Test-Application 1 #################
-        createVariable("app1Name", "Consuming Test App ${apiNumber} ${orgNumber}");
-        http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
-                .payload("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
+        variable("app1Name", "Consuming Test App ${apiNumber} ${orgNumber}");
+        $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
+            .body("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
-                .extractFromPayload("$.id", "consumingTestApp1Id")
-                .extractFromPayload("$.name", "consumingTestApp1Name"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).extract(fromBody()
+            .expression("$.id", "consumingTestApp1Id")
+            .expression("$.name", "consumingTestApp1Name")));
 
-        echo("####### Created Test-Application 1: '${consumingTestApp1Name}' with id: '${consumingTestApp1Id}' #######");
+        $(echo("####### Created Test-Application 1: '${consumingTestApp1Name}' with id: '${consumingTestApp1Id}' #######"));
 
-        echo("####### Importing the API including applications, which should exported in the second step #######");
-        createVariable(ImportTestAction.API_DEFINITION, "/test/export/files/basic/petstore.json");
-        createVariable(ImportTestAction.API_CONFIG, "/test/export/files/applications/1_api-with-0-org-1-app.json");
-        createVariable("consumingTestAppName", "${consumingTestApp1Name}");
-        createVariable("expectedReturnCode", "0");
-        swaggerImport.doExecute(context);
+        $(echo("####### Importing the API including applications, which should exported in the second step #######"));
+        variable(ImportTestAction.API_DEFINITION, "/test/export/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/test/export/files/applications/1_api-with-0-org-1-app.json");
+        variable("consumingTestAppName", "${consumingTestApp1Name}");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
 
-        echo("####### Export the API including applications from the API-Manager #######");
-        createVariable("expectedReturnCode", "0");
-        swaggerExport.doExecute(context);
+        $(echo("####### Export the API including applications from the API-Manager #######"));
+        variable("expectedReturnCode", "0");
+        $(action(swaggerExport));
         String exportedAPIConfigFile = context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/api-config.json";
-        echo("####### Reading exported API-Config file: '" + exportedAPIConfigFile + "' #######");
+        $(echo("####### Reading exported API-Config file: '" + exportedAPIConfigFile + "' #######"));
         JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(new File(exportedAPIConfigFile).toPath()));
         assertEquals(exportedAPIConfig.get("version").asText(), "1.0.1");
         assertEquals(exportedAPIConfig.get("organization").asText(), "API Development " + context.getVariable("orgNumber"));
@@ -87,7 +97,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
         });
         assertEquals(exportedApps.size(), 1, "Number of exported apps not correct");
         ClientApplication app = exportedApps.get(0);
-        assertTrue(app.getApiAccess() == null || app.getApiAccess().size() == 0, "Exported Apps should not contains API-Access");
+        assertTrue(app.getApiAccess() == null || app.getApiAccess().isEmpty(), "Exported Apps should not contains API-Access");
         assertNull(app.getId(), "The ID of an application shouldn't be exported.");
         assertNull(app.getOrganization(), "The Org-ID of an application shouldn't be exported.");
         assertNull(app.getAppQuota(), "The application quota should not be exported. It's not supported by the export!");

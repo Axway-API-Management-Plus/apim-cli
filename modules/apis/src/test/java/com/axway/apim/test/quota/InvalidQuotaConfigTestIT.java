@@ -1,46 +1,42 @@
 package com.axway.apim.test.quota;
 
-import java.io.IOException;
-
-import org.testng.annotations.Optional;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
+import java.io.IOException;
 
-@Test
-public class InvalidQuotaConfigTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
-	private ImportTestAction swaggerImport;
-	
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class InvalidQuotaConfigTestIT extends TestNGCitrusSpringSupport {
+
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
+	public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
 		description("Try to import an API with invalid quota configuration.");
-		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/invalid-quota-api-${apiNumber}");
 		variable("apiName", "Invalid Quota-API-${apiNumber}");
+        $(echo("####### Trying to import API: '${apiName}' on path: '${apiPath}' with invalid quota config #######"));
+        variable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/issue-109-invalid-quota-config-1.json");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", "71");
+        $(action(swaggerImport));
 
-		echo("####### Trying to import API: '${apiName}' on path: '${apiPath}' with invalid quota config #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/issue-109-invalid-quota-config-1.json");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", "71");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Trying to import API: '${apiName}' on path: '${apiPath}' with invalid quota config #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/issue-109-invalid-quota-config-2.json");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", "71");
-		swaggerImport.doExecute(context);
+        $(echo("####### Trying to import API: '${apiName}' on path: '${apiPath}' with invalid quota config #######"));
+        variable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/issue-109-invalid-quota-config-2.json");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", "71");
+        $(action(swaggerImport));
 	}
 }

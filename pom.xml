@@ -61,7 +61,7 @@
         <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <wiremock.version>2.35.0</wiremock.version>
-        <citrus.version>3.4.0</citrus.version>
+        <citrus.version>4.0.2</citrus.version>
         <failsafe.version>3.3.2</failsafe.version>
         <graphql.version>21.3</graphql.version>
     </properties>
@@ -271,11 +271,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.consol.citrus.mvn</groupId>
-                <artifactId>citrus-maven-plugin</artifactId>
-                <version>${citrus.version}</version>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

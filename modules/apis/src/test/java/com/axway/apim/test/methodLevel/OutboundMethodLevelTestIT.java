@@ -1,71 +1,75 @@
 package com.axway.apim.test.methodLevel;
 
-import java.io.IOException;
-
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
+import java.io.IOException;
 
-@Test
-public class OutboundMethodLevelTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
-	private ImportTestAction swaggerImport;
 
-	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
-		description("Validate Outbound Method level settings are applied");
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class OutboundMethodLevelTestIT extends TestNGCitrusSpringSupport {
 
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/basic-outbound-method-level-api-${apiNumber}");
-		variable("apiName", "Basic Outbound Method-Level-API-${apiNumber}");
+    @Autowired
+    HttpClient apiManager;
 
-		echo("####### Try to replicate an API having Outbound Method-Level settings declared #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/methodLevel/method-level-outboundbound-api-key.json");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", "0");
-		createVariable("outboundProfileName", "HTTP Basic outbound Test ${apiNumber}");
-		swaggerImport.doExecute(context);
+    @CitrusTest
+    @Test
+    public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        description("Validate Outbound Method level settings are applied");
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+        variable("apiPath", "/basic-outbound-method-level-api-${apiNumber}");
+        variable("apiName", "Basic Outbound Method-Level-API-${apiNumber}");
 
-		echo("####### Validate the FE-API has been configured with outbound HTTP-Basic on method level #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
-			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[?(@.name=='${outboundProfileName}')].type", "http_basic")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].apiId", "backendApiId")
-			);
+        $(echo("####### Try to replicate an API having Outbound Method-Level settings declared #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/methodLevel/method-level-outboundbound-api-key.json");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", "0");
+        variable("outboundProfileName", "HTTP Basic outbound Test ${apiNumber}");
+        $(action(swaggerImport));
 
-		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.extractFromPayload("$.[?(@.name=='getOrderById')].id", "apiMethodId"));
+        $(echo("####### Validate the FE-API has been configured with outbound HTTP-Basic on method level #######"));
+        $(http().client(apiManager).send().get("/proxies"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+                .expression("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+                .expression("$.[?(@.path=='${apiPath}')].state", "${state}")
+                .expression("$.[?(@.path=='${apiPath}')].authenticationProfiles[?(@.name=='${outboundProfileName}')].type", "http_basic"))
+            .extract(fromBody()
+                .expression("$.[?(@.path=='${apiPath}')].id", "apiId")
+                .expression("$.[?(@.path=='${apiPath}')].apiId", "backendApiId")));
 
-		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.authenticationProfile", "${outboundProfileName}")
-			.validate("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.apiId", "${backendApiId}")
-			);
+        $(http().client(apiManager).send().get("/proxies/${apiId}/operations"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).extract(fromBody()
+            .expression("$.[?(@.name=='getOrderById')].id", "apiMethodId")));
 
-		echo("####### Perform a No-Change #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/methodLevel/method-level-outboundbound-api-key.json");
-		createVariable("state", "unpublished");
-        createVariable("enforce", "false");
-		createVariable("expectedReturnCode", "10");
-		createVariable("outboundProfileName", "HTTP Basic outbound Test ${apiNumber}");
-		swaggerImport.doExecute(context);
-	}
+        $(http().client(apiManager).send().get("/proxies/${apiId}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.authenticationProfile", "${outboundProfileName}")
+            .expression("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.apiId", "${backendApiId}")));
+
+        $(echo("####### Perform a No-Change #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/methodLevel/method-level-outboundbound-api-key.json");
+        variable("state", "unpublished");
+        variable("enforce", "false");
+        variable("expectedReturnCode", "10");
+        variable("outboundProfileName", "HTTP Basic outbound Test ${apiNumber}");
+        $(action(swaggerImport));
+    }
 }

@@ -1,77 +1,113 @@
 package com.axway.apim.setup.it.tests;
 
-import com.axway.apim.test.actions.TestParams;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.TestUtils;
+import com.axway.apim.setup.APIManagerSettingsApp;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.exceptions.ValidationException;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.setup.it.ExportManagerConfigTestAction;
-import com.axway.apim.setup.it.ImportManagerConfigTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.message.MessageType;
+import java.io.File;
 
-@Test
-public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
+import static org.citrusframework.validation.json.JsonPathMessageValidationContext.Builder.jsonPath;
 
-    private static final String PACKAGE = "/com/axway/apim/setup/it/tests/";
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusSpringSupport {
+
+    @Autowired
+    private HttpClient apiManager;
 
     @CitrusTest
     @Test
-    @Parameters("context")
-    public void runRemoteHostsImportExport(@Optional @CitrusResource TestContext context) {
+    public void runRemoteHostsImport(@Optional @CitrusResource TestContext context) {
         description("Export/Import RemoteHosts from and into the API-Manager");
-        ImportManagerConfigTestAction importApp = new ImportManagerConfigTestAction(context);
-        ExportManagerConfigTestAction exportApp = new ExportManagerConfigTestAction(context);
-        echo("####### Add Remote-Host 1 #######");
-        createVariable("useApiAdmin", "true"); // Use admin account
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "remote-host-1.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        createVariable("${remoteHostName}", "sample.remote.host" + importApp.getRandomNum());
-        createVariable("${remoteHostPort}", "8888");
-        importApp.doExecute(context);
-        echo("####### Validate remote host has 1 been added correctly #######");
-        http(builder -> builder.client("apiManager").send().get("/remotehosts").header("Content-Type", "application/json"));
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${remoteHostName}')].name", "${remoteHostName}")
-            .validate("$.[?(@.name=='${remoteHostName}')].port", "${remoteHostPort}"));
-        echo("####### Add Remote-Host 2 #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "remote-host-1.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        createVariable("${remoteHostName}", "another.remote.host" + importApp.getRandomNum());
-        createVariable("${remoteHostPort}", "9999");
-        importApp.doExecute(context);
-        echo("####### Validate remote host has 2 been added correctly #######");
-        http(builder -> builder.client("apiManager").send().get("/remotehosts").header("Content-Type", "application/json"));
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${remoteHostName}')].name", "${remoteHostName}")
-            .validate("$.[?(@.name=='${remoteHostName}')].port", "${remoteHostPort}")
-            .extractFromPayload("$.[?(@.name=='${remoteHostName}')].createdOn", "remoteHostCreatedOn")
-            .extractFromPayload("$.[?(@.name=='${remoteHostName}')].createdBy", "remoteHostCreatedBy")
-            .extractFromPayload("$.[?(@.name=='${remoteHostName}')].id", "remoteHostId"));
-        echo("####### Update remote host 2 #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "remote-host-1.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        createVariable("${remoteHostPort}", "9999");
-        importApp.doExecute(context);
-        echo("####### Validate a new Remote-Host has been updated #######");
-        http(builder -> builder.client("apiManager").send().get("/remotehosts").header("Content-Type", "application/json"));
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].name", "${remoteHostName}")
-            .validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].port", "${remoteHostPort}")
-            .validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdBy", "${remoteHostCreatedBy}") // createdBy should not be changed/updated
-            .validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdOn", "${remoteHostCreatedOn}") // createdOn should not be changed/updated
-        );
-        echo("####### Export remote host 2 #######");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        createVariable(TestParams.PARAM_TARGET, exportApp.getTestDirectory().getPath());
-        createVariable(TestParams.PARAM_OUTPUT_FORMAT, "json");
-        createVariable(TestParams.PARAM_NAME, "another*" + importApp.getRandomNum());
-        exportApp.doExecute(context);
-        Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "One remote host is expected");
+        $(echo("####### Add Remote-Host 1 #######"));
+        variable("remoteHostName", "citrus:concat('sample.remote.host-',  citrus:randomNumber(4))");
+        variable("remoteHostPort", "8888");
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings");
+        $(testContext -> {
+            String[] args = {"settings", "import", "-c", updatedConfigFile, "-h",
+                testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = APIManagerSettingsApp.importConfig(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
+
+        $(echo("####### Validate remote host has ${remoteHostName} been added correctly #######"));
+        $(http().client(apiManager).send().get("/remotehosts").message());
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.[?(@.name=='${remoteHostName}')].name", "${remoteHostName}")
+            .expression("$.[?(@.name=='${remoteHostName}')].port", "${remoteHostPort}")));
+
+        $(echo("####### Add Remote-Host  ${remoteHostName}  #######"));
+        variable("remoteHostName", "citrus:concat('sample.remote.host-',  citrus:randomNumber(4))");
+        variable("remoteHostPort", "9999");
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings");
+
+        $(testContext -> {
+            String[] args = {"settings", "import", "-c", updatedConfigFile2, "-h",
+                testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = APIManagerSettingsApp.importConfig(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
+
+        $(echo("####### Validate remote host has 2 been added correctly #######"));
+        $(http().client(apiManager).send().get("/remotehosts").message());
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.[?(@.name=='${remoteHostName}')].name", "${remoteHostName}")
+            .expression("$.[?(@.name=='${remoteHostName}')].port", "${remoteHostPort}")).extract(fromBody()
+            .expression("$.[?(@.name=='${remoteHostName}')].createdOn", "remoteHostCreatedOn")
+            .expression("$.[?(@.name=='${remoteHostName}')].createdBy", "remoteHostCreatedBy")
+            .expression("$.[?(@.name=='${remoteHostName}')].id", "remoteHostId")));
+
+
+        $(echo("####### Update remote host 2 #######"));
+        variable("$remoteHostPort", "9999");
+        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings");
+
+        $(testContext -> {
+            String[] args = {"settings", "import", "-c", updatedConfigFile3, "-h",
+                testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = APIManagerSettingsApp.importConfig(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
+
+        $(echo("####### Validate a new Remote-Host has been updated #######"));
+        $(http().client(apiManager).send().get("/remotehosts").message());
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.[?(@.name=='${remoteHostName}')].name", "${remoteHostName}")
+            .expression("$.[?(@.name=='${remoteHostName}')].port", "${remoteHostPort}")
+            .expression("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdBy", "${remoteHostCreatedBy}") // createdBy should not be changed/updated
+            .expression("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdOn", "${remoteHostCreatedOn}"))); // createdOn should not be changed/updated
+    }
+
+    @Test
+    @CitrusTest
+    public void runRemoteHostsExport() {
+        $(echo("####### Export remote host 2 #######"));
+        String tmpDirPath = TestUtils.createTestDirectory("settings").getPath();
+        $(testContext -> {
+            String[] args = {"settings", "get", "-type", "remotehosts", "-o", "json", "-t", tmpDirPath, "-deleteTarget", "-h",
+                testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = APIManagerSettingsApp.exportConfig(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
+        Assert.assertEquals(new File(tmpDirPath, "axway-api-manager").list().length, 1, "One remote host is expected");
     }
 }
