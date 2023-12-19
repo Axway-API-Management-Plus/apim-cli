@@ -44,6 +44,11 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         variable("username1", "User-A-" + no);
         variable("username2", "User-B-" + no);
         variable("username3", "User-C-" + no);
+        // Get organization name
+        $(http().client(apiManager).send().get("/organizations?field=name&op=eq&value=${orgName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.[?(@.name=='${orgName}')].name", "@assertThat(hasSize(1))@")).extract(fromBody()
+            .expression("$.[?(@.id=='${orgName}')].id", "orgId")));
         $(http().client(apiManager).send().post("/users").message().header("Content-Type", "application/json")
             .body("{\"loginName\":\"${username1}\",\"name\":\"${username1}\",\"email\":\"${username1}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
         $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()

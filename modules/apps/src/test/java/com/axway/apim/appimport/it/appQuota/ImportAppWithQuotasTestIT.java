@@ -70,7 +70,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusSpringSupport {
 
 
         $(echo("####### Import application: '${appName}' without quotas #######"));
-        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/AppWithNoQuotas.json",
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appQuota/AppWithNoQuotas.json",
             context, "apps", true);
         $(testContext -> {
             String[] args = {"app", "import", "-c", updatedConfigFile2, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
@@ -82,7 +82,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusSpringSupport {
 
 
         $(echo("####### Import Same application: '${appName}' incl. quotas #######"));
-        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/AppWithQuotas.json",
+        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appQuota/AppWithQuotas.json",
             context, "apps", true);
         $(testContext -> {
             String[] args = {"app", "import", "-c", updatedConfigFile3, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
