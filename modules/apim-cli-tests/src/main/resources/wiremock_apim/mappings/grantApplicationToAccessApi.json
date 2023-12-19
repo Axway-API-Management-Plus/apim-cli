@@ -1,7 +1,12 @@
 {
   "request": {
     "method": "POST",
-    "urlPath": "/api/portal/v1.4/applications/3be01ec6-7254-4ce3-a3f1-87636d59c614/apis"
+    "urlPath": "/api/portal/v1.4/applications/3be01ec6-7254-4ce3-a3f1-87636d59c614/apis",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    }
   },
   "response": {
     "status": 201,
