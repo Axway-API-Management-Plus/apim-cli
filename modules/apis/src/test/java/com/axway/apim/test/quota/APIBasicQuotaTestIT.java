@@ -11,7 +11,6 @@ import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -31,7 +30,6 @@ public class APIBasicQuotaTestIT extends TestNGCitrusSpringSupport {
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run() throws IOException, InterruptedException {
         ImportTestAction swaggerImport = new ImportTestAction();
         description("Import an API containing a quota definition");

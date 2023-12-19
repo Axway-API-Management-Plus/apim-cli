@@ -41,7 +41,7 @@ public class IgnoreClientAppsTestIT extends TestNGCitrusSpringSupport {
 			.header("Content-Type", "application/json")
 			.body("{\"name\":\"${testAppName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).extract(fromBody()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
             .expression("$.id", "testAppId")
 			.expression("$.name", "testAppName")));
 

@@ -10,7 +10,6 @@ import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ public class DuplicateApplicationSubscriptionTestIT extends TestNGCitrusSpringSu
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run() throws IOException {
         ImportTestAction swaggerImport = new ImportTestAction();
         description("Verify subscription handling, if App isn't unique based on the name (See issue #217)");

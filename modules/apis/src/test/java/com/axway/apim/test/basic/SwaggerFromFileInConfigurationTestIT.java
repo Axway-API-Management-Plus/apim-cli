@@ -10,7 +10,6 @@ import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -29,7 +28,6 @@ public class SwaggerFromFileInConfigurationTestIT extends TestNGCitrusSpringSupp
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run() throws IOException {
         ImportTestAction swaggerImport = new ImportTestAction();
         description("Validates a Swagger-File can be taken from a file path described in json configuration file");

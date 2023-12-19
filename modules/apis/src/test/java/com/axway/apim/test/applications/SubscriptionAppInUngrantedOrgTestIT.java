@@ -39,7 +39,7 @@ public class SubscriptionAppInUngrantedOrgTestIT extends TestNGCitrusSpringSuppo
         variable("appName2", "App in ungranted org ${apiNumber}");
         $(http().client(apiManager).send().post("/applications").name("orgCreatedRequest").message().header("Content-Type", "application/json")
 			.body("{\"name\":\"${appName1}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).extract(fromBody()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
             .expression("$.id", "testAppId1")
 			.expression("$.name", "testAppName1")));
 

@@ -62,7 +62,7 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
             .body("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).extract(fromBody()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
             .expression("$.id", "consumingTestApp1Id")
             .expression("$.name", "consumingTestApp1Name")));
 

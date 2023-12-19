@@ -8,7 +8,6 @@ import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ public class InboundMethodLevelInvalidOperationTestIT extends TestNGCitrusSpring
     HttpClient apiManager;
 
 	@CitrusTest
-	@Test @Parameters("context")
+	@Test
 	public void run() throws IOException {
         ImportTestAction swaggerImport = new ImportTestAction();
 		description("Make sure, the error that an invalid operationId is given is properly handled.");

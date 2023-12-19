@@ -47,7 +47,7 @@ public class VhostConfigOrgWithVHostTestIT extends TestNGCitrusSpringSupport {
 
         $(http().client(apiManager).send().post("/organizations").message().header("Content-Type", "application/json")
 				.body("{\"name\": \"${vhostOrgName}\", \"description\": \"Org 1 with dev permission and VHost\", \"enabled\": true, \"development\": true, \"virtualHost\": \"${vhost}\" }"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
 				.expression("$.name", "${vhostOrgName}")).extract(fromBody()
 				.expression("$.id", "vhostOrgId")));
 

@@ -10,7 +10,6 @@ import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class SwaggerFromURLRefFileInConfigurationTestIT extends TestNGCitrusSpri
     HttpClient apiManager;
 
 	@CitrusTest
-	@Test @Parameters("context")
+	@Test
 	public void run() throws IOException {
         ImportTestAction swaggerImport = new ImportTestAction();
 		description("Validates a Swagger-File can be taken from a URL using a REF-File described in API json configuration");

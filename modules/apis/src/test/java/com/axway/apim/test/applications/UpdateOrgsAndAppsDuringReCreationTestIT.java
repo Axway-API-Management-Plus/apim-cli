@@ -42,7 +42,7 @@ public class UpdateOrgsAndAppsDuringReCreationTestIT extends TestNGCitrusSpringS
 
         $(http().client(apiManager).send().post("/organizations").message().header("Content-Type", "application/json")
             .body("{\"name\": \"${orgName1}\", \"description\": \"Org 1 without dev permission\", \"enabled\": true, \"development\": false }"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
             .expression("$.name", "${orgName1}")).extract(fromBody()
             .expression("$.id", "orgId1")));
 
