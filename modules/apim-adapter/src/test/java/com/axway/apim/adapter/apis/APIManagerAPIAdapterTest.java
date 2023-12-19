@@ -414,16 +414,16 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         apiManagerAPIAdapter.grantClientOrganization(organizations, api, true);
     }
 
-//    @Test
-//    public void grantClientApplication() throws AppException {
-//        ClientAppFilter clientAppFilter = new ClientAppFilter.Builder()
-//            .hasName("Test App 2008")
-//            .build();
-//        ClientApplication clientApplication = apiManagerAdapter.getAppAdapter().getApplication(clientAppFilter);
-//        API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
-//        apiManagerAPIAdapter.grantClientApplication(clientApplication, api);
-//
-//    }
+    @Test
+    public void grantClientApplication() throws AppException {
+        ClientAppFilter clientAppFilter = new ClientAppFilter.Builder()
+            .hasName("Test App 2008")
+            .build();
+        ClientApplication clientApplication = apiManagerAdapter.getAppAdapter().getApplication(clientAppFilter);
+        API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        apiManagerAPIAdapter.grantClientApplication(clientApplication, api);
+
+    }
 
     @Test
     public void revokeClientOrganization() throws AppException {
