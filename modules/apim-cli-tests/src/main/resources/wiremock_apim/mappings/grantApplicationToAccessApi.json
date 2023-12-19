@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "url": "/api/portal/v1.4/applications/3be01ec6-7254-4ce3-a3f1-87636d59c614/apis"
+    "urlPath": "/api/portal/v1.4/applications/3be01ec6-7254-4ce3-a3f1-87636d59c614/apis"
   },
   "response": {
     "status": 201,

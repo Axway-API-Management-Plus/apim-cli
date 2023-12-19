@@ -5,11 +5,6 @@
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%highlight{%d [%c{1}] %-5level: %msg%n%throwable}{STYLE=Logback}"/>
         </Console>
-        <!--        <File name="file" fileName="logs/apim.log">-->
-        <!--            <PatternLayout>-->
-        <!--                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>-->
-        <!--            </PatternLayout>-->
-        <!--        </File>-->
     </Appenders>
     <Loggers>
         <Logger name="com.axway.apim" level="${env:LOG_LEVEL:-info}"/>

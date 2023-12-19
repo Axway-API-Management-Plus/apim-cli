@@ -13,10 +13,11 @@ public class WiremockWrapper {
     WireMockServer wireMockServer;
 
 
-    public void initWiremock(){
+    public void initWiremock() {
 
-        wireMockServer = new WireMockServer(options().httpsPort(8075).jettyIdleTimeout(30000L).jettyStopTimeout(10000L)
-                .usingFilesUnderClasspath("wiremock_apim"));
+        wireMockServer = new WireMockServer(options().httpsPort(8075).jettyIdleTimeout(30000L).jettyStopTimeout(10000L).httpDisabled(true)
+            .templatingEnabled(false)
+            .usingFilesUnderClasspath("wiremock_apim"));
         System.setProperty("http.keepAlive", "false");
         wireMockServer.start();
         LOG.info("Wiremock server started");
