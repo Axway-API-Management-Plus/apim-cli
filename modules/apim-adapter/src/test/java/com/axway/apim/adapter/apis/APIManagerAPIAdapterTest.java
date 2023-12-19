@@ -26,12 +26,9 @@ import java.util.Map;
 
 public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
-    APIManagerAPIAdapter apiManagerAPIAdapter;
-
+    private APIManagerAPIAdapter apiManagerAPIAdapter;
     private APIManagerAdapter apiManagerAdapter;
     private APIManagerOrganizationAdapter orgAdapter;
-
-
 
     @BeforeClass
     public void init() {
@@ -439,6 +436,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
             apiManagerAPIAdapter.grantClientApplication(clientApplication, api);
         }catch (AppException e){
+            e.printStackTrace();
             Assert.fail(e.getMessage());
         }
     }
