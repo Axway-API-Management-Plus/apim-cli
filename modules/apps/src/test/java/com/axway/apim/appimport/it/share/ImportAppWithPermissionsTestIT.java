@@ -24,6 +24,8 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
@@ -45,7 +47,9 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         variable("username2", "User-B-" + no);
         variable("username3", "User-C-" + no);
         // Get organization name
-        $(http().client(apiManager).send().get("/organizations?field=name&op=eq&value=${orgName}"));
+        String orgName = URLEncoder.encode(context.getVariable("orgName"), "UTF-8");
+        // Get organization name
+        $(http().client(apiManager).send().get("/organizations?field=name&op=eq&value="+orgName));
         $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
             .expression("$.[?(@.name=='${orgName}')].name", "@assertThat(hasSize(1))@")).extract(fromBody()
             .expression("$.[?(@.id=='${orgName}')].id", "orgId")));
