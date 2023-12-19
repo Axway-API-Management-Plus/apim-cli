@@ -66,8 +66,6 @@ public enum ErrorCode {
     CHECK_CERTS_FOUND_CERTS(101, "Certificates found that will expire within the given number of days.", false),
     GRANT_ACCESS_APPLICATION_ERR(102, "Error granting application access to API."),
     REVOKE_ACCESS_APPLICATION_ERR(103, "Error revoking application access to API."),
-
-
     INVALID_SECURITY_PROFILE_CONFIG(104, "The given security profile is invalid.", false);
 
 

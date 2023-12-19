@@ -44,7 +44,7 @@ public class UtilsTest {
 
     @Test(expectedExceptions = AppException.class)
     public void testGetAPIDefinitionUriFromFileInvalidFile() throws AppException {
-        Assert.assertEquals("{", Utils.getAPIDefinitionUriFromFile("test.json"));
+        Assert.assertEquals("{", Utils.getAPIDefinitionUriFromFile("test2.json"));
     }
 
     @Test
@@ -353,7 +353,7 @@ public class UtilsTest {
 
     @Test
     void handleAppExceptionErrorCodes() {
-            AppException appException = new AppException("error", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
+        AppException appException = new AppException("error", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
         Assert.assertEquals(103, Utils.handleAppException(appException, LoggerFactory.getLogger("Utils"), new ErrorCodeMapper()));
     }
 
