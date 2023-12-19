@@ -71,7 +71,7 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusSpringSupport {
         description("Update API-Configuration with custom config file");
         $(echo("####### Import configuration #######"));
         context.setVariable("portalName", "MY API-MANAGER NAME");
-        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/apimanager-config.json", context, "settings");
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/apimanager-config.json", context, "settings", true);
 
         $(testContext -> {
             String[] args = {"settings", "import", "-c", updatedConfigFile, "-h",
@@ -88,13 +88,13 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusSpringSupport {
 
 
         $(echo("####### Import configuration using organization administrator role#######"));
-        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/apimanager-config.json", context, "settings");
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/apimanager-config.json", context, "settings", true);
         $(testContext -> {
             String[] args = {"settings", "import", "-c", updatedConfigFile2, "-h",
                 testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${oadminUsername1}"), "-p", testContext.replaceDynamicContentInString("${oadminPassword1}")};
             int returnCode = APIManagerSettingsApp.importConfig(args);
             if (returnCode != 17)
-                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+                throw new ValidationException("Expected RC was: 17 but got: " + returnCode);
         });
     }
 }

@@ -34,12 +34,16 @@ public class TestUtils {
     /**
      * To make testing easier we allow reading test-files from classpath as well
      */
-    public static String createTestConfig(String configFilePath, TestContext context, String tempDirName) {
+    public static String createTestConfig(String configFilePath, TestContext context, String tempDirName, boolean replaceDynamicContent) {
         Resource configFile = Resources.fromClasspath(configFilePath);
         try (Reader reader = configFile.getReader()) {
             String content = IOUtils.toString(reader);
-            String replacedConfig = context.replaceDynamicContentInString(content);
-            return writeDataToFile(configFile, tempDirName, replacedConfig);
+            if(replaceDynamicContent) {
+                String replacedConfig = context.replaceDynamicContentInString(content);
+                return writeDataToFile(configFile, tempDirName, replacedConfig);
+            }else {
+                return writeDataToFile(configFile, tempDirName, content);
+            }
         } catch (IOException e) {
             throw new ValidationException("Unable to create test config file.", e);
         }

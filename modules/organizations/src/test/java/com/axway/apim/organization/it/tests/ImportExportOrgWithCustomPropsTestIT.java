@@ -43,9 +43,10 @@ public class ImportExportOrgWithCustomPropsTestIT extends TestNGCitrusSpringSupp
         variable("orgDescription", "A description for my custom properties org");
 
         $(echo("####### Import organization: '${orgName}' with custom properties #######"));
-        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/organization/orgImport/OrgWithCustomProps.json", context, "orgs");
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/organization/orgImport/OrgWithCustomProps.json",
+            context, "orgs", true);
         $(testContext -> {
-            String[] args = {"user", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"org", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
             int returnCode = OrganizationApp.importOrganization(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
@@ -62,17 +63,19 @@ public class ImportExportOrgWithCustomPropsTestIT extends TestNGCitrusSpringSupp
 
         $(echo("####### Re-Import same organization - Should be a No-Change #######"));
         $(testContext -> {
-            String[] args = {"user", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"org", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
             int returnCode = OrganizationApp.importOrganization(args);
             if (returnCode != 10)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
         $(echo("####### Export the organization: '${orgName}' - To validate custom properties are exported #######"));
-        String tmpDirPath = TestUtils.createTestDirectory("settings").getPath();
+        String tmpDirPath = TestUtils.createTestDirectory("orgs").getPath();
         String orgName = context.replaceDynamicContentInString("${orgName}");
         $(testContext -> {
             String[] args = {"org", "get", "-n", orgName, "-o", "json", "-t", tmpDirPath, "-deleteTarget", "-h",
-                testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+                testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"),
+                "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
             int returnCode = OrganizationApp.exportOrgs(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
@@ -89,7 +92,8 @@ public class ImportExportOrgWithCustomPropsTestIT extends TestNGCitrusSpringSupp
 
         $(echo("####### Re-Import EXPORTED organization - Should be a No-Change #######"));
         $(testContext -> {
-            String[] args = {"user", "import", "-c", exportedOrgPath, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"org", "import", "-c", exportedOrgPath, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
             int returnCode = OrganizationApp.importOrganization(args);
             if (returnCode != 10)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);

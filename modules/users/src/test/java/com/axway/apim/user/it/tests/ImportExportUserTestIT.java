@@ -41,7 +41,7 @@ public class ImportExportUserTestIT extends TestNGCitrusSpringSupport {
         variable("userCustomProperty2", "2");
         variable("userCustomProperty3", "true");
         $(echo("####### Import user: '${loginName}' having custom properties and a password #######"));
-        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/users/userImport/SingleUser.json", context, "users");
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/users/userImport/SingleUser.json", context, "users", true);
         $(testContext -> {
             String[] args = {"user", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
             int returnCode = UserApp.importUsers(args);

@@ -37,7 +37,7 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusSpringSupport 
         $(echo("####### Add Remote-Host 1 #######"));
         variable("remoteHostName", "citrus:concat('sample.remote.host-',  citrus:randomNumber(4))");
         variable("remoteHostPort", "8888");
-        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings");
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings", true);
         $(testContext -> {
             String[] args = {"settings", "import", "-c", updatedConfigFile, "-h",
                 testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
@@ -55,7 +55,7 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusSpringSupport 
         $(echo("####### Add Remote-Host  ${remoteHostName}  #######"));
         variable("remoteHostName", "citrus:concat('sample.remote.host-',  citrus:randomNumber(4))");
         variable("remoteHostPort", "9999");
-        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings");
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings", true);
 
         $(testContext -> {
             String[] args = {"settings", "import", "-c", updatedConfigFile2, "-h",
@@ -77,7 +77,7 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusSpringSupport 
 
         $(echo("####### Update remote host 2 #######"));
         variable("$remoteHostPort", "9999");
-        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings");
+        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/setup/it/tests/remote-host-1.json", context, "settings", true);
 
         $(testContext -> {
             String[] args = {"settings", "import", "-c", updatedConfigFile3, "-h",

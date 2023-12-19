@@ -1,140 +1,170 @@
 package com.axway.apim.appimport.it.share;
 
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.TestUtils;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.appimport.it.ExportAppTestAction;
-import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.test.actions.TestParams;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.message.MessageType;
+import com.axway.apim.appexport.ApplicationExportApp;
+import com.axway.apim.appimport.ClientApplicationImportApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.dsl.JsonPathSupport;
+import org.citrusframework.exceptions.ValidationException;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-@Test
-public class ImportAppWithPermissionsTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
-    private static final String PACKAGE = "/com/axway/apim/appimport/apps/appPermissions/";
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
 
-    ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private HttpClient apiManager;
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run(@Optional @CitrusResource TestContext context) throws IOException {
         description("Import application incl. shares into API-Manager");
+        ObjectMapper mapper = new ObjectMapper();
+        String no =  RandomNumberFunction.getRandomNumber(4, true);
+        variable("username1", "User-A-" + no);
+        variable("username2", "User-B-" + no);
+        variable("username3", "User-C-" + no);
+        $(http().client(apiManager).send().post("/users").message().header("Content-Type", "application/json")
+            .body("{\"loginName\":\"${username1}\",\"name\":\"${username1}\",\"email\":\"${username1}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
+            .expression("$.id", "userId-1")));
+        $(echo("####### Created Test-User 1 to share with: '${username1}' (${userId-1}) #######"));
 
-        ImportAppTestAction importApp = new ImportAppTestAction(context);
-        int no = importApp.getRandomNum();
-        createVariable("username1", "User-A-" + no);
-        createVariable("username2", "User-B-" + no);
-        createVariable("username3", "User-C-" + no);
-        http(builder -> builder.client("apiManager").send().post("/users").header("Content-Type", "application/json")
-            .payload("{\"loginName\":\"${username1}\",\"name\":\"${username1}\",\"email\":\"${username1}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
-            .extractFromPayload("$.id", "userId-1"));
-        echo("####### Created Test-User 1 to share with: '${username1}' (${userId-1}) #######");
+        $(http().client(apiManager).send().post("/users").message().header("Content-Type", "application/json")
+            .body("{\"loginName\":\"${username2}\",\"name\":\"${username2}\",\"email\":\"${username2}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
+            .expression("$.id", "userId-2")));
+        $(echo("####### Created Test-User 2 to share with: '${username2}' (${userId-2}) #######"));
 
-        http(builder -> builder.client("apiManager").send().post("/users").header("Content-Type", "application/json")
-            .payload("{\"loginName\":\"${username2}\",\"name\":\"${username2}\",\"email\":\"${username2}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
-            .extractFromPayload("$.id", "userId-2"));
-        echo("####### Created Test-User 2 to share with: '${username2}' (${userId-2}) #######");
-
-        http(builder -> builder.client("apiManager").send().post("/users").header("Content-Type", "application/json")
-            .payload("{\"loginName\":\"${username3}\",\"name\":\"${username3}\",\"email\":\"${username3}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
-            .extractFromPayload("$.id", "userId-3"));
-        echo("####### Created Test-User 3 to share with: '${username3}' (${userId-3}) #######");
+        $(http().client(apiManager).send().post("/users").message().header("Content-Type", "application/json")
+            .body("{\"loginName\":\"${username3}\",\"name\":\"${username3}\",\"email\":\"${username3}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
+            .expression("$.id", "userId-3")));
+        $(echo("####### Created Test-User 3 to share with: '${username3}' (${userId-3}) #######"));
 
         variable("appName", "Shared-App-" + no);
 
-        echo("####### Import application: '${appName}' #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "AppWith2Permissions.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
+        $(echo("####### Import application: '${appName}' #######"));
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWith2Permissions.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Validate application: '${appName}' has been imported #######");
-        http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
+        $(echo("####### Validate application: '${appName}' has been imported #######"));
+        $(http().client(apiManager).send().get("/applications?field=name&op=eq&value=${appName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")).extract(fromBody()
+            .expression("$.[?(@.name=='${appName}')].id", "appId")));
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
-            .extractFromPayload("$.[?(@.name=='${appName}')].id", "appId"));
+        $(echo("####### Validate application: '${appName}' (${appId}) has defined permissions #######"));
+        $(http().client(apiManager).send().get("/applications/${appId}/permissions"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.*.id", "@assertThat(hasSize(3))@")   // Must be three, as the application is created by an OrgAdmin
+            .expression("$.[?(@.userId=='${userId-1}')].permission", "manage")
+            .expression("$.[?(@.userId=='${userId-2}')].permission", "view")));
 
-        echo("####### Validate application: '${appName}' (${appId}) has defined permissions #######");
-        http(builder -> builder.client("apiManager").send().get("/applications/${appId}/permissions").header("Content-Type", "application/json"));
+       $(echo("####### Re-Import same application - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
+        });
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.*.id", "@assertThat(hasSize(3))@")   // Must be three, as the application is created by an OrgAdmin
-            .validate("$.[?(@.userId=='${userId-1}')].permission", "manage")
-            .validate("$.[?(@.userId=='${userId-2}')].permission", "view"));
+       $(echo("####### Reduce number of permissions #######"));
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWith1Permission1Invalid.json", context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile2, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Re-Import same application - Should be a No-Change #######");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "10");
-        importApp.doExecute(context);
+        $(echo("####### Validate application: '${appName}' (${appId}) has reduced permissions #######"));
+        $(http().client(apiManager).send().get("/applications/${appId}/permissions"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.*.id", "@assertThat(hasSize(2))@")   // Must be three, as the application is created by an OrgAdmin
+            .expression("$.[?(@.userId=='${userId-2}')].permission", "view")));
 
-        echo("####### Reduce number of permissions #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "AppWith1Permission1Invalid.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
+        $(echo("####### Replicate with ALL permissions #######"));
+        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWithALLPermissions.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile3, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Validate application: '${appName}' (${appId}) has reduced permissions #######");
-        http(builder -> builder.client("apiManager").send().get("/applications/${appId}/permissions").header("Content-Type", "application/json"));
+        $(echo("####### Validate application: '${appName}' (${appId}) has permissions for ALL users #######"));
+        $(http().client(apiManager).send().get("/applications/${appId}/permissions"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.*.id", "@assertThat(hasSize(4))@")   // Must be four, as the application is created by an OrgAdmin
+            .expression("$.[?(@.userId=='${userId-1}')].permission", "view")
+            .expression("$.[?(@.userId=='${userId-2}')].permission", "view")
+            .expression("$.[?(@.userId=='${userId-3}')].permission", "view")));
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.*.id", "@assertThat(hasSize(2))@")   // Must be three, as the application is created by an OrgAdmin
-            .validate("$.[?(@.userId=='${userId-2}')].permission", "view"));
+        $(echo("####### Replicate with ALL permissions and ONE Manage override for user: ${username2} #######"));
+        String updatedConfigFile4 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWithALLPermOneOverride.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile4, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Replicate with ALL permissions #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "AppWithALLPermissions.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
+        $(echo("####### Validate application: '${appName}' (${appId}) has permissions for ALL users and ONE manage #######"));
+        $(http().client(apiManager).send().get("/applications/${appId}/permissions"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.*.id", "@assertThat(hasSize(4))@")   // Must be four, as the application is created by an OrgAdmin
+            .expression("$.[?(@.userId=='${userId-1}')].permission", "view")
+            .expression("$.[?(@.userId=='${userId-2}')].permission", "manage")
+            .expression("$.[?(@.userId=='${userId-3}')].permission", "view")));
 
-        echo("####### Validate application: '${appName}' (${appId}) has permissions for ALL users #######");
-        http(builder -> builder.client("apiManager").send().get("/applications/${appId}/permissions").header("Content-Type", "application/json"));
+        $(echo("####### Export the application: '${appName}' - To validate permissions are exported #######"));
+        String tmpDirPath = TestUtils.createTestDirectory("apps").getPath();
+        String appName = context.replaceDynamicContentInString("${appName}");
 
-            http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.*.id", "@assertThat(hasSize(4))@")   // Must be four, as the application is created by an OrgAdmin
-            .validate("$.[?(@.userId=='${userId-1}')].permission", "view")
-            .validate("$.[?(@.userId=='${userId-2}')].permission", "view")
-            .validate("$.[?(@.userId=='${userId-3}')].permission", "view"));
-
-        echo("####### Replicate with ALL permissions and ONE Manage override for user: ${username2} #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "AppWithALLPermOneOverride.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
-
-        echo("####### Validate application: '${appName}' (${appId}) has permissions for ALL users and ONE manage #######");
-        http(builder -> builder.client("apiManager").send().get("/applications/${appId}/permissions").header("Content-Type", "application/json"));
-
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.*.id", "@assertThat(hasSize(4))@")   // Must be four, as the application is created by an OrgAdmin
-            .validate("$.[?(@.userId=='${userId-1}')].permission", "view")
-            .validate("$.[?(@.userId=='${userId-2}')].permission", "manage")
-            .validate("$.[?(@.userId=='${userId-3}')].permission", "view"));
-
-        ExportAppTestAction exportApp = new ExportAppTestAction(context);
-
-        echo("####### Export the application: '${appName}' - To validate permissions are exported #######");
-        createVariable(TestParams.PARAM_TARGET, exportApp.getTestDirectory().getPath());
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        createVariable(TestParams.PARAM_OUTPUT_FORMAT, "json");
-        createVariable(TestParams.PARAM_NAME, "${appName}");
-        exportApp.doExecute(context);
-
-        Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "Expected to have one application exported");
-        String exportedConfig = exportApp.getLastResult().getExportedFiles().get(0);
-
+        $(testContext -> {
+            String[] args = {"org", "get", "-n", appName, "-t", tmpDirPath, "-deleteTarget", "-h", testContext.getVariable("apiManagerHost"), "-u",
+                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-o", "json"};
+            int returnCode = ApplicationExportApp.export(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
+        Assert.assertEquals(new File(tmpDirPath, appName).listFiles().length, 1, "Expected to have one application exported");
+        String exportedConfig = new File(tmpDirPath, appName).listFiles()[0].getPath();
         ClientApplication exportedApp = mapper.readValue(new File(exportedConfig), ClientApplication.class);
-
         Assert.assertNotNull(exportedApp.getPermissions(), "Exported client application must have permissions");
         Assert.assertEquals(exportedApp.getPermissions().size(), 4, "Exported client application must have 4 permissions");
     }
