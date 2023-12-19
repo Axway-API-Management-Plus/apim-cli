@@ -1,6 +1,7 @@
 package com.axway.apim;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ public class WiremockWrapper {
 
         wireMockServer = new WireMockServer(options().httpsPort(8075).jettyIdleTimeout(30000L).jettyStopTimeout(10000L).httpDisabled(true)
             .templatingEnabled(false)
+            .notifier(new ConsoleNotifier(true))
             .usingFilesUnderClasspath("wiremock_apim"));
         System.setProperty("http.keepAlive", "false");
         wireMockServer.start();
