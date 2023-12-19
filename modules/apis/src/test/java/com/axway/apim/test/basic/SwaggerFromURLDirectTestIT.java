@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import static org.citrusframework.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.actions.TraceVariablesAction.Builder.traceVariables;
 import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
 import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
@@ -36,7 +37,7 @@ public class SwaggerFromURLDirectTestIT extends TestNGCitrusSpringSupport {
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/direct-url-swagger-${apiNumber}");
         variable("apiName", "Direct-URL-Swagger from URL-${apiNumber}");
-        variable("orgNumber", "orgName");
+        $(traceVariables("orgNumber", "orgName"));
 
         $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######"));
         variable(ImportTestAction.API_DEFINITION, "https://petstore.swagger.io/v2/swagger.json");
