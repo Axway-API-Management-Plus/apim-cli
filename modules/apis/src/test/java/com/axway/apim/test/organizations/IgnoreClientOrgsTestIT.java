@@ -58,7 +58,9 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusSpringSupport {
         $(http().client(apiManager).send().get("/proxies"));
         $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
             .expression("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-            .expression("$.[?(@.path=='${apiPath}')].state", "published")));
+            .expression("$.[?(@.path=='${apiPath}')].state", "published")).extract(fromBody()
+            .expression("$.[?(@.path=='${apiPath}')].id", "apiId")));
+
         $(echo("####### Validate second org has no permission #######"));
         $(http().client(apiManager).send().get("/organizations/${noPermOrgId}/apis"));
         $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()

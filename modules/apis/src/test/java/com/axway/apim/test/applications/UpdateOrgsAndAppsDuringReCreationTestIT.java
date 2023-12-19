@@ -48,19 +48,19 @@ public class UpdateOrgsAndAppsDuringReCreationTestIT extends TestNGCitrusSpringS
 
         $(http().client(apiManager).send().post("/organizations").message().header("Content-Type", "application/json")
             .body("{\"name\": \"${orgName2}\", \"description\": \"Org 2 without dev permission\", \"enabled\": true, \"development\": false }"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
             .expression("$.name", "${orgName2}")).extract(fromBody()
             .expression("$.id", "orgId2")));
 
         $(http().client(apiManager).send().post("/organizations").message().header("Content-Type", "application/json")
             .body("{\"name\": \"${orgName3}\", \"description\": \"Org 3 without dev permission\", \"enabled\": true, \"development\": false }"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
             .expression("$.name", "${orgName3}")).extract(fromBody()
             .expression("$.id", "orgId3")));
 
         $(http().client(apiManager).send().post("/organizations").message().header("Content-Type", "application/json")
             .body("{\"name\": \"${orgName4}\", \"description\": \"Org 4 without dev permission\", \"enabled\": true, \"development\": false }"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
                 .expression("$.name", "${orgName4}"))
             .extract(fromBody()
                 .expression("$.id", "orgId4")));
@@ -75,28 +75,28 @@ public class UpdateOrgsAndAppsDuringReCreationTestIT extends TestNGCitrusSpringS
 
         $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
             .body("{\"name\":\"${appName1}\",\"apis\":[],\"organizationId\":\"${orgId1}\"}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
                 .expression("$.name", "${appName1}"))
             .extract(fromBody()
                 .expression("$.id", "appId1")));
 
         $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
             .body("{\"name\":\"${appName2}\",\"apis\":[],\"organizationId\":\"${orgId2}\"}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
                 .expression("$.name", "${appName2}"))
             .extract(fromBody()
                 .expression("$.id", "appId2")));
 
         $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
             .body("{\"name\":\"${appName3}\",\"apis\":[],\"organizationId\":\"${orgId3}\"}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
                 .expression("$.name", "${appName3}"))
             .extract(fromBody()
                 .expression("$.id", "appId3")));
 
         $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
             .body("{\"name\":\"${appName4}\",\"apis\":[],\"organizationId\":\"${orgId4}\"}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
                 .expression("$.name", "${appName4}"))
             .extract(fromBody()
                 .expression("$.id", "appId4")));

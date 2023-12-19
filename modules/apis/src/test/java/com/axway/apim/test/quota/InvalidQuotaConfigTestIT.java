@@ -6,7 +6,6 @@ import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.functions.core.RandomNumberFunction;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ import static org.citrusframework.actions.EchoAction.Builder.echo;
 public class InvalidQuotaConfigTestIT extends TestNGCitrusSpringSupport {
 
 	@CitrusTest
-	@Test @Parameters("context")
+	@Test
 	public void run() throws IOException {
         ImportTestAction swaggerImport = new ImportTestAction();
 		description("Try to import an API with invalid quota configuration.");

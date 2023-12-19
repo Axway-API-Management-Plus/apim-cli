@@ -59,7 +59,8 @@ public class IgnoreClientAppsTestIT extends TestNGCitrusSpringSupport {
         $(http().client(apiManager).send().get("/proxies"));
         $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
 			.expression("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.expression("$.[?(@.path=='${apiPath}')].state", "published")));
+			.expression("$.[?(@.path=='${apiPath}')].state", "published")).extract(fromBody()
+            .expression("$.[?(@.path=='${apiPath}')].id", "apiId")));
 
 		$(echo("####### Validate the application no Access to this API #######"));
         $(http().client(apiManager).send().get("/applications/${testAppId}/apis"));

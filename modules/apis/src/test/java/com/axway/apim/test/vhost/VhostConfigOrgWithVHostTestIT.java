@@ -70,7 +70,7 @@ public class VhostConfigOrgWithVHostTestIT extends TestNGCitrusSpringSupport {
 
         $(echo("####### Manually unpublish this API! #######"));
         $(http().client(apiManager).send().post("/proxies/${apiId}/unpublish"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).validate(jsonPath()
 				.expression("$.[?(@.path=='${apiPath}')].state", "unpublished")));
 
         $(echo("####### Re-Import the API and the VHost must be configured again #######"));
