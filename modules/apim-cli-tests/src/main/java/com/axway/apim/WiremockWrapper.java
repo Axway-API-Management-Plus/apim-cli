@@ -2,6 +2,7 @@ package com.axway.apim;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
+import com.github.tomakehurst.wiremock.common.Notifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +16,17 @@ public class WiremockWrapper {
 
 
     public void initWiremock() {
+        Notifier notifier;
+        boolean wiremockFlag = Boolean.parseBoolean(System.getenv().getOrDefault("wiremock_debug", "false"));
+        if(wiremockFlag){
+            notifier = new ConsoleNotifier(true);
+        }else {
+            notifier = new ConsoleNotifier(false);
+        }
 
         wireMockServer = new WireMockServer(options().httpsPort(8075).jettyIdleTimeout(30000L).jettyStopTimeout(10000L).httpDisabled(true)
             .templatingEnabled(false)
-            .notifier(new ConsoleNotifier(true))
+            .notifier(notifier)
             .usingFilesUnderClasspath("wiremock_apim"));
         System.setProperty("http.keepAlive", "false");
         wireMockServer.start();
