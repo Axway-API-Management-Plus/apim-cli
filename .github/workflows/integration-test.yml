@@ -8,18 +8,18 @@ env:
   CACHE_FILE_APIM: api-manager_7_7_20231130.cache.tar
   CACHE_FILE_CASSANDRA: cassandra_4_0_11.cache.tar
   FED_FILE: swagger-promote-7.7-20231130.fed
-  LOG_LEVEL: info
+  LOG_LEVEL: debug
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'zulu'
+          distribution: 'temurin'
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
