@@ -89,8 +89,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         GenerateTemplate app = new GenerateTemplate();
         try {
             File file = new File(params.getConfig());
-            if(file.getParentFile() != null && !file.getParentFile().exists()){
-                file.getParentFile().mkdirs();
+            if(file.getParentFile() != null && !file.getParentFile().exists() && (file.getParentFile().mkdirs())){
+                    LOG.info("Created new Directory : {}", file.getParentFile());
             }
             APIConfig apiConfig = app.generateTemplate(params);
             try (FileWriter fileWriter = new FileWriter(params.getConfig())) {
@@ -167,16 +167,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             urlString = "https://localhost";
         }
         API api = new API();
-        List<Tag> tags = openAPI.getTags();
-        if(tags != null) {
-            TagMap apiManagerTags = new TagMap();
-            for (Tag tag : tags) {
-                String[] value = new String[1];
-                value[0] = tag.getName();
-                apiManagerTags.put(tag.getName(), value);
-            }
-            api.setTags(apiManagerTags);
-        }
+        addTags(api, openAPI);
         api.setState("published");
         api.setBackendResourcePath(urlString);
         api.setPath(basePath);
@@ -229,6 +220,19 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
 
         return new APIConfig(api, apiSpecLocation, securityProfiles);
+    }
+
+    public void addTags(API api, OpenAPI openAPI){
+        List<Tag> tags = openAPI.getTags();
+        if(tags != null) {
+            TagMap apiManagerTags = new TagMap();
+            for (Tag tag : tags) {
+                String[] value = new String[1];
+                value[0] = tag.getName();
+                apiManagerTags.put(tag.getName(), value);
+            }
+            api.setTags(apiManagerTags);
+        }
     }
 
     public AuthType matchAuthType(String backendAuthType) {
@@ -417,7 +421,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
     public String downloadCertificatesAndContent(API api, String configPath, String url) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
+                return new X509Certificate[0];
             }
 
             public void checkClientTrusted(X509Certificate[] certs, String authType) {//NOSONAR
