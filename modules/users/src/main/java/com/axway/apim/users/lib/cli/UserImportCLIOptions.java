@@ -37,8 +37,8 @@ public class UserImportCLIOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
-        Console.println("How to imports organizations using the JSON-Config format");
-        Console.println("Import an organization using enviornment properties: env.api-env.properties:");
+        Console.println("How to imports users using the JSON-Config format");
+        Console.println("Import an user using environment properties: env.api-env.properties:");
         Console.println(getBinaryName() + " user import -c user.json -s api-env");
         Console.println(getBinaryName() + " user import -c user.json -h localhost -u apiadmin -p changeme");
         Console.println();
