@@ -41,6 +41,7 @@ public class ImportExportUserTestIT extends TestNGCitrusSpringSupport {
         variable("userCustomProperty2", "2");
         variable("userCustomProperty3", "true");
         $(echo("####### Import user: '${loginName}' having custom properties and a password #######"));
+
         String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/users/userImport/SingleUser.json", context, "users", true);
         $(testContext -> {
             String[] args = {"user", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
@@ -64,9 +65,7 @@ public class ImportExportUserTestIT extends TestNGCitrusSpringSupport {
 
         $(echo("####### Try to login with created user #######"));
         $(http().client(apiManager).send().post("/login").message().contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .body("username=${loginName}&password=${password}&success=/title"));
-
+            .body("username=${loginName}&password=${password}"));
         $(http().client(apiManager).receive().response(HttpStatus.OK));
-
     }
 }
