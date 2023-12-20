@@ -25,7 +25,6 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
@@ -48,11 +47,11 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         variable("username3", "User-C-" + no);
         // Get organization name
         String orgName = URLEncoder.encode(context.getVariable("orgName"), "UTF-8");
-        // Get organization name
         $(http().client(apiManager).send().get("/organizations?field=name&op=eq&value="+orgName));
         $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
-            .expression("$.[?(@.name=='${orgName}')].name", "@assertThat(hasSize(1))@")).extract(fromBody()
-            .expression("$.[?(@.id=='${orgName}')].id", "orgId")));
+            .expression("$.[0].name", "@assertThat(hasSize(1))@")).extract(fromBody()
+            .expression("$.[0].id", "orgId")));
+        $(echo("####### Organization id -  ${orgId} #######"));
         $(http().client(apiManager).send().post("/users").message().header("Content-Type", "application/json")
             .body("{\"loginName\":\"${username1}\",\"name\":\"${username1}\",\"email\":\"${username1}@company.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
         $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
@@ -77,8 +76,8 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWith2Permissions.json",
             context, "apps", true);
         $(testContext -> {
-            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
-                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("oadminUsername1"), "-p", testContext.getVariable("oadminPassword1")};
             int returnCode = ClientApplicationImportApp.importApp(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
@@ -99,8 +98,8 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
 
        $(echo("####### Re-Import same application - Should be a No-Change #######"));
         $(testContext -> {
-            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
-                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("oadminUsername1"), "-p", testContext.getVariable("oadminPassword1")};
             int returnCode = ClientApplicationImportApp.importApp(args);
             if (returnCode != 10)
                 throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
@@ -109,8 +108,8 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
        $(echo("####### Reduce number of permissions #######"));
         String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWith1Permission1Invalid.json", context, "apps", true);
         $(testContext -> {
-            String[] args = {"app", "import", "-c", updatedConfigFile2, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
-                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"app", "import", "-c", updatedConfigFile2, "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("oadminUsername1"), "-p", testContext.getVariable("oadminPassword1")};
             int returnCode = ClientApplicationImportApp.importApp(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
@@ -126,8 +125,8 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWithALLPermissions.json",
             context, "apps", true);
         $(testContext -> {
-            String[] args = {"app", "import", "-c", updatedConfigFile3, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
-                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"app", "import", "-c", updatedConfigFile3, "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("oadminUsername1"), "-p", testContext.getVariable("oadminPassword1")};
             int returnCode = ClientApplicationImportApp.importApp(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
@@ -145,8 +144,8 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         String updatedConfigFile4 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appPermissions/AppWithALLPermOneOverride.json",
             context, "apps", true);
         $(testContext -> {
-            String[] args = {"app", "import", "-c", updatedConfigFile4, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
-                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            String[] args = {"app", "import", "-c", updatedConfigFile4, "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("oadminUsername1"), "-p", testContext.getVariable("oadminPassword1")};
             int returnCode = ClientApplicationImportApp.importApp(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
@@ -165,8 +164,8 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         String appName = context.replaceDynamicContentInString("${appName}");
 
         $(testContext -> {
-            String[] args = {"org", "get", "-n", appName, "-t", tmpDirPath, "-deleteTarget", "-h", testContext.getVariable("apiManagerHost"), "-u",
-                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-o", "json"};
+            String[] args = {"org", "get", "-n", appName, "-t", tmpDirPath, "-deleteTarget",  "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("oadminUsername1"), "-p", testContext.getVariable("oadminPassword1"), "-o", "json"};
             int returnCode = ApplicationExportApp.export(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
