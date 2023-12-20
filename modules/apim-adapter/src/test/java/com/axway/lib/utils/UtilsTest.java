@@ -44,7 +44,7 @@ public class UtilsTest {
 
     @Test(expectedExceptions = AppException.class)
     public void testGetAPIDefinitionUriFromFileInvalidFile() throws AppException {
-        Assert.assertEquals("{", Utils.getAPIDefinitionUriFromFile("test.json"));
+        Assert.assertEquals("{", Utils.getAPIDefinitionUriFromFile("test2.json"));
     }
 
     @Test

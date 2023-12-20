@@ -1,17 +1,18 @@
 package com.axway.apim.export.test.methodLevel;
 
+import com.axway.apim.EndpointConfig;
 import com.axway.apim.api.model.*;
 import com.axway.apim.export.test.ExportTestAction;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -22,21 +23,21 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.testng.Assert.*;
 
-@Test
-public class MethodLevelExportTestIT extends TestNGCitrusTestRunner {
 
-	private ExportTestAction swaggerExport;
-	private ImportTestAction swaggerImport;
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class MethodLevelExportTestIT extends TestNGCitrusSpringSupport {
 
 	@CitrusTest
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 
-		swaggerExport = new ExportTestAction();
-		swaggerImport = new ImportTestAction();
+        ExportTestAction swaggerExport = new ExportTestAction();
+        ImportTestAction swaggerImport = new ImportTestAction();
 		description("Import an API with method level settings to export it afterwards");
 
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -50,21 +51,20 @@ public class MethodLevelExportTestIT extends TestNGCitrusTestRunner {
 		variable("exportFolder", "api-test-${apiName}");
 		variable("exportAPIName", "${apiName}.json");
 
-		echo("####### Importing the API with method level setting, which should exported in the second step #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/test/export/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/test/export/files/methodLevel/inbound-api-key-and-cors.json");
-		createVariable("backendBasepath", "http://petstore.swagger.io/v3");
-		createVariable("expectedReturnCode", "0");
-		swaggerImport.doExecute(context);
+		$(echo("####### Importing the API with method level setting, which should exported in the second step #######"));
+        variable(ImportTestAction.API_DEFINITION,  "/test/export/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG,  "/test/export/files/methodLevel/inbound-api-key-and-cors.json");
+        variable("backendBasepath", "http://petstore.swagger.io/v3");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
 
-		echo("####### Export the API from the API-Manager #######");
-		createVariable("expectedReturnCode", "0");
-		swaggerExport.doExecute(context);
+        $(echo("####### Export the API from the API-Manager #######"));
+        variable("expectedReturnCode", "0");
+        $(swaggerExport);
 
 		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/api-config.json";
 
-		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
-		mapper.disable(MapperFeature.USE_ANNOTATIONS);
+        $(echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######"));
 		JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(new File(exportedAPIConfigFile).toPath()));
 		JsonNode importedAPIConfig = mapper.readTree(this.getClass().getResourceAsStream("/test/export/files/methodLevel/inbound-api-key-and-cors.json"));
 

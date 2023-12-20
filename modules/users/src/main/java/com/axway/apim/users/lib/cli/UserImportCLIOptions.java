@@ -39,8 +39,8 @@ public class UserImportCLIOptions extends CLIOptions {
         Console.println("----------------------------------------------------------------------------------------");
         Console.println("How to imports organizations using the JSON-Config format");
         Console.println("Import an organization using enviornment properties: env.api-env.properties:");
-        Console.println(getBinaryName() + " org import -c myOrgs/partner-org.json -s api-env");
-        Console.println(getBinaryName() + " org import -c myOrgs/development-org.json -h localhost -u apiadmin -p changeme");
+        Console.println(getBinaryName() + " user import -c user.json -s api-env");
+        Console.println(getBinaryName() + " user import -c user.json -h localhost -u apiadmin -p changeme");
         Console.println();
         Console.println();
         Console.println("For more information and advanced examples please visit:");

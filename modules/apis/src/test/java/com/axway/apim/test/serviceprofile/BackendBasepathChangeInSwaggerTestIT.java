@@ -1,41 +1,42 @@
 package com.axway.apim.test.serviceprofile;
 
-import java.io.IOException;
-
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.DefaultTestActionBuilder;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
+import java.io.IOException;
 
-@Test
-public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
-	private ImportTestAction swaggerImport;
-	
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusSpringSupport {
+
+    @Autowired
+    HttpClient apiManager;
+
 	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
+	@Test
+	public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
 		description("Import Swagger Spec without any host");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/basepath-changed-in-swagger-test-${apiNumber}");
 		variable("apiName", "Basepath changed in Swagger Test ${apiNumber}");
-		echo("####### Try to import an API without having the host configured at all #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-without-any-host.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://petstore.swagger.io");
-		createVariable("apiPath", "/basepath-changed-in-swagger-test-2-${apiNumber}");
-		createVariable("apiName", "Basepath changed in Swagger Test 2 ${apiNumber}");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", "0");
-		swaggerImport.doExecute(context);
-
+		$(echo("####### Try to import an API without having the host configured at all #######"));
+        variable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-without-any-host.json");
+        variable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
+        variable("backendBasepath", "https://petstore.swagger.io");
+        variable("apiPath", "/basepath-changed-in-swagger-test-2-${apiNumber}");
+        variable("apiName", "Basepath changed in Swagger Test 2 ${apiNumber}");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", "0");
+        $(DefaultTestActionBuilder.action(swaggerImport));
 	}
 }

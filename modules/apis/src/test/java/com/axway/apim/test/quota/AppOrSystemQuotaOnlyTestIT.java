@@ -1,86 +1,86 @@
 package com.axway.apim.test.quota;
 
-import java.io.IOException;
-
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
+import java.io.IOException;
 
-@Test
-public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestRunner {
-	
-	private ImportTestAction swaggerImport;
-	
-	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
-		swaggerImport = new ImportTestAction();
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.actions.SleepAction.Builder.sleep;
+import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
-		description("Validates quota is set when only System- or Application-Quota is configured (see bug #55)");
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusSpringSupport {
 
-		createVariable("useApiAdmin", "true"); // Use apiadmin account
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/only-one-quota-api-${apiNumber}");
-		variable("apiName", "Only-One-Quota-API-${apiNumber}");
+    @Autowired
+    HttpClient apiManager;
 
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with System-Quota only #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/3_api-with-system-quota-only.json");
-		createVariable("state", "published");
-		createVariable("expectedReturnCode", "0");
-		createVariable("systemPeriod", "hour");
-		createVariable("messages", "345");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate API: '${apiName}' has a been imported including System-Quota #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
+    @CitrusTest
+    @Test
+    public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        description("Validates quota is set when only System- or Application-Quota is configured (see bug #55)");
+        variable("useApiAdmin", "true"); // Use apiadmin account
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+        variable("apiPath", "/only-one-quota-api-${apiNumber}");
+        variable("apiName", "Only-One-Quota-API-${apiNumber}");
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' with System-Quota only #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/quota/3_api-with-system-quota-only.json");
+        variable("state", "published");
+        variable("expectedReturnCode", "0");
+        variable("systemPeriod", "hour");
+        variable("messages", "345");
+        $(action(swaggerImport));
 
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
-		
-		echo("####### Check System-Quotas have been setup as configured #######");
-		echo("####### ############ Sleep 2 seconds ##################### #######");
-		Thread.sleep(2000);
-		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").name("api").header("Content-Type", "application/json"));
+        $(echo("####### Validate API: '${apiName}' has a been imported including System-Quota #######"));
+        $(http().client(apiManager).send().get("/proxies"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+            .expression("$.[?(@.path=='${apiPath}')].state", "published")).extract(fromBody()
+            .expression("$.[?(@.path=='${apiPath}')].id", "apiId")));
 
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttle")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].method", "*")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.messages", "345")
-			//.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "hour")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "5"));
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with Appliction-Quota only #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/4_api-with-app-quota-only2.json");
-		createVariable("state", "published");
-		createVariable("expectedReturnCode", "0");
-		createVariable("applicationPeriod", "day");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Check Application-Quotas have been setup as configured #######");
-		echo("####### ############ Sleep 2 seconds ##################### #######");
-		Thread.sleep(2000);
-		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000001").name("api")	.header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttlemb")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].method", "*")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.mb", "787")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "day") 
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "4"));
-		
-	}
+        $(echo("####### Check System-Quotas have been setup as configured #######"));
+        $(echo("####### ############ Sleep 2 seconds ##################### #######"));
+        $(sleep().seconds(2));
+        $(http().client(apiManager).send().get("/quotas/00000000-0000-0000-0000-000000000000"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.restrictions.[?(@.api=='${apiId}')].type", "throttle")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].method", "*")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].config.messages", "345")
+            //.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "hour")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].config.per", "5")));
+
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' with Appliction-Quota only #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/quota/4_api-with-app-quota-only2.json");
+        variable("state", "published");
+        variable("expectedReturnCode", "0");
+        variable("applicationPeriod", "day");
+        $(action(swaggerImport));
+
+        $(echo("####### Check Application-Quotas have been setup as configured #######"));
+        $(echo("####### ############ Sleep 2 seconds ##################### #######"));
+        $(sleep().seconds(2));
+        $(http().client(apiManager).send().get("/quotas/00000000-0000-0000-0000-000000000001").name("api"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            .expression("$.restrictions.[?(@.api=='${apiId}')].type", "throttlemb")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].method", "*")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].config.mb", "787")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].config.period", "day")
+            .expression("$.restrictions.[?(@.api=='${apiId}')].config.per", "4")));
+
+    }
 }

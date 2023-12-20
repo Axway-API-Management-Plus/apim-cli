@@ -1,110 +1,123 @@
 package com.axway.apim.appimport.it.basic;
 
-import java.io.IOException;
-
-import com.axway.apim.test.actions.TestParams;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.TestUtils;
+import com.axway.apim.appimport.ClientApplicationImportApp;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.dsl.JsonPathSupport;
+import org.citrusframework.exceptions.ValidationException;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.lib.error.AppException;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
 
-@Test
-public class ImportSimpleApplicationTestIT extends TestNGCitrusTestRunner {
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class ImportSimpleApplicationTestIT extends TestNGCitrusSpringSupport {
 
-    private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
+    @Autowired
+    private HttpClient apiManager;
 
     @CitrusTest
     @Test
-    @Parameters("context")
-    public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+    public void run(@Optional @CitrusResource TestContext context) {
         description("Import application into API-Manager");
+        variable("appName", "My-App-" + RandomNumberFunction.getRandomNumber(4, true));
+        $(echo("####### Import application: '${appName}' #######"));
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/SimpleTestApplication.json", context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        ImportAppTestAction importApp = new ImportAppTestAction(context);
+        $(echo("####### Validate application: '${appName}' has been imported #######"));
+        $(http().client(apiManager).send().get("/applications?field=name&op=eq&value=${appName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")));
 
-        variable("appName", "My-App-" + importApp.getRandomNum());
-
-        echo("####### Import application: '${appName}' #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "SimpleTestApplication.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
-
-        echo("####### Validate application: '${appName}' has been imported #######");
-        http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
-
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
-            .extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
-
-        echo("####### Re-Import same application - Should be a No-Change #######");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "10");
-        importApp.doExecute(context);
+        $(echo("####### Re-Import same application - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
+        });
     }
 
     @CitrusTest
     @Test
     @Parameters("context")
-    public void importAsAdmin(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+    public void importAsAdmin(@Optional @CitrusResource TestContext context) {
         description("Import application into API-Manager using an admin account");
-
-        ImportAppTestAction importApp = new ImportAppTestAction(context);
-
-        variable("appName", "My-Admin-App-" + importApp.getRandomNum());
+        variable("appName", "My-Admin-App-" + RandomNumberFunction.getRandomNumber(4, true));
         // Directly use an admin-account, otherwise the OrgAdmin organization is used by default
-        createVariable(TestParams.PARAM_OADMIN_USERNAME, "apiadmin");
-        createVariable(TestParams.PARAM_OADMIN_PASSWORD, "changeme");
+        variable("useApiAdmin", "true");
+        $(echo("####### Import application: '${appName}' #######"));
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/SimpleTestApplication.json", context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Import application: '${appName}' #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "SimpleTestApplication.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
-
-        echo("####### Validate application: '${appName}' has been imported #######");
-        http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
-
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
-            .extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
-
-        echo("####### Re-Import same application - Should be a No-Change #######");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "10");
-        importApp.doExecute(context);
+        $(echo("####### Validate application: '${appName}' has been imported #######"));
+        $(http().client(apiManager).send().get("/applications?field=name&op=eq&value=${appName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")));
+        $(echo("####### Re-Import same application - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
+        });
     }
 
     @CitrusTest
     @Test
     @Parameters("context")
-    public void importDisabledApplication(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+    public void importDisabledApplication(@Optional @CitrusResource TestContext context) {
         description("Import application into API-Manager which is disabled");
-
-        ImportAppTestAction importApp = new ImportAppTestAction(context);
-
         variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
-        variable("appName", "Disabled-App-" + importApp.getRandomNum());
+        variable("appName", "Disabled-App-" + RandomNumberFunction.getRandomNumber(4, true));
 
-        echo("####### Import application: '${appName}' #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "DisabledApplication.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
+        $(echo("####### Import application: '${appName}' #######"));
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/DisabledApplication.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Validate disabled application: '${appName}' has been imported #######");
-        http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
+        $(echo("####### Validate disabled application: '${appName}' has been imported #######"));
+        $(http().client(apiManager).send().get("/applications?field=name&op=eq&value=${appName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
+            .expression("$.[?(@.name=='${appName}')].enabled", "false")));
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
-            .validate("$.[?(@.name=='${appName}')].enabled", "false")
-            .extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
-
-        echo("####### Re-Import same application - Should be a No-Change #######");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "10");
-        importApp.doExecute(context);
+        $(echo("####### Re-Import same application - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
+        });
     }
 }

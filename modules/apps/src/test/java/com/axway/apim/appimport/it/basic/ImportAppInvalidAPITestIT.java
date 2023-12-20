@@ -1,37 +1,35 @@
 package com.axway.apim.appimport.it.basic;
 
-import java.io.IOException;
-
-import com.axway.apim.test.actions.TestParams;
+import com.axway.apim.TestUtils;
+import com.axway.apim.appimport.ClientApplicationImportApp;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.exceptions.ValidationException;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.lib.error.AppException;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
 @Test
-public class ImportAppInvalidAPITestIT extends TestNGCitrusTestRunner {
-
-    private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
+public class ImportAppInvalidAPITestIT extends TestNGCitrusSpringSupport {
 
     @CitrusTest
     @Test
-    @Parameters("context")
-    public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+    public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) {
         description("Trying to import an application that requests access to an unknown API");
-        ImportAppTestAction importApp = new ImportAppTestAction(context);
-
-        variable("appName", "Complete-App-" + importApp.getRandomNum());
+        variable("appName", "Complete-App-" + RandomNumberFunction.getRandomNumber(4, true));
         variable("apiName1", "This-API-is-unkown");
-
-        echo("####### Import application: '${appName}' with access to ONE UNKNOWN API #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "AppWithAPIAccess.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "56");
-        importApp.doExecute(context);
+        $(echo("####### Import application: '${appName}' with access to ONE UNKNOWN API #######"));
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/AppWithAPIAccess.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 56)
+                throw new ValidationException("Expected RC was: 56 but got: " + returnCode);
+        });
     }
 }

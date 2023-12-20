@@ -44,7 +44,7 @@ public class ImageComparisionTest {
 
 		Assert.assertEquals(rc, false, "Word API has been removed from the image, hence images don't match anymore.");
 	}
-	
+
 	@Test
 	public void testMediumImage() throws AppException, IOException {
 		// Load the API-Image as it defined by the user
@@ -55,7 +55,7 @@ public class ImageComparisionTest {
 
 		Assert.assertEquals(rc, true, "Must be realized as to be the same image.");
 	}
-	
+
 	@Test
 	public void testLargeImage() throws AppException, IOException {
 		// Load the API-Image as it defined by the user

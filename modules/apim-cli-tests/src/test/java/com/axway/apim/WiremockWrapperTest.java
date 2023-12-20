@@ -2,7 +2,6 @@ package com.axway.apim;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import wiremock.org.eclipse.jetty.util.IO;
 
 import java.io.IOException;
 import java.net.*;

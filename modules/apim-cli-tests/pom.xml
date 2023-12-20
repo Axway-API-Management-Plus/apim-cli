@@ -18,59 +18,64 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8-standalone</artifactId>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
             <version>${wiremock.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-base</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-spring</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-endpoint-catalog</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-http</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-testng</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-validation-json</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-java-dsl</artifactId>
+            <groupId>org.citrusframework</groupId>
+            <artifactId>citrus-validation-xml</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
+            <artifactId>citrus-java-dsl</artifactId>
+            <version>4.0.0-M1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-sql</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-groovy</artifactId>
             <version>${citrus.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.consol.citrus</groupId>
+            <groupId>org.citrusframework</groupId>
             <artifactId>citrus-validation-hamcrest</artifactId>
-            <version>3.4.0</version>
+            <version>${citrus.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

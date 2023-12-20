@@ -1,52 +1,54 @@
 package com.axway.apim.test.basic;
 
+import com.axway.apim.EndpointConfig;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-@Test
-public class UnpublishDeleteMustBeBreakingTestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
-	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException {
-		ImportTestAction swaggerImport = new ImportTestAction();
-		echo("####### This test makes sure, once an API is published, unpublishing or deleting it requires a force #######");
-		variable("useApiAdmin", "true"); // Use apiadmin account
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
-		variable("apiPath", "/check-is-breaking-${apiNumber}");
-		variable("apiName", "Check-is-Breaking-${apiNumber}");
 
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' as Published #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("state", "published");
-		createVariable("version", "1.0.0");
-		createVariable("expectedReturnCode", "0");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate unpublishing it, will fail, with the need to enforce it #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("state", "unpublished");
-		createVariable("enforce", "false");
-		createVariable("expectedReturnCode", "15");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate deleting it, will fail, with the need to enforce it #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("state", "deleted");
-		createVariable("expectedReturnCode", "15");
-		swaggerImport.doExecute(context);
-	}
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class UnpublishDeleteMustBeBreakingTestIT extends TestNGCitrusSpringSupport {
+
+    @CitrusTest
+    @Test
+    public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        $(echo("####### This test makes sure, once an API is published, unpublishing or deleting it requires a force #######"));
+        variable("useApiAdmin", "true"); // Use apiadmin account
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
+        variable("apiPath", "/check-is-breaking-${apiNumber}");
+        variable("apiName", "Check-is-Breaking-${apiNumber}");
+
+
+        $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' as Published #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+        variable("state", "published");
+        variable("version", "1.0.0");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
+
+        $(echo("####### Validate unpublishing it, will fail, with the need to enforce it #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+        variable("state", "unpublished");
+        variable("enforce", "false");
+        variable("expectedReturnCode", "15");
+        $(action(swaggerImport));
+
+        $(echo("####### Validate deleting it, will fail, with the need to enforce it #######"));
+        variable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+        variable("state", "deleted");
+        variable("expectedReturnCode", "15");
+        $(action(swaggerImport));
+    }
 }
