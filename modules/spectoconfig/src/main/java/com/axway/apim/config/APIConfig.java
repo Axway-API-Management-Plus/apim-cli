@@ -4,7 +4,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.config.model.APISecurity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.*;
@@ -12,7 +11,6 @@ import java.util.*;
 @JsonPropertyOrder({"name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
     "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
     "corsProfiles", "caCerts"})
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class APIConfig {
 
     public static final String DEFAULT = "_default";

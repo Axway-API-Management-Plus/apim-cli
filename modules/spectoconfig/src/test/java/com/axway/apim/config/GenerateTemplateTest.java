@@ -46,16 +46,7 @@ public class GenerateTemplateTest {
         Executors.newSingleThreadExecutor().execute(() -> {
             try(ServerConnector connector = new ServerConnector(server)) {
                 connector.setPort(7070);
-                HttpConfiguration http_config = new HttpConfiguration();
-                http_config.setSecureScheme("https");
-                http_config.setSecurePort(8443);
-
-                http_config.setOutputBufferSize(32768);
-                HttpConfiguration https_config = new HttpConfiguration(http_config);
-                SecureRequestCustomizer src = new SecureRequestCustomizer();
-                src.setStsMaxAge(2000);
-                src.setStsIncludeSubDomains(true);
-                https_config.addCustomizer(src);
+                HttpConfiguration https_config = getHttpConfiguration();
                 SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
                 sslContextFactory.setKeyStorePath(resourcePath + File.separator + "keystore.jks");
                 sslContextFactory.setKeyStorePassword("changeit");
@@ -81,6 +72,19 @@ public class GenerateTemplateTest {
             }
         });
         Thread.sleep(1000);
+    }
+
+    private static HttpConfiguration getHttpConfiguration() {
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setSecureScheme("https");
+        http_config.setSecurePort(8443);
+        http_config.setOutputBufferSize(32768);
+        HttpConfiguration https_config = new HttpConfiguration(http_config);
+        SecureRequestCustomizer src = new SecureRequestCustomizer();
+        src.setStsMaxAge(2000);
+        src.setStsIncludeSubDomains(true);
+        https_config.addCustomizer(src);
+        return https_config;
     }
 
     @AfterClass

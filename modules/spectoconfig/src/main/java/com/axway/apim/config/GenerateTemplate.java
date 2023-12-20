@@ -283,6 +283,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         authNProfile.setParameters(parameters);
         authnProfiles.add(authNProfile);
         api.setAuthenticationProfiles(authnProfiles);
+
     }
 
     public DeviceType matchDeviceType(String frontendAuthType) {
@@ -445,6 +446,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
                 String filename = createCertFileName(publicCert);
                 if (parent != null) {
+                    new File(parent).mkdirs();
                     filename = file.toPath().getParent().toString() + File.separator + filename;
                 }
                 try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {//NOSONAR
@@ -470,7 +472,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     public String createCertFileName(X509Certificate certificate) {
         String filename = null;
-        String certAlias = certificate.getSubjectDN().getName();
+        String certAlias = certificate.getSubjectX500Principal().getName();
         String[] nameParts = certAlias.split(",");
         for (String namePart : nameParts) {
             if (namePart.trim().startsWith("CN=")) {
