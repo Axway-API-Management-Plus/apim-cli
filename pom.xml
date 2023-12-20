@@ -60,8 +60,8 @@
         <sonar.issue.ignore.multicriteria.e2.ruleKey>java:S106</sonar.issue.ignore.multicriteria.e2.ruleKey>
         <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <wiremock.version>3.3.1</wiremock.version>
         <citrus.version>4.0.2</citrus.version>
+        <jackson.version>2.15.3</jackson.version>
         <failsafe.version>3.3.2</failsafe.version>
         <graphql.version>21.3</graphql.version>
     </properties>
@@ -104,6 +104,10 @@
                         <groupId>commons-codec</groupId>
                         <artifactId>commons-codec</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -134,22 +138,22 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.15.2</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.15.2</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.15.2</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.15.2</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -201,7 +205,7 @@
             <dependency>
                 <groupId>io.swagger.parser.v3</groupId>
                 <artifactId>swagger-parser</artifactId>
-                <version>2.1.11</version>
+                <version>2.1.19</version>
                 <exclusions>
                     <exclusion>
                         <groupId>io.swagger.parser.v3</groupId>

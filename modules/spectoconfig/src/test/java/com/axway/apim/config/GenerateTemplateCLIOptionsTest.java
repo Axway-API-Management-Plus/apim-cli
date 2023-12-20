@@ -46,9 +46,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfig() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
 
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
         Assert.assertEquals("published", documentContext.read("$.state"));
@@ -75,9 +75,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithFrontendApikey() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey"};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
 
         Assert.assertEquals("apiKey", documentContext.read("$.securityProfiles[0].devices[0].type"));
         Assert.assertEquals("API Key", documentContext.read("$.securityProfiles[0].devices[0].name"));
@@ -90,9 +90,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithFrontendOauth() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "oauth"};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "oauth"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("oauth", documentContext.read("$.securityProfiles[0].devices[0].type"));
         Assert.assertEquals("OAuth", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
@@ -118,9 +118,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithFrontendExternalOauth() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "oauth-external"};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "oauth-external"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("oauthExternal", documentContext.read("$.securityProfiles[0].devices[0].type"));
         Assert.assertEquals("OAuth (External)", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
@@ -149,9 +149,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithBackendApikey() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey"};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
         Assert.assertEquals("apiKey", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("4249823490238490", documentContext.read("$.authenticationProfiles[0].parameters.apiKey"));
@@ -162,9 +162,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithBackendOauth() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "apiKey"};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "apiKey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
         Assert.assertEquals("oauth", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("<Name-of-configured-OAuth-Profile>", documentContext.read("$.authenticationProfiles[0].parameters.providerProfile"));
@@ -174,9 +174,9 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithBackendSSL() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "ssl", "-frontendAuthType", "apiKey"};
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "ssl", "-frontendAuthType", "apiKey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
         Assert.assertEquals("ssl", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("file", documentContext.read("$.authenticationProfiles[0].parameters.source"));

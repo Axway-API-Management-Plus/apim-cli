@@ -88,6 +88,10 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         GenerateTemplate app = new GenerateTemplate();
         try {
+            File file = new File(params.getConfig());
+            if(file.getParentFile() != null && !file.getParentFile().exists()){
+                file.getParentFile().mkdirs();
+            }
             APIConfig apiConfig = app.generateTemplate(params);
             try (FileWriter fileWriter = new FileWriter(params.getConfig())) {
                 if (params.getOutputFormat().equals(StandardExportParams.OutputFormat.yaml))
@@ -103,7 +107,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 objectMapper.writeValue(fileWriter, jsonNode);
                 LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
             }
-        } catch (IOException | CertificateEncodingException | NoSuchAlgorithmException | KeyManagementException e) {
+        } catch (Exception e) {
             LOG.error("Error in processing :", e);
             if (e instanceof AppException) {
                 AppException appException = (AppException) e;
@@ -162,22 +166,22 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             basePath = strURL;
             urlString = "https://localhost";
         }
-
-        List<Tag> tags = openAPI.getTags();
-        TagMap apiManagerTags = new TagMap();
-        for (Tag tag : tags) {
-            String[] value = new String[1];
-            value[0] = tag.getName();
-            apiManagerTags.put(tag.getName(), value);
-        }
-
         API api = new API();
+        List<Tag> tags = openAPI.getTags();
+        if(tags != null) {
+            TagMap apiManagerTags = new TagMap();
+            for (Tag tag : tags) {
+                String[] value = new String[1];
+                value[0] = tag.getName();
+                apiManagerTags.put(tag.getName(), value);
+            }
+            api.setTags(apiManagerTags);
+        }
         api.setState("published");
         api.setBackendResourcePath(urlString);
         api.setPath(basePath);
         api.setName(info.getTitle());
         api.setVersion(info.getVersion());
-        api.setTags(apiManagerTags);
         api.setDescriptionType("original");
         CorsProfile corsProfile = new CorsProfile();
         corsProfile.setName("Custom CORS");
@@ -446,7 +450,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
                 String filename = createCertFileName(publicCert);
                 if (parent != null) {
-                    new File(parent).mkdirs();
                     filename = file.toPath().getParent().toString() + File.separator + filename;
                 }
                 try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {//NOSONAR
