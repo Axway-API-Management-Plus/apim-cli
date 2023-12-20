@@ -21,6 +21,8 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
@@ -74,7 +76,7 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusSpringSupport {
         $(testContext -> {
             String[] args = {"api", "import", "-c", updatedConfigFile2, "-a", specFile, "-h", testContext.getVariable("apiManagerHost"),
                 "-u", testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
-            int returnCode = OrganizationApp.importOrganization(args);
+            int returnCode = APIImportApp.importAPI(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
@@ -111,11 +113,11 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusSpringSupport {
 
         $(echo("####### Re-Import same organization - Should be a No-Change #######"));
         $(testContext -> {
-            String[] args = {"org", "import", "-c", updatedConfigFile, "-h", testContext.getVariable("apiManagerHost"), "-u",
+            String[] args = {"org", "import", "-c", updatedConfigFile3, "-h", testContext.getVariable("apiManagerHost"), "-u",
                 testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
             int returnCode = OrganizationApp.importOrganization(args);
             if (returnCode != 10)
-                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
         });
         $(echo("####### Re-Import same organization - But reduced API-Access to API 1 #######"));
         String updatedConfigFile4 = TestUtils.createTestConfig("/com/axway/apim/organization/orgImport/SingleOrgGrantAPIAccessOneAPI.json", context, "orgs", true);
@@ -140,13 +142,13 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusSpringSupport {
         $(testContext -> {
             String[] args = {"org", "get", "-n", orgName, "-t", tmpDirPath, "-deleteTarget", "-h", testContext.getVariable("apiManagerHost"), "-u",
                 testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-o", "json"};
-            int returnCode = OrganizationApp.importOrganization(args);
+            int returnCode = OrganizationApp.exportOrgs(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
 
-        Assert.assertEquals(new File(tmpDirPath, orgName).listFiles().length, 1, "Expected to have one organization exported");
-        String exportedOrgPath = new File(tmpDirPath, orgName).listFiles()[0].getPath();
+        Assert.assertEquals(Arrays.stream(Objects.requireNonNull(new File(tmpDirPath, orgName).listFiles())).filter(file -> file.getName().equals("org-config.json")).count(), 1, "Expected to have one organization exported");
+        String exportedOrgPath = Arrays.stream(Objects.requireNonNull(new File(tmpDirPath, orgName).listFiles())).filter(file -> file.getName().equals("org-config.json")).findAny().get().getPath();
 
         $(echo("####### Re-Import EXPORTED organization - Should be a No-Change #######"));
         $(testContext -> {

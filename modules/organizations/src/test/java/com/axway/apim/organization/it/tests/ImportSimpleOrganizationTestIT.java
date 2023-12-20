@@ -19,6 +19,8 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
@@ -37,11 +39,8 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusSpringSupport {
         description("Import organization into API-Manager");
         variable("useApiAdmin", "true"); // Use apiadmin account
         variable("orgName", "citrus:concat('My-Org-',  citrus:randomNumber(4))");
-
         variable("orgDescription", "A description for my org");
         // This test must be executed with an Admin-Account as we need to create a new organization
-        //createVariable(PARAM_IGNORE_ADMIN_ACC, "fals");
-
         $(echo("####### Import organization: '${orgName}' #######"));
         String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/organization/orgImport/SingleOrganization.json",
             context, "orgs", true);
@@ -87,13 +86,13 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusSpringSupport {
         $(testContext -> {
             String[] args = {"org", "get", "-n", orgName, "-t", tmpDirPath, "-deleteTarget", "-h", testContext.getVariable("apiManagerHost"), "-u",
                 testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-o", "json"};
-            int returnCode = OrganizationApp.importOrganization(args);
+            int returnCode = OrganizationApp.exportOrgs(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
 
-        Assert.assertEquals(new File(tmpDirPath, orgName).listFiles().length, 1, "Expected to have one organization exported");
-        String exportedOrgPath = new File(tmpDirPath, orgName).listFiles()[0].getPath();
+        Assert.assertEquals(Arrays.stream(Objects.requireNonNull(new File(tmpDirPath, orgName).listFiles())).filter(file -> file.getName().equals("org-config.json")).count(), 1, "Expected to have one organization exported");
+        String exportedOrgPath = Arrays.stream(Objects.requireNonNull(new File(tmpDirPath, orgName).listFiles())).filter(file -> file.getName().equals("org-config.json")).findAny().get().getPath();
 
         $(echo("####### Re-Import EXPORTED organization - Should be a No-Change #######"));
         $(testContext -> {
@@ -101,7 +100,7 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusSpringSupport {
                 "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
             int returnCode = OrganizationApp.importOrganization(args);
             if (returnCode != 10)
-                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
         });
     }
 }
