@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -31,7 +30,6 @@ public class ImportAndExportAlertsTestIT extends TestNGCitrusSpringSupport {
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void runConfigImportAndExport() {
         description("Export/Import alerts from and into the API-Manager");
         $(echo("####### Export the configuration #######"));
