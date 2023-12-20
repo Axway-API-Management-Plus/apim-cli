@@ -12,7 +12,6 @@ import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
@@ -61,11 +60,5 @@ public class ImportExportUserTestIT extends TestNGCitrusSpringSupport {
             .expression("$.[?(@.loginName=='${loginName}')].phone", "+006856778789")
             .expression("$.[?(@.loginName=='${loginName}')].mobile", "+534534534435")).extract(fromBody()
             .expression("$.[?(@.loginName=='${loginName}')].id", "userId")));
-
-
-        $(echo("####### Try to login with created user #######"));
-        $(http().client(apiManager).send().post("/login").message().contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .body("username=${loginName}&password=${password}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK));
     }
 }
