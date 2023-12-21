@@ -241,6 +241,12 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>2.3.8</version>
             </dependency>
+            <!-- Used by olingo -->
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.10.1</version>
+            </dependency>
             <dependency>
                 <groupId>dev.failsafe</groupId>
                 <artifactId>failsafe</artifactId>
