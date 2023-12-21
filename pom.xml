@@ -64,6 +64,9 @@
         <jackson.version>2.15.3</jackson.version>
         <failsafe.version>3.3.2</failsafe.version>
         <graphql.version>21.3</graphql.version>
+        <olingo.odata4.version>4.10.0</olingo.odata4.version>
+        <olingo.odata2.version>2.0.13</olingo.odata2.version>
+
     </properties>
     <scm>
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
@@ -163,12 +166,12 @@
             <dependency>
                 <groupId>org.apache.olingo</groupId>
                 <artifactId>olingo-odata2-api</artifactId>
-                <version>2.0.12</version>
+                <version>${olingo.odata2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.olingo</groupId>
                 <artifactId>olingo-odata2-core</artifactId>
-                <version>2.0.12</version>
+                <version>${olingo.odata2.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-codec</groupId>
@@ -179,17 +182,17 @@
             <dependency>
                 <groupId>org.apache.olingo</groupId>
                 <artifactId>odata-commons-api</artifactId>
-                <version>4.9.0</version>
+                <version>${olingo.odata4.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.olingo</groupId>
                 <artifactId>odata-commons-core</artifactId>
-                <version>4.9.0</version>
+                <version>${olingo.odata4.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.olingo</groupId>
                 <artifactId>odata-client-core</artifactId>
-                <version>4.9.0</version>
+                <version>${olingo.odata4.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -238,13 +241,6 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>2.3.8</version>
             </dependency>
-            <!-- Used by olingo -->
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.10.1</version>
-            </dependency>
-
             <dependency>
                 <groupId>dev.failsafe</groupId>
                 <artifactId>failsafe</artifactId>
