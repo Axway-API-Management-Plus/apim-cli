@@ -1,4 +1,4 @@
-
+# Not used - Migrated to official docker image
 # Purpose
 The project is using Integration-Tests to simulate tasks the API-Developer is doing. That means, creating the API for the first time, doing frequent changes, subscribe with applications, etc. 
 For that TravisCI is using, which is starting an API-Manager V7.x Docker-Container to perform these integration tests. This document describes the steps needed to build the Docker-Image.

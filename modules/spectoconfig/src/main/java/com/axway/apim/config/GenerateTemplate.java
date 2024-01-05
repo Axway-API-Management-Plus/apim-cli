@@ -107,13 +107,11 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 objectMapper.writeValue(fileWriter, jsonNode);
                 LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
             }
-        } catch (Exception e) {
+        } catch (AppException e) {
+            LOG.error("{} : Error code {}", e.getError().getDescription(), e.getError().getCode());
+            return e.getError().getCode();
+        }catch (Exception e) {
             LOG.error("Error in processing :", e);
-            if (e instanceof AppException) {
-                AppException appException = (AppException) e;
-                LOG.error("{} : Error code {}", appException.getError().getDescription(), appException.getError().getCode());
-                return appException.getError().getCode();
-            }
             return 1;
         }
         return 0;
@@ -433,7 +431,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
         File file = new File(configPath);
         String parent = file.getParent();
-        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
+        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.lineSeparator().getBytes());
         URL httpURL = new URL(url);
         SSLContext sc = SSLContext.getInstance("TLS");
         sc.init(null, trustAllCerts, new java.security.SecureRandom());
