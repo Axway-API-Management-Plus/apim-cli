@@ -254,7 +254,7 @@ public class CoreParameters implements Parameters {
     public URI getAPIManagerURL() throws AppException {
         try {
             if (apiManagerUrl == null) {
-                apiManagerUrl = new URI("https://" + this.getHostname2() + ":" + this.getPort2());
+                return new URI("https://" + this.getHostname2() + ":" + this.getPort2());
             }
             return apiManagerUrl;
         } catch (URISyntaxException e) {
@@ -414,9 +414,9 @@ public class CoreParameters implements Parameters {
             parameterMissing = true;
             LOG.error("Required parameter: 'password' is missing.");
         }
-        if (getAPIManagerURL() == null) {
+        if (getHostname2() == null) {
             parameterMissing = true;
-            LOG.error("Required parameter: apimanagerUrl is missing.");
+            LOG.error("Required parameter: host or apimanagerUrl is missing.");
         }
         if (parameterMissing) {
             LOG.error("Missing required parameters. Use either Command-Line-Options or Environment.Properties to provided required parameters.");

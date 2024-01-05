@@ -110,8 +110,9 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
 
     public void writeJSON(List<APICert> apiCerts) throws AppException {
         try {
+            String folderName = "certs";
             String givenTarget = params.getTarget();
-            File localFolder = new File(givenTarget);
+            File localFolder = new File(givenTarget + File.separator + folderName);
             LOG.debug("Going to export expired certificates details into folder: {}", localFolder);
             validateFolder(localFolder);
             String filePath = localFolder.getCanonicalPath() + File.separator + "certificates.json";
