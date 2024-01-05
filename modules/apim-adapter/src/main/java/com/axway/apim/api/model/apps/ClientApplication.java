@@ -237,7 +237,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
     public void setCustomProperties(Map<String, String> customProperties) {
         this.customProperties = customProperties;
         if (this.customProperties != null) {
-            this.customPropertiesKeys = customProperties.keySet().stream().collect(Collectors.toList());
+            this.customPropertiesKeys = new ArrayList<>(customProperties.keySet());
         }
     }
 
@@ -250,7 +250,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
         if (other == null) return false;
         if (other instanceof ClientApplication) {
             ClientApplication otherApp = (ClientApplication) other;
-            Comparator c = Comparator.comparing(ClientAppCredential::getCredentialType).thenComparing(ClientAppCredential::getId);
+            Comparator<ClientAppCredential> comparator = Comparator.comparing(ClientAppCredential::getCredentialType).thenComparing(ClientAppCredential::getId);
             return
                 StringUtils.equals(otherApp.getName(), this.getName()) &&
                     StringUtils.equals(otherApp.getEmail(), this.getEmail()) &&
@@ -258,7 +258,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
                     StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
                     otherApp.getState().equals(this.getState()) &&
                     otherApp.getOrganization().equals(this.getOrganization()) &&
-                    (otherApp.getCredentials() == null || otherApp.getCredentials().stream().sorted(c).collect(Collectors.toList()).equals(this.getCredentials().stream().sorted(c).collect(Collectors.toList()))) &&
+                    (otherApp.getCredentials() == null || otherApp.getCredentials().stream().sorted(comparator).collect(Collectors.toList()).equals(this.getCredentials().stream().sorted(comparator).collect(Collectors.toList()))) &&
                     (otherApp.getOauthResources() == null || otherApp.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()).equals(this.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()))) &&
                     (otherApp.getImage() == null || otherApp.getImage().equals(this.getImage())) &&
                     (otherApp.getCustomProperties() == null || otherApp.getCustomProperties().equals(this.getCustomProperties()));
