@@ -10,7 +10,7 @@ public class CLIAPIUpgradeAccessOptionsTest {
 
     @Test
     public void testUpgradeAccessAPIParameters() throws AppException {
-        String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2023"};
+        String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2027"};
         CLIOptions cliOptions = CLIAPIUpgradeAccessOptions.create(args);
         APIUpgradeAccessParams params = (APIUpgradeAccessParams)cliOptions.getParams();
 
@@ -28,7 +28,7 @@ public class CLIAPIUpgradeAccessOptionsTest {
         Assert.assertEquals(params.getReferenceAPIOrganization(), "RefOrg");
         Assert.assertTrue(params.getReferenceAPIRetire());
         Assert.assertTrue(params.getReferenceAPIDeprecate());
-        Assert.assertEquals(Long.parseLong("1703980800000"), (long) params.getReferenceAPIRetirementDate());
+        Assert.assertEquals(Long.parseLong("1830211200000"), (long) params.getReferenceAPIRetirementDate());
 
         // Make sure, the default handling works for deprecate / and retire
         String[] args2 = {"-s", "prod", "-a", "/api/v1/to/be/upgraded"};
