@@ -1,24 +1,18 @@
 package com.axway.apim.setup.impl;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import com.axway.apim.lib.error.ErrorCode;
-import com.axway.apim.lib.utils.rest.Console;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Config;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
+
+import java.lang.reflect.Field;
 
 public class ConsolePrinterConfig {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterConfig.class);
 
     APIManagerAdapter adapter;
 
@@ -88,25 +82,11 @@ public class ConsolePrinterConfig {
                     APIManagerConfigAnnotation annotation = field.getAnnotation(APIManagerConfigAnnotation.class);
                     if (annotation.configType() == configType) {
                         String dots = ".....................................";
-                        Console.printf("%s %s: %s", annotation.name(), dots.substring(annotation.name().length()), getFieldValue(field.getName(), config));
+                        Console.printf("%s %s: %s", annotation.name(), dots.substring(annotation.name().length()), Utils.getFieldValue(field.getName(), config));
                     }
                 }
             }
             Console.println();
-        }
-    }
-
-    private String getFieldValue(String fieldName, Config config) {
-        try {
-            PropertyDescriptor pd = new PropertyDescriptor(fieldName, config.getClass());
-            Method getter = pd.getReadMethod();
-            Object value = getter.invoke(config);
-            return (value == null) ? "N/A" : value.toString();
-        } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error(e.getMessage(), e);
-            }
-            return "Err";
         }
     }
 }

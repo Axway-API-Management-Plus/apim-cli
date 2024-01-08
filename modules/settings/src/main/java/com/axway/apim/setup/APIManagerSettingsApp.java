@@ -148,7 +148,6 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         APIManagerAdapter apimAdapter = null;
         try {
             params.validateRequiredParameters();
-            // Clean some Singleton-Instances, as tests are running in the same JVM
             errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
             apimAdapter = APIManagerAdapter.getInstance();
             APIManagerConfig desiredConfig = new APIManagerConfigAdapter(params).getManagerConfig();

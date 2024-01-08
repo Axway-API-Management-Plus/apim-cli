@@ -26,7 +26,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -451,6 +453,20 @@ public class Utils {
             FileUtils.deleteDirectory(localFolder);
         } catch (IOException e) {
             throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
+
+    public static String getFieldValue(String fieldName, Object object) {
+        try {
+            PropertyDescriptor pd = new PropertyDescriptor(fieldName, object.getClass());
+            Method getter = pd.getReadMethod();
+            Object value = getter.invoke(object);
+            return (value == null) ? "N/A" : value.toString();
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.error(e.getMessage(), e);
+            }
+            return "Err";
         }
     }
 }
