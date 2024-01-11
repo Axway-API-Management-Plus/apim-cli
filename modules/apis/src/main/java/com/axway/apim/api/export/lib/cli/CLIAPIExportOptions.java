@@ -56,6 +56,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
 		Console.println("How to get APIs with different output formats");
 		Console.println("Get all APIs on console using environment properties: env.api-env.properties:");
 		Console.println(getBinaryName()+" api get -s api-env");

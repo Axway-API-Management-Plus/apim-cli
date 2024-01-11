@@ -7,6 +7,9 @@ import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 public class CLIChangeAPIOptionsTest {
 
     @Test
@@ -30,6 +33,18 @@ public class CLIChangeAPIOptionsTest {
         // Validate the change parameters are included
         Assert.assertEquals(params.getNewBackend(), "http://my.new.backend");
         Assert.assertEquals(params.getOldBackend(), "http://my.old.backend");
+    }
+
+    @Test
+    public void printUsage() throws AppException {
+        PrintStream old = System.out;
+        String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-newBackend", "http://my.new.backend", "-oldBackend", "http://my.old.backend"};
+        CLIOptions options = CLIChangeAPIOptions.create(args);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(byteArrayOutputStream));
+        options.printUsage("test", args);
+        System.setOut(old);
+        Assert.assertTrue(byteArrayOutputStream.toString().contains("-newBackend http://my.new.backend"));
     }
 
 }

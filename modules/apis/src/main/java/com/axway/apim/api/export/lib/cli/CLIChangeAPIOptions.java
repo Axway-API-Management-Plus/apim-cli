@@ -41,6 +41,7 @@ public class CLIChangeAPIOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
 		Console.println("Changing APIs examples:");
 		Console.println();
 		Console.println("Changes the backend basepath of selected APIs from any to new");
