@@ -36,6 +36,7 @@ public class UserImportCLIOptions extends CLIOptions {
     @Override
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
+        Console.println(getAppName());
         Console.println("----------------------------------------------------------------------------------------");
         Console.println("How to imports users using the JSON-Config format");
         Console.println("Import an user using environment properties: env.api-env.properties:");

@@ -65,7 +65,7 @@ public class ExportAPI {
         return actualAPIProxy.getSecurityProfiles();
     }
 
-    private void expandTokenStoreAndAuthPolicy(){
+    private void expandTokenStoreAndAuthPolicy() {
         for (SecurityProfile profile : actualAPIProxy.getSecurityProfiles()) {
             for (SecurityDevice device : profile.getDevices()) {
                 if (device.getType().equals(DeviceType.oauthExternal)) {
@@ -102,15 +102,15 @@ public class ExportAPI {
     }
 
     public Map<String, InboundProfile> getInboundProfiles() {
-        if (actualAPIProxy.getInboundProfiles() == null) return Collections.emptyMap();
-        if (actualAPIProxy.getInboundProfiles().isEmpty()) return Collections.emptyMap();
+        if (actualAPIProxy.getInboundProfiles() == null || actualAPIProxy.getInboundProfiles().isEmpty())
+            return Collections.emptyMap();
         return actualAPIProxy.getInboundProfiles();
     }
 
 
     public List<CorsProfile> getCorsProfiles() {
-        if (actualAPIProxy.getCorsProfiles() == null) return Collections.emptyList();
-        if (actualAPIProxy.getCorsProfiles().isEmpty()) return Collections.emptyList();
+        if (actualAPIProxy.getCorsProfiles() == null || actualAPIProxy.getCorsProfiles().isEmpty())
+            return Collections.emptyList();
         if (actualAPIProxy.getCorsProfiles().size() == 1) {
             CorsProfile corsProfile = actualAPIProxy.getCorsProfiles().get(0);
             if (corsProfile.equals(CorsProfile.getDefaultCorsProfile())) return Collections.emptyList();
@@ -135,8 +135,7 @@ public class ExportAPI {
 
 
     public TagMap getTags() {
-        if (actualAPIProxy.getTags() == null) return new TagMap();
-        if (actualAPIProxy.getTags().isEmpty()) return new TagMap();
+        if (actualAPIProxy.getTags() == null || actualAPIProxy.getTags().isEmpty()) return new TagMap();
         return actualAPIProxy.getTags();
     }
 

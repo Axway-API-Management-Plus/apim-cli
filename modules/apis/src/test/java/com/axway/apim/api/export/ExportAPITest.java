@@ -142,4 +142,88 @@ public class ExportAPITest {
         List<SecurityProfile> resultSecurityProfiles = exportAPI.getSecurityProfiles();
         Assert.assertTrue(resultSecurityProfiles.isEmpty());
     }
+
+    @Test
+    public void getRemoteHostNull(){
+        API api = new API();
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertNull(exportAPI.getRemoteHost());
+    }
+
+    @Test
+    public void getRemoteHostStandard(){
+        API api = new API();
+        RemoteHost remoteHost = new RemoteHost();
+        remoteHost.setPort(443);
+        remoteHost.setName("api.axway.com");
+        api.setRemotehost(remoteHost);
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertEquals(exportAPI.getRemoteHost(), "api.axway.com");
+    }
+
+    @Test
+    public void getRemoteHostCustomPort(){
+        API api = new API();
+        RemoteHost remoteHost = new RemoteHost();
+        remoteHost.setPort(8065);
+        remoteHost.setName("api.axway.com");
+        api.setRemotehost(remoteHost);
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertEquals(exportAPI.getRemoteHost(), "api.axway.com:8065");
+    }
+
+    @Test
+    public void getCorsProfilesEmpty(){
+        API api = new API();
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertTrue(exportAPI.getCorsProfiles().isEmpty());
+    }
+
+    @Test
+    public void getCorsProfilesDefault(){
+        API api = new API();
+        CorsProfile corsProfile = CorsProfile.getDefaultCorsProfile();
+        List<CorsProfile> corsProfiles = new ArrayList<>();
+        corsProfiles.add(corsProfile);
+        api.setCorsProfiles(corsProfiles);
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertTrue(exportAPI.getCorsProfiles().isEmpty());
+    }
+
+    @Test
+    public void getCorsProfiles(){
+        API api = new API();
+        CorsProfile corsProfile = CorsProfile.getDefaultCorsProfile();
+        corsProfile.setName("custom");
+        List<CorsProfile> corsProfiles = new ArrayList<>();
+        corsProfiles.add(corsProfile);
+        api.setCorsProfiles(corsProfiles);
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertFalse(exportAPI.getCorsProfiles().isEmpty());
+    }
+
+    @Test
+    public void getInboundProfilesEmpty(){
+        API api = new API();
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertTrue(exportAPI.getInboundProfiles().isEmpty());
+    }
+
+    @Test
+    public void getTagsEmpty(){
+        API api = new API();
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertTrue(exportAPI.getTags().isEmpty());
+    }
+
+    @Test
+    public void getTags(){
+        API api = new API();
+        TagMap apiManagerTags = new TagMap();
+        String[] tagValue = {"dev"};
+        apiManagerTags.put("stage", tagValue);
+        api.setTags(apiManagerTags);
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertFalse(exportAPI.getTags().isEmpty());
+    }
 }

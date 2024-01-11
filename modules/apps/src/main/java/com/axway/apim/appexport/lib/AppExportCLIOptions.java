@@ -13,7 +13,7 @@ public class AppExportCLIOptions extends CLIOptions {
 	private AppExportCLIOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new AppExportCLIOptions(args);
 		cliOptions = new StandardExportCLIOptions(cliOptions);
@@ -30,7 +30,7 @@ public class AppExportCLIOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("*My Great App*");
 		addOption(option);
-		
+
 		option = new  Option("id", true, "Filter the export to an application with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-APP");
@@ -45,22 +45,22 @@ public class AppExportCLIOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("*Partners*");
 		addOption(option);
-		
+
 		option = new  Option("createdBy", true, "Filter for applications created by this user based on the login-name");
 		option.setRequired(false);
 		option.setArgName("tom");
 		addOption(option);
-		
+
 		option = new  Option("api", true, "Filter applications having access to this API. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*MyAPI*");
 		addOption(option);
-		
+
 		option = new  Option("credential", true, "Filter applications having this credential information. Client-ID and API-Key is considered here.");
 		option.setRequired(false);
 		option.setArgName("*9877979779*");
 		addOption(option);
-		
+
 		option = new  Option("redirectUrl", true, "Filter applications having this Redirect-URL. Only OAuth-Credentials are considered.");
 		option.setRequired(false);
 		option.setArgName("*localhost*");
@@ -71,6 +71,7 @@ public class AppExportCLIOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
 		Console.println("How to get/export applications with different output formats");
 		Console.println("Get all applications on console using environment properties: env.api-env.properties:");
 		Console.println(getBinaryName()+" app get -s api-env");
@@ -93,7 +94,7 @@ public class AppExportCLIOptions extends CLIOptions {
 	protected String getAppName() {
 		return "Application-Export";
 	}
-	
+
 	@Override
 	public Parameters getParams() {
 		AppExportParams params = new AppExportParams();

@@ -9,8 +9,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -184,5 +186,17 @@ public class GenerateTemplateCLIOptionsTest {
         Assert.assertEquals("********", documentContext.read("$.authenticationProfiles[0].parameters.password"));
         Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].parameters.trustAll", Boolean.class));
         Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class));
+    }
+
+    @Test
+    public void printUsage() throws AppException {
+        PrintStream old = System.out;
+        String[] args = {"template", "generate", "-c", "test/api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "ssl", "-frontendAuthType", "apiKey"};
+        CLIOptions options = GenerateTemplateCLIOptions.create(args);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(byteArrayOutputStream));
+        options.printUsage("test", args);
+        System.setOut(old);
+        Assert.assertTrue(byteArrayOutputStream.toString().contains("generate"));
     }
 }

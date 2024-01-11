@@ -32,7 +32,8 @@ public class UserExportCLIOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
-		Console.println("How to get/export user(s) with different output formats");
+        Console.println(getAppName());
+        Console.println("How to get/export user(s) with different output formats");
 		Console.println("Get all users on console using environment properties: env.api-env.properties:");
 		Console.println(getBinaryName()+" user get -s api-env");
 		Console.println("Same as before, but with output format JSON - As it is used to import applications");

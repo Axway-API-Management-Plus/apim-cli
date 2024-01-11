@@ -61,7 +61,8 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
-        Console.println("How to Generate Config files");
+        Console.println(getAppName());
+        Console.println("How to Generate API Config files");
         Console.println("Generate API manager configuration file based on Open API Specification");
         Console.println(getBinaryName() + " template generate -c samples/config-api-specification.json -a samples/openapi.json");
         Console.println("For more information and advanced examples please visit:");
@@ -70,7 +71,7 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
 
     @Override
     protected String getAppName() {
-        return "Application-Export";
+        return "Generate Template";
     }
 
     @Override
