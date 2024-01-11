@@ -151,7 +151,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
     private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {
         Base64.Decoder decoder = Base64.getDecoder();
-        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
+        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.lineSeparator().getBytes());
         for (CaCert caCert : caCerts) {
             if (caCert.getCertBlob() == null) {
                 LOG.warn("- Ignoring cert export for null certBlob for alias: {}", caCert.getAlias());

@@ -1,7 +1,6 @@
 package com.axway.apim.api.model;
 
 import com.axway.apim.adapter.jackson.PolicyDeserializer;
-import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -32,9 +31,6 @@ public class OutboundProfile extends Profile {
 
     List<Object> parameters = new ArrayList<>();
 
-    public OutboundProfile() throws AppException {
-        super();
-    }
 
     public String getAuthenticationProfile() {
         // give a default value in case of blank value
@@ -50,7 +46,7 @@ public class OutboundProfile extends Profile {
     }
 
     public String getRouteType() {
-        // default value policy is set in case of an existing value (different of "proxy" ) or in case of existing routePoulicy
+        // default value policy is set in case of an existing value (different of "proxy" ) or in case of existing routePolicy
         if ((StringUtils.isNotBlank(routeType) && !StringUtils.equals("proxy", routeType)) || (routePolicy != null)) {
             return "policy";
         } else {

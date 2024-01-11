@@ -66,6 +66,7 @@ public class CLIAPIUpgradeAccessOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
         Console.println("Upgrade access for one or more APIs based on the given reference API.");
         Console.println("App-Subscriptions and Granted orgs are taken over to all selected APIs based on the reference API.");
         Console.println("The reference API must be unique. APIs must be published to be considered.");

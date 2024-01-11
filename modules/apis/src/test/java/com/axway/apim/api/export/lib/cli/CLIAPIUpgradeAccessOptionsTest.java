@@ -6,6 +6,9 @@ import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 public class CLIAPIUpgradeAccessOptionsTest {
 
     @Test
@@ -36,6 +39,18 @@ public class CLIAPIUpgradeAccessOptionsTest {
         params = (APIUpgradeAccessParams)cliOptions.getParams();
         Assert.assertFalse(params.getReferenceAPIRetire());
         Assert.assertFalse(params.getReferenceAPIDeprecate());
+    }
+
+    @Test
+    public void printUsage() throws AppException {
+        PrintStream old = System.out;
+        String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2027"};
+        CLIOptions options = CLIAPIUpgradeAccessOptions.create(args);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(byteArrayOutputStream));
+        options.printUsage("test", args);
+        System.setOut(old);
+        Assert.assertTrue(byteArrayOutputStream.toString().contains("-refAPIId 123456"));
     }
 
 }
