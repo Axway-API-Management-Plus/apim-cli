@@ -7,6 +7,9 @@ import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 public class CLIAPIGrantAccessOptionsTest {
     @Test
     public void testGrantAccessAPIParameters() throws AppException {
@@ -43,5 +46,18 @@ public class CLIAPIGrantAccessOptionsTest {
         Assert.assertEquals(apiFilter.getVhost(), "api.chost.com");
         Assert.assertEquals(apiFilter.getInboundSecurity(), "api-key");
         Assert.assertEquals(apiFilter.getTag(), "tagGroup=*myTagValue*");
+    }
+
+    @Test
+    public void printUsage() throws AppException {
+        PrintStream old = System.out;
+        String[] args = {"-s", "prod", "-a", "/api/v1/some", "-orgName", "OrgName", "-orgId", "OrgId", "-n", "MyAPIName", "-org", "MyAPIOrg", "-id", "MY-API-ID", "-vhost", "api.chost.com", "-backend", "backend.host",
+            "-policy", "PolicyName", "-inboundsecurity", "api-key", "-tag", "tagGroup=*myTagValue*"};
+        CLIOptions options = CLIAPIGrantAccessOptions.create(args);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(byteArrayOutputStream));
+        options.printUsage("test", args);
+        System.setOut(old);
+        Assert.assertTrue(byteArrayOutputStream.toString().contains("-a /api/v1/some"));
     }
 }

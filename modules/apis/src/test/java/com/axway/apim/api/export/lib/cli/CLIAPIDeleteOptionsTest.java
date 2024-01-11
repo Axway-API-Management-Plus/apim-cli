@@ -23,7 +23,7 @@ public class CLIAPIDeleteOptionsTest {
     public void printUsage() throws AppException {
         PrintStream old = System.out;
         String[] args = {"-h", "localhost", "-n", "petstore"};
-        CLIOptions options = CLIChangeAPIOptions.create(args);
+        CLIOptions options = CLIAPIDeleteOptions.create(args);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(byteArrayOutputStream));
         options.printUsage("test", args);
