@@ -7,7 +7,7 @@ import com.axway.apim.api.model.User;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.ImportResult;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
@@ -128,8 +128,8 @@ public class UserApp implements APIMCLIServiceProvider {
         }
     }
 
-    public ImportResult importUsers(UserImportParams params) {
-        ImportResult result = new ImportResult();
+    public Result importUsers(UserImportParams params) {
+        Result result = new Result();
         APIManagerAdapter apiManagerAdapter = null;
         try {
             apiManagerAdapter = APIManagerAdapter.getInstance();
