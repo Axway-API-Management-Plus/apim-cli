@@ -1,151 +1,168 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.WiremockWrapper;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.utils.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
+import java.io.IOException;
 
-import java.util.List;
+public class OutboundProfileTest extends WiremockWrapper {
 
-public class OutboundProfileTest {
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
+
+    private static final String testPackage = "com/axway/apim/model/";
+
+    ObjectMapper mapper = new ObjectMapper();
+
     @Test
-    public void testWithCustomRequestPolicy() throws AppException {
+    public void testProfilesEquality() throws IOException {
+        CoreParameters coreParameters = new CoreParameters();
+        coreParameters.setHostname("localhost");
+        coreParameters.setUsername("test");
+        coreParameters.setPassword(Utils.getEncryptedPassword());
+        OutboundProfile profile1 = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ConfiguredOutboundProfile1.json"), OutboundProfile.class);
+        OutboundProfile profile3 = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ConfiguredOutboundProfile1.json"), OutboundProfile.class);
+        OutboundProfile profile2 = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ConfiguredOutboundProfile2.json"), OutboundProfile.class);
+        Assert.assertNotEquals(profile2, profile1, "Both profiles are different");
+        Assert.assertEquals(profile3, profile1, "Both profiles are the same");
+    }
+    @Test
+    public void testWithCustomRequestPolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setRequestPolicy(null);
         desiredProfile.setRequestPolicy(new Policy("My custom request policy"));
-        Assert.assertFalse(actualProfile.equals(desiredProfile), "Outbound profiles must be different");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "Outbound profiles must be different");
     }
 
     @Test
-    public void testWithCustomResponsePolicy() throws AppException {
+    public void testWithCustomResponsePolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setResponsePolicy(null);
         desiredProfile.setResponsePolicy(new Policy("My custom response policy"));
-        Assert.assertFalse(actualProfile.equals(desiredProfile), "Outbound profiles must be different");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "Outbound profiles must be different");
     }
 
     @Test
-    public void testWithCustomSameResponsePolicy() throws AppException {
+    public void testWithCustomSameResponsePolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setResponsePolicy(new Policy("My custom response policy"));
         desiredProfile.setResponsePolicy(new Policy("My custom response policy"));
-        Assert.assertTrue(actualProfile.equals(desiredProfile), "Outbound profiles must be equal");
+        Assert.assertEquals(desiredProfile, actualProfile, "Outbound profiles must be equal");
     }
 
     @Test
-    public void testWithCustomRoutePolicy() throws AppException {
+    public void testWithCustomRoutePolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setRoutePolicy(null);
         desiredProfile.setRoutePolicy(new Policy("My custom routing policy"));
-        Assert.assertFalse(actualProfile.equals(desiredProfile), "Outbound profiles must be different");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "Outbound profiles must be different");
     }
 
     @Test
-    public void testWithCustomSameRoutingPolicy() throws AppException {
+    public void testWithCustomSameRoutingPolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setRoutePolicy(new Policy("My custom routing policy"));
         desiredProfile.setRoutePolicy(new Policy("My custom routing policy"));
-        Assert.assertTrue(actualProfile.equals(desiredProfile), "Outbound profiles must be equal");
+        Assert.assertEquals(desiredProfile, actualProfile, "Outbound profiles must be equal");
     }
 
     @Test
-    public void testWithCustomFaultHandlerPolicy() throws AppException {
+    public void testWithCustomFaultHandlerPolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setFaultHandlerPolicy(null);
         desiredProfile.setFaultHandlerPolicy(new Policy("My custom fault handler policy"));
-        Assert.assertFalse(actualProfile.equals(desiredProfile), "Outbound profiles must be different");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "Outbound profiles must be different");
     }
 
     @Test
-    public void testWithCustomSameFaultHandlerPolicy() throws AppException {
+    public void testWithCustomSameFaultHandlerPolicy() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setFaultHandlerPolicy(new Policy("My custom fault handler policy"));
         desiredProfile.setFaultHandlerPolicy(new Policy("My custom fault handler policy"));
-        Assert.assertTrue(actualProfile.equals(desiredProfile), "Outbound profiles must be equal");
+        Assert.assertEquals(desiredProfile, actualProfile, "Outbound profiles must be equal");
     }
 
     @Test
-    public void testWithDifferentAuthNProfile() throws AppException {
+    public void testWithDifferentAuthNProfile() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setAuthenticationProfile("Passthrough");
         desiredProfile.setAuthenticationProfile("Another profile");
-        Assert.assertFalse(actualProfile.equals(desiredProfile),
-            "The AuthN-Profile of the outbound profiles are different.");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "The AuthN-Profile of the outbound profiles are different.");
     }
 
     @Test
-    public void testDefaultValueAuthNProfile() throws AppException {
+    public void testDefaultValueAuthNProfile() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setAuthenticationProfile(null);
         desiredProfile.setAuthenticationProfile("_default");
-        Assert.assertTrue(actualProfile.equals(desiredProfile), "The AuthN-Profile of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The AuthN-Profile of the outbound profiles are different.");
         actualProfile.setAuthenticationProfile("_default");
         desiredProfile.setAuthenticationProfile("_default");
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The AuthN-Profile of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The AuthN-Profile of the outbound profiles are different.");
         actualProfile.setAuthenticationProfile("_default");
         desiredProfile.setAuthenticationProfile(null);
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The AuthN-Profile of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The AuthN-Profile of the outbound profiles are different.");
         actualProfile.setAuthenticationProfile(null);
         desiredProfile.setAuthenticationProfile(null);
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The AuthN-Profile of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The AuthN-Profile of the outbound profiles are different.");
     }
 
     @Test
-    public void testWithDifferentARouteType() throws AppException {
+    public void testWithDifferentARouteType() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setRouteType("proxy");
         desiredProfile.setRouteType("policy");
-        Assert.assertFalse(actualProfile.equals(desiredProfile), "The route type of the outbound profiles are equals.");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are equals.");
     }
 
     @Test
-    public void testDefaultValueRoute() throws AppException {
+    public void testDefaultValueRoute() {
         OutboundProfile actualProfile = new OutboundProfile();
         OutboundProfile desiredProfile = new OutboundProfile();
         actualProfile.setRouteType(null);
         desiredProfile.setRouteType("proxy");
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The route type of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are different.");
         actualProfile.setRouteType("proxy");
         desiredProfile.setRouteType("proxy");
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The route type of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are different.");
         actualProfile.setRouteType("proxy");
         desiredProfile.setRouteType(null);
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The Aroute type of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The Aroute type of the outbound profiles are different.");
         actualProfile.setRouteType(null);
         desiredProfile.setRouteType(null);
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The route type of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are different.");
         actualProfile.setRouteType("");
         desiredProfile.setRouteType("");
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The route type of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are different.");
         actualProfile.setRouteType("policy");
         desiredProfile.setRouteType("policy");
-        Assert.assertTrue(actualProfile.equals(desiredProfile),
-            "The route type of the outbound profiles are different.");
+        Assert.assertEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are different.");
         actualProfile.setRouteType("policy");
         desiredProfile.setRouteType("proxy");
-        Assert.assertFalse(actualProfile.equals(desiredProfile), "The route type of the outbound profiles are equals.");
+        Assert.assertNotEquals(desiredProfile, actualProfile, "The route type of the outbound profiles are equals.");
         actualProfile.setRoutePolicy(new Policy("My custom routing policy"));
         Assert.assertEquals(actualProfile.getRouteType(), "policy", "The route type is policy");
         actualProfile.setRouteType(null);
