@@ -21,6 +21,8 @@ import java.util.*;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class ExportAPI {
     private static final String DEFAULT = "_default";
+    public static final String TOKEN_STORE = "tokenStore";
+    public static final String AUTHENTICATION_POLICY = "authenticationPolicy";
     private final API actualAPIProxy;
 
     public ExportAPI(API actualAPIProxy) {
@@ -68,18 +70,24 @@ public class ExportAPI {
     private void expandTokenStoreAndAuthPolicy() {
         for (SecurityProfile profile : actualAPIProxy.getSecurityProfiles()) {
             for (SecurityDevice device : profile.getDevices()) {
-                if (device.getType().equals(DeviceType.oauthExternal)) {
-                    String tokenStore = device.getProperties().get("tokenStore");
-                    if (tokenStore != null) {
-                        device.getProperties().put("tokenStore", Utils.getExternalPolicyName(tokenStore));
-                    }
-                } else if (device.getType().equals(DeviceType.authPolicy)) {
-                    String authenticationPolicy = device.getProperties().get("authenticationPolicy");
-                    if (authenticationPolicy != null) {
-                        device.getProperties().put("authenticationPolicy", Utils.getExternalPolicyName(authenticationPolicy));
-                    }
+
+                DeviceType type = device.getType();
+                Map<String, String> properties = device.getProperties();
+
+                if (type == DeviceType.oauth ) {
+                    String tokenStore = properties.get(TOKEN_STORE);
+                    String tokenStoreName = Utils.getExternalPolicyName(tokenStore, Utils.FedKeyType.OAuthTokenProfile);
+                    properties.put(TOKEN_STORE, tokenStoreName);
+                } else if (type == DeviceType.oauthExternal) {
+                    String tokenStore = properties.get(TOKEN_STORE);
+                    String tokenStoreName = Utils.getExternalPolicyName(tokenStore);
+                    properties.put(TOKEN_STORE, tokenStoreName);
+                } else if (type == DeviceType.authPolicy) {
+                    String authenticationPolicy = properties.get(AUTHENTICATION_POLICY);
+                    String authenticationPolicyName = Utils.getExternalPolicyName(authenticationPolicy);
+                    properties.put(AUTHENTICATION_POLICY, authenticationPolicyName);
                 }
-                device.setConvertPolicies(false);
+
             }
         }
     }

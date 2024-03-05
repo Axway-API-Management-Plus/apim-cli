@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 /**
  * This class defines all common properties on an API and how each property should be
  * treated during replication.
- * APIManagerAPI and APIImportDefintion are both an instance of this class.
+ * APIManagerAPI and APIImportDefinition are both an instance of this class.
  * <p>
  * Annotations for each property are used by the APIChangeState to decide:
  * - Is it a breaking change?

@@ -367,5 +367,4 @@ public class UtilsTest {
             Assert.assertEquals(99, Utils.handleAppException(exception, LoggerFactory.getLogger("Utils"), new ErrorCodeMapper()));
         }
     }
-
 }

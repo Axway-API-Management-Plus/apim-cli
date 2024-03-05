@@ -19,10 +19,10 @@ public class YamlAPIExporter extends JsonAPIExporter{
 
     @Override
     public void execute(List<API> apis) throws AppException {
-        LOG.info("Export API configuration as Yaml");
+        LOG.info("Export API and configuration as Yaml format");
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
-            saveAPILocally(exportAPI, this);
+            exportHelper.saveAPILocally(exportAPI, this);
         }
     }
 }

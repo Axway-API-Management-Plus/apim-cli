@@ -66,7 +66,7 @@
         <graphql.version>21.3</graphql.version>
         <olingo.odata4.version>4.10.0</olingo.odata4.version>
         <olingo.odata2.version>2.0.13</olingo.odata2.version>
-
+        <jsonpath.version>2.9.0</jsonpath.version>
     </properties>
     <scm>
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
@@ -253,7 +253,11 @@
                 <artifactId>graphql-java</artifactId>
                 <version>${graphql.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${jsonpath.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>

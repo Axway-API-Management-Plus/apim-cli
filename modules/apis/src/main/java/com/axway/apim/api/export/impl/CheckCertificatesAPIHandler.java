@@ -114,7 +114,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             String givenTarget = params.getTarget();
             File localFolder = new File(givenTarget + File.separator + folderName);
             LOG.debug("Going to export expired certificates details into folder: {}", localFolder);
-            validateFolder(localFolder);
+            exportHelper.validateFolder(localFolder);
             String filePath = localFolder.getCanonicalPath() + File.separator + "certificates.json";
             ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
             try (Writer writer = new FileWriter(filePath)) {

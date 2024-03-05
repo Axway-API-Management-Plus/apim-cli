@@ -84,9 +84,6 @@ public class APIManagerPoliciesAdapter {
         }
     }
 
-
-
-
     private void readPoliciesFromAPIManager(PolicyType type) throws AppException {
         if (apiManagerResponse.get(type) != null) return;
         CoreParameters cmd = CoreParameters.getInstance();
@@ -214,9 +211,6 @@ public class APIManagerPoliciesAdapter {
         LOG.debug("Changing Auth policy : {} with {}", oauthTokenInfo, entityStoreOauthTokenInfo);
         Map<String, String> properties = securityDevice.getProperties();
         properties.put(TOKEN_STORE, entityStoreOauthTokenInfo);
-        properties.put("oauth.token.client_id", "${oauth.token.client_id}");
-        properties.put("oauth.token.scopes", "${oauth.token.scopes}");
-        properties.put("oauth.token.valid", "${oauth.token.valid}");
     }
 
     public List<Policy> getAllPolicies() throws AppException {
