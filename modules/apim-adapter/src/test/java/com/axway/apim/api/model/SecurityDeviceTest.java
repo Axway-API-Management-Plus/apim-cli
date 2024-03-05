@@ -54,8 +54,7 @@ public class SecurityDeviceTest {
             "        \"descriptionUrl\" : \"\",\n" +
             "        \"descriptionMarkdown\" : \"\",\n" +
             "        \"description\" : \"\"\n" +
-            "      },\n" +
-            "      \"convertPolicies\" : \"true\"\n" +
+            "      }\n" +
             "    } ]\n" +
             "  } ]";
 
