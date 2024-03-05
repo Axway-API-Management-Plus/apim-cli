@@ -5,18 +5,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class APIImportAppTest {
-//    extends WiremockWrapper {
-//
-//    @BeforeClass
-//    public void initWiremock() {
-//        super.initWiremock();
-//    }
-//
-//    @AfterClass
-//    public void close() {
-//        super.close();
-//    }
+public class APIImportAppTest extends WiremockWrapper {
+
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
 
     @Test
     public void importApiTest() {
@@ -40,14 +39,5 @@ public class APIImportAppTest {
         String[] args = {"-version"};
         int returnCode = APIImportApp.importAPI(args);
         Assert.assertEquals(returnCode, 0);
-    }
-
-    @Test
-    public void importApiTest2() {
-
-        String confFile = "/Users/rnatarajan/IdeaProjects/apim-cli-dev/distribution/target/axway-apimcli-1.14.4-SNAPSHOT/apim-cli-1.14.4-SNAPSHOT/scripts/api-v3/api-config.json";
-        String[] args = {"-h", "localhost", "-c", confFile, "-u", "apiadmin", "-p", "changeme1", "-force"};
-        int returnCode = APIImportApp.importAPI(args);
-        Assert.assertEquals(returnCode, 15);
     }
 }
