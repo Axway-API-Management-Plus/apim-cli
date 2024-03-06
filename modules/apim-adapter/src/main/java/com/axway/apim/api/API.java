@@ -23,12 +23,7 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -127,7 +122,8 @@ public class API implements CustomPropertiesEntity {
     @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
     protected String version;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, ignoreNull = false)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     protected String vhost = null;
 
     @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
