@@ -11,13 +11,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class Config {
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "API Manager name",
 			description = "The name of the API Manager.")
 	private String portalName;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "API Manager host",
@@ -35,67 +35,67 @@ public class Config {
 			name = "API Portal host and port",
 			description = "The network hostname or IP Address of the API Portal which will be used in email links.")
 	private String apiPortalHostname;
-	
+
 	@APIManagerConfigAnnotation(
-			configType = ConfigType.APIPortal, 
+			configType = ConfigType.APIPortal,
 			name = "API Portal",
 			description = "Indicates if the API Portal is configured.")
 	private Boolean isApiPortalConfigured;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "User registration",
 			description = "Enables/disables user registration for the API Manager.")
 	private Boolean registrationEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Enable password reset",
 			description = "Enables/disables support for resetting user passwords for the API Manager.")
 	private Boolean resetPasswordEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Change password on first login",
 			description = "Enables/disables support for changing user passwords on first login for the API Manager.")
 	private Boolean changePasswordOnFirstLogin;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Enable password expiry",
 			description = "Enables/disables support for user passwords expiration for the API Manager.")
 	private Boolean passwordExpiryEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Days before passwords expire",
 			description = "The number of days before user passwords expire for the API Manager.")
 	private Integer passwordLifetimeDays;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Minimum password length",
 			description = "The minimum password length.")
 	private Integer minimumPasswordLength;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Auto-approve user registration",
 			description = "Enables/disables auto-approve for user registration whereby API Administrator or Organization Administrator approval is not required.")
 	private Boolean autoApproveUserRegistration;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Enable application scopes",
 			description = "Enables/disables the ability to add System scopes to an Application. These scopes represent Gateway OAuth resources that are not covered by APIs.")
 	private Boolean systemOAuthScopesEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Apply application scope restrictions",
 			description = "Enables/disables the ability to show Application default enabled scopes only.")
 	private Boolean applicationScopeRestrictions;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Auto-approve applications",
@@ -107,88 +107,94 @@ public class Config {
 			name = "Delegate user management",
 			description = "Enables/disables user administration to the Organization Administrators.")
 	private Boolean delegateUserAdministration;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Delegation,
 			name = "Delegate application management",
 			description = "Enables/disables application administration to the Organization Administrators.")
-	private Boolean delegateApplicationAdministration;	
-	
-	@APIManagerConfigAnnotation(
+	private Boolean delegateApplicationAdministration;
+
+    @APIManagerConfigAnnotation(
+        configType = ConfigType.Delegation,
+        name = "Allow validation of duplicate API paths",
+        description = "Enables/disables validation of duplicate API paths to the Organization Administrators.")
+    private Boolean apiPathDuplicateValidationEnabled;
+
+    @APIManagerConfigAnnotation(
 			configType = ConfigType.APIRegistration,
 			name = "API default virtual host",
 			description = "The network host and port that serves as the default virtual host from which API Manager registered API will be accessible through.")
 	private String apiDefaultVirtualHost;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Enable query string version routing",
 			description = "Enable routing to APIs on the same base path.")
 	private Boolean apiRoutingKeyEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Query string version parameter",
 			description = "An additional routing key is required to support multiple APIs registered on the same base path. This indicates where to look for the value.")
 	private String apiRoutingKeyLocation;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "Email reply-to",
 			description = "The 'from' address used in emails.")
 	private String emailFrom;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "Email bounce",
 			description = "An email address where undeliverable emails will be bounced to.")
 	private String emailBounceAddress;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIRegistration,
 			name = "API promotion via policy",
 			description = "Enables/disables API promotion via policy.")
 	private Boolean promoteApiViaPolicy;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.GlobalPolicies,
 			name = "Enable Global Policies",
 			description = "Enables/disables Global policies.")
 	private Boolean globalPoliciesEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.GlobalPolicies,
 			name = "Global request policy",
 			description = "The Global Request Policy to be executed for all Frontend API calls. Must be a valid policy ID. Can be null to indicate no policy.")
 	@JsonDeserialize( using = PolicyDeserializer.class)
 	private Policy globalRequestPolicy;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.GlobalPolicies,
 			name = "Global response policy",
 			description = "The Global Response Policy to be executed for all Frontend API calls. Must be a valid policy ID. Can be null to indicate no policy.")
 	@JsonDeserialize( using = PolicyDeserializer.class)
 	private Policy globalResponsePolicy;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.FaultHandlers,
 			name = "Enable API Manager fault handlers",
 			description = "Enables/disables API Manager fault handlers.")
 	private Boolean faultHandlersEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.FaultHandlers,
 			name = "Global Fault Handler Policy",
 			description = "The Global Fault Handler Policy to be used by all Frontend APIs in the event of an error. Must be a valid policy ID. Can be null to indicate no policy.")
 	@JsonDeserialize( using = PolicyDeserializer.class)
 	private Policy globalFaultHandlerPolicy;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Strict certificate checking",
 			description = "For API import, strict certificate checking will only allow recognised, valid server certificates when performing API imports from SSL protected endpoints. Default is set to true.")
 	private Boolean strictCertificateChecking;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Server certificate verification",
@@ -200,21 +206,21 @@ public class Config {
 			name = "Enable advisory banner",
 			description = "Enables/disables API Manager advisory banner.")
 	private Boolean advisoryBannerEnabled;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.AdvisoryBanner,
 			name = "Advisory banner text.",
 			description = "Advisory banner text.")
 	private String advisoryBannerText;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Idle session timeout (minutes)",
 			description = "Idle session timeout (minutes).")
 	private Integer sessionIdleTimeout;
-	
+
 	private Integer sessionTimeout;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Login name validation regex",
@@ -226,58 +232,58 @@ public class Config {
 			name = "User name validation regex",
 			description = "User name validation regex")
 	private String userNameRegex;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "Trial mode",
 			description = "Trial mode")
 	private Boolean isTrial;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "Default trial duration",
 			description = "Default trial duration")
 	private Integer defaultTrialDuration;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "API-Manager version",
 			description = "The Version information of API Manager.")
 	private String productVersion;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIManager,
 			name = "API-Manager OS",
 			description = "The operating system on which API Manager server is running.")
 	private String os;
-	
+
 	/** The architecture of the operating system on which the API Manager server is running. Supported values: [ win-x86-32, linux-x86-64 ] */
 	private String architecture;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Import timeout (seconds)",
 			description = "API Import timeout in seconds. Defaults to 60 seconds.")
 	private Integer apiImportTimeout;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Mime validation",
 			description = "Specifies whether or not mime-type validation is performed during API Import. Currently mime-type validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
 	private Boolean apiImportMimeValidation;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Allow users to modify Backend APIs",
 			description = "Specifies whether or not backend APIs can be edited post import. This option is switched OFF by default.")
 	private Boolean apiImportEditable;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Lock user account on invalid login",
 			description = "Specifies whether or not to lock a user account when invalid login attempts are encountered; settings include, how many times authentication can be attempted, and what happens after this limit is crossed.")
 	private LockUserAccount lockUserAccount;
-	
+
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.Session,
 			name = "Login response time (ms)",
@@ -306,23 +312,23 @@ public class Config {
 
 
 	private Boolean baseOAuth;
-	
+
 	private Boolean oadminSelfServiceEnabled = Boolean.FALSE;
-	
+
 	private String externalUserName;
-	
+
 	private String externalUserDescription;
-	
+
 	private String externalUserPhone;
-	
+
 	private String externalUserEmail;
-	
+
 	private String externalUserOrganization;
-	
+
 	private String externalUserRole;
-	
+
 	private Boolean externalUserEnabled;
-	
+
 	private Boolean regTokenEmailEnabled;
 
 	public String getPortalName() {
@@ -796,4 +802,12 @@ public class Config {
 	public void setAllowEmptyValue(Boolean allowEmptyValue) {
 		this.allowEmptyValue = allowEmptyValue;
 	}
+
+    public Boolean getApiPathDuplicateValidationEnabled() {
+        return apiPathDuplicateValidationEnabled;
+    }
+
+    public void setApiPathDuplicateValidationEnabled(Boolean apiPathDuplicateValidationEnabled) {
+        this.apiPathDuplicateValidationEnabled = apiPathDuplicateValidationEnabled;
+    }
 }
