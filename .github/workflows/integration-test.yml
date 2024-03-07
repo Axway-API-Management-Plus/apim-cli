@@ -4,7 +4,7 @@ on: [push]
 
 env:
   CASSANDRA_DOCKER_IMAGE: cassandra:4.0.11
-  APIM_DOCKER_IMAGE: docker.repository.axway.com/apigateway-docker-prod/7.7/gateway:7.7.0.20231130-2-BN0052-ubi9
+  APIM_DOCKER_IMAGE: docker.repository.axway.com/apigateway-docker-prod/7.7/gateway:7.7.0.20240228-1-BN0065-ubi9
   CACHE_FILE_APIM: api-manager_7_7_20231130.cache.tar
   CACHE_FILE_CASSANDRA: cassandra_4_0_11.cache.tar
   FED_FILE: swagger-promote-7.7-20231130.fed
