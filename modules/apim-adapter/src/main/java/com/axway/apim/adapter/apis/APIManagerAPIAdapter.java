@@ -567,7 +567,10 @@ public class APIManagerAPIAdapter {
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
         mapper.setSerializationInclusion(Include.NON_NULL);
+        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+            SimpleBeanPropertyFilter.serializeAll());
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier()));
+        mapper.setFilterProvider(filter);
         mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
         translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
         try {
