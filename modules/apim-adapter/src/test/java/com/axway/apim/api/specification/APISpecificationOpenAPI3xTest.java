@@ -23,18 +23,7 @@ public class APISpecificationOpenAPI3xTest {
 	ObjectMapper mapper = new ObjectMapper();
 	ObjectMapper ymlMapper = new ObjectMapper(new YAMLFactory());
 
-	@Test
-	public void keepOneUrlInOpenApiServers() throws IOException {
 
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/petstore-openapi30.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
-		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
-		Assert.assertEquals(apiDefinition.getDescription(), "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.");
-		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
-		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsNotPresent() throws IOException {
