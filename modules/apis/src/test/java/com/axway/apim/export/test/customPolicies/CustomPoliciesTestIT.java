@@ -1,6 +1,7 @@
 package com.axway.apim.export.test.customPolicies;
 
 import com.axway.apim.EndpointConfig;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.*;
 import com.axway.apim.export.test.ExportTestAction;
 import com.axway.apim.test.ImportTestAction;
@@ -77,6 +78,7 @@ public class CustomPoliciesTestIT extends TestNGCitrusSpringSupport {
             variable("useApiAdmin", "false"); // This is an org-admin user
         } else {
             variable("exportLocation", "${exportLocation}/ignoreAdminAccount");
+            variable("useApiAdmin", "true");
             $(echo("####### Exporting the API with Admin permissions #######"));
         }
 
@@ -95,44 +97,37 @@ public class CustomPoliciesTestIT extends TestNGCitrusSpringSupport {
         assertEquals(exportedAPIConfig.get("version").asText(), "v1");
         assertEquals(exportedAPIConfig.get("organization").asText(), "API Development " + context.getVariable("orgNumber"));
 
-        List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {
-        });
+        List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {});
 // ignore empty values in properties
-        importedSecurityProfiles = mapper.readValue(mapper.writeValueAsString(importedSecurityProfiles), new TypeReference<List<SecurityProfile>>() {
-        });
-        List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {
-        });
+        importedSecurityProfiles = mapper.readValue(mapper.writeValueAsString(importedSecurityProfiles), new TypeReference<List<SecurityProfile>>() {});
+        List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {});
         assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
-        Map<String, OutboundProfile> importedOutboundProfiles = mapper.readValue(mapper.writeValueAsString(importedAPIConfig.get("outboundProfiles")), new TypeReference<Map<String, OutboundProfile>>() {
-        });
-        Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>() {
-        });
-        assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        try {
+            Map<String, OutboundProfile> importedOutboundProfiles = mapper.readValue(mapper.writeValueAsString(importedAPIConfig.get("outboundProfiles")), new TypeReference<Map<String, OutboundProfile>>() {});
+            Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>() {});
+            assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
+        }finally {
+            // OutboundProfile calls API Manager
+            apiManagerAdapter.deleteInstance();
+        }
         assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("requestPolicy").asText().startsWith("<key"), "Request policy should not start with <key");
         assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("responsePolicy").asText().startsWith("<key"), "Request policy should not start with <key");
 
-        TagMap importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap>() {
-        });
-        TagMap exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap>() {
-        });
+        TagMap importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap>() {});
+        TagMap exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap>() {});
         assertEquals(exportedTags, importedTags, "Tags are not equal.");
 
-        List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {
-        });
-        List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {
-        });
+        List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {});
+        List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {});
         assertEquals(importedCorsProfiles, exportedCorsProfiles, "CorsProfiles are not equal.");
 
-        APIQuota importedAppQuota = mapper.convertValue(importedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {
-        });
-        APIQuota exportedAppQuota = mapper.convertValue(exportedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {
-        });
+        APIQuota importedAppQuota = mapper.convertValue(importedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {});
+        APIQuota exportedAppQuota = mapper.convertValue(exportedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {});
         assertEquals(importedAppQuota, exportedAppQuota, "applicationQuota are not equal.");
 
-        APIQuota importedSystemQuota = mapper.convertValue(importedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {
-        });
-        APIQuota exportedSystemQuota = mapper.convertValue(exportedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {
-        });
+        APIQuota importedSystemQuota = mapper.convertValue(importedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {});
+        APIQuota exportedSystemQuota = mapper.convertValue(exportedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {});
         assertEquals(importedSystemQuota, exportedSystemQuota, "systemQuota are not equal.");
 
 
