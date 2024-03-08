@@ -193,7 +193,6 @@ public class APIImportConfigAdapter {
         } else {
             throw new AppException("No API Specification configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
         }
-        apiSpecification.configureBasePath(((DesiredAPI) apiConfig).getBackendBasepath(), apiConfig);
         apiConfig.setApiDefinition(apiSpecification);
     }
 
