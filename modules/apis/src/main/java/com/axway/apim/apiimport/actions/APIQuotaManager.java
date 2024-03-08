@@ -71,6 +71,7 @@ public class APIQuotaManager {
         }
         // Load the entire current default quota
         APIQuota currentDefaultQuota = quotaManager.getDefaultQuota(type);
+        LOG.debug("Current Default Quota : {}", currentDefaultQuota);
         List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
         populateMethodId(createdAPI, mergedRestrictions);
         // If there is an actual API, remove the restrictions for the current actual API
