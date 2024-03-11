@@ -29,53 +29,58 @@ public class UpdateExistingAPI {
     public void execute(APIChangeState changes) throws AppException {
 
         API actualAPI = changes.getActualAPI();
+        API desiredAPI = changes.getDesiredAPI();
         List<APIMethod> actualAPIMethods = changes.getActualAPI().getApiMethods();
         APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         try {
             LOG.info("Update existing {} API: {} {} (ID: {})", actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
             // Copy all desired proxy changes into the actual API
-            APIChangeState.copyChangedProps(changes.getDesiredAPI(), changes.getActualAPI(), changes.getAllChanges());
-            changes.getActualAPI().setApiMethods(null);
-            List<APIMethod> desiredAPIMethods = changes.getDesiredAPI().getApiMethods();
+            APIChangeState.copyChangedProps(desiredAPI, actualAPI, changes.getAllChanges());
+            actualAPI.setApiMethods(null);
+            List<APIMethod> desiredAPIMethods = desiredAPI.getApiMethods();
             ManageApiMethods manageApiMethods = new ManageApiMethods();
             manageApiMethods.isMethodMismatch(actualAPIMethods, desiredAPIMethods);
             // If a proxy update is required
             if (changes.isProxyUpdateRequired()) {
+                // Handle vhost
+                if(desiredAPI.getVhost() == null || desiredAPI.getVhost().isEmpty()){
+                    actualAPI.setVhost(null);
+                }
                 // Update the proxy
-                apiAdapter.updateAPIProxy(changes.getActualAPI());
+                apiAdapter.updateAPIProxy(actualAPI);
             }
-            manageApiMethods.updateApiMethods(changes.getActualAPI().getId(), actualAPIMethods, desiredAPIMethods);
+            manageApiMethods.updateApiMethods(actualAPI.getId(), actualAPIMethods, desiredAPIMethods);
             // Handle backendBasePath update
             if (changes.getBreakingChanges().contains("serviceProfiles")) {
-                String backendBasePath = changes.getDesiredAPI().getServiceProfiles().get("_default").getBasePath();
+                String backendBasePath = desiredAPI.getServiceProfiles().get("_default").getBasePath();
                 if (backendBasePath != null && !CoreParameters.getInstance().isOverrideSpecBasePath()) {
-                    ServiceProfile actualServiceProfile = changes.getActualAPI().getServiceProfiles().get("_default");
+                    ServiceProfile actualServiceProfile = actualAPI.getServiceProfiles().get("_default");
                     LOG.info("Replacing existing API backendBasePath {} with new value : {}", actualServiceProfile.getBasePath(), backendBasePath);
                     actualServiceProfile.setBasePath(backendBasePath);
-                    apiAdapter.updateAPIProxy(changes.getActualAPI());
+                    apiAdapter.updateAPIProxy(actualAPI);
                 }
             }
             // If image an include, update it
             if (changes.getAllChanges().contains("image")) {
-                apiAdapter.updateAPIImage(changes.getActualAPI(), changes.getDesiredAPI().getImage());
+                apiAdapter.updateAPIImage(actualAPI, desiredAPI.getImage());
             }
             // This is special, as the status is not a property and requires some additional actions!
             APIStatusManager statusUpdate = new APIStatusManager();
             if (changes.getNonBreakingChanges().contains("state")) {
-                statusUpdate.update(changes.getActualAPI(), changes.getDesiredAPI().getState(), changes.getDesiredAPI().getVhost());
+                statusUpdate.update(actualAPI, desiredAPI.getState(), desiredAPI.getVhost());
             }
             if (changes.getNonBreakingChanges().contains("retirementDate")) {
-                apiAdapter.updateRetirementDate(changes.getActualAPI(), changes.getDesiredAPI().getRetirementDate());
+                apiAdapter.updateRetirementDate(actualAPI, desiredAPI.getRetirementDate());
             }
             // This is required when an API has been set back to Unpublished
             // In that case, the V-Host is reset to null - But we still want to use the configured V-Host
-            if (statusUpdate.isUpdateVHostRequired()) {
-                apiAdapter.updateAPIProxy(changes.getActualAPI());
+            if (statusUpdate.isUpdateVHostRequired() && desiredAPI.getVhost() != null) {
+                apiAdapter.updateAPIProxy(actualAPI);
             }
-            new APIQuotaManager(changes.getDesiredAPI(), changes.getActualAPI()).execute(changes.getActualAPI());
-            new ManageClientOrganization(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
+            new APIQuotaManager(desiredAPI, actualAPI).execute(actualAPI);
+            new ManageClientOrganization(desiredAPI, actualAPI).execute(false);
             // Handle subscription to applications
-            new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
+            new ManageClientApps(desiredAPI, actualAPI, null).execute(false);
             if (actualAPI.getState().equals(API.STATE_DELETED)) {
                 LOG.info("Successfully deleted API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
             } else {
@@ -88,7 +93,7 @@ public class UpdateExistingAPI {
             LOG.error("Error updating existing API", e);
             throw new AppException("Error updating existing API", ErrorCode.BREAKING_CHANGE_DETECTED);
         } finally {
-            APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());
+            APIPropertiesExport.getInstance().setProperty("feApiId", actualAPI.getId());
         }
     }
 
