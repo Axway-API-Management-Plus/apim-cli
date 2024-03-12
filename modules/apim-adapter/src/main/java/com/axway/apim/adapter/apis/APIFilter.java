@@ -63,13 +63,12 @@ public class APIFilter implements CustomPropertiesFilter {
     private String outboundAuthentication;
     private String organization;
     private String createdOn;
-    private APIType type;
+    private final APIType type;
     private String policyName;
     private String tag;
     private List<String> customProperties;
     private boolean deprecated;
     private boolean retired;
-    private String apiType;
 
     private METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
 
@@ -441,7 +440,7 @@ public class APIFilter implements CustomPropertiesFilter {
             ", customProperties=" + customProperties +
             ", deprecated=" + deprecated +
             ", retired=" + retired +
-            ", apiType='" + apiType + '\'' +
+            ", version ='" + version + '\'' +
             ", translateMethodMode=" + translateMethodMode +
             ", loadBackendAPI=" + loadBackendAPI +
             ", includeOperations=" + includeOperations +
