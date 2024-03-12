@@ -13,6 +13,7 @@ import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -59,7 +60,7 @@ public class ExportHelper {
         String targetFile = null;
         String configFile;
         try {
-            targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
+            targetFile = localFolder.getCanonicalPath() + "/" + Utils.replaceSpecialChars(exportAPI.getName()) + apiDef.getAPIDefinitionType().getFileExtension();
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
                 writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
                 exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());

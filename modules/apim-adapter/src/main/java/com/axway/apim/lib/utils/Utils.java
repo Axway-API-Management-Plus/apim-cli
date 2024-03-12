@@ -476,4 +476,8 @@ public class Utils {
             .filter(e -> !e.getValue().isEmpty())
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
+
+    public static String replaceSpecialChars(String fileName){
+        return fileName.replaceAll("[\\\\/:*?\"<>|]", "");
+    }
 }

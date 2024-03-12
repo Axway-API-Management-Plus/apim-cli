@@ -367,4 +367,10 @@ public class UtilsTest {
             Assert.assertEquals(99, Utils.handleAppException(exception, LoggerFactory.getLogger("Utils"), new ErrorCodeMapper()));
         }
     }
+
+    @Test
+    void replaceSplChars() {
+        Assert.assertEquals("api-old(XX) API  OLD", Utils.replaceSpecialChars("api-old/(XX) API ** OLD**"));
+        Assert.assertEquals("api-old(XX) API  OLD", Utils.replaceSpecialChars("api-old/(XX) API ** OLD**:"));
+    }
 }
