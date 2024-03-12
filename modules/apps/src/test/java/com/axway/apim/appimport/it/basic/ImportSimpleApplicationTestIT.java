@@ -33,6 +33,7 @@ public class ImportSimpleApplicationTestIT extends TestNGCitrusSpringSupport {
     public void run(@Optional @CitrusResource TestContext context) {
         description("Import application into API-Manager");
         variable("appName", "My-App-" + RandomNumberFunction.getRandomNumber(4, true));
+        variable("useApiAdmin", "true");
         $(echo("####### Import application: '${appName}' #######"));
         String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/SimpleTestApplication.json", context, "apps", true);
         $(testContext -> {

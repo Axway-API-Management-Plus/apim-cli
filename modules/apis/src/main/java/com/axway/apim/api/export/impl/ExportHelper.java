@@ -6,6 +6,8 @@ import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.api.model.AuthType;
+import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.specification.APISpecification;
@@ -30,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 public class ExportHelper {
 
@@ -84,6 +87,8 @@ public class ExportHelper {
             storeCaCerts(localFolder, exportAPI.getCaCerts());
         }
 
+        storePrivateCerts(localFolder, exportAPI.getAuthenticationProfiles());
+
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
@@ -134,6 +139,27 @@ public class ExportHelper {
             }
         }
     }
+
+    private void storePrivateCerts(File localFolder, List<AuthenticationProfile> authenticationProfiles) throws AppException {
+        for (AuthenticationProfile profile : authenticationProfiles) {
+            if (profile.getType() == AuthType.ssl && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                try {
+                    Map<String, Object> parameters = profile.getParameters();
+                    String pfx = (String) parameters.get("pfx");
+                    String content = pfx.replaceFirst("data:.+,", "");
+                    byte[] data  = Base64.getMimeDecoder().decode(content.replace("\\r\\n","\n"));
+                    String fileName = "backend_cert.pfx";
+                    writeBytesToFile(data, localFolder + "/" + fileName);
+                    parameters.remove("pfx");
+                    parameters.put("certFile", fileName);
+
+                } catch (AppException e) {
+                    throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+                }
+            }
+        }
+    }
+
 
     public void writeContent(ObjectMapper mapper, ExportAPI exportAPI, File localFolder, String configFile) throws AppException {
         try {

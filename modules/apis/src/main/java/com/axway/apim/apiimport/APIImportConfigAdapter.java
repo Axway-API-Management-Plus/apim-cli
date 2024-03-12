@@ -15,6 +15,7 @@ import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -666,12 +667,9 @@ public class APIImportConfigAdapter {
 
     private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
         if (!authnProfile.getType().equals(AuthType.ssl)) return;
+        if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) return;
         String keystore = (String) authnProfile.getParameters().get("certFile");
         String password = (String) authnProfile.getParameters().get("password");
-        if (keystore.contains(":")) {
-            LOG.warn("Keystore format: <keystorename>:<type> is deprecated. Please remove the keystore type.");
-            keystore = keystore.split(":")[0];
-        }
         File clientCertFile = new File(keystore);
         try {
             if (!clientCertFile.exists()) {
