@@ -52,7 +52,8 @@ public class ExportHelper {
         // Skip processing if API definition is not available due to original API cloned and deleted.
         if (apiDef == null) {
             LOG.error("Backend API Definition is not available for the API : {}, hence use the option -useFEAPIDefinition to export API", exportAPI.getName());
-            return;
+            if (params.getId() != null)
+                throw new AppException("Backend API Definition is not available for the API : " + exportAPI.getName() + ", hence use the option -useFEAPIDefinition to export API", ErrorCode.BACKEND_API_DEF_NA);
         }
         String targetFile = null;
         String configFile;
