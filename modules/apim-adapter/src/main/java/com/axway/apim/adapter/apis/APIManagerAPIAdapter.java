@@ -172,7 +172,7 @@ public class APIManagerAPIAdapter {
             .build();
     }
 
-    API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
+    public API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
         if (foundAPIs.isEmpty()) return null;
         // If filtered resultSet contains more than one API, here we try to find a unique API based on the logical
         // criteria (apiPath, VHost and QueryVersion)
@@ -184,7 +184,7 @@ public class APIManagerAPIAdapter {
             Map<String, List<API>> apisPerKey = new HashMap<>();
             // Create a List of APIs based on the logical keys
             for (API api : foundAPIs) {
-                String key = api.getPath() + "###" + api.getVhost() + "###" + api.getApiRoutingKey();
+                String key = api.getPath() + "###" + api.getVhost() + "###" + getVersion(api);
                 if (apisPerKey.containsKey(key)) {
                     apisPerKey.get(key).add(api);
                 } else {
@@ -193,13 +193,21 @@ public class APIManagerAPIAdapter {
                     apisPerKey.put(key, apiWithKey);
                 }
             }
-            String filterKey = filter.getApiPath() + "###" + filter.getVhost() + "###" + filter.getQueryStringVersion();
+            String filterKey = filter.getApiPath() + "###" + filter.getVhost() + "###" + getVersion(filter);
             if (apisPerKey.get(filterKey) != null && apisPerKey.get(filterKey).size() == 1) {
                 return apisPerKey.get(filterKey).get(0);
             }
             throw new AppException("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API);
         }
         return foundAPIs.get(0);
+    }
+
+    public String getVersion(API api) {
+        return api.getApiRoutingKey() != null ? api.getApiRoutingKey() : api.getVersion();
+    }
+
+    public String getVersion(APIFilter apiFilter) {
+        return apiFilter.getQueryStringVersion() != null ? apiFilter.getQueryStringVersion() : apiFilter.getVersion();
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {

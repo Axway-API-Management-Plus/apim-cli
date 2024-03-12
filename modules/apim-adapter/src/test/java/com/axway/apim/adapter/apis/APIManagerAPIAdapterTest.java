@@ -150,6 +150,33 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         Assert.assertEquals(uniqueAPI, testAPI2);
     }
 
+    @Test
+    public void testUniqueApiWithoutVhostAndQueryStringRouting() throws AppException {
+        API testAPI1 = createTestAPIWithStateAndVersion("/api/v1/resource", "deprecated", "1.0");
+        API testAPI2 = createTestAPIWithStateAndVersion("/api/v1/resource", "deprecated", "2.0");
+        API testAPI3 = createTestAPIWithStateAndVersion("/api/v1/resource", "published", "3.0");
+
+        List<API> testAPIs = new ArrayList<>();
+        testAPIs.add(testAPI1);
+        testAPIs.add(testAPI2);
+        testAPIs.add(testAPI3);
+
+        APIFilter filter = new APIFilter.Builder().hasApiPath("/api/v1/resource").hasVersion("3.0").build();
+
+        // Must fail (throw an Exception) as the API is really not unique, if we filter with the QueryVersion only
+        API uniqueAPI = apiManagerAPIAdapter.getUniqueAPI(testAPIs, filter);
+        Assert.assertEquals(uniqueAPI, testAPI3);
+    }
+
+    private static API createTestAPIWithStateAndVersion(String apiPath, String state, String version) {
+        API testAPI = new API();
+        testAPI.setPath(apiPath);
+        testAPI.setState(state);
+        testAPI.setVersion(version);
+        return testAPI;
+    }
+
+
     private static API createTestAPI(String apiPath, String vhost, String queryVersion) {
         API testAPI = new API();
         testAPI.setPath(apiPath);

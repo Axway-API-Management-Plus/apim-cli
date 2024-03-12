@@ -55,6 +55,7 @@ public class APIFilter implements CustomPropertiesFilter {
     private String name;
     private String vhost;
     private String apiPath;
+    private String version;
     private String queryStringVersion;
     private String state;
     private String backendBasepath;
@@ -328,6 +329,14 @@ public class APIFilter implements CustomPropertiesFilter {
         return state;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     public boolean isRetired() {
         return retired;
     }
@@ -591,6 +600,7 @@ public class APIFilter implements CustomPropertiesFilter {
         String apiPath;
         String queryStringVersion;
         String state;
+        String version;
         String backendBasepath;
         String inboundSecurity;
         String outboundAuthentication;
@@ -665,6 +675,7 @@ public class APIFilter implements CustomPropertiesFilter {
             apiFilter.setIncludeRemoteHost(this.includeRemoteHost);
             apiFilter.setLoadBackendAPI(this.loadBackendAPI);
             apiFilter.setState(this.state);
+            apiFilter.setVersion(this.version);
             apiFilter.setRetired(this.retired);
             apiFilter.setDeprecated(this.deprecated);
             apiFilter.setCustomProperties(this.customProperties);
@@ -726,6 +737,12 @@ public class APIFilter implements CustomPropertiesFilter {
             this.state = state;
             return this;
         }
+
+        public Builder hasVersion(String version) {
+            this.version = version;
+            return this;
+        }
+
 
         public Builder hasPolicyName(String policyName) {
             this.policyName = policyName;
@@ -862,6 +879,7 @@ public class APIFilter implements CustomPropertiesFilter {
             this.failOnError = failOnError;
             return this;
         }
+
     }
 
     private static boolean isPolicyUsed(API api, String policyName) {
