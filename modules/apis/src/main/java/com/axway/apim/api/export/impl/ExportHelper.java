@@ -54,6 +54,7 @@ public class ExportHelper {
             LOG.error("Backend API Definition is not available for the API : {}, hence use the option -useFEAPIDefinition to export API", exportAPI.getName());
             if (params.getId() != null)
                 throw new AppException("Backend API Definition is not available for the API : " + exportAPI.getName() + ", hence use the option -useFEAPIDefinition to export API", ErrorCode.BACKEND_API_DEF_NA);
+            return;
         }
         String targetFile = null;
         String configFile;
