@@ -2,6 +2,7 @@ package com.axway.apim.appimport.it.share;
 
 import com.axway.apim.EndpointConfig;
 import com.axway.apim.TestUtils;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.ApplicationExportApp;
 import com.axway.apim.appimport.ClientApplicationImportApp;
@@ -172,8 +173,13 @@ public class ImportAppWithPermissionsTestIT extends TestNGCitrusSpringSupport {
         });
         Assert.assertEquals(new File(tmpDirPath, appName).listFiles().length, 1, "Expected to have one application exported");
         String exportedConfig = new File(tmpDirPath, appName).listFiles()[0].getPath();
-        ClientApplication exportedApp = mapper.readValue(new File(exportedConfig), ClientApplication.class);
-        Assert.assertNotNull(exportedApp.getPermissions(), "Exported client application must have permissions");
-        Assert.assertEquals(exportedApp.getPermissions().size(), 4, "Exported client application must have 4 permissions");
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        try {
+            ClientApplication exportedApp = mapper.readValue(new File(exportedConfig), ClientApplication.class);
+            Assert.assertNotNull(exportedApp.getPermissions(), "Exported client application must have permissions");
+            Assert.assertEquals(exportedApp.getPermissions().size(), 4, "Exported client application must have 4 permissions");
+        }finally {
+            apiManagerAdapter.deleteInstance();
+        }
     }
 }
