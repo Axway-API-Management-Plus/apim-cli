@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.*;
 
-@JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost", "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties", "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
+@JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost", "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties", "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods", "clientOrganizations", "applications"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class ExportAPI {
     private static final String DEFAULT = "_default";
@@ -74,7 +74,7 @@ public class ExportAPI {
                 DeviceType type = device.getType();
                 Map<String, String> properties = device.getProperties();
 
-                if (type == DeviceType.oauth ) {
+                if (type == DeviceType.oauth) {
                     String tokenStore = properties.get(TOKEN_STORE);
                     String tokenStoreName = Utils.getExternalPolicyName(tokenStore, Utils.FedKeyType.OAuthTokenProfile);
                     properties.put(TOKEN_STORE, tokenStoreName);
@@ -281,11 +281,12 @@ public class ExportAPI {
         if (actualAPIProxy.getClientOrganizations().isEmpty()) return Collections.emptyList();
         if (actualAPIProxy.getClientOrganizations().size() == 1 && actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization()))
             return Collections.emptyList();
-        List<String> orgs = new ArrayList<>();
+        List<String> organizations = new ArrayList<>();
         for (Organization org : actualAPIProxy.getClientOrganizations()) {
-            orgs.add(org.getName());
+            if (!org.getName().equals(actualAPIProxy.getOrganization().getName())) // Ignore the development organization
+                organizations.add(org.getName());
         }
-        return orgs;
+        return organizations;
     }
 
     public List<ClientApplication> getApplications() {

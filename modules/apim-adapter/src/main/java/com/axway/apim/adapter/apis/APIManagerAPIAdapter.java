@@ -393,11 +393,8 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void addQuotaConfiguration(API api) throws AppException {
-        addQuotaConfiguration(api, true);
-    }
 
-    private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
+    public void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
         if (!addQuota || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         APIQuota applicationQuota = null;
         APIQuota systemQuota;
@@ -427,11 +424,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void addClientOrganizations(API api) throws AppException {
-        addClientOrganizations(api, true);
-    }
-
-    private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
+    public void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
         if (!addClientOrganizations || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         List<Organization> grantedOrgs;
         List<Organization> allOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getAllOrgs();
@@ -447,11 +440,7 @@ public class APIManagerAPIAdapter {
         api.setClientOrganizations(grantedOrgs);
     }
 
-    public void addClientApplications(API api) throws AppException {
-        addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
-    }
-
-    private void addClientApplications(API api, APIFilter filter) throws AppException {
+    public void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
         List<ClientApplication> apps;
         apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());

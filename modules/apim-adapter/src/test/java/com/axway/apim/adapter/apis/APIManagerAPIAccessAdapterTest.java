@@ -3,6 +3,7 @@ package com.axway.apim.adapter.apis;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.ApiOrganizationSubscription;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
@@ -209,7 +210,12 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         Assert.assertEquals(missingApiAccesses.get(0).getApiName(), "12345");
     }
 
-
+    @Test
+    public void getApiAccess() throws AppException {
+        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = apiManagerAPIAccessAdapter.getApiAccess("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+        Assert.assertNotNull(apiOrganizationSubscriptions);
+        Assert.assertEquals(4, apiOrganizationSubscriptions.size());
+    }
 
 
 }

@@ -429,7 +429,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     @Test
     public void addClientApplications() throws AppException {
         API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
-        apiManagerAPIAdapter.addClientApplications(api);
+        apiManagerAPIAdapter.addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
     }
 
     @Test

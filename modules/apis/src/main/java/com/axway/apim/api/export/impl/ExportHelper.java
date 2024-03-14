@@ -63,10 +63,11 @@ public class ExportHelper {
         String targetFile = null;
         String configFile;
         try {
-            targetFile = localFolder.getCanonicalPath() + "/" + Utils.replaceSpecialChars(exportAPI.getName()) + apiDef.getAPIDefinitionType().getFileExtension();
+            String fileName = Utils.replaceSpecialChars(exportAPI.getName()) + apiDef.getAPIDefinitionType().getFileExtension();
+            targetFile = localFolder.getCanonicalPath() + "/" + fileName;
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
                 writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-                exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
+                exportAPI.getAPIDefinition().setApiSpecificationFile(fileName);
             }
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
