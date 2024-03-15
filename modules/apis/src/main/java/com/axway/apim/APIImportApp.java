@@ -80,7 +80,6 @@ public class APIImportApp implements APIMCLIServiceProvider {
                 .hasApiPath(desiredAPI.getPath())
                 .hasVHost(desiredAPI.getVhost())
                 .hasVersion(desiredAPI.getVersion())
-                .hasState(desiredAPI.getState())
                 .includeCustomProperties(desiredAPI.getCustomProperties())
                 .hasQueryStringVersion(desiredAPI.getApiRoutingKey())
                 .includeClientOrganizations(true) // We have to load clientOrganization, in case they have to be taken over
