@@ -289,17 +289,13 @@ public class ExportAPI {
         return organizations;
     }
 
-    public List<ClientApplication> getApplications() {
+    public List<Map<String, String>> getApplications() {
         if (actualAPIProxy.getApplications().isEmpty()) return Collections.emptyList();
-        List<ClientApplication> exportApps = new ArrayList<>();
+        List<Map<String, String>> exportApps = new ArrayList<>();
+        Map<String, String> applications = new HashMap<>();
+        exportApps.add(applications);
         for (ClientApplication app : actualAPIProxy.getApplications()) {
-            ClientApplication exportApp = new ClientApplication();
-            exportApp.setEnabled(app.isEnabled());
-            exportApp.setName(app.getName());
-            exportApp.setOrganization(null);
-            exportApp.setCredentials(null);
-            exportApp.setApiAccess(null);
-            exportApps.add(exportApp);
+            applications.put("name", app.getName());
         }
         return exportApps;
     }
