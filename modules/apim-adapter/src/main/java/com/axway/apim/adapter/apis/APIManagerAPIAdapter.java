@@ -184,7 +184,7 @@ public class APIManagerAPIAdapter {
             Map<String, List<API>> apisPerKey = new HashMap<>();
             // Create a List of APIs based on the logical keys
             for (API api : foundAPIs) {
-                String key = api.getPath() + "###" + api.getVhost() + "###" + getVersion(api) + "###" + api.getState();
+                String key = api.getPath() + "###" + api.getVhost() + "###" + getVersion(api);
                 if (apisPerKey.containsKey(key)) {
                     apisPerKey.get(key).add(api);
                 } else {
@@ -193,7 +193,7 @@ public class APIManagerAPIAdapter {
                     apisPerKey.put(key, apiWithKey);
                 }
             }
-            String filterKey = filter.getApiPath() + "###" + filter.getVhost() + "###" + getVersion(filter) + "###" + filter.getState();
+            String filterKey = filter.getApiPath() + "###" + filter.getVhost() + "###" + getVersion(filter);
             if (apisPerKey.get(filterKey) != null && apisPerKey.get(filterKey).size() == 1) {
                 return apisPerKey.get(filterKey).get(0);
             }
