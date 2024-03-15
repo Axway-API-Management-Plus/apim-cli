@@ -161,7 +161,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         testAPIs.add(testAPI2);
         testAPIs.add(testAPI3);
 
-        APIFilter filter = new APIFilter.Builder().hasApiPath("/api/v1/resource").hasVersion("3.0").build();
+        APIFilter filter = new APIFilter.Builder().hasApiPath("/api/v1/resource").hasState("published").hasVersion("3.0").build();
 
         // Must fail (throw an Exception) as the API is really not unique, if we filter with the QueryVersion only
         API uniqueAPI = apiManagerAPIAdapter.getUniqueAPI(testAPIs, filter);
