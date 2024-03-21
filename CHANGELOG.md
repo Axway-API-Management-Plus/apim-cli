@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Issues exporting and importing an API (See issue [#460](https://github.com/Axway-API-Management-Plus/apim-cli/issues/460))
 - Error importing APIs with inbound OAuth  (See issue [#459](https://github.com/Axway-API-Management-Plus/apim-cli/issues/459)) 
 - Deleting a V-Host is not considered as a modification (See issue [#457](https://github.com/Axway-API-Management-Plus/apim-cli/issues/457))
+- NullPointerException Error when importing a new API with system quotas (See issue [#474](https://github.com/Axway-API-Management-Plus/apim-cli/issues/474))
 ### Added
 - Support Feb 2024 APIM Release (See issue [#461](https://github.com/Axway-API-Management-Plus/apim-cli/issues/461))
 
