@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.4] In progress
+# [1.14.4] 2024-03-21
 
 ### Fixed
 - "ERROR: Cannot validate/fulfill configuration file." when importing back downloaded API (See issue [#466](https://github.com/Axway-API-Management-Plus/apim-cli/issues/466))
