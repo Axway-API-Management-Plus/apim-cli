@@ -1,0 +1,33 @@
+[
+  {
+    "organizationName": "API Development 5172",
+    "organizationId": "8d7db2fb-8677-4456-8aa2-90fdce560e63",
+    "createdOn": 1710376577878,
+    "applications": []
+  },
+  {
+    "organizationName": "API Development 4172",
+    "organizationId": "a0d455da-82f1-44e3-aa6d-fdd622b8f09c",
+    "createdOn": 1710376577883,
+    "applications": []
+  },
+  {
+    "organizationName": "Community",
+    "organizationId": "3befdf00-b5ba-4163-98c6-7d36ac124d97",
+    "createdOn": 1710376577890,
+    "applications": []
+  },
+  {
+    "organizationName": "API Development 2172",
+    "organizationId": "4f2f83b5-dfe4-406f-84eb-2ee2450b4368",
+    "createdOn": 1710376577886,
+    "applications": [
+      {
+        "applicationName": "Test_Consumer",
+        "applicationId": "d7b7ee80-99c6-45f2-b09d-d2465a1da9ed",
+        "organizationId": "4f2f83b5-dfe4-406f-84eb-2ee2450b4368",
+        "createdOn": 1710376750063
+      }
+    ]
+  }
+]

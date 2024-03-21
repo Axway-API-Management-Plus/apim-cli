@@ -7,6 +7,7 @@ import com.axway.apim.adapter.Response;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.AbstractEntity;
+import com.axway.apim.api.model.ApiOrganizationSubscription;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
@@ -287,5 +288,24 @@ public class APIManagerAPIAccessAdapter {
             missingAccess.add(access);
         }
         return missingAccess;
+    }
+
+
+    public List<ApiOrganizationSubscription> getApiAccess(String apiId) throws AppException{
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/apiaccess").build();
+            RestAPICall request = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode > 200) {
+                    LOG.error("Can't get API access requests for API. Response-Code: {}. Got response: {}", statusCode, response);
+                    throw new AppException("Can't get API access requests for API: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                return mapper.readValue(response, new TypeReference<List<ApiOrganizationSubscription>>(){});
+            }
+        } catch (Exception e) {
+            throw new AppException("Can't delete API access requests for application.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
     }
 }

@@ -6,17 +6,12 @@ import com.axway.apim.lib.APIManagerAlertsAnnotation;
 import com.axway.apim.lib.APIManagerAlertsAnnotation.AlertType;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 public class ConsolePrinterAlerts {
-
-	private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterAlerts.class);
 
 	APIManagerAdapter adapter;
 
@@ -56,25 +51,11 @@ public class ConsolePrinterAlerts {
 					APIManagerAlertsAnnotation annotation = field.getAnnotation(APIManagerAlertsAnnotation.class);
 					if(annotation.alertType()==type) {
 						String dots = ".....................................";
-						Console.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), alerts));
+						Console.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), Utils.getFieldValue(field.getName(), alerts));
 					}
 				}
 			}
 			Console.println();
-		}
-	}
-
-	private String getFieldValue(String fieldName, Alerts alerts) {
-		try {
-			PropertyDescriptor pd = new PropertyDescriptor(fieldName, alerts.getClass());
-			Method getter = pd.getReadMethod();
-			Object value = getter.invoke(alerts);
-			return (value==null) ? "N/A" : value.toString();
-		} catch (Exception e) {
-			if(LOG.isDebugEnabled()) {
-				LOG.error(e.getMessage(), e);
-			}
-			return "Err";
 		}
 	}
 }

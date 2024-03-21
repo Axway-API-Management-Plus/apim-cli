@@ -126,9 +126,9 @@ public class ConsoleAPIExporter extends APIResultHandler {
         if (!params.getWide().equals(Wide.ultra)) {
             try {
                 APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
-                apiAdapter.addClientApplications(api);
-                apiAdapter.addClientOrganizations(api);
-                apiAdapter.addQuotaConfiguration(api);
+                apiAdapter.addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
+                apiAdapter.addClientOrganizations(api, true);
+                apiAdapter.addQuotaConfiguration(api, true);
             } catch (AppException e) {
                 LOG.error("Error loading API details.", e);
             }

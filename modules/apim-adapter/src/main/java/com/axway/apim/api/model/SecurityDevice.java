@@ -1,5 +1,6 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,19 +67,15 @@ public class SecurityDevice {
     }
 
 
-    public void setConvertPolicies(boolean convertPolicies) {
-        this.convertPolicies = convertPolicies;
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other == null) return false;
         if (other instanceof SecurityDevice) {
             SecurityDevice otherSecurityDevice = (SecurityDevice) other;
-            if (!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
-            if (!StringUtils.equals(otherSecurityDevice.getType().getName(), this.getType().getName())) return false;
+            if (!StringUtils.equals(otherSecurityDevice.getName(), name)) return false;
+            if (!StringUtils.equals(otherSecurityDevice.getType().getName(), type.getName())) return false;
             //Ignore order check as 7.7.20211130 returning order id as  1 n whereas 7.7.20220830 returning order id as 0
-            return otherSecurityDevice.getProperties().equals(this.getProperties());
+            return Utils.removeEmptyValuesFromMap(otherSecurityDevice.getProperties()).equals(Utils.removeEmptyValuesFromMap(properties));
         }
         return true;
     }

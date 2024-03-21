@@ -26,6 +26,7 @@ public class CLIAPIDeleteOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
         Console.println("How to delete APIs using different filter options:");
         Console.println(getBinaryName() + " api delete -s api-env");
         Console.println(getBinaryName() + " api delete -s api-env -n \"*API*\"");

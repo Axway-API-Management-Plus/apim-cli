@@ -27,6 +27,7 @@ public class CLIAPIUnpublishOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
         Console.println("How to unpublish APIs using different filter options:");
         Console.println(getBinaryName() + " api unpublish -s api-env");
         Console.println(getBinaryName() + " api unpublish -s api-env -n \"*API*\"");

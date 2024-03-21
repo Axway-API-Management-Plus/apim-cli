@@ -71,6 +71,7 @@ public class APIQuotaManager {
         }
         // Load the entire current default quota
         APIQuota currentDefaultQuota = quotaManager.getDefaultQuota(type);
+        LOG.debug("Current Default Quota : {}", currentDefaultQuota);
         List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
         populateMethodId(createdAPI, mergedRestrictions);
         // If there is an actual API, remove the restrictions for the current actual API
@@ -125,11 +126,13 @@ public class APIQuotaManager {
             if (restriction.getMethod().equals("*")) continue;
             // Additionally, we have to change the methodId
             // Load the method for actualAPI to get the name of the method to which the existing quota is applied to
-            APIMethod actualMethod = methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod());
-            // Now load the new method based on the name for the createdAPI
-            APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
-            // Finally modify the restriction
-            restriction.setMethod(newMethod.getId());
+            if (actualState != null) {
+                APIMethod actualMethod = methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod());
+                // Now load the new method based on the name for the createdAPI
+                APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
+                // Finally modify the restriction
+                restriction.setMethod(newMethod.getId());
+            }
         }
     }
 

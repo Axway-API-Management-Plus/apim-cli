@@ -1,20 +1,22 @@
 package com.axway.apim.export.test.customPolicies;
 
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.*;
 import com.axway.apim.export.test.ExportTestAction;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -25,33 +27,34 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.testng.Assert.*;
 
-@Test
-public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
 
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class CustomPoliciesTestIT extends TestNGCitrusSpringSupport {
     private final ExportTestAction swaggerExport = new ExportTestAction();
     private final ImportTestAction swaggerImport = new ImportTestAction();
 
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run(@Optional @CitrusResource TestContext context) throws IOException {
         description("Import an API to export it afterwards");
-        createVariable("useApiAdmin", "true");
+        variable("useApiAdmin", "true");
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/api/test/" + this.getClass().getSimpleName() + "-${apiNumber}");
         variable("apiName", this.getClass().getSimpleName() + "-${apiNumber}");
         variable("state", "published");
-        echo("####### Importing the API, which should exported in the second step #######");
-        createVariable(ImportTestAction.API_DEFINITION, "/test/export/files/basic/petstore.json");
-        createVariable(ImportTestAction.API_CONFIG, "/test/export/files/customPolicies/custom-policies-issue-156.json");
-        createVariable("requestPolicy", "Request policy 1");
-        createVariable("responsePolicy", "Response policy 1");
-        createVariable("tokenInfoPolicy", "Tokeninfo policy 1");
-        createVariable("expectedReturnCode", "0");
-        swaggerImport.doExecute(context);
+        $(echo("####### Importing the API, which should exported in the second step #######"));
+        variable(ImportTestAction.API_DEFINITION, "/test/export/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG, "/test/export/files/customPolicies/custom-policies-issue-156.json");
+        variable("requestPolicy", "Request policy 1");
+        variable("responsePolicy", "Response policy 1");
+        variable("tokenInfoPolicy", "Tokeninfo policy 1");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
         exportAPI(context, false);
         exportAPI(context, true);
     }
@@ -66,23 +69,24 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
         variable("exportFolder", "api-test-${apiName}");
         variable("exportAPIName", "${apiName}.json");
 
-        echo("####### Export the API from the API-Manager #######");
-        createVariable("expectedReturnCode", "0");
+        $(echo("####### Export the API from the API-Manager #######"));
+        variable("expectedReturnCode", "0");
 
         if (ignoreAdminAccount) {
-            echo("####### Exporting the API with Org-Admin permissions only #######");
-            createVariable("exportLocation", "${exportLocation}/orgAdmin");
-            createVariable("useApiAdmin", "false"); // This is an org-admin user
+            $(echo("####### Exporting the API with Org-Admin permissions only #######"));
+            variable("exportLocation", "${exportLocation}/orgAdmin");
+            variable("useApiAdmin", "false"); // This is an org-admin user
         } else {
-            createVariable("exportLocation", "${exportLocation}/ignoreAdminAccount");
-            echo("####### Exporting the API with Admin permissions #######");
+            variable("exportLocation", "${exportLocation}/ignoreAdminAccount");
+            variable("useApiAdmin", "true");
+            $(echo("####### Exporting the API with Admin permissions #######"));
         }
 
-        swaggerExport.doExecute(context);
+        $(action(swaggerExport));
 
         String exportedAPIConfigFile = context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/api-config.json";
 
-        echo("####### Reading exported API-Config file: '" + exportedAPIConfigFile + "' #######");
+        $(echo("####### Reading exported API-Config file: '" + exportedAPIConfigFile + "' #######"));
         JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(Paths.get(exportedAPIConfigFile)));
         String tmp = context.replaceDynamicContentInString(IOUtils.toString(this.getClass().getResourceAsStream("/test/export/files/customPolicies/custom-policies-issue-156.json"), StandardCharsets.UTF_8));
         JsonNode importedAPIConfig = mapper.readTree(tmp);
@@ -93,45 +97,37 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
         assertEquals(exportedAPIConfig.get("version").asText(), "v1");
         assertEquals(exportedAPIConfig.get("organization").asText(), "API Development " + context.getVariable("orgNumber"));
 
-        List<SecurityProfile> importedSecurityProfiles =  mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {
-        });
+        List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {});
 // ignore empty values in properties
-        importedSecurityProfiles =  mapper.readValue(mapper.writeValueAsString(importedSecurityProfiles), new TypeReference<List<SecurityProfile>>() {
-        });
-        List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {
-        });
+        importedSecurityProfiles = mapper.readValue(mapper.writeValueAsString(importedSecurityProfiles), new TypeReference<List<SecurityProfile>>() {});
+        List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>() {});
         assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
-        ;
-        Map<String, OutboundProfile> importedOutboundProfiles = mapper.readValue(mapper.writeValueAsString(importedAPIConfig.get("outboundProfiles")), new TypeReference<Map<String, OutboundProfile>>() {
-        });
-        Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>() {
-        });
-        assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
+        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+        try {
+            Map<String, OutboundProfile> importedOutboundProfiles = mapper.readValue(mapper.writeValueAsString(importedAPIConfig.get("outboundProfiles")), new TypeReference<Map<String, OutboundProfile>>() {});
+            Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>() {});
+            assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
+        }finally {
+            // OutboundProfile calls API Manager
+            apiManagerAdapter.deleteInstance();
+        }
         assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("requestPolicy").asText().startsWith("<key"), "Request policy should not start with <key");
         assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("responsePolicy").asText().startsWith("<key"), "Request policy should not start with <key");
 
-        TagMap importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap>() {
-        });
-        TagMap exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap>() {
-        });
-        assertTrue(importedTags.equals(exportedTags), "Tags are not equal.");
+        TagMap importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap>() {});
+        TagMap exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap>() {});
+        assertEquals(exportedTags, importedTags, "Tags are not equal.");
 
-        List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {
-        });
-        List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {
-        });
+        List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {});
+        List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>() {});
         assertEquals(importedCorsProfiles, exportedCorsProfiles, "CorsProfiles are not equal.");
 
-        APIQuota importedAppQuota = mapper.convertValue(importedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {
-        });
-        APIQuota exportedAppQuota = mapper.convertValue(exportedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {
-        });
+        APIQuota importedAppQuota = mapper.convertValue(importedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {});
+        APIQuota exportedAppQuota = mapper.convertValue(exportedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>() {});
         assertEquals(importedAppQuota, exportedAppQuota, "applicationQuota are not equal.");
 
-        APIQuota importedSystemQuota = mapper.convertValue(importedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {
-        });
-        APIQuota exportedSystemQuota = mapper.convertValue(exportedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {
-        });
+        APIQuota importedSystemQuota = mapper.convertValue(importedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {});
+        APIQuota exportedSystemQuota = mapper.convertValue(exportedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>() {});
         assertEquals(importedSystemQuota, exportedSystemQuota, "systemQuota are not equal.");
 
 

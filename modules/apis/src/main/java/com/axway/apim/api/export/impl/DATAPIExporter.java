@@ -47,16 +47,16 @@ public class DATAPIExporter extends APIResultHandler {
     }
 
     public void saveAPILocally(API api) throws AppException {
-        String apiPath = getAPIExportFolder(api.getPath());
+        String apiPath = exportHelper.getAPIExportFolder(api.getPath());
         String vhost = getVHost(api).replace(":", "_");
         File localFolder = new File(this.givenExportFolder + File.separator + vhost + File.separator + apiPath);
         LOG.debug("Going to export API: {} into folder: {}", api, localFolder);
-        validateFolder(localFolder);
+        exportHelper.validateFolder(localFolder);
         byte[] datFileContent = apiManager.getApiAdapter().getAPIDatFile(api, datPassword);
         String targetFile = null;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + api.getName() + ".dat";
-            writeBytesToFile(datFileContent, targetFile);
+            exportHelper.writeBytesToFile(datFileContent, targetFile);
         } catch (IOException e) {
             throw new AppException("Can't save API-DAT file locally: " + targetFile,
                     ErrorCode.UNXPECTED_ERROR, e);

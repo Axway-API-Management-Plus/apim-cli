@@ -1,94 +1,129 @@
 package com.axway.apim.appimport.it.appQuota;
 
+import com.axway.apim.APIImportApp;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.TestUtils;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.appimport.it.ExportAppTestAction;
-import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.test.ImportTestAction;
-import com.axway.apim.test.actions.TestParams;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.message.MessageType;
+import com.axway.apim.appexport.ApplicationExportApp;
+import com.axway.apim.appimport.ClientApplicationImportApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.dsl.JsonPathSupport;
+import org.citrusframework.exceptions.ValidationException;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-@Test
-public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner  {
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.actions.SleepAction.Builder.sleep;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
-	private static final String PACKAGE = "/com/axway/apim/appimport/apps/appQuota/";
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class ImportAppWithQuotasTestIT extends TestNGCitrusSpringSupport {
+
+    @Autowired
+    private HttpClient apiManager;
+
 
 	@CitrusTest
 	@Test
-	@Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		description("Import application into API-Manager");
-
-		ImportAppTestAction importApp = new ImportAppTestAction(context);
-		ExportAppTestAction exportApp = new ExportAppTestAction(context);
-		ImportTestAction apiImport = new ImportTestAction();
 		ObjectMapper mapper = new ObjectMapper();
-
-		int randomId = importApp.getRandomNum();
+		String randomId = RandomNumberFunction.getRandomNumber(4, true);
 		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("appName", "My-App-"+randomId);
 		variable("apiName", "Test-API-"+randomId);
 		variable("apiPath", "/test/api/"+randomId);
 
-		echo("####### Importing Test API 1 : '${apiName}' on path: '${apiPath}' #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/appimport/apps/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/appimport/apps/basic/test-api-config.json");
-		createVariable("expectedReturnCode", "0");
-		apiImport.doExecute(context);
+		$(echo("####### Importing Test API 1 : '${apiName}' on path: '${apiPath}' #######"));
 
-        echo("####### Import application: '${appName}' without quotas #######");
-        createVariable(TestParams.PARAM_CONFIGFILE,  PACKAGE + "AppWithNoQuotas.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/test-api-config.json",
+            context, "apps", true);
+        String specFile = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/basic/petstore.json",
+            context, "apps", false);
+        $(testContext -> {
+            String[] args = {"api", "import", "-c", updatedConfigFile, "-a", specFile, "-h", testContext.getVariable("apiManagerHost"),
+                "-u", testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
+            int returnCode = APIImportApp.importAPI(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-		echo("####### Import Same application: '${appName}' incl. quotas #######");
-		createVariable(TestParams.PARAM_CONFIGFILE,  PACKAGE + "AppWithQuotas.json");
-		createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-		importApp.doExecute(context);
 
-		echo("####### Validate application: '${appName}' incl. quotas has been imported #######");
-		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
+        $(echo("####### Import application: '${appName}' without quotas #######"));
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appQuota/AppWithNoQuotas.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile2, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
-			.extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
-        sleep(3000);
-		echo("####### Re-Import same application - Should be a No-Change #######");
-		createVariable(TestParams.PARAM_EXPECTED_RC, "10");
-		importApp.doExecute(context);
 
-		echo("####### Export the application: '${appName}' - To validate quotas are correctly exported #######");
-		createVariable(TestParams.PARAM_TARGET, exportApp.getTestDirectory().getPath());
-		createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-		createVariable(TestParams.PARAM_OUTPUT_FORMAT, "json");
-		createVariable(TestParams.PARAM_NAME, "${appName}");
-		exportApp.doExecute(context);
+        $(echo("####### Import Same application: '${appName}' incl. quotas #######"));
+        String updatedConfigFile3 = TestUtils.createTestConfig("/com/axway/apim/appimport/apps/appQuota/AppWithQuotas.json",
+            context, "apps", true);
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile3, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-		Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "Expected to have one application exported");
-		String exportedConfig = exportApp.getLastResult().getExportedFiles().get(0);
+        $(echo("####### Validate application: '${appName}' incl. quotas has been imported #######"));
+        $(http().client(apiManager).send().get("/applications?field=name&op=eq&value=${appName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+			.expression("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")).extract(fromBody()
+			.expression("$.[?(@.id=='${appName}')].id", "appId")));
+        $(sleep().seconds(3));
+        $(echo("####### Re-Import same application - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"app", "import", "-c", updatedConfigFile3, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
+        });
 
+        $(echo("####### Export the application: '${appName}' - To validate quotas are correctly exported #######"));
+
+        String tmpDirPath = TestUtils.createTestDirectory("apps").getPath();
+        String appName = context.replaceDynamicContentInString("${appName}");
+
+        $(testContext -> {
+            String[] args = {"org", "get", "-n", appName, "-t", tmpDirPath, "-deleteTarget", "-h", testContext.getVariable("apiManagerHost"), "-u",
+                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-o", "json"};
+            int returnCode = ApplicationExportApp.export(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
+        Assert.assertEquals(new File(tmpDirPath, appName).listFiles().length, 1, "Expected to have one application exported");
+        String exportedConfig = new File(tmpDirPath, appName).listFiles()[0].getPath();
 		mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, true)));
 		ClientApplication exportedApp = mapper.readValue(new File(exportedConfig), ClientApplication.class);
-
 		Assert.assertNotNull(exportedApp.getAppQuota(), "Exported client application must have application quota");
-
 		APIQuota appQuota = exportedApp.getAppQuota();
 		Assert.assertEquals(appQuota.getRestrictions().size(), 3, "Two restrictions are expected.");
 		QuotaRestriction allAPIsRestri = null;

@@ -88,6 +88,10 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         GenerateTemplate app = new GenerateTemplate();
         try {
+            File file = new File(params.getConfig());
+            if(file.getParentFile() != null && !file.getParentFile().exists() && (file.getParentFile().mkdirs())){
+                    LOG.info("Created new Directory : {}", file.getParentFile());
+            }
             APIConfig apiConfig = app.generateTemplate(params);
             try (FileWriter fileWriter = new FileWriter(params.getConfig())) {
                 if (params.getOutputFormat().equals(StandardExportParams.OutputFormat.yaml))
@@ -103,13 +107,11 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 objectMapper.writeValue(fileWriter, jsonNode);
                 LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
             }
-        } catch (IOException | CertificateEncodingException | NoSuchAlgorithmException | KeyManagementException e) {
+        } catch (AppException e) {
+            LOG.error("{} : Error code {}", e.getError().getDescription(), e.getError().getCode());
+            return e.getError().getCode();
+        }catch (Exception e) {
             LOG.error("Error in processing :", e);
-            if (e instanceof AppException) {
-                AppException appException = (AppException) e;
-                LOG.error("{} : Error code {}", appException.getError().getDescription(), appException.getError().getCode());
-                return appException.getError().getCode();
-            }
             return 1;
         }
         return 0;
@@ -162,22 +164,13 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             basePath = strURL;
             urlString = "https://localhost";
         }
-
-        List<Tag> tags = openAPI.getTags();
-        TagMap apiManagerTags = new TagMap();
-        for (Tag tag : tags) {
-            String[] value = new String[1];
-            value[0] = tag.getName();
-            apiManagerTags.put(tag.getName(), value);
-        }
-
         API api = new API();
+        addTags(api, openAPI);
         api.setState("published");
         api.setBackendResourcePath(urlString);
         api.setPath(basePath);
         api.setName(info.getTitle());
         api.setVersion(info.getVersion());
-        api.setTags(apiManagerTags);
         api.setDescriptionType("original");
         CorsProfile corsProfile = new CorsProfile();
         corsProfile.setName("Custom CORS");
@@ -225,6 +218,19 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
 
         return new APIConfig(api, apiSpecLocation, securityProfiles);
+    }
+
+    public void addTags(API api, OpenAPI openAPI){
+        List<Tag> tags = openAPI.getTags();
+        if(tags != null) {
+            TagMap apiManagerTags = new TagMap();
+            for (Tag tag : tags) {
+                String[] value = new String[1];
+                value[0] = tag.getName();
+                apiManagerTags.put(tag.getName(), value);
+            }
+            api.setTags(apiManagerTags);
+        }
     }
 
     public AuthType matchAuthType(String backendAuthType) {
@@ -283,6 +289,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         authNProfile.setParameters(parameters);
         authnProfiles.add(authNProfile);
         api.setAuthenticationProfiles(authnProfiles);
+
     }
 
     public DeviceType matchDeviceType(String frontendAuthType) {
@@ -412,7 +419,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
     public String downloadCertificatesAndContent(API api, String configPath, String url) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
+                return new X509Certificate[0];
             }
 
             public void checkClientTrusted(X509Certificate[] certs, String authType) {//NOSONAR
@@ -424,7 +431,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
         File file = new File(configPath);
         String parent = file.getParent();
-        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
+        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.lineSeparator().getBytes());
         URL httpURL = new URL(url);
         SSLContext sc = SSLContext.getInstance("TLS");
         sc.init(null, trustAllCerts, new java.security.SecureRandom());
@@ -470,7 +477,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     public String createCertFileName(X509Certificate certificate) {
         String filename = null;
-        String certAlias = certificate.getSubjectDN().getName();
+        String certAlias = certificate.getSubjectX500Principal().getName();
         String[] nameParts = certAlias.split(",");
         for (String namePart : nameParts) {
             if (namePart.trim().startsWith("CN=")) {

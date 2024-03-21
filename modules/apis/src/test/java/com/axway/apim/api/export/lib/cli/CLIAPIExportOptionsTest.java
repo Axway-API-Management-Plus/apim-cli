@@ -7,6 +7,9 @@ import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 public class CLIAPIExportOptionsTest {
 
 
@@ -87,7 +90,7 @@ public class CLIAPIExportOptionsTest {
         options = CLIAPIExportOptions.create(args3);
         params = (APIExportParams) options.getParams();
         Assert.assertEquals(params.getCreatedOnAfter(), "1590969600000");
-        Assert.assertTrue(Long.parseLong(params.getCreatedOnBefore())>Long.parseLong("1630665581555"), "Now should be always in the future.");
+        Assert.assertTrue(Long.parseLong(params.getCreatedOnBefore()) > Long.parseLong("1630665581555"), "Now should be always in the future.");
     }
 
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The start-date: 01/Jan/2021 00:00:00 GMT cannot be bigger than the end date: 31/Dec/2020 23:59:59 GMT.")
@@ -96,6 +99,7 @@ public class CLIAPIExportOptionsTest {
         CLIOptions options = CLIAPIExportOptions.create(args);
         options.getParams();
     }
+
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "You cannot use 'now' as the start date.")
     public void testCreatedOnWithStartNow() throws AppException {
         String[] args = {"-s", "prod", "-createdOn", "now:2020-12-31"};
@@ -108,6 +112,19 @@ public class CLIAPIExportOptionsTest {
         String[] args = {"-s", "prod", "-createdOn", "2020-01-01-2020-12-31"};
         CLIOptions options = CLIAPIExportOptions.create(args);
         options.getParams();
+    }
+
+
+    @Test
+    public void printUsage() throws AppException {
+        PrintStream old = System.out;
+        String[] args = {"-s", "prod", "-createdOn", "2020-01-01-2020-12-31"};
+        CLIOptions options = CLIAPIExportOptions.create(args);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(byteArrayOutputStream));
+        options.printUsage("test", args);
+        System.setOut(old);
+        Assert.assertTrue(byteArrayOutputStream.toString().contains("-createdOn 2020-01-01-2020-12-31 "));
     }
 
 }

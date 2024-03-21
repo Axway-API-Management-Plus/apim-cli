@@ -1,13 +1,13 @@
 package com.axway.apim.export.test;
 
+import com.axway.apim.APIExportApp;
+import org.citrusframework.actions.AbstractTestAction;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.exceptions.CitrusRuntimeException;
+import org.citrusframework.exceptions.ValidationException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.axway.apim.APIExportApp;
-import com.consol.citrus.actions.AbstractTestAction;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.exceptions.CitrusRuntimeException;
-import com.consol.citrus.exceptions.ValidationException;
 
 public class ExportTestAction extends AbstractTestAction {
 

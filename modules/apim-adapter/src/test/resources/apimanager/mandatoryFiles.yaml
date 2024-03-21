@@ -1,0 +1,4 @@
+required:
+    - /merge/apigateway/groups/emt-group/emt-service/conf/jvm.xml
+    - /merge/apigateway/webapps/apiportal/vordel/apiportal/app/app.config
+    - /merge/fed

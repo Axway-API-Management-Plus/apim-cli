@@ -20,9 +20,7 @@ public class ManageApiMethods {
         APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
         if (desiredApiMethods != null) {
             // Ignore if actual and desired methods are same
-            List<APIMethod> differences = actualApiMethods.stream()
-                    .filter(desiredApiMethods::contains)
-                    .collect(Collectors.toList());
+            List<APIMethod> differences = actualApiMethods.stream().filter(desiredApiMethods::contains).collect(Collectors.toList());
             desiredApiMethods.removeAll(differences);
             LOG.info("Total number of methods to be updated : {}", desiredApiMethods.size());
             if (!desiredApiMethods.isEmpty()) {
@@ -33,6 +31,7 @@ public class ManageApiMethods {
                     for (APIMethod method : apiMethods) {
                         String operationName = method.getName();
                         if (operationName.equals(apiMethod.getName())) {
+                            LOG.info("Updating API method : {}", apiMethod.getName());
                             apiMethod.setId(method.getId());
                             apiMethod.setApiId(method.getApiId());
                             apiMethod.setVirtualizedApiId(method.getVirtualizedApiId());
@@ -41,11 +40,6 @@ public class ManageApiMethods {
                             updatedMethodNames.add(operationName);
                             break;
                         }
-                    }
-                }
-                for (APIMethod apiMethod : desiredApiMethods) {
-                    if (!updatedMethodNames.contains(apiMethod.getName())) {
-                        LOG.warn("API Method {} in config file is not matching with API Manager, So ignoring it", apiMethod.getName());
                     }
                 }
             }

@@ -6,19 +6,19 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 public class CorsProfile {
-	
+
 	String name;
-	
+
 	boolean isDefault;
-	
+
 	String[] origins;
-	
+
 	String[] allowedHeaders;
-	
+
 	String[] exposedHeaders;
-	
+
 	boolean supportCredentials;
-	
+
 	String maxAgeSeconds;
 
 	public String getName() {
@@ -76,7 +76,7 @@ public class CorsProfile {
 	public void setMaxAgeSeconds(String maxAgeSeconds) {
 		this.maxAgeSeconds = maxAgeSeconds;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
@@ -115,4 +115,11 @@ public class CorsProfile {
 		defaultCorsProfile.setMaxAgeSeconds("0");
 		return defaultCorsProfile;
 	}
+
+    @Override
+    public String toString() {
+        return "CorsProfile{" +
+            "name='" + name + '\'' +
+            '}';
+    }
 }

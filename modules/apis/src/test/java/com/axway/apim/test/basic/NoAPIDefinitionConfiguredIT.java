@@ -1,41 +1,38 @@
 package com.axway.apim.test.basic;
 
-import java.io.IOException;
-
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
-import com.axway.apim.lib.error.AppException;
+import com.axway.apim.EndpointConfig;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.test.context.ContextConfiguration;
+import org.testng.annotations.Test;
 
-@Test
-public class NoAPIDefinitionConfiguredIT extends TestNGCitrusTestRunner {
+import java.io.IOException;
 
-	private ImportTestAction swaggerImport;
-	
-	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
-		description("If no api-definition is passed as argument and no apiDefinition attribute is found in configuration file, the tool must fail with a dedicated return code.");
-		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
-		variable("apiPath", "/my-no-api-def-${apiNumber}");
-		variable("apiName", "No-API-DEF-CONFIGURED-${apiNumber}");
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
-		echo("####### Calling the tool with a Non-Admin-User. #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("state", "unpublished");
-		createVariable("expectedReturnCode", String.valueOf(ErrorCode.NO_API_DEFINITION_CONFIGURED.getCode()));
-		swaggerImport.doExecute(context);
-	}
 
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class NoAPIDefinitionConfiguredIT extends TestNGCitrusSpringSupport {
+
+    @CitrusTest
+    @Test
+    public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
+        description("If no api-definition is passed as argument and no apiDefinition attribute is found in configuration file, the tool must fail with a dedicated return code.");
+
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
+        variable("apiPath", "/my-no-api-def-${apiNumber}");
+        variable("apiName", "No-API-DEF-CONFIGURED-${apiNumber}");
+
+        $(echo("####### Calling the tool with a Non-Admin-User. #######"));
+        variable(ImportTestAction.API_DEFINITION, "");
+        variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/minimal-config.json");
+        variable("state", "unpublished");
+        variable("expectedReturnCode", String.valueOf(ErrorCode.NO_API_DEFINITION_CONFIGURED.getCode()));
+        $(action(swaggerImport));
+    }
 }

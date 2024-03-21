@@ -26,7 +26,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -39,6 +41,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -46,7 +49,7 @@ public class Utils {
     public static final String MASKED_VALUE = "********";
 
     public enum FedKeyType {
-        FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>");
+        FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>"), OAuthTokenProfile("<key type='AccessTokenPersist'>");
 
         private final String keyType;
 
@@ -452,5 +455,29 @@ public class Utils {
         } catch (IOException e) {
             throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
         }
+    }
+
+    public static String getFieldValue(String fieldName, Object object) {
+        try {
+            PropertyDescriptor pd = new PropertyDescriptor(fieldName, object.getClass());
+            Method getter = pd.getReadMethod();
+            Object value = getter.invoke(object);
+            return (value == null) ? "N/A" : value.toString();
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.error(e.getMessage(), e);
+            }
+            return "Err";
+        }
+    }
+
+    public static Map<String,String> removeEmptyValuesFromMap(Map<String, String> map){
+        return map.entrySet().stream()
+            .filter(e -> !e.getValue().isEmpty())
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public static String replaceSpecialChars(String fileName){
+        return fileName.replaceAll("[\\\\/:*?\"<>|]", "");
     }
 }

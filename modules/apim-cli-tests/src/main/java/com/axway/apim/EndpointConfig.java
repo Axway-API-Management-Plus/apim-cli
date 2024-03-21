@@ -1,14 +1,18 @@
 package com.axway.apim;
 
-import com.consol.citrus.dsl.endpoint.CitrusEndpoints;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.http.interceptor.LoggingClientInterceptor;
-import com.consol.citrus.variable.GlobalVariables;
-import com.consol.citrus.variable.GlobalVariablesPropertyLoader;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
+import org.citrusframework.dsl.endpoint.CitrusEndpoints;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.http.interceptor.LoggingClientInterceptor;
+import org.citrusframework.variable.GlobalVariables;
+import org.citrusframework.variable.GlobalVariablesPropertyLoader;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +20,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
+import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +38,7 @@ public class EndpointConfig {
     private int port;
 
     @Bean
-    public HttpClient apiManager() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public HttpClient apiManager() {
         return CitrusEndpoints
             .http()
             .client()
@@ -44,12 +49,24 @@ public class EndpointConfig {
     }
 
     @Bean
-    public org.apache.http.client.HttpClient httpClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public org.apache.hc.client5.http.classic.HttpClient httpClient() {
 
-        return HttpClientBuilder.create()
-            .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
-            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-            .build();
+        try {
+            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+            SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
+                .build();
+            SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(
+                sslContext, NoopHostnameVerifier.INSTANCE);
+            PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setSSLSocketFactory(sslSocketFactory)
+                .build();
+            return HttpClients.custom()
+                .setConnectionManager(connectionManager)
+                .build();
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new BeanCreationException("Failed to create http client for ssl connection", e);
+        }
     }
 
     @Bean
@@ -63,7 +80,7 @@ public class EndpointConfig {
     }
 
     @Bean
-    public HttpComponentsClientHttpRequestFactory sslRequestFactory() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public HttpComponentsClientHttpRequestFactory sslRequestFactory() {
         return new HttpComponentsClientHttpRequestFactory(httpClient());
     }
 

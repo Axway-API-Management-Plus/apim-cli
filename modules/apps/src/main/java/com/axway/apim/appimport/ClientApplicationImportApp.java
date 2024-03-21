@@ -9,7 +9,7 @@ import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
-import com.axway.apim.lib.ImportResult;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
@@ -55,12 +55,12 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
             return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
         }
         ClientApplicationImportApp app = new ClientApplicationImportApp();
-        ImportResult importResult = app.importApp(params);
+        Result importResult = app.importApp(params);
         return errorCodeMapper.getMapedErrorCode(importResult.getErrorCode()).getCode();
     }
 
-    public ImportResult importApp(AppImportParams params) {
-        ImportResult result = new ImportResult();
+    public Result importApp(AppImportParams params) {
+        Result result = new Result();
         APIManagerAdapter apiManagerAdapter = null;
         try {
             params.validateRequiredParameters();

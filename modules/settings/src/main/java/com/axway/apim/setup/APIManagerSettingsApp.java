@@ -8,7 +8,7 @@ import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.ImportResult;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.error.AppException;
@@ -141,14 +141,13 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         return quotas;
     }
 
-    public ImportResult importConfig(StandardImportParams params) {
+    public Result importConfig(StandardImportParams params) {
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-        ImportResult result = new ImportResult();
+        Result result = new Result();
         StringBuilder updatedAssets = new StringBuilder();
         APIManagerAdapter apimAdapter = null;
         try {
             params.validateRequiredParameters();
-            // Clean some Singleton-Instances, as tests are running in the same JVM
             errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
             apimAdapter = APIManagerAdapter.getInstance();
             APIManagerConfig desiredConfig = new APIManagerConfigAdapter(params).getManagerConfig();

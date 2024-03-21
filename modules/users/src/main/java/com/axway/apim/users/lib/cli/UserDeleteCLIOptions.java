@@ -26,6 +26,7 @@ public class UserDeleteCLIOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
         Console.println("How to delete users using different filter options:");
         Console.println(getBinaryName() + " user delete -s api-env");
         Console.println(getBinaryName() + " user delete -s api-env -n \"*Name of user*\" -loginName \"*loginNameOfUser*\"");

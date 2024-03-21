@@ -69,7 +69,7 @@ public class APIManagerAPIAdapter {
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
-    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228", "7.7.20230530", "7.7.20230830", "7.7.20231130");
+    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228", "7.7.20230530", "7.7.20230830", "7.7.20231130", "7.7.20240228");
 
     /**
      * Maps the provided status to the REST-API endpoint to change the status!
@@ -172,7 +172,7 @@ public class APIManagerAPIAdapter {
             .build();
     }
 
-    API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
+    public API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
         if (foundAPIs.isEmpty()) return null;
         // If filtered resultSet contains more than one API, here we try to find a unique API based on the logical
         // criteria (apiPath, VHost and QueryVersion)
@@ -184,7 +184,7 @@ public class APIManagerAPIAdapter {
             Map<String, List<API>> apisPerKey = new HashMap<>();
             // Create a List of APIs based on the logical keys
             for (API api : foundAPIs) {
-                String key = api.getPath() + "###" + api.getVhost() + "###" + api.getApiRoutingKey();
+                String key = api.getPath() + "###" + api.getVhost() + "###" + getVersion(api);
                 if (apisPerKey.containsKey(key)) {
                     apisPerKey.get(key).add(api);
                 } else {
@@ -193,13 +193,21 @@ public class APIManagerAPIAdapter {
                     apisPerKey.put(key, apiWithKey);
                 }
             }
-            String filterKey = filter.getApiPath() + "###" + filter.getVhost() + "###" + filter.getQueryStringVersion();
+            String filterKey = filter.getApiPath() + "###" + filter.getVhost() + "###" + getVersion(filter);
             if (apisPerKey.get(filterKey) != null && apisPerKey.get(filterKey).size() == 1) {
                 return apisPerKey.get(filterKey).get(0);
             }
             throw new AppException("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API);
         }
         return foundAPIs.get(0);
+    }
+
+    public String getVersion(API api) {
+        return api.getApiRoutingKey() != null ? api.getApiRoutingKey() : api.getVersion();
+    }
+
+    public String getVersion(APIFilter apiFilter) {
+        return apiFilter.getQueryStringVersion() != null ? apiFilter.getQueryStringVersion() : apiFilter.getVersion();
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
@@ -385,11 +393,8 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void addQuotaConfiguration(API api) throws AppException {
-        addQuotaConfiguration(api, true);
-    }
 
-    private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
+    public void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
         if (!addQuota || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         APIQuota applicationQuota = null;
         APIQuota systemQuota;
@@ -419,11 +424,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void addClientOrganizations(API api) throws AppException {
-        addClientOrganizations(api, true);
-    }
-
-    private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
+    public void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
         if (!addClientOrganizations || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
         List<Organization> grantedOrgs;
         List<Organization> allOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getAllOrgs();
@@ -439,11 +440,7 @@ public class APIManagerAPIAdapter {
         api.setClientOrganizations(grantedOrgs);
     }
 
-    public void addClientApplications(API api) throws AppException {
-        addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
-    }
-
-    private void addClientApplications(API api, APIFilter filter) throws AppException {
+    public void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
         List<ClientApplication> apps;
         apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());

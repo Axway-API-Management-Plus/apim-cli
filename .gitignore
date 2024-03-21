@@ -16,3 +16,4 @@
 /distribution/**/target/
 
 .DS_Store
+/.idea/

@@ -1,71 +1,106 @@
 package com.axway.apim.organization.it.tests;
 
-import com.axway.apim.organization.it.ExportOrganizationTestAction;
-import com.axway.apim.organization.it.ImportOrganizationTestAction;
-import com.axway.apim.test.actions.TestParams;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.message.MessageType;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.TestUtils;
+import com.axway.apim.organization.OrganizationApp;
+import org.citrusframework.annotations.CitrusResource;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
+import org.citrusframework.dsl.JsonPathSupport;
+import org.citrusframework.exceptions.ValidationException;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.message.MessageType;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-@Test
-public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
+import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
-    private static final String PACKAGE = "/com/axway/apim/organization/orgImport/";
+import static org.citrusframework.actions.EchoAction.Builder.echo;
+import static org.citrusframework.http.actions.HttpActionBuilder.http;
+import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
+
+
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class ImportSimpleOrganizationTestIT extends TestNGCitrusSpringSupport {
+
+    @Autowired
+    private HttpClient apiManager;
 
     @CitrusTest
     @Test
-    @Parameters("context")
     public void run(@Optional @CitrusResource TestContext context) {
         description("Import organization into API-Manager");
-        ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
-        ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);
         variable("useApiAdmin", "true"); // Use apiadmin account
-        variable("orgName", "My-Org-" + importApp.getRandomNum());
+        variable("orgName", "citrus:concat('My-Org-',  citrus:randomNumber(4))");
         variable("orgDescription", "A description for my org");
         // This test must be executed with an Admin-Account as we need to create a new organization
-        //createVariable(PARAM_IGNORE_ADMIN_ACC, "fals");
+        $(echo("####### Import organization: '${orgName}' #######"));
+        String updatedConfigFile = TestUtils.createTestConfig("/com/axway/apim/organization/orgImport/SingleOrganization.json",
+            context, "orgs", true);
+        $(testContext -> {
+            String[] args = {"org", "import", "-c", updatedConfigFile, "-h", testContext.getVariable("apiManagerHost"), "-u",
+                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
+            int returnCode = OrganizationApp.importOrganization(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Import organization: '${orgName}' #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, PACKAGE + "SingleOrganization.json");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
 
-        echo("####### Validate organization: '${orgName}' has been imported #######");
-        http(builder -> builder.client("apiManager").send().get("/organizations?field=name&op=eq&value=${orgName}").header("Content-Type", "application/json"));
+        $(echo("####### Validate organization: '${orgName}' has been imported #######"));
+        $(http().client(apiManager).send().get("/organizations?field=name&op=eq&value=${orgName}"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(JsonPathSupport.jsonPath()
+            .expression("$.[?(@.name=='${orgName}')].name", "@assertThat(hasSize(1))@")).extract(fromBody()
+            .expression("$.[?(@.id=='${orgName}')].id", "orgId")));
 
-        http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-            .validate("$.[?(@.name=='${orgName}')].name", "@assertThat(hasSize(1))@")
-            .extractFromPayload("$.[?(@.id=='${orgName}')].id", "orgId"));
+        $(echo("####### Re-Import same organization - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"org", "import", "-c", updatedConfigFile, "-h", testContext.getVariable("apiManagerHost"), "-u",
+                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
+            int returnCode = OrganizationApp.importOrganization(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Re-Import same organization - Should be a No-Change #######");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "10");
-        importApp.doExecute(context);
+        $(echo("####### Change the description and import it again #######"));
+        variable("orgDescription", "My changed org description");
+        String updatedConfigFile2 = TestUtils.createTestConfig("/com/axway/apim/organization/orgImport/SingleOrganization.json",
+            context, "orgs", true);
+        $(testContext -> {
+            String[] args = {"org", "import", "-c", updatedConfigFile2, "-h", testContext.getVariable("apiManagerHost"), "-u",
+                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
+            int returnCode = OrganizationApp.importOrganization(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Change the description and import it again #######");
-        createVariable("orgDescription", "My changed org description");
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        importApp.doExecute(context);
+        $(echo("####### Export the organization #######"));
+        String tmpDirPath = TestUtils.createTestDirectory("orgs").getPath();
+        String orgName = context.replaceDynamicContentInString("${orgName}");
+        $(testContext -> {
+            String[] args = {"org", "get", "-n", orgName, "-t", tmpDirPath, "-deleteTarget", "-h", testContext.getVariable("apiManagerHost"), "-u",
+                testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-o", "json"};
+            int returnCode = OrganizationApp.exportOrgs(args);
+            if (returnCode != 0)
+                throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
+        });
 
-        echo("####### Export the organization #######");
-        createVariable(TestParams.PARAM_TARGET, exportApp.getTestDirectory().getPath());
-        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
-        createVariable(TestParams.PARAM_OUTPUT_FORMAT, "json");
-        createVariable(TestParams.PARAM_NAME, "${orgName}");
-        exportApp.doExecute(context);
+        Assert.assertEquals(Arrays.stream(Objects.requireNonNull(new File(tmpDirPath, orgName).listFiles())).filter(file -> file.getName().equals("org-config.json")).count(), 1, "Expected to have one organization exported");
+        String exportedOrgPath = Arrays.stream(Objects.requireNonNull(new File(tmpDirPath, orgName).listFiles())).filter(file -> file.getName().equals("org-config.json")).findAny().get().getPath();
 
-        Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "Expected to have one organization exported");
-        String exportedConfig = exportApp.getLastResult().getExportedFiles().get(0);
-
-        echo("####### Re-Import EXPORTED organization - Should be a No-Change #######");
-        createVariable(TestParams.PARAM_CONFIGFILE, exportedConfig);
-        createVariable("expectedReturnCode", "10");
-        importApp.doExecute(context);
+        $(echo("####### Re-Import EXPORTED organization - Should be a No-Change #######"));
+        $(testContext -> {
+            String[] args = {"org", "import", "-c", exportedOrgPath, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"),
+                "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
+            int returnCode = OrganizationApp.importOrganization(args);
+            if (returnCode != 10)
+                throw new ValidationException("Expected RC was: 10 but got: " + returnCode);
+        });
     }
 }

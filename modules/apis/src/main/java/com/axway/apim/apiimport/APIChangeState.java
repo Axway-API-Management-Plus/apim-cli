@@ -85,14 +85,13 @@ public class APIChangeState {
                     Method method2 = actualAPI.getClass().getMethod(getterMethodName, null);
                     Object desiredValue = method.invoke(desiredAPI, null);
                     Object actualValue = method2.invoke(actualAPI, null);
+                    APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
                     if (desiredValue == null && actualValue == null) continue;
-                    if (desiredValue == null) {
+                    if (desiredValue == null && property.ignoreNull()) {
                         LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), null, actualValue);
                         continue; // No change, if nothing is provided!
                     }
-                    // desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
                     if (actualValue == null || !Utils.compareValues(actualValue, desiredValue)) {
-                        APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
                         // Property change requires proxy update
                         if (property.copyProp()) this.proxyUpdateRequired = true;
                         if (property.isBreaking()) {

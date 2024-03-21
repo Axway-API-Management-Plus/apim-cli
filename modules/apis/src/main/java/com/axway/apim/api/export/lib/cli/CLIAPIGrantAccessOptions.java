@@ -45,6 +45,7 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
 		Console.println("Grant access for selected organizations to one or more APIs.");
 		Console.println("You can use all known API filters to select the desired APIs. However, only APIs that are in the Published status are considered.");
         Console.println("----------------------------Grant API Access to Organization----------------------------");

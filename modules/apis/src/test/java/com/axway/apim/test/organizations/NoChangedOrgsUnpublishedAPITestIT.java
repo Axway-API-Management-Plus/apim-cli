@@ -1,51 +1,52 @@
 package com.axway.apim.test.organizations;
 
-import java.io.IOException;
-
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.http.client.HttpClient;
+import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.test.ImportTestAction;
-import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
+import java.io.IOException;
 
-@Test
-public class NoChangedOrgsUnpublishedAPITestIT extends TestNGCitrusTestRunner {
+import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.actions.EchoAction.Builder.echo;
 
-	private ImportTestAction swaggerImport;
-	
+@ContextConfiguration(classes = {EndpointConfig.class})
+public class NoChangedOrgsUnpublishedAPITestIT extends TestNGCitrusSpringSupport {
+
+    @Autowired
+    HttpClient apiManager;
 	@CitrusTest
-	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
+	@Test
+	public void run() throws IOException {
+        ImportTestAction swaggerImport = new ImportTestAction();
 		description("Making sure, organization are not conisdered as changes if desired state is Unpublished");
-		
+
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/no-change-org-unpublished-${apiNumber}");
 		variable("apiName", "No-Change-Org-Unpublished-${apiNumber}");
 
-		// Replication must fail, is Query-String option is enabled, but API-Manager hasn't configured it 
-		echo("####### API-Config without queryString option - Must fail #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
-		createVariable("state", "unpublished");
-		createVariable("orgName", "${orgName}");
-		createVariable("orgName2", "${orgName2}");
-		createVariable("expectedReturnCode", "0");
-		swaggerImport.doExecute(context);
-		
-		echo("####### Re-Import the same - Must lead to a No-Change! #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
-		createVariable("state", "unpublished");
-		createVariable("orgName", "${orgName}");
-		createVariable("orgName2", "${orgName2}");
-		createVariable("expectedReturnCode", "10"); // No-Change is expected!
-		swaggerImport.doExecute(context);
+		// Replication must fail, is Query-String option is enabled, but API-Manager hasn't configured it
+		$(echo("####### API-Config without queryString option - Must fail #######"));
+        variable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+        variable("state", "unpublished");
+        variable("orgName", "${orgName}");
+        variable("orgName2", "${orgName2}");
+        variable("expectedReturnCode", "0");
+        $(action(swaggerImport));
+
+		$(echo("####### Re-Import the same - Must lead to a No-Change! #######"));
+        variable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+        variable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+        variable("state", "unpublished");
+        variable("orgName", "${orgName}");
+        variable("orgName2", "${orgName2}");
+        variable("expectedReturnCode", "10"); // No-Change is expected!
+		$(action(swaggerImport));
 	}
 }

@@ -35,6 +35,7 @@ public class CLICheckCertificatesOptions extends CLIOptions {
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
         Console.println("----------------------------------------------------------------------------------------");
+        Console.println(getAppName());
         Console.println("Check Certificate examples:");
         Console.println();
         Console.println("Certificate expires in next 90 days");

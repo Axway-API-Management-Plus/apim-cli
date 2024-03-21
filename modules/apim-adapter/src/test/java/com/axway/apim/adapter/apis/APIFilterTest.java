@@ -432,7 +432,7 @@ public class APIFilterTest extends WiremockWrapper {
         properties.put("authenticationPolicy", "<key type='CircuitContainer'><id field='name' value='API Keys'/><key type='FilterCircuit'><id field='name' value='" + policyName + "'/></key></key>");
         SecurityDevice securityDevice = new SecurityDevice();
         securityDevice.setType(DeviceType.authPolicy);
-        securityDevice.setConvertPolicies(false);
+       // securityDevice.setConvertPolicies(false);
         securityDevice.setProperties(properties);
         List<SecurityDevice> devices = new ArrayList<>();
         devices.add(securityDevice);

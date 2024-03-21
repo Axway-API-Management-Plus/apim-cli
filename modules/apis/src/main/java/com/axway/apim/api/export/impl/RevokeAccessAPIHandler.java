@@ -38,12 +38,7 @@ public class RevokeAccessAPIHandler extends APIResultHandler {
 
     @Override
     public void execute(List<API> apis) throws AppException {
-        if (apis == null || apis.isEmpty()) {
-            throw new AppException("API to revoke access  is missing.", ErrorCode.UNKNOWN_API);
-        }
-        if (orgs == null || orgs.isEmpty()) {
-            throw new AppException("Organization to revoke access is missing.", ErrorCode.UNKNOWN_ORGANIZATION);
-        }
+        validate(apis);
         if (!CoreParameters.getInstance().isForce()) {
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
                 Console.println("Going to revoke access.");
@@ -52,8 +47,20 @@ public class RevokeAccessAPIHandler extends APIResultHandler {
                 return;
             }
         }
-        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
+        revokeAccess(apis);
+    }
 
+    public void validate(List<API> apis) throws AppException{
+        if (apis == null || apis.isEmpty()) {
+            throw new AppException("API to revoke access  is missing.", ErrorCode.UNKNOWN_API);
+        }
+        if (orgs == null || orgs.isEmpty()) {
+            throw new AppException("Organization to revoke access is missing.", ErrorCode.UNKNOWN_ORGANIZATION);
+        }
+    }
+
+    public void revokeAccess(List<API> apis) throws AppException{
+        APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
         for (API api : apis) {
             try {
                 if (clientApplication == null) {
@@ -81,13 +88,12 @@ public class RevokeAccessAPIHandler extends APIResultHandler {
                         throw new AppException("Application " + clientApplication.getName() + " Does not belong to organization " + orgs, ErrorCode.UNXPECTED_ERROR);
                     }
                 }
+            } catch (AppException e) {
+                result.setError(e.getError());
+                LOG.error("Error revoking access to API : {}", api.toStringHuman(), e);
             } catch (Exception e) {
-                if (e instanceof AppException) {
-                    result.setError(((AppException) e).getError());
-                } else {
-                    result.setError(ErrorCode.ERR_GRANTING_ACCESS_TO_API);
-                    LOG.error("Error revoking access to API:  {}  for organizations: {} Error message: {}", api.toStringHuman(), orgs, e.getMessage());
-                }
+                result.setError(ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                LOG.error("Error revoking access to API:  {}  for organizations: {} Error message: {}", api.toStringHuman(), orgs, e.getMessage());
             }
         }
     }

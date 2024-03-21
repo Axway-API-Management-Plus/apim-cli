@@ -93,22 +93,16 @@ public class OAS3xSpecification extends APISpecification {
         try {
             if (openApiNode.has(SERVERS)) {
                 ArrayNode servers = (ArrayNode) openApiNode.get(SERVERS);
-                if (!servers.isEmpty()) {
-                    // Remove remaining server nodes as  currently not handling multiple URLs
-                    for (int i = 1; i < servers.size(); i++) {
-                        servers.remove(i);
-                    }
-                    if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
-                        JsonNode server = servers.get(0);
-                        JsonNode urlJsonNode = server.get("url");
-                        if (urlJsonNode != null) {
-                            String serverUrl = urlJsonNode.asText();
-                            if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
-                                overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
-                            } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
-                                LOG.info("servers.url does not contain host name hence updating host value from backendBasepath : {}", backendBasePath);
-                                updateServerSection(backendBasePath, serverUrl);
-                            }
+                if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
+                    JsonNode server = servers.get(0);
+                    JsonNode urlJsonNode = server.get("url");
+                    if (urlJsonNode != null) {
+                        String serverUrl = urlJsonNode.asText();
+                        if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                            overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
+                        } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
+                            LOG.info("servers.url does not contain host name hence updating host value from backendBasepath : {}", backendBasePath);
+                            updateServerSection(backendBasePath, serverUrl);
                         }
                     }
                 }

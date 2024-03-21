@@ -1,15 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.*;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -21,16 +11,16 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.DeviceType;
-import com.axway.apim.api.model.InboundProfile;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.SecurityDevice;
-import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.api.model.*;
 import com.axway.apim.lib.Result;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
+import java.util.*;
 
 public abstract class APIResultHandler {
 
@@ -38,6 +28,7 @@ public abstract class APIResultHandler {
     APIExportParams params;
 
     protected Result result;
+    protected ExportHelper exportHelper;
 
 
     public enum APIListImpl {
@@ -72,11 +63,13 @@ public abstract class APIResultHandler {
     protected APIResultHandler(APIExportParams params) {
         this.params = params;
         this.result = new Result();
+        this.exportHelper = new ExportHelper(params);
     }
 
     protected APIResultHandler(APIExportParams params, Result result) {
         this.params = params;
         this.result = result;
+        this.exportHelper = new ExportHelper(params);
     }
 
     public static APIResultHandler create(APIListImpl exportImpl, APIExportParams params) throws AppException {
@@ -235,44 +228,6 @@ public abstract class APIResultHandler {
             return grantedOrgs;
         }
     }
-
-    protected void validateFolder(File localFolder) throws AppException {
-        if (localFolder.exists()) {
-            if (Boolean.TRUE.equals(params.isDeleteTarget())) {
-                LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-                try {
-                    FileUtils.deleteDirectory(localFolder);
-                } catch (IOException e) {
-                    throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-                }
-            } else {
-                LOG.warn("Local export folder: {} already exists. API will not be exported. (You may set -deleteTarget)", localFolder);
-                return;
-            }
-        }
-        if (!localFolder.mkdirs()) {
-            throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
-        }
-    }
-
-    protected String getAPIExportFolder(String apiExposurePath) {
-        if (apiExposurePath.startsWith("/"))
-            apiExposurePath = apiExposurePath.replaceFirst("/", "");
-        if (apiExposurePath.endsWith("/"))
-            apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
-        apiExposurePath = apiExposurePath.replace("/", "-");
-        return apiExposurePath;
-    }
-
-    protected void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-
-        try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
-            fileOutputStream.write(bFile);
-        } catch (IOException e) {
-            throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-        }
-    }
-
     protected APIFilter createFilter() {
         Builder builder = getBaseAPIFilterBuilder();
         switch (params.getWide()) {

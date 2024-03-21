@@ -44,9 +44,7 @@ public class APIManagerCLI {
     Method selectedMethod = null;
 
     public APIManagerCLI(String[] args) {
-        super();
-        ServiceLoader<APIMCLIServiceProvider> loader = ServiceLoader
-            .load(APIMCLIServiceProvider.class);
+        ServiceLoader<APIMCLIServiceProvider> loader = ServiceLoader.load(APIMCLIServiceProvider.class);
         for (APIMCLIServiceProvider cliService : loader) {
             List<APIMCLIServiceProvider> providerList = servicesMappedByGroup.get(cliService.getGroupId());
             if (providerList == null) {

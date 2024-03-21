@@ -5,7 +5,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
-import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;

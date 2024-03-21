@@ -143,7 +143,7 @@ cp -v $testSources/runInstall.sh Dockerfiles/gateway-base/scripts/runInstall.sh
 echo "########### Create Base-Image        ###################"
 ./build_base_image.py --installer=../$installer --os=centos7 --out-image apigw-base:$version
 echo "########### Create API-Gateway-Image ###################"
-./build_gw_image.py --license=../multiple.lic --default-cert --fed=$testSources/$fedFile --merge-dir $testSources/merge-dir/apigateway --parent-image apigw-base:$version --out-image=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:$version
+./build_gw_image.py --license=../multiple.lic --default-cert --fed=$testSources/$fedFile --merge-dir $testSources/merge/apigateway --parent-image apigw-base:$version --out-image=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:$version
 
 echo "########### Push Image               ###################"
 docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:$version

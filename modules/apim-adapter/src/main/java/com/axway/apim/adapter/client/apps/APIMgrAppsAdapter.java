@@ -38,7 +38,7 @@ public class APIMgrAppsAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
     public static final String APPLICATIONS = "/applications";
-    public static final String ERROR_CREATING_APPLICATION_ERROR = "Error creating application. Error: ";
+    public static final String ERROR_CREATING_APPLICATION_ERROR = "Error creating application";
     public static final String ERROR_CREATING_APPLICATION_RESPONSE_CODE = "Error creating application Response-Code: ";
     public static final String PERMISSIONS = "permissions";
     public static final String API_KEY = "apiKey";
@@ -327,7 +327,7 @@ public class APIMgrAppsAdapter {
             manageAppPermissions(desiredApp, actualApp);
             saveQuota(desiredApp, actualApp);
         } catch (Exception e) {
-            throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
+            throw new AppException(e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
         }
     }
 
@@ -335,7 +335,7 @@ public class APIMgrAppsAdapter {
         ClientApplication createdApp;
         try {
             if (actualApp == null) {
-                LOG.info("Creating new application");
+                LOG.info("Creating new application : {}", desiredApp.getName());
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS).build();
                 FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", PERMISSIONS));
@@ -366,7 +366,7 @@ public class APIMgrAppsAdapter {
                 createdApp = actualApp;
             }
         } catch (Exception e) {
-            throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+            throw new AppException("Error creating/updating application", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
         return createdApp;
     }
@@ -403,7 +403,7 @@ public class APIMgrAppsAdapter {
                 Utils.logPayload(LOG, httpResponse);
             }
         } catch (Exception e) {
-            throw new AppException("Error uploading application image. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+            throw new AppException("Error uploading application image", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
 
@@ -422,14 +422,11 @@ public class APIMgrAppsAdapter {
                 final String credentialId = ((OAuth) cred).getClientId();
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
-                    LOG.info("Found oauth credential with same ID for application {}", actualApp != null ? actualApp.getId() : null);
+                    LOG.info("Found oauth credential with same ID for application");
                     //I found a credential with same id name but different in some properties, I have to update it
                     endpoint.append("/" + credentialId);
                     update = true;
-                    cred.setId(credentialId);
-                    cred.setApplicationId(actualApp.getId());
-                    cred.setCreatedBy(opt.get().getCreatedBy());
-                    cred.setCreatedOn(opt.get().getCreatedOn());
+                    copyClientAppCredential(cred, opt.get(), false);
                 }
             } else if (cred instanceof ExtClients) {
                 final String credentialId = ((ExtClients) cred).getClientId();
@@ -442,9 +439,7 @@ public class APIMgrAppsAdapter {
                     //I found a credential with same id name but different in some properties, I have to update it
                     endpoint.append("/" + cred.getId());
                     update = true;
-                    cred.setId(credentialId);
-                    cred.setCreatedBy(opt.get().getCreatedBy());
-                    cred.setCreatedOn(opt.get().getCreatedOn());
+                    copyClientAppCredential(cred, opt.get(), false);
                 }
             } else if (cred instanceof APIKey) {
                 final String credentialId = ((APIKey) cred).getApiKey();
@@ -455,35 +450,44 @@ public class APIMgrAppsAdapter {
                 if (opt.isPresent()) {
                     LOG.info("Found apikey credential with same ID");
                     //I found a credential with same id name but different in some properties, I have to update it
-                    endpoint.append( "/" + ((APIKey) cred).getApiKey());
+                    endpoint.append("/" + ((APIKey) cred).getApiKey());
                     update = true;
-                    cred.setId(opt.get().getId());
-                    cred.setApplicationId(opt.get().getApplicationId());
-                    cred.setSecret(opt.get().getSecret());
-                    cred.setCreatedBy(opt.get().getCreatedBy());
-                    cred.setCreatedOn(opt.get().getCreatedOn());
+                    copyClientAppCredential(cred, opt.get(), true);
                 }
             } else {
                 throw new AppException("Unsupported credential: " + cred.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
             }
-            try {
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + endpoint).build();
-                mapper.setFilterProvider(filter);
-                mapper.setSerializationInclusion(Include.NON_NULL);
-                String json = mapper.writeValueAsString(cred);
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error saving/updating application credentials. Response-Code: {}", statusCode);
-                        Utils.logPayload(LOG, httpResponse);
-                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
-                    }
+            upsertCredential(cred, filter, app.getId(), endpoint.toString(), update);
+        }
+    }
+
+    public void copyClientAppCredential(ClientAppCredential cred, ClientAppCredential target, boolean copySecret) {
+        cred.setId(target.getId());
+        cred.setApplicationId(target.getApplicationId());
+        if (copySecret)
+            cred.setSecret(target.getSecret());
+        cred.setCreatedBy(target.getCreatedBy());
+        cred.setCreatedOn(target.getCreatedOn());
+    }
+
+    public void upsertCredential(ClientAppCredential cred, FilterProvider filter, String appId, String path, boolean update) throws AppException {
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + appId + "/" + path).build();
+            mapper.setFilterProvider(filter);
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            String json = mapper.writeValueAsString(cred);
+            HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+            RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error saving/updating application credentials. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
+                    throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-            } catch (Exception e) {
-                throw new AppException(ERROR_CREATING_APPLICATION_ERROR + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
             }
+        } catch (Exception e) {
+            throw new AppException(ERROR_CREATING_APPLICATION_ERROR, ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
 
@@ -550,13 +554,13 @@ public class APIMgrAppsAdapter {
                 }
             }
         } catch (Exception e) {
-            throw new AppException("Error creating application quota. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+            throw new AppException("Error creating application quota", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
 
     private void saveAPIAccess(ClientApplication app, ClientApplication actualApp) throws AppException {
         if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return;
-        if (actualApp != null && Utils.compareValues(app.getApiAccess(),(actualApp.getApiAccess()))) return;
+        if (actualApp != null && Utils.compareValues(app.getApiAccess(), (actualApp.getApiAccess()))) return;
         APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().getAccessAdapter();
         accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
     }
@@ -603,7 +607,7 @@ public class APIMgrAppsAdapter {
                     }
                 }
             } catch (Exception e) {
-                throw new AppException(ERROR_CREATING_APPLICATION_ERROR + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+                throw new AppException(ERROR_CREATING_APPLICATION_ERROR, ErrorCode.CANT_CREATE_API_PROXY, e);
             }
         }
     }
@@ -753,7 +757,7 @@ public class APIMgrAppsAdapter {
                     }
                 }
             } catch (Exception e) {
-                throw new AppException(ERROR_CREATING_APPLICATION_ERROR + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+                throw new AppException(ERROR_CREATING_APPLICATION_ERROR, ErrorCode.CANT_CREATE_API_PROXY, e);
             }
         }
     }
@@ -790,7 +794,7 @@ public class APIMgrAppsAdapter {
                 }
             }
         } catch (Exception e) {
-            throw new AppException("Error deleting application scope. Error: " + e.getMessage(), ErrorCode.API_MANAGER_COMMUNICATION, e);
+            throw new AppException("Error deleting application scope", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 

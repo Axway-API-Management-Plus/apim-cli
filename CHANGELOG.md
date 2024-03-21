@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+# [1.14.4] In progress
+
+### Fixed
+- "ERROR: Cannot validate/fulfill configuration file." when importing back downloaded API (See issue [#466](https://github.com/Axway-API-Management-Plus/apim-cli/issues/466))
+- APIM-cli import conflicts with older retired versions of a feAPI (See issue [#469](https://github.com/Axway-API-Management-Plus/apim-cli/issues/469))
+- API with star (*) on the name fails to be exported (See issue [#467](https://github.com/Axway-API-Management-Plus/apim-cli/issues/467))
+- Missing error code when " Backend API Definition is not available for the API " (See issue [#465](https://github.com/Axway-API-Management-Plus/apim-cli/issues/465))
+- Issues exporting and importing an API (See issue [#460](https://github.com/Axway-API-Management-Plus/apim-cli/issues/460))
+- Error importing APIs with inbound OAuth  (See issue [#459](https://github.com/Axway-API-Management-Plus/apim-cli/issues/459)) 
+- Deleting a V-Host is not considered as a modification (See issue [#457](https://github.com/Axway-API-Management-Plus/apim-cli/issues/457))
+- NullPointerException Error when importing a new API with system quotas (See issue [#474](https://github.com/Axway-API-Management-Plus/apim-cli/issues/474))
+### Added
+- Support Feb 2024 APIM Release (See issue [#461](https://github.com/Axway-API-Management-Plus/apim-cli/issues/461))
+
 # [1.14.3] 2023-12-07
 ### Fixed
 - APIM CLI to check/skip already removed API (See issue [#417](https://github.com/Axway-API-Management-Plus/apim-cli/issues/417))

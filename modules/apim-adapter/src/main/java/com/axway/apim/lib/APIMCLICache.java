@@ -12,10 +12,10 @@ import org.ehcache.spi.loaderwriter.CacheLoadingException;
 import org.ehcache.spi.loaderwriter.CacheWritingException;
 
 public class APIMCLICache<K, V> implements Cache<K, V> {
-	
+
 	private final Cache<K, V> cache;
 	private final String prefix;
-	
+
 	public APIMCLICache(Cache<K, V> cache, String prefix) {
 		super();
 		this.cache = cache;
@@ -91,7 +91,7 @@ public class APIMCLICache<K, V> implements Cache<K, V> {
 	public boolean replace(K key, V value1, V value2) throws CacheLoadingException, CacheWritingException {
 		return this.cache.replace(getPrefixedKey(key), value1, value2);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private K getPrefixedKey(K key) {
 		return (K) (prefix+key);
