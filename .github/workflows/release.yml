@@ -6,11 +6,11 @@ on:
       releaseVersion:
         description: "Default version to use when preparing a release."
         required: true
-        default: "1.14.0"
+        default: "1.14.4"
       developmentVersion:
         description: "Default version to use for new local working copy."
         required: true
-        default: "1.14.1-SNAPSHOT"
+        default: "1.14.5-SNAPSHOT"
 
 jobs:
   build:
@@ -22,8 +22,8 @@ jobs:
       - name: Set up Java to deploy to OSSRH
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
-          distribution: 'zulu'
+          java-version: '17'
+          distribution: 'temurin'
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
