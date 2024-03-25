@@ -47,7 +47,7 @@ public class AppException extends JsonProcessingException {
     }
 
     public void logException(Logger logger) {
-        if (error == ErrorCode.SUCCESS)
+        if (error == ErrorCode.SUCCESS || error == ErrorCode.CLI_PARSING)
             return;
         Throwable cause = null;
         if (error.getPrintStackTrace().booleanValue() || logger.isDebugEnabled()) {

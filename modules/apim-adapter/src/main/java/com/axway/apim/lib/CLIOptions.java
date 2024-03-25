@@ -89,7 +89,7 @@ public abstract class CLIOptions {
             this.envProperties = new EnvironmentProperties(cmd.getOptionValue("stage"), getValue("apimCLIHome"));
         } catch (ParseException e) {
             printUsage(e.getMessage(), args);
-            throw new AppException(e.getMessage(), ErrorCode.UNXPECTED_ERROR, e);
+            throw new AppException(e.getMessage(), ErrorCode.CLI_PARSING, e);
         }
     }
 
