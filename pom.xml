@@ -231,11 +231,18 @@
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
                 <version>3.10.8</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId> jaxb-runtime</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+            <!-- used by ehcache to read xml configuration-->
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
-                <version>2.3.8</version>
+                <version>4.0.5</version>
             </dependency>
             <!-- Used by olingo -->
             <dependency>

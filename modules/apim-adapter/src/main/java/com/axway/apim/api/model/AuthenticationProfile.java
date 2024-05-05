@@ -9,6 +9,7 @@ import java.util.Objects;
 
 public class AuthenticationProfile {
 
+    public static final String PASSWORD = "password";
     private String name;
 
     private boolean isDefault;
@@ -64,16 +65,20 @@ public class AuthenticationProfile {
             Map<String, Object> thisParameters = this.getParameters();
             otherParameters.remove("_id_");
             thisParameters.remove("_id_");
-            if(StringUtils.equals(authenticationProfile.getName(), this.getName())
-                    && authenticationProfile.getIsDefault() == this.getIsDefault()
-                    && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())){
-                if(authenticationProfile.getType().equals(AuthType.ssl) || authenticationProfile.getType().equals(AuthType.http_basic)){
+            if (StringUtils.equals(authenticationProfile.getName(), this.getName())
+                && authenticationProfile.getIsDefault() == this.getIsDefault()
+                && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())) {
+                if (authenticationProfile.getType().equals(AuthType.ssl) || authenticationProfile.getType().equals(AuthType.http_basic)) {
                     Map<String, Object> otherParametersCopy = new HashMap<>(otherParameters);
-                    otherParametersCopy.remove("password");
                     Map<String, Object> thisParametersCopy = new HashMap<>(thisParameters);
-                    thisParametersCopy.remove("password");
+                    // Passwords are no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state, but can be overridden by setting
+                    // system property com.axway.apimanager.api.model.disable.confidential.fields=false in API Gateway
+                    if (otherParametersCopy.get(PASSWORD) == null || thisParametersCopy.get(PASSWORD) == null) {
+                        otherParametersCopy.remove(PASSWORD);
+                        thisParametersCopy.remove(PASSWORD);
+                    }
                     return otherParametersCopy.equals(thisParametersCopy);
-                }else {
+                } else {
                     return otherParameters.equals(thisParameters);
                 }
             }
@@ -90,7 +95,7 @@ public class AuthenticationProfile {
             parametersString = "{trustAll=" + this.getParameters().get("trustAll") + ", password=" + Utils.getEncryptedPassword() + ", pfx=" + pfx + "}";
         }
         return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parametersString
-                + ", type=" + type + "]";
+            + ", type=" + type + "]";
     }
 
     @Override

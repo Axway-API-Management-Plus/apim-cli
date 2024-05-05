@@ -402,11 +402,23 @@ public class APIManagerAPIAdapter {
         try {
             applicationQuota = quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-Quota
             systemQuota = quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+            translateMethodIdsToName(applicationQuota, api.getId());
+            translateMethodIdsToName(systemQuota, api.getId());
             api.setApplicationQuota(applicationQuota);
             api.setSystemQuota(systemQuota);
         } catch (AppException e) {
             LOG.error("Application-Default quota response: {}", applicationQuota);
             throw e;
+        }
+    }
+
+    public void translateMethodIdsToName(APIQuota apiQuota, String apiId) throws AppException {
+        if(apiQuota != null) {
+            APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
+            List<QuotaRestriction> quotaRestrictions = apiQuota.getRestrictions();
+            for (QuotaRestriction quotaRestriction : quotaRestrictions) {
+                quotaRestriction.setMethod(methodAdapter.getMethodForId(apiId, quotaRestriction.getApiId()).getName());
+            }
         }
     }
 
@@ -418,8 +430,9 @@ public class APIManagerAPIAdapter {
         } else {
             LOG.info("Loading application quotas for {} subscribed applications.", api.getApplications().size());
         }
+        APIManagerQuotaAdapter quotaAdapter = APIManagerAdapter.getInstance().getQuotaAdapter();
         for (ClientApplication app : api.getApplications()) {
-            APIQuota appQuota = APIManagerAdapter.getInstance().getQuotaAdapter().getQuota(app.getId(), null, true, true);
+            APIQuota appQuota = quotaAdapter.getQuota(app.getId(), null, true, true);
             app.setAppQuota(appQuota);
         }
     }

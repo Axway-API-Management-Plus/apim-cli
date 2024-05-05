@@ -273,18 +273,18 @@ public class Utils {
         if (filter.getCustomProperties() == null || entities.isEmpty()) {
             return;
         }
-        Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<>();
+        Map<String, JsonNode> entityAsJsonMappedWithId = new HashMap<>();
         JsonNode jsonPayload = mapper.readTree(json);
         // Create a map based on the API-ID containing the original JSON-Payload received from API-Manager
         for (JsonNode node : jsonPayload) {
             String apiId = node.get("id").asText();
-            enitityAsJsonMappedWithId.put(apiId, node);
+            entityAsJsonMappedWithId.put(apiId, node);
         }
         Map<String, String> customProperties = new LinkedHashMap<>();
         // Iterate over all APIs (at this point not yet having the custom-properties serialized)
         for (CustomPropertiesEntity entity : entities) {
             // Get the original JSON-Payload for the current API fetched from API-Manager
-            JsonNode node = enitityAsJsonMappedWithId.get(entity.getId());
+            JsonNode node = entityAsJsonMappedWithId.get(entity.getId());
             // Iterate over all requested Custom-Properties that should be returned
             for (String customPropKey : filter.getCustomProperties()) {
                 // Try to get the value for that custom property from the JSON-Payload
