@@ -239,10 +239,11 @@
                 </exclusions>
             </dependency>
             <!-- used by ehcache to read xml configuration-->
+
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
-                <version>4.0.5</version>
+                <version>2.3.9</version>
             </dependency>
             <!-- Used by olingo -->
             <dependency>

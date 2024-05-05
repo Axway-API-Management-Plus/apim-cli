@@ -413,11 +413,13 @@ public class APIManagerAPIAdapter {
     }
 
     public void translateMethodIdsToName(APIQuota apiQuota, String apiId) throws AppException {
-        if(apiQuota != null) {
+        if (apiQuota != null) {
             APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
             List<QuotaRestriction> quotaRestrictions = apiQuota.getRestrictions();
             for (QuotaRestriction quotaRestriction : quotaRestrictions) {
-                quotaRestriction.setMethod(methodAdapter.getMethodForId(apiId, quotaRestriction.getApiId()).getName());
+                APIMethod apiMethod = methodAdapter.getMethodForId(apiId, quotaRestriction.getApiId());
+                if (apiMethod != null)
+                    quotaRestriction.setMethod(apiMethod.getName());
             }
         }
     }
