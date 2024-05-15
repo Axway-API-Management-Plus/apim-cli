@@ -83,8 +83,8 @@ public class APIChangeState {
                     String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
                     Method method = desiredAPI.getClass().getMethod(getterMethodName, null);
                     Method method2 = actualAPI.getClass().getMethod(getterMethodName, null);
-                    Object desiredValue = method.invoke(desiredAPI, null);
-                    Object actualValue = method2.invoke(actualAPI, null);
+                    Object desiredValue = method.invoke(desiredAPI,  null);
+                    Object actualValue = method2.invoke(actualAPI,  null);
                     APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
                     if (desiredValue == null && actualValue == null) continue;
                     if (desiredValue == null && property.ignoreNull()) {
@@ -287,7 +287,7 @@ public class APIChangeState {
         boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
         if (orgAdminSelfServiceEnabled) return false;
         return (!getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && !getDesiredAPI().getState().equals(API.STATE_DELETED)) ||
-                (getActualAPI() != null && !getActualAPI().getState().equals(API.STATE_UNPUBLISHED));
+            (getActualAPI() != null && !getActualAPI().getState().equals(API.STATE_UNPUBLISHED));
     }
 
     public String waiting4Approval() throws AppException {

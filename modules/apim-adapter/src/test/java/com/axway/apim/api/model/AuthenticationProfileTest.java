@@ -148,6 +148,59 @@ public class AuthenticationProfileTest {
     }
 
     @Test
+    public void compareBasicAuthProfilesWithDifferentPassword(){
+        AuthenticationProfile authenticationProfile = new AuthenticationProfile();
+        authenticationProfile.setName("_default");
+        authenticationProfile.setType(AuthType.http_basic);
+        authenticationProfile.setIsDefault(true);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("username","admin");
+        parameters.put("password", Utils.getEncryptedPassword());
+        parameters.put("_id_", 0);
+
+        authenticationProfile.setParameters(parameters);
+        AuthenticationProfile authenticationProfileFromGateway = new AuthenticationProfile();
+        authenticationProfileFromGateway.setName("_default");
+        authenticationProfileFromGateway.setIsDefault(true);
+        authenticationProfileFromGateway.setType(AuthType.http_basic);
+
+        parameters = new HashMap<>();
+        parameters.put("username","admin");
+        parameters.put("password", Utils.getEncryptedPassword()+1);
+        parameters.put("_id_", 0);
+
+        authenticationProfileFromGateway.setParameters(parameters);
+        Assert.assertNotEquals(authenticationProfileFromGateway, authenticationProfile);
+    }
+
+    @Test
+    public void compareBasicAuthProfilesWithSamePassword(){
+        AuthenticationProfile authenticationProfile = new AuthenticationProfile();
+        authenticationProfile.setName("_default");
+        authenticationProfile.setType(AuthType.http_basic);
+        authenticationProfile.setIsDefault(true);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("username","admin");
+        parameters.put("password", Utils.getEncryptedPassword());
+        parameters.put("_id_", 0);
+
+        authenticationProfile.setParameters(parameters);
+        AuthenticationProfile authenticationProfileFromGateway = new AuthenticationProfile();
+        authenticationProfileFromGateway.setName("_default");
+        authenticationProfileFromGateway.setIsDefault(true);
+        authenticationProfileFromGateway.setType(AuthType.http_basic);
+
+        parameters = new HashMap<>();
+        parameters.put("username","admin");
+        parameters.put("password", Utils.getEncryptedPassword());
+        parameters.put("_id_", 0);
+
+        authenticationProfileFromGateway.setParameters(parameters);
+        Assert.assertEquals(authenticationProfileFromGateway, authenticationProfile);
+    }
+
+
+    @Test
     public void compareApikeyAuthProfiles(){
         AuthenticationProfile authenticationProfile = new AuthenticationProfile();
         authenticationProfile.setName("_default");

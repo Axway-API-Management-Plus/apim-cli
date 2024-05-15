@@ -118,9 +118,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
         }
     }
     private String getExportFolder(ExportApplication app) {
-        String appName = app.getName();
-        appName = appName.replace(" ", "-");
-        return appName;
+        return Utils.replaceSpecialChars(app.getName());
     }
 
     public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {

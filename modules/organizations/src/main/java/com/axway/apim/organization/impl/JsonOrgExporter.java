@@ -99,9 +99,7 @@ public class JsonOrgExporter extends OrgResultHandler {
     }
 
     private String getExportFolder(ExportOrganization org) {
-        String name = org.getName();
-        name = name.replace(" ", "-");
-        return name;
+        return Utils.replaceSpecialChars(org.getName());
     }
 
     @Override
