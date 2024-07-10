@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+# [1.14.5] 2024-07-12
+
+## Fixed
+- Outside environment variables should not affect tests  (See issue [#488](https://github.com/Axway-API-Management-Plus/apim-cli/issues/469))
+- API deployment does not set new auth basic password (See issue [#481](https://github.com/Axway-API-Management-Plus/apim-cli/issues/467))
+
+### Added
+- Support May 2024 APIM Release (See issue [#486](https://github.com/Axway-API-Management-Plus/apim-cli/issues/461))
+
 # [1.14.4] 2024-03-21
 
 ### Fixed
