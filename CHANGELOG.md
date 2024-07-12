@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Support May 2024 APIM Release (See issue [#486](https://github.com/Axway-API-Management-Plus/apim-cli/issues/461))
 
+### Changed
+- Citrus integration framework upgraded to version 4.1.1
+
 # [1.14.4] 2024-03-21
 
 ### Fixed
