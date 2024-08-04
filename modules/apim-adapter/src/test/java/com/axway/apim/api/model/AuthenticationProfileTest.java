@@ -1,6 +1,9 @@
 package com.axway.apim.api.model;
 
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -172,6 +175,24 @@ public class AuthenticationProfileTest {
         authenticationProfileFromGateway.setParameters(parameters);
         Assert.assertNotEquals(authenticationProfileFromGateway, authenticationProfile);
     }
+
+    @Test
+    public void checkBasicAuthProfilesWithEmptyPassword() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        String authProfile = "{\n" +
+            "         \"name\":\"HTTP Basic Auth\",\n" +
+            "         \"parameters\":{\n" +
+            "            \"username\":\"usernameabc\",\n" +
+            "            \"password\":\"\"\n" +
+            "         },\n" +
+            "         \"type\":\"http_basic\"\n" +
+            "      }";
+        AuthenticationProfile authenticationProfile = mapper.readValue(authProfile, AuthenticationProfile.class);
+        Assert.assertTrue(authenticationProfile.getParameters().get("password").equals(""));
+    }
+
 
     @Test
     public void compareBasicAuthProfilesWithSamePassword(){
