@@ -27,6 +27,7 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
     private String apimCliHome;
+
     @BeforeClass
     public void initWiremock() {
         super.initWiremock();
@@ -42,6 +43,7 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         }
 
     }
+
     @AfterClass
     public void close() {
         super.close();
@@ -272,8 +274,8 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with classic markdown local list");
         Assert.assertEquals(apiConfig.getDescriptionManual(), "THIS IS THE API-DESCRIPTION FROM A LOCAL MARKDOWN!\n"
-                + "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n"
-                + "THIS IS THE SECOND API-DESCRIPTION FROM A LOCAL MARKDOWN!");
+            + "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n"
+            + "THIS IS THE SECOND API-DESCRIPTION FROM A LOCAL MARKDOWN!");
     }
 
     @Test
@@ -306,7 +308,7 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
         API api = new API();
         CaCert caCert = new CaCert();
-      //  caCert.setAlias("CN=test");
+        //  caCert.setAlias("CN=test");
         caCert.setInbound("true");
         caCert.setOutbound("false");
         caCert.setCertFile("certchain.pem");
@@ -315,6 +317,21 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         api.setCaCerts(caCerts);
         adapter.completeCaCerts(api);
         Assert.assertEquals(api.getCaCerts().size(), 3);
+    }
+
+    @Test
+    public void testOutboundBasicAuthEmptyPassword() throws AppException {
+        // Create Environment properties without any stage (basically loads env.properties)
+        EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
+        APIImportParams params = new APIImportParams();
+        params.setProperties(props);
+        params.setHostname("localhost");
+        params.setUsername("test");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound_basic_auth_empty_password.json").getFile();
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
+        API apiConfig = adapter.getApiConfig();
+        Assert.assertEquals("", apiConfig.getAuthenticationProfiles().get(0).getParameters().get("password"));
     }
 
 }

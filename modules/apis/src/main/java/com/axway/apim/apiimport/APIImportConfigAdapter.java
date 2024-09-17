@@ -19,7 +19,6 @@ import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -96,7 +95,6 @@ public class APIImportConfigAdapter {
             // We would like to get back the original AppExcepption instead of a JsonMappingException
             mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
             mapper.registerModule(module);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
             ObjectReader reader = mapper.reader();
             API baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {

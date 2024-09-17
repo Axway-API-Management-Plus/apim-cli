@@ -3,6 +3,7 @@ package com.axway.apim.adapter.apis;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -11,7 +12,15 @@ import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -785,5 +794,29 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         Assert.assertEquals("graph", jsonNode.get("name").asText());
     }
 
+
+    @Test
+    public void updateAPIProxyWithBasicAuthEmptyPassword() throws IOException {
+        String testConfig = this.getClass().getResource("/com/axway/apim/adapter/conf/outbound_basic_auth_empty_password.json").getPath();
+        File file = new File(testConfig);
+        ObjectMapper mapper = Utils.createObjectMapper(new File(testConfig));
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(QuotaRestrictionDeserializer.DeserializeMode.configFile, false));
+        // We would like to get back the original AppExcepption instead of a JsonMappingException
+        mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
+        mapper.registerModule(module);
+        ObjectReader reader = mapper.reader();
+        API baseConfig = reader.forType(API.class).readValue(file);
+        System.out.println(baseConfig.getAuthenticationProfiles());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String[] serializeAllExcept = apiManagerAPIAdapter.getSerializeAllExcept();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+            SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
+        objectMapper.setFilterProvider(filter);
+
+        System.out.println(objectMapper.writeValueAsString(baseConfig));
+    }
 
 }

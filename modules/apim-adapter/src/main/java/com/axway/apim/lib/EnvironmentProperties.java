@@ -22,6 +22,7 @@ public class EnvironmentProperties implements Map<String, String> {
     public static final String FALSE = "false";
     public static final boolean RETAIN_BACKEND_URL = Boolean.parseBoolean(System.getenv().getOrDefault("retain.backend.url", FALSE));
     public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_console", FALSE));
+    public static final boolean OVERRIDE_CERTIFICATES = Boolean.parseBoolean(System.getenv().getOrDefault("override_certificates", FALSE));
     public static final boolean CHECK_CATALOG = Boolean.parseBoolean(System.getenv().getOrDefault("check_catalog", FALSE));
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 

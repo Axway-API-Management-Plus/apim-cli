@@ -20,6 +20,7 @@ import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.error.AppException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,10 @@ public class CreateNewAPI {
         rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
 
         try {
+            if(EnvironmentProperties.OVERRIDE_CERTIFICATES){
+                //Ignore certificates downloaded from backend.
+                createdAPI.setCaCerts(new ArrayList<>());
+            }
             // ... here we basically need to add all props to initially bring the API in sync!
             APIChangeState.initCreatedAPI(desiredAPI, createdAPI);
             //handle backend base path update

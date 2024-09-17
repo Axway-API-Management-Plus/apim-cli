@@ -605,7 +605,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private String[] getSerializeAllExcept() throws AppException {
+    public String[] getSerializeAllExcept() throws AppException {
         String[] serializeAllExcept;
         // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
         if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
