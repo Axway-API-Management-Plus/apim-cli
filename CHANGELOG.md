@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Force APIM-cli to download the latest Trusted Certificates in a Frontend API (See issue [#494](https://github.com/Axway-API-Management-Plus/apim-cli/issues/494))
 
+### Changed
+- Updated libs
+    - com.graphql-java:graphql-java from 21.3 to 21.5
+    - commons-io:commons-io from 2.11.0 to 2.14.0
+  
+
 # [1.14.5] 2024-07-12
 
 ## Fixed
