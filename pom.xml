@@ -63,7 +63,7 @@
         <citrus.version>4.3.3</citrus.version>
         <jackson.version>2.15.3</jackson.version>
         <failsafe.version>3.3.2</failsafe.version>
-        <graphql.version>21.3</graphql.version>
+        <graphql.version>21.5</graphql.version>
         <olingo.odata4.version>4.10.0</olingo.odata4.version>
         <olingo.odata2.version>2.0.13</olingo.odata2.version>
         <jsonpath.version>2.9.0</jsonpath.version>
