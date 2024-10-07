@@ -60,7 +60,7 @@
         <sonar.issue.ignore.multicriteria.e2.ruleKey>java:S106</sonar.issue.ignore.multicriteria.e2.ruleKey>
         <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <citrus.version>4.1.1</citrus.version>
+        <citrus.version>4.3.3</citrus.version>
         <jackson.version>2.15.3</jackson.version>
         <failsafe.version>3.3.2</failsafe.version>
         <graphql.version>21.3</graphql.version>
@@ -117,7 +117,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.11.0</version>
+                <version>2.14.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

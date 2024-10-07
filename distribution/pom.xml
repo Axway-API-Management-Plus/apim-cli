@@ -12,7 +12,6 @@
 	<artifactId>distribution</artifactId>
 	<packaging>pom</packaging>
 	<name>Distribution</name>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
@@ -52,6 +51,7 @@
 	</dependencies>
 
 	<build>
+        <finalName>axway-apimcli-1.14.5.1-SNAPSHOT</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>

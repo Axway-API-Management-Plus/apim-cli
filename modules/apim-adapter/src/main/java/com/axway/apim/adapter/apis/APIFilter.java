@@ -200,12 +200,9 @@ public class APIFilter implements CustomPropertiesFilter {
             op = "like";
             apiPath = apiPath.replace("*", "");
         }
-        // Only from version 7.7 on we can query for the path directly.
-        if (APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-            filters.add(new BasicNameValuePair(FIELD, "path"));
-            filters.add(new BasicNameValuePair(OP, op));
-            filters.add(new BasicNameValuePair(VALUE, apiPath));
-        }
+        filters.add(new BasicNameValuePair(FIELD, "path"));
+        filters.add(new BasicNameValuePair(OP, op));
+        filters.add(new BasicNameValuePair(VALUE, apiPath));
     }
 
     public String getQueryStringVersion() {

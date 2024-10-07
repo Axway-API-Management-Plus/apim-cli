@@ -1,6 +1,7 @@
 package com.axway.apim.api.specification;
 
 import com.axway.apim.api.API;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.errors.SchemaProblem;
@@ -41,6 +42,7 @@ public class GraphqlSpecification extends APISpecification {
 
     @Override
     public boolean parse(byte[] apiSpecificationContent){
+        CoreParameters.getInstance().setOverrideSpecBasePath(false); // Not allowing override base path for Graphql, hence changing it to false.
         this.apiSpecificationContent = apiSpecificationContent;
         SchemaParser schemaParser = new SchemaParser();
         try {

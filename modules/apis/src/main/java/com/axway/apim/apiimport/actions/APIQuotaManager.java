@@ -128,10 +128,14 @@ public class APIQuotaManager {
             // Load the method for actualAPI to get the name of the method to which the existing quota is applied to
             if (actualState != null) {
                 APIMethod actualMethod = methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod());
-                // Now load the new method based on the name for the createdAPI
-                APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
-                // Finally modify the restriction
-                restriction.setMethod(newMethod.getId());
+                if (actualMethod != null) {
+                    // Now load the new method based on the name for the createdAPI
+                    APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
+                    // Finally modify the restriction
+                    restriction.setMethod(newMethod.getId());
+                } else {
+                    LOG.warn("API Method Name : {} not found in specification", restriction.getMethod());
+                }
             }
         }
     }

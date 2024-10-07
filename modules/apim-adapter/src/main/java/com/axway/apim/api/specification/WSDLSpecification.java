@@ -2,6 +2,7 @@ package com.axway.apim.api.specification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.ServiceProfile;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
@@ -61,6 +62,7 @@ public class WSDLSpecification extends APISpecification {
             return true;
         }
         try {
+            CoreParameters.getInstance().setOverrideSpecBasePath(false); // Not allowing override base path for WSDL, hence changing it to false.
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             // to be compliant, completely disable DOCTYPE declaration:
