@@ -292,10 +292,12 @@ public class ExportAPI {
     public List<Map<String, String>> getApplications() {
         if (actualAPIProxy.getApplications().isEmpty()) return Collections.emptyList();
         List<Map<String, String>> exportApps = new ArrayList<>();
-        Map<String, String> applications = new HashMap<>();
-        exportApps.add(applications);
         for (ClientApplication app : actualAPIProxy.getApplications()) {
+            if(app.getOrganization().getName().equals(actualAPIProxy.getOrganization().getName())) // Ignore the app under development organization
+                continue;
+            Map<String, String> applications = new HashMap<>();
             applications.put("name", app.getName());
+            exportApps.add(applications);
         }
         return exportApps;
     }
