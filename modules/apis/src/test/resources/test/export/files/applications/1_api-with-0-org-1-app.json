@@ -4,6 +4,7 @@
    "state":"${state}",
    "version":"1.0.1",
    "organization":"API Development ${orgNumber}",
+  "clientOrganizations" : [ "API Development 5172" ],
    "applications":[
       { "name":"${consumingTestAppName}" }
    ]
