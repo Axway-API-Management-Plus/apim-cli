@@ -2,13 +2,14 @@ version: "2"
 
 services:
   cassandra:
+    # image: cassandra:4.0.13
     image: ${CASSANDRA_DOCKER_IMAGE}
     ports:
       - 9042:9042   # Cassandra listen socket
     hostname: cassandra
 
   apimgmt:
-    # image: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7
+    # image: docker.repository.axway.com/apigateway-docker-prod/7.7/gateway:7.7.0.20240530-2-BN0004-ubi9
     image: ${APIM_DOCKER_IMAGE}
     volumes:
       - ${GITHUB_WORKSPACE}/licenses:/opt/Axway/apigateway/conf/licenses
