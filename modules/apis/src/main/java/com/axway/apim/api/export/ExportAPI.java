@@ -295,6 +295,7 @@ public class ExportAPI {
         for (ClientApplication app : actualAPIProxy.getApplications()) {
             Map<String, String> applications = new HashMap<>();
             applications.put("name", app.getName());
+            applications.put("organization", app.getOrganization().getName());
             exportApps.add(applications);
         }
         return exportApps;

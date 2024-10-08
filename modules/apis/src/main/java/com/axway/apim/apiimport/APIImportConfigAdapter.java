@@ -389,7 +389,10 @@ public class APIImportConfigAdapter {
             while (it.hasNext()) {
                 app = it.next();
                 if (app.getName() != null) {
-                    ClientAppFilter filter = new ClientAppFilter.Builder().hasName(app.getName()).build();
+                    ClientAppFilter.Builder builder = new ClientAppFilter.Builder().hasName(app.getName());
+                    if (app.getOrganization() != null)
+                        builder.hasOrganizationName(app.getOrganization().getName());
+                    ClientAppFilter filter = builder.build();
                     loadedApp = APIManagerAdapter.getInstance().getAppAdapter().getApplication(filter);
                     if (loadedApp == null) {
                         LOG.warn("Unknown application with name: {} configured. Ignoring this application.", filter.getApplicationName());
@@ -398,7 +401,7 @@ public class APIImportConfigAdapter {
                         it.remove();
                         continue;
                     }
-                    LOG.info("Found existing application: {} ({}) based on given name {}", app.getName(), app.getId(), app.getName());
+                    LOG.info("Application exists : {} ({})]", app.getName(), app.getId());
                 } else if (app.getApiKey() != null) {
                     loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
                     if (loadedApp == null) {
