@@ -313,12 +313,12 @@
                 <configuration>
                     <!-- Skips integration tests if the value of skip.integration.tests property is true -->
                     <skipTests>${skip.integration.tests}</skipTests>
-                    <!--excludes>
+                    <excludes>
                         <exclude>**/ValidateAppQuotaStaysTestIT.java</exclude>
                         <exclude>**/DontOverwriteManualQuotaTestIT.java</exclude>
                         <exclude>**/QuotaModeReplaceTestIT.java</exclude>
                         <exclude>**/ReCreateAPIQuotaStaysTestIT.java</exclude>
-                    </excludes-->
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

@@ -83,6 +83,8 @@ public class APIManagerAPIMethodAdapter {
     }
 
     public APIMethod getMethodForId(String apiId, String methodId) throws AppException {
+        if(methodId.equals("*"))
+            return null;
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
         if (apiMethods.isEmpty()) {
             LOG.warn("No operations found for API with id: {}", apiId);

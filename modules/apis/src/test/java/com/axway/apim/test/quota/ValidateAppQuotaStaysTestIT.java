@@ -76,7 +76,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusSpringSupport {
 						+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId}\",\"type\":\"throttle\",\"config\":{\"period\":\"day\",\"per\":2,\"messages\":100000}} "
 					+ "],"
 					+ "\"system\":false}"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK));
+        $(http().client(apiManager).receive().response(HttpStatus.CREATED));
         $(echo("####### Enforce Re-Creation of API - Application quotas must stay #######"));
         variable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
         variable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/2_api-with-quota-app-subscription.json");
