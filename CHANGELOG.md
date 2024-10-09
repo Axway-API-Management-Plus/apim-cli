@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Importing SOAP API with different endpoints (for import and for runtime calls)  (See issue [#501](https://github.com/Axway-API-Management-Plus/apim-cli/issues/501))
 - -returnCodeMapping option does not work on apim-cli org import (See issue [#496](https://github.com/Axway-API-Management-Plus/apim-cli/issues/496))
 - The output of command 'apim api get' is not containing the complete list of client applications (array) of the api (See issue [#495](https://github.com/Axway-API-Management-Plus/apim-cli/issues/495))
+- Update API with Assigned Quota (See issue [#499](https://github.com/Axway-API-Management-Plus/apim-cli/issues/499))
+
 ### Added
 - Force APIM-cli to download the latest Trusted Certificates in a Frontend API (See issue [#494](https://github.com/Axway-API-Management-Plus/apim-cli/issues/494))
 
