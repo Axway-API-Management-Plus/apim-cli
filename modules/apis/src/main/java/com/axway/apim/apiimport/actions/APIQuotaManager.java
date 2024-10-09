@@ -43,6 +43,7 @@ public class APIQuotaManager {
         // Handle the system quota
         List<QuotaRestriction> actualRestrictions = actualState != null ? getRestrictions(actualState.getSystemQuota()) : null;
         List<QuotaRestriction> desiredRestrictions = getRestrictions(desiredState.getSystemQuota());
+
         updateRestrictions(actualRestrictions, desiredRestrictions, createdAPI, Quota.SYSTEM_DEFAULT, sameAPI);
         // Handle the application quota
         actualRestrictions = actualState != null ? getRestrictions(actualState.getApplicationQuota()) : null;
@@ -55,6 +56,10 @@ public class APIQuotaManager {
         if (actualRestrictions == null && desiredRestrictions == null) return;
         if (desiredRestrictions != null && desiredRestrictions.equals(actualRestrictions) && sameAPI) {
             LOG.info("{} quota for API: {} is UN-CHANGED. Nothing to do.", type.getFriendlyName(), createdAPI.getName());
+            return;
+        }
+        if(desiredRestrictions != null && desiredRestrictions.isEmpty()) {
+            LOG.info("{} quota for API: {} Nothing to do.", type.getFriendlyName(), createdAPI.getName());
             return;
         }
         APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
