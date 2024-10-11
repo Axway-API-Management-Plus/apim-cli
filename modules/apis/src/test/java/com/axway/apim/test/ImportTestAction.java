@@ -49,8 +49,8 @@ public class ImportTestAction extends AbstractTestAction {
             apiDefinition = origApiDefinition;
         }
         String configFile = replaceDynamicContentInFile(origConfigFile, context, createTempFilename(origConfigFile));
-        LOG.info("Using Replaced Swagger-File: " + apiDefinition);
-        LOG.info("Using Replaced configFile-File: " + configFile);
+        LOG.info("Using Replaced Swagger-File: {}", apiDefinition);
+        LOG.info("Using Replaced configFile-File: {}", configFile);
         int expectedReturnCode = 0;
         try {
             expectedReturnCode = Integer.parseInt(context.getVariable("expectedReturnCode"));
@@ -119,7 +119,7 @@ public class ImportTestAction extends AbstractTestAction {
             // This creates the dynamic staging config file! (For testing, we also support reading out of a file directly)
             replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
         }
-        copyImagesAndCertificates(origConfigFile, context);
+        copyImagesAndCertificates(origConfigFile);
 
         List<String> args = new ArrayList<>();
         if (useEnvironmentOnly) {
@@ -138,8 +138,7 @@ public class ImportTestAction extends AbstractTestAction {
             if (useApiAdmin) {
                 LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${apiManagerUser}") + "'");
                 args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
-            }
-            else {
+            } else {
                 LOG.info("API-Manager import is using user: '" + context.replaceDynamicContentInString("${oadminUsername1}") + "'");
                 args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
             }
@@ -262,7 +261,7 @@ public class ImportTestAction extends AbstractTestAction {
         return testDir;
     }
 
-    private void copyImagesAndCertificates(String origConfigFile, TestContext context) {
+    private void copyImagesAndCertificates(String origConfigFile) {
         File sourceDir = new File(origConfigFile).getParentFile();
         if (!sourceDir.exists()) {
             sourceDir = new File(ImportTestAction.class.getResource(origConfigFile).getFile()).getParentFile();
@@ -272,7 +271,7 @@ public class ImportTestAction extends AbstractTestAction {
         }
         FileFilter filter = new WildcardFileFilter("*.crt", "*.jpg", "*.png", "*.pem", "*.md");
         try {
-            LOG.info("Copy certificates and images from source: " + sourceDir + " into test-dir: '" + testDir + "' (Filter: \"*.crt\", \"*.jpg\", \"*.png\", \"*.pem\", \"*.md\")");
+            LOG.info("Copy certificates and images from source: {} into test-dir: {} (Filter: \"*.crt\", \"*.jpg\", \"*.png\", \"*.pem\", \"*.md\")", sourceDir, testDir);
             FileUtils.copyDirectory(sourceDir, testDir, filter);
         } catch (IOException e) {
             e.printStackTrace();

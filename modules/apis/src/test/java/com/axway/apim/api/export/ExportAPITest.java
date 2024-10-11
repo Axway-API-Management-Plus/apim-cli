@@ -2,13 +2,11 @@ package com.axway.apim.api.export;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
+import com.axway.apim.api.model.apps.ClientApplication;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExportAPITest {
 
@@ -144,14 +142,14 @@ public class ExportAPITest {
     }
 
     @Test
-    public void getRemoteHostNull(){
+    public void getRemoteHostNull() {
         API api = new API();
         ExportAPI exportAPI = new ExportAPI(api);
         Assert.assertNull(exportAPI.getRemoteHost());
     }
 
     @Test
-    public void getRemoteHostStandard(){
+    public void getRemoteHostStandard() {
         API api = new API();
         RemoteHost remoteHost = new RemoteHost();
         remoteHost.setPort(443);
@@ -162,7 +160,7 @@ public class ExportAPITest {
     }
 
     @Test
-    public void getRemoteHostCustomPort(){
+    public void getRemoteHostCustomPort() {
         API api = new API();
         RemoteHost remoteHost = new RemoteHost();
         remoteHost.setPort(8065);
@@ -173,14 +171,14 @@ public class ExportAPITest {
     }
 
     @Test
-    public void getCorsProfilesEmpty(){
+    public void getCorsProfilesEmpty() {
         API api = new API();
         ExportAPI exportAPI = new ExportAPI(api);
         Assert.assertTrue(exportAPI.getCorsProfiles().isEmpty());
     }
 
     @Test
-    public void getCorsProfilesDefault(){
+    public void getCorsProfilesDefault() {
         API api = new API();
         CorsProfile corsProfile = CorsProfile.getDefaultCorsProfile();
         List<CorsProfile> corsProfiles = new ArrayList<>();
@@ -191,7 +189,7 @@ public class ExportAPITest {
     }
 
     @Test
-    public void getCorsProfiles(){
+    public void getCorsProfiles() {
         API api = new API();
         CorsProfile corsProfile = CorsProfile.getDefaultCorsProfile();
         corsProfile.setName("custom");
@@ -203,21 +201,21 @@ public class ExportAPITest {
     }
 
     @Test
-    public void getInboundProfilesEmpty(){
+    public void getInboundProfilesEmpty() {
         API api = new API();
         ExportAPI exportAPI = new ExportAPI(api);
         Assert.assertTrue(exportAPI.getInboundProfiles().isEmpty());
     }
 
     @Test
-    public void getTagsEmpty(){
+    public void getTagsEmpty() {
         API api = new API();
         ExportAPI exportAPI = new ExportAPI(api);
         Assert.assertTrue(exportAPI.getTags().isEmpty());
     }
 
     @Test
-    public void getTags(){
+    public void getTags() {
         API api = new API();
         TagMap apiManagerTags = new TagMap();
         String[] tagValue = {"dev"};
@@ -225,5 +223,39 @@ public class ExportAPITest {
         api.setTags(apiManagerTags);
         ExportAPI exportAPI = new ExportAPI(api);
         Assert.assertFalse(exportAPI.getTags().isEmpty());
+    }
+
+
+    @Test
+    public void getMultipleApplicationTest() {
+        API api = new API();
+        APIMethod apiMethod = new APIMethod();
+        TagMap apiManagerTags = new TagMap();
+        String[] tagValue = {"dev"};
+        Organization organization = new Organization();
+        organization.setName("test");
+        api.setOrganization(organization);
+
+        Organization consumerOrganization = new Organization();
+        consumerOrganization.setName("test2");
+
+        List<ClientApplication> exportApps = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            ClientApplication clientApplication = new ClientApplication();
+            clientApplication.setName("app" + i);
+            clientApplication.setOrganization(consumerOrganization);
+            exportApps.add(clientApplication);
+        }
+        api.setApplications(exportApps);
+
+
+
+        apiManagerTags.put("stage", tagValue);
+        apiMethod.setTags(apiManagerTags);
+        apiMethod.setDescriptionType("manual");
+        apiMethod.setDescriptionManual("manual desc");
+
+        ExportAPI exportAPI = new ExportAPI(api);
+        Assert.assertEquals(2, exportAPI.getApplications().size());
     }
 }

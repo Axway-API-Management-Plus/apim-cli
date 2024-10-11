@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+# [1.14.6] In progress
+## Fixed
+- Importing SOAP API with different endpoints (for import and for runtime calls)  (See issue [#501](https://github.com/Axway-API-Management-Plus/apim-cli/issues/501))
+- -returnCodeMapping option does not work on apim-cli org import (See issue [#496](https://github.com/Axway-API-Management-Plus/apim-cli/issues/496))
+- The output of command 'apim api get' is not containing the complete list of client applications (array) of the api (See issue [#495](https://github.com/Axway-API-Management-Plus/apim-cli/issues/495))
+- Update API with Assigned Quota (See issue [#499](https://github.com/Axway-API-Management-Plus/apim-cli/issues/499))
+
+### Added
+- Force APIM-cli to download the latest Trusted Certificates in a Frontend API (See issue [#494](https://github.com/Axway-API-Management-Plus/apim-cli/issues/494))
+
+### Changed
+- Updated libs to fix security vulnerabilities 
+    - com.graphql-java:graphql-java from 21.3 to 21.5
+    - commons-io:commons-io from 2.11.0 to 2.14.0
+  
+
 # [1.14.5] 2024-07-12
 
 ## Fixed

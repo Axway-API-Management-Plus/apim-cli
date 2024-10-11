@@ -8,10 +8,10 @@ env:
   CACHE_FILE_APIM: api-manager_7_7_20240530.cache.tar
   CACHE_FILE_CASSANDRA: cassandra_4_0_13.cache.tar
   FED_FILE: swagger-promote-7.7-20240530.fed
-  LOG_LEVEL: info
+  LOG_LEVEL: debug
 
 jobs:
-  build:
+  integration-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,9 +58,9 @@ jobs:
         run: |
           mkdir licenses
           echo ${{ secrets.APIM_LIC }} | base64 -di > licenses/apim.lic
-          docker-compose run --rm start_cassandra
-          docker-compose run --rm start_apimgmt
-          docker-compose logs --tail 30 apimgmt
+          docker compose run --rm start_cassandra
+          docker compose run --rm start_apimgmt
+          docker compose logs --tail 30 apimgmt
       - name: Maven APIM Integration Test
         run: mvn verify -P integration-tests
 

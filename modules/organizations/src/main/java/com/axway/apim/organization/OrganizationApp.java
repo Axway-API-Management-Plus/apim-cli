@@ -24,7 +24,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrganizationApp.class);
 
-    static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
     @Override
     public String getName() {
@@ -115,16 +114,18 @@ public class OrganizationApp implements APIMCLIServiceProvider {
     @CLIServiceMethod(name = "import", description = "Import organization(s) into the API-Manager")
     public static int importOrganization(String[] args) {
         OrgImportParams params;
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             params = (OrgImportParams) OrgImportCLIOptions.create(args).getParams();
         } catch (AppException e) {
-            LOG.error("Error {}", e.getMessage());
-            return e.getError().getCode();
+            LOG.error("Error importing org {}", e.getMessage());
+            return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
         }
-        return importOrganization(params);
+        return errorCodeMapper.getMapedErrorCode(importOrganization(params)).getCode();
+
     }
 
-    public static int importOrganization(OrgImportParams params) {
+    public static ErrorCode importOrganization(OrgImportParams params) {
         APIManagerAdapter apiManagerAdapter = null;
         try {
             params.validateRequiredParameters();
@@ -141,13 +142,13 @@ public class OrganizationApp implements APIMCLIServiceProvider {
                 importManager.replicate(desiredOrg, actualOrg);
             }
             LOG.info("Successfully replicated organization(s) into API-Manager");
-            return ErrorCode.SUCCESS.getCode();
+            return ErrorCode.SUCCESS;
         } catch (AppException ap) {
             ap.logException(LOG);
-            return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
+            return ap.getError();
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-            return ErrorCode.UNXPECTED_ERROR.getCode();
+            return ErrorCode.UNXPECTED_ERROR;
         } finally {
             Utils.deleteInstance(apiManagerAdapter);
         }
@@ -159,7 +160,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
             OrgExportParams params = (OrgExportParams) OrgDeleteCLIOptions.create(args).getParams();
             return delete(params).getRc();
         } catch (AppException e) {
-            LOG.error("Error : {}", e.getMessage());
+            LOG.error("Error deleting org : {}", e.getMessage());
             return e.getError().getCode();
         }
     }

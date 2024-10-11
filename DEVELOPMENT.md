@@ -19,50 +19,11 @@ are ready for the next version. This means that the develop branch is actually s
 - GnuPG for Code-Signing (e.g. https://gnupg.org/)
 - Apache Maven 3.6.3 or higher
 
-#### Maven settings.xml
+### Maven pgp usage
+- https://maven.apache.org/plugins/maven-gpg-plugin/usage.html
 
-A server configuration for GitHub write access by Maven using your personal access token. 
 
-```xml
-    <server>
-      <id>github</id>
-      <username>cwiechmann@axway.com</username>
-      <password>YOUR_GITHUB_PAT</password>
-    </server>
-```
-The Code must be signed to be published to Maven-Central. A Signing-Key must be created and published:  
-Learn more: https://central.sonatype.org/publish/requirements/gpg/  
-  
-Confguration required for the Sonatype communication:  
-Learn more: https://github.com/chhh/sonatype-ossrh-parent/blob/master/publishing-to-maven-central.md  
-  
-A profile Sonatype servers used by Sonatype maven plugin.
-
-```xml
-    <server>
-      <id>ossrh</id>
-      <username>YOUR_OSSRH_USERNAME</username>
-      <password>YOUR_OSSRH_PASSWORD</password>
-    </server>
-```
-
-A profile for GPG which is used by the `maven-gpg-plugin` plugin.
-
-```xml
-    <profile>
-      <id>ossrh</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <gpg.executable>gpg</gpg.executable>
-        <gpg.passphrase>axway</gpg.passphrase>
-      </properties>
-    </profile>
-```
-Learn more: https://maven.apache.org/plugins/maven-gpg-plugin/usage.html
-
-### Create a new release
+## Create a new release
   
 For the release, develop is merged into Master and the release is generated on Master with Maven.
 
@@ -85,47 +46,12 @@ git commit
 git push
 ```
 
-### 4. Create Pre-Release with Maven 
+### 4. Create Release with Maven 
 
-```sh
-mvn -Darguments=-DskipTests release:prepare -P release
+- Run Github action Release API CLI on github and Maven repository
 
-# Set the version number following [Semantic Versioning](https://semver.org/)
-# Git-Label version should be for example: 1.11.0
-# Next SNAPSHOT Version: 1.12.0-SNAPSHOT
-```
-
-### 5. Validate the Pre-Release
-
-- Use the Pre-Release to manually perform some smoke tests  
-`apim-cli\distribution\target`
-  - If you are not happy with the actual build for any reason, you need to rollback the actual release prepare:  
-  ```sh
-  mvn release:rollback
-  # Sometimes the created tag isn't removed automatically. You need to delete it to re-execute release:prepare: 
-  git tag -d 1.11.0
-  git push origin :refs/tags/1.11.0
-  ```
-
-### 6. Create the release
-
-```sh
-# This uploads the release artifacts to Maven-Central automatically
-mvn -Darguments=-DskipTests release:perform -P release
-```
   
-### 7. Create a release on GitHub
-
-- Select the tag created by Maven
-- Use the description from the previous release and modify it
-- It also pushes the Chocolately package
-- upload the created release files to GitHub: 
-  ```
-  target/checkout/distribution/target/axway-apimcli-1.11.0.zip
-  target/checkout/distribution/target/axway-apimcli-1.11.0.tar.gz
-  ```
-  
-### 8. Commit all changes and merge master into develop
+### 5. Commit all changes and merge master into develop
 ```
 git checkout develop
 git merge master

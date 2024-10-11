@@ -1,6 +1,7 @@
 package com.axway.apim.api.specification;
 
 import com.axway.apim.api.API;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -33,6 +34,7 @@ public class WADLSpecification extends APISpecification {
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
         try {
+            CoreParameters.getInstance().setOverrideSpecBasePath(false); // Not allowing override base path for WADL, hence changing it to false.
             if (backendBasePath != null) {
                 URL url = new URL(backendBasePath); // Parse it to make sure it is valid
                 if (url.getPath() != null && !url.getPath().isEmpty() && !backendBasePath.endsWith("/")) { // See issue #178

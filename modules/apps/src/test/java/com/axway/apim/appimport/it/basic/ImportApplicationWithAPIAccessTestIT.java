@@ -47,7 +47,7 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusSpringSupp
             context, "apps", false);
         $(testContext -> {
             String[] args = {"api", "import", "-c", updatedConfigFile, "-a", specFile, "-h", testContext.getVariable("apiManagerHost"),
-                "-u", testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass")};
+                "-u", testContext.getVariable("apiManagerUser"), "-p", testContext.getVariable("apiManagerPass"), "-force"};
             int returnCode = APIImportApp.importAPI(args);
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);

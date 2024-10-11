@@ -60,7 +60,7 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         // ############## Creating Test-Application 1 #################
         variable("app1Name", "Consuming Test App ${apiNumber} ${orgNumber}");
         $(http().client(apiManager).send().post("/applications").message().header("Content-Type", "application/json")
-            .body("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
+            .body("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId3}\"}"));
 
         $(http().client(apiManager).receive().response(HttpStatus.CREATED).message().type(MessageType.JSON).extract(fromBody()
             .expression("$.id", "consumingTestApp1Id")
@@ -83,7 +83,6 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(new File(exportedAPIConfigFile).toPath()));
         assertEquals(exportedAPIConfig.get("version").asText(), "1.0.1");
         assertEquals(exportedAPIConfig.get("organization").asText(), "API Development " + context.getVariable("orgNumber"));
-        //assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://petstore.swagger.io");
         assertEquals(exportedAPIConfig.get("state").asText(), "published");
         assertEquals(exportedAPIConfig.get("path").asText(), context.getVariable("apiPath"));
         assertEquals(exportedAPIConfig.get("name").asText(), context.getVariable("apiName"));
@@ -99,12 +98,10 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         ClientApplication app = exportedApps.get(0);
         assertTrue(app.getApiAccess() == null || app.getApiAccess().isEmpty(), "Exported Apps should not contains API-Access");
         assertNull(app.getId(), "The ID of an application shouldn't be exported.");
-        assertNull(app.getOrganization(), "The Org-ID of an application shouldn't be exported.");
         assertNull(app.getAppQuota(), "The application quota should not be exported. It's not supported by the export!");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/StarfieldServicesRootCertificateAuthority-G2.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
-        // assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/Amazon.crt").exists(), "Certificate Amazon.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/" + context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
     }
 }

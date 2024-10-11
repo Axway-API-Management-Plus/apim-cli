@@ -92,7 +92,6 @@ public class ExportHelper {
 
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         FilterProvider filters = new SimpleFilterProvider()
             .addFilter("CaCertFilter",
                 SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))

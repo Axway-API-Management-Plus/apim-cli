@@ -417,7 +417,7 @@ public class APIManagerAPIAdapter {
             APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
             List<QuotaRestriction> quotaRestrictions = apiQuota.getRestrictions();
             for (QuotaRestriction quotaRestriction : quotaRestrictions) {
-                APIMethod apiMethod = methodAdapter.getMethodForId(apiId, quotaRestriction.getApiId());
+                APIMethod apiMethod = methodAdapter.getMethodForId(apiId, quotaRestriction.getMethod());
                 if (apiMethod != null)
                     quotaRestriction.setMethod(apiMethod.getName());
             }
@@ -605,7 +605,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private String[] getSerializeAllExcept() throws AppException {
+    public String[] getSerializeAllExcept() throws AppException {
         String[] serializeAllExcept;
         // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
         if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {

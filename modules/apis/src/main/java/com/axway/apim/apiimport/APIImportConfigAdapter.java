@@ -19,7 +19,6 @@ import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -96,7 +95,6 @@ public class APIImportConfigAdapter {
             // We would like to get back the original AppExcepption instead of a JsonMappingException
             mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
             mapper.registerModule(module);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
             ObjectReader reader = mapper.reader();
             API baseConfig = reader.withAttribute(VALIDATE_ORGANIZATION, validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {
@@ -391,7 +389,10 @@ public class APIImportConfigAdapter {
             while (it.hasNext()) {
                 app = it.next();
                 if (app.getName() != null) {
-                    ClientAppFilter filter = new ClientAppFilter.Builder().hasName(app.getName()).build();
+                    ClientAppFilter.Builder builder = new ClientAppFilter.Builder().hasName(app.getName());
+                    if (app.getOrganization() != null)
+                        builder.hasOrganizationName(app.getOrganization().getName());
+                    ClientAppFilter filter = builder.build();
                     loadedApp = APIManagerAdapter.getInstance().getAppAdapter().getApplication(filter);
                     if (loadedApp == null) {
                         LOG.warn("Unknown application with name: {} configured. Ignoring this application.", filter.getApplicationName());
@@ -400,7 +401,7 @@ public class APIImportConfigAdapter {
                         it.remove();
                         continue;
                     }
-                    LOG.info("Found existing application: {} ({}) based on given name {}", app.getName(), app.getId(), app.getName());
+                    LOG.info("Application exists : {} ({})]", app.getName(), app.getId());
                 } else if (app.getApiKey() != null) {
                     loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
                     if (loadedApp == null) {
