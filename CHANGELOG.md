@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.6] In progress
+# [1.14.6]  2024-10-11
 ## Fixed
 - Importing SOAP API with different endpoints (for import and for runtime calls)  (See issue [#501](https://github.com/Axway-API-Management-Plus/apim-cli/issues/501))
 - -returnCodeMapping option does not work on apim-cli org import (See issue [#496](https://github.com/Axway-API-Management-Plus/apim-cli/issues/496))
