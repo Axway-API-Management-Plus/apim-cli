@@ -126,4 +126,23 @@ public class CoreCLIOptionsTest {
         Assert.assertEquals(params.isDisableCompression(), false);
 
     }
+
+    @Test
+    public void testCustomHeaders() throws AppException {
+        String[] args = {"-customHeaders", "abc:xyz"};
+        CLIOptions options = SampleCLIOptions.create(args);
+        CoreParameters params = (CoreParameters) options.getParams();
+        System.out.println(params.getCustomHeaders());
+        Assert.assertEquals(params.getCustomHeaders(), "abc:xyz");
+
+    }
+
+    @Test
+    public void testCustomHeadersNegative() throws AppException {
+        String[] args = {""};
+        CLIOptions options = SampleCLIOptions.create(args);
+        CoreParameters params = (CoreParameters) options.getParams();
+        Assert.assertNull(params.getCustomHeaders());
+
+    }
 }

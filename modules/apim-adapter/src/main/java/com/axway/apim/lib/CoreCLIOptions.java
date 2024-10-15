@@ -40,6 +40,7 @@ public class CoreCLIOptions extends CLIOptions {
         params.setTimeout(getValue("timeout"));
         params.setDisableCompression(hasOption("disableCompression"));
         params.setOverrideSpecBasePath(hasOption("overrideSpecBasePath"));
+        params.setCustomHeaders(getValue("customHeaders"));
         return params;
     }
 
@@ -152,7 +153,11 @@ public class CoreCLIOptions extends CLIOptions {
 
         option = new Option("overrideSpecBasePath", "Override API Specification ( open api, Swagger 2)  using backendBasepath");
         option.setRequired(false);
-        addOption(option);
+        cliOptions.addOption(option);
+
+        option = new Option("customHeaders", true,"Custom http headers added while calling API manager in case it is protected with Gateway");
+        option.setRequired(false);
+        cliOptions.addOption(option);
     }
 
     @Override
