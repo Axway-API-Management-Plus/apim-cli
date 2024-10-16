@@ -210,25 +210,27 @@ public class APIImportConfigAdapter {
             apiConfig.getClientOrganizations().addAll(allOrgs);
             apiConfig.setRequestForAllOrgs(true);
         } else {
-            // And validate each configured organization really exists in the API-Manager
-            Iterator<Organization> it = apiConfig.getClientOrganizations().iterator();
-            String invalidClientOrgs = null;
-            List<Organization> foundOrgs = new ArrayList<>();
-            while (it.hasNext()) {
-                Organization desiredOrg = it.next();
-                Organization org = organizationAdapter.getOrgForName(desiredOrg.getName());
-                if (org == null) {
-                    LOG.warn("Unknown organization with name: {} configured. Ignoring this organization.", desiredOrg.getName());
-                    invalidClientOrgs = invalidClientOrgs == null ? desiredOrg.getName() : invalidClientOrgs + ", " + desiredOrg.getName();
-                    APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
-                    it.remove();
-                    continue;
-                }
-                it.remove();
-                foundOrgs.add(org);
-            }
-            apiConfig.getClientOrganizations().addAll(foundOrgs);
+            List<Organization> filteredOrganizations = removeInvalidOrganizations(apiConfig.getClientOrganizations());
+            filteredOrganizations.remove(apiConfig.getOrganization());
+            apiConfig.setClientOrganizations(filteredOrganizations);
         }
+    }
+
+    public List<Organization> removeInvalidOrganizations(List<Organization> inputOrganizations) throws AppException {
+        List<Organization> validOrganizations = new ArrayList<>();
+        APIManagerOrganizationAdapter organizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
+        String invalidClientOrgs = null;
+        for (Organization inputOrganization : inputOrganizations) {
+            Organization organization = organizationAdapter.getOrgForName(inputOrganization.getName());
+            if (organization == null) {
+                LOG.warn("Unknown organization with name: {} configured. Ignoring this organization.", inputOrganization.getName());
+                invalidClientOrgs = invalidClientOrgs == null ? inputOrganization.getName() : invalidClientOrgs + ", " + inputOrganization.getName();
+                APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
+            } else {
+                validOrganizations.add(organization);
+            }
+        }
+        return validOrganizations;
     }
 
 
