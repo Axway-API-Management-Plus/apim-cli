@@ -153,6 +153,13 @@ public class APIManagerAPIAccessAdapter {
         }
     }
 
+    private void removeApplicationFromCache(String id) {
+        Cache<String, String> usedCache = caches.get(Type.applications);
+        if (usedCache != null && usedCache.containsKey(id))
+                usedCache.remove(id);
+
+    }
+
     public void saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
         List<APIAccess> existingAPIAccess = getAPIAccess(entity, type, true);
         List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
@@ -191,6 +198,30 @@ public class APIManagerAPIAccessAdapter {
                 }
             }
             throw new AppException("Unable to find API", ErrorCode.UNKNOWN_API);
+        }
+    }
+
+    public APIAccess createAPIAccessForApplication(APIAccess apiAccess, String applicationId) throws AppException {
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + applicationId + "/apis").build();
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+                SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
+            mapper.setFilterProvider(filter);
+            HttpEntity entity = new StringEntity(mapper.writeValueAsString(apiAccess), ContentType.APPLICATION_JSON);
+            RestAPICall request = new POSTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error granting access to application id : {} for  API-Proxy  : {} using URI: {} Received Status-Code: {} Response: {}", applicationId, apiAccess.getApiId(), uri, statusCode, response);
+                    throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                }
+                removeApplicationFromCache(applicationId);
+                return mapper.readValue(response, APIAccess.class);
+            }
+        } catch (Exception e) {
+            throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API, e);
         }
     }
 
@@ -252,12 +283,12 @@ public class APIManagerAPIAccessAdapter {
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, errorResponse);
-                    throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode, ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
                 }
                 removeFromCache(parentEntity.getId(), type);
             }
         } catch (Exception e) {
-            throw new AppException("Can't delete API access requests for application.", ErrorCode.CANT_CREATE_API_PROXY, e);
+            throw new AppException("Can't delete API access requests for application.", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR, e);
         }
     }
 
@@ -291,7 +322,7 @@ public class APIManagerAPIAccessAdapter {
     }
 
 
-    public List<ApiOrganizationSubscription> getApiAccess(String apiId) throws AppException{
+    public List<ApiOrganizationSubscription> getApiAccess(String apiId) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/apiaccess").build();
             RestAPICall request = new GETRequest(uri);
@@ -302,7 +333,8 @@ public class APIManagerAPIAccessAdapter {
                     LOG.error("Can't get API access requests for API. Response-Code: {}. Got response: {}", statusCode, response);
                     throw new AppException("Can't get API access requests for API: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                return mapper.readValue(response, new TypeReference<List<ApiOrganizationSubscription>>(){});
+                return mapper.readValue(response, new TypeReference<List<ApiOrganizationSubscription>>() {
+                });
             }
         } catch (Exception e) {
             throw new AppException("Can't delete API access requests for application.", ErrorCode.API_MANAGER_COMMUNICATION, e);

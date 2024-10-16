@@ -49,7 +49,7 @@ public class ManageClientApps {
             LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
             return;
         }
-        if (desiredState.getApplications() != null) { // Happens, when config-file doesn't contains client apps
+        if (desiredState.getApplications() != null) { // Happens, when config-file doesn't contain client apps
             // Remove configured apps, for Non-Granted-Orgs!
             removeNonGrantedClientApps(desiredState.getApplications());
         }
@@ -115,15 +115,11 @@ public class ManageClientApps {
         if (missingDesiredApps.isEmpty()) return;
         LOG.info("Creating API-Access for the following apps: {}", missingDesiredApps);
         for (ClientApplication app : missingDesiredApps) {
-            try {
-                LOG.info("Creating API-Access for application {}", app.getName());
-                APIAccess apiAccess = new APIAccess();
-                apiAccess.setApiId(apiId);
-                accessAdapter.createAPIAccess(apiAccess, app, Type.applications);
-            } catch (AppException e) {
-                throw new AppException("Failure creating API-Access for application: '" + app.getName() + "'. " + e.getMessage(),
-                        ErrorCode.API_MANAGER_COMMUNICATION, e);
-            }
+            LOG.info("Creating API-Access for application {}", app.getName());
+            APIAccess apiAccess = new APIAccess();
+            apiAccess.setApiId(apiId);
+            APIAccess response = accessAdapter.createAPIAccessForApplication(apiAccess, app.getId());
+            LOG.info("Created API ({}) Access for application {} ", response.getApiId(), app.getName());
         }
     }
 
@@ -142,6 +138,7 @@ public class ManageClientApps {
             }
         }
     }
+
     private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) {
         List<ClientApplication> missingApps = new ArrayList<>();
         if (otherApps == null) otherApps = new ArrayList<>();

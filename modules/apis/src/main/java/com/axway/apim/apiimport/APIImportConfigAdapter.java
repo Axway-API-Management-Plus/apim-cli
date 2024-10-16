@@ -209,11 +209,6 @@ public class APIImportConfigAdapter {
             apiConfig.getClientOrganizations().addAll(allOrgs);
             apiConfig.setRequestForAllOrgs(true);
         } else {
-            // As the API-Manager internally handles the owning organization in the same way,
-            // we have to add the Owning-Org as a desired org
-            if (!apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
-                apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
-            }
             // And validate each configured organization really exists in the API-Manager
             Iterator<Organization> it = apiConfig.getClientOrganizations().iterator();
             String invalidClientOrgs = null;
