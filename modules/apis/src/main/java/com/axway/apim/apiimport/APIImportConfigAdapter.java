@@ -206,6 +206,7 @@ public class APIImportConfigAdapter {
         if (apiConfig.getClientOrganizations().contains(new Organization.Builder().hasName("ALL").build())) {
             List<Organization> allOrgs = organizationAdapter.getAllOrgs();
             apiConfig.getClientOrganizations().clear();
+            allOrgs.remove(apiConfig.getOrganization());
             apiConfig.getClientOrganizations().addAll(allOrgs);
             apiConfig.setRequestForAllOrgs(true);
         } else {
@@ -229,6 +230,7 @@ public class APIImportConfigAdapter {
             apiConfig.getClientOrganizations().addAll(foundOrgs);
         }
     }
+
 
     private void addQuotaConfiguration(API apiConfig) {
         if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
