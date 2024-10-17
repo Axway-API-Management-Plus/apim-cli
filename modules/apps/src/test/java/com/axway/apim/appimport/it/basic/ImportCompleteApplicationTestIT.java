@@ -103,6 +103,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusSpringSupport {
             .expression("$.[?(@.scope=='${scopeName1}')].isDefault", "${scopeIsDefault1}")
             .expression("$.[?(@.scope=='${scopeName2}')].isDefault", "${scopeIsDefault2}")));
 
+        $(sleep().seconds(5));
         $(echo("####### Re-Import same application - Should be a No-Change #######"));
         $(testContext -> {
             String[] args = {"app", "import", "-c", updatedConfigFile, "-h", testContext.replaceDynamicContentInString("${apiManagerHost}"), "-u", testContext.replaceDynamicContentInString("${apiManagerUser}"), "-p", testContext.replaceDynamicContentInString("${apiManagerPass}")};
