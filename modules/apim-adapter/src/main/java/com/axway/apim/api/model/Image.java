@@ -34,11 +34,9 @@ public class Image {
     }
 
     public Image() {
-        super();
     }
 
     public Image(String filename) {
-        super();
         this.filename = filename;
     }
 

@@ -14,7 +14,6 @@ public class CLIUserFilterOptions extends CLIOptions {
 	private final CLIOptions cliOptions;
 
 	public CLIUserFilterOptions(CLIOptions cliOptions) {
-		super();
 		this.cliOptions = cliOptions;
 	}
 
@@ -32,7 +31,7 @@ public class CLIUserFilterOptions extends CLIOptions {
 			params.setEnabled(Boolean.parseBoolean(getValue(ENABLED)));
 		}
 		params.setId(getValue("id"));
-		
+
 		return (Parameters) params;
 	}
 
@@ -45,7 +44,7 @@ public class CLIUserFilterOptions extends CLIOptions {
 	public void addOption(Option option) {
 		cliOptions.addOption(option);
 	}
-	
+
 	@Override
 	public String getValue(String key) {
 		return cliOptions.getValue(key);
@@ -72,47 +71,47 @@ public class CLIUserFilterOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("*mark24*");
 		addOption(option);
-		
+
 		option = new  Option("n", "name", true, "Filter users with the specified name. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*Mark*");
 		addOption(option);
-		
+
 		option = new  Option("email", true, "Filter users with the specified Email-Address. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*@axway.com*");
 		addOption(option);
-		
+
 		option = new  Option("type", true, "Filter users with specific type. External users are managed in external system such as LDAP");
 		option.setRequired(false);
 		option.setArgName("internal|external");
 		addOption(option);
-		
+
 		option = new  Option("org", true, "Filter users belonging to specified organization. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*Partner*");
 		addOption(option);
-		
+
 		option = new  Option("role", true, "Filter users with the given role. ");
 		option.setRequired(false);
 		option.setArgName("user|oadmin|admin");
 		addOption(option);
-		
+
 		option = new  Option("state", true, "Filter users with the given state. ");
 		option.setRequired(false);
 		option.setArgName("approved|pending");
 		addOption(option);
-		
+
 		option = new  Option(ENABLED, true, "Filter users based on the enablement flag. By default enabled users are include by default.");
 		option.setRequired(false);
 		option.setArgName("true|false");
 		addOption(option);
-		
+
 		option = new  Option("id", true, "Filter users with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-USER");
 		addOption(option);
-		
+
 		cliOptions.addOptions();
 	}
 

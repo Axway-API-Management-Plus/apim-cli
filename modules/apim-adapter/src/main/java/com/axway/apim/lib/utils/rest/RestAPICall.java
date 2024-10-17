@@ -31,7 +31,6 @@ public abstract class RestAPICall {
     protected HttpHost target;
 
     protected RestAPICall(HttpEntity entity, URI uri) {
-        super();
         this.entity = entity;
         this.uri = uri;
     }

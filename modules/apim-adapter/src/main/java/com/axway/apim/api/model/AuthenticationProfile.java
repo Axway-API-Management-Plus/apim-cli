@@ -18,10 +18,6 @@ public class AuthenticationProfile {
 
     private AuthType type;
 
-    public AuthenticationProfile() {
-        super();
-    }
-
     public String getName() {
         return name;
     }

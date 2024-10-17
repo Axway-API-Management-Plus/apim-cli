@@ -14,7 +14,6 @@ public class SecurityProfile {
     private List<SecurityDevice> devices;
 
     public SecurityProfile() {
-        super();
         this.devices = new ArrayList<>();
     }
 

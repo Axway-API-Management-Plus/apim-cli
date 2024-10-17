@@ -6,10 +6,6 @@ import com.axway.apim.api.model.APIAccess;
 
 public class APIAccessComparator implements Comparator<APIAccess> {
 
-    public APIAccessComparator() {
-        super();
-    }
-
     @Override
     public int compare(APIAccess apiAccess1, APIAccess apiAccess2) {
         if (apiAccess1 == null || apiAccess2 == null) return 0;

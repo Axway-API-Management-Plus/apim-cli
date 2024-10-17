@@ -122,10 +122,6 @@ public class    RemoteHostFilter {
         Integer port;
         Organization organization;
 
-        public Builder() {
-            super();
-        }
-
         public RemoteHostFilter build() {
             RemoteHostFilter filter = new RemoteHostFilter();
             filter.setAlias(this.alias);

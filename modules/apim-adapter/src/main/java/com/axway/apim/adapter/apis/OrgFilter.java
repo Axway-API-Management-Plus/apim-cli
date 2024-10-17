@@ -26,7 +26,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 	String development;
 	boolean includeImage;
 	boolean includeAPIAccess;
-	
+
 	private List<String> customProperties;
 
 	private final List<NameValuePair> filters = new ArrayList<>();
@@ -103,19 +103,19 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
+
 	public void setDevelopment(String development) {
 		this.development = development;
 	}
-	
+
 	public String getDevelopment() {
 		return development;
 	}
-	
+
 	public boolean isIncludeImage() {
 		return includeImage;
 	}
-	
+
 	public boolean isIncludeAPIAccess() {
 		return includeAPIAccess;
 	}
@@ -135,7 +135,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 		if(!(obj instanceof OrgFilter)) return false;
 		OrgFilter other = (OrgFilter)obj;
 		return (
-				StringUtils.equals(other.getId(), this.getId()) && 
+				StringUtils.equals(other.getId(), this.getId()) &&
 				StringUtils.equals(other.getName(), this.getName()) &&
 				other.isEnabled() == this.isEnabled() &&
 				StringUtils.equals(other.getApiId(), this.getApiId())
@@ -154,7 +154,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public String toString() {
 		return "OrgFilter [name=" + name + ", id=" + id + "]";
 	}
-	
+
 	public boolean filter(Organization org) {
 		return this.development != null && Boolean.parseBoolean(this.development) != org.isDevelopment();
 	}
@@ -173,15 +173,11 @@ public class OrgFilter implements CustomPropertiesFilter {
 		String name;
 		String phone;
 		String development;
-		
+
 		boolean includeImage;
 		boolean includeAPIAccess;
-		
-		private List<String> customProperties;
 
-		public Builder() {
-			super();
-		}
+		private List<String> customProperties;
 
 		public OrgFilter build() {
 			OrgFilter filter = new OrgFilter();
@@ -218,26 +214,26 @@ public class OrgFilter implements CustomPropertiesFilter {
 			this.enabled = enabled;
 			return this;
 		}
-		
+
 		public Builder hasDevelopment(String development) {
 			this.development = development;
 			return this;
 		}
-		
+
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
 			return this;
 		}
-		
+
 		public Builder includeAPIAccess(boolean includeAPIAccess) {
 			this.includeAPIAccess = includeAPIAccess;
 			return this;
 		}
-		
+
 		public Builder includeCustomProperties(List<String> customProperties) {
 			this.customProperties = customProperties;
 			return this;
-		}		
+		}
 	}
 
 }

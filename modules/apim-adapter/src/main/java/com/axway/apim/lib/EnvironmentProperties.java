@@ -37,7 +37,6 @@ public class EnvironmentProperties implements Map<String, String> {
     }
 
     public EnvironmentProperties(String stage, String swaggerPromoteHome) {
-        super();
         this.stage = stage;
         this.swaggerPromoteHome = swaggerPromoteHome;
         if (swaggerPromoteHome == null) {
@@ -50,7 +49,6 @@ public class EnvironmentProperties implements Map<String, String> {
 
     private void initProperties() {
         mainProperties = loadProperties(null);
-
         if (stage != null && !stage.equals("NOT_SET")) {
             stageProperties = loadProperties(stage);
         }

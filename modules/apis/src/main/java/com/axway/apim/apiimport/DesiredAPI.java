@@ -29,9 +29,6 @@ public class DesiredAPI extends API {
     @JsonProperty("apiDefinition")
     public String apiDefinitionImport = null;
 
-    public DesiredAPI() {
-        super();
-    }
 
     /**
      * BackendBasePath is a property which doesn't exists in API-Manager naturally.
@@ -61,14 +58,12 @@ public class DesiredAPI extends API {
         }
         this.backendBasepath = backendBasepath;
     }
+
     @Override
     public String getApiDefinitionImport() {
         return apiDefinitionImport;
     }
 
-    public void setApiDefinitionImport(String apiDefinitionImport) {
-        this.apiDefinitionImport = apiDefinitionImport;
-    }
 
     public void setRetirementDate(String retirementDate) throws AppException {
         this.retirementDate = Utils.getParsedDate(retirementDate);
@@ -76,9 +71,5 @@ public class DesiredAPI extends API {
 
     public DesiredAPISpecification getDesiredAPISpecification() {
         return desiredAPISpecification;
-    }
-
-    public void setDesiredAPISpecification(DesiredAPISpecification desiredAPISpecification) {
-        this.desiredAPISpecification = desiredAPISpecification;
     }
 }

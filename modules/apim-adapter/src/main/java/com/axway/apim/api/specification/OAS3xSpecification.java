@@ -24,10 +24,6 @@ public class OAS3xSpecification extends APISpecification {
 
     private JsonNode openApiNode = null;
 
-    public OAS3xSpecification() {
-        super();
-    }
-
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
         if (this.mapper.getFactory() instanceof YAMLFactory) {

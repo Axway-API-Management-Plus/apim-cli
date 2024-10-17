@@ -220,11 +220,6 @@ public class UserFilter implements CustomPropertiesFilter {
 
         private List<String> customProperties;
 
-
-        public Builder() {
-            super();
-        }
-
         public UserFilter build() {
             UserFilter filter = new UserFilter();
             filter.setId(this.id);

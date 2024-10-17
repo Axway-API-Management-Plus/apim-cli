@@ -20,7 +20,6 @@ public class CLIAPIFilterOptions extends CLIOptions {
     private final CLIOptions cliOptions;
 
     public CLIAPIFilterOptions(CLIOptions cliOptions) {
-        super();
         this.cliOptions = cliOptions;
     }
 

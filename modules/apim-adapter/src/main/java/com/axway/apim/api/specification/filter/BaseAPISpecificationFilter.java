@@ -16,7 +16,6 @@ public class BaseAPISpecificationFilter {
         APISpecificationFilter filterConfigFilter;
 
         public FilterConfig(APISpecificationFilter filterConfigFilter) {
-            super();
             this.filterConfigFilter = filterConfigFilter;
         }
 

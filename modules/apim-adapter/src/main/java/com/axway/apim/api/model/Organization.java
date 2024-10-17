@@ -52,11 +52,9 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
     private List<APIAccess> apiAccess = new ArrayList<>();
 
     public Organization() {
-        super();
     }
 
     public Organization(String name) {
-        super();
         setName(name);
     }
 

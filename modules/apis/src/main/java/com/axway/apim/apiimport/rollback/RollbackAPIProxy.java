@@ -21,7 +21,6 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
     API rollbackAPI;
 
     public RollbackAPIProxy(API rollbackAPI) {
-        super();
         this.rollbackAPI = rollbackAPI;
         executeOrder = 10;
         this.name = "Frontend-API";

@@ -25,9 +25,6 @@ public class APIManagerSetupExportParams extends StandardExportParams {
     private String remoteHostName;
     private String remoteHostId;
 
-    public APIManagerSetupExportParams() {
-        super();
-    }
 
     public static synchronized APIManagerSetupExportParams getInstance() {
         return (APIManagerSetupExportParams) CoreParameters.getInstance();

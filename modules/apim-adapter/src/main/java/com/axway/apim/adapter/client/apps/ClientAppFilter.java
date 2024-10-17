@@ -357,9 +357,6 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         private List<String> customProperties;
 
-        public Builder() {
-            super();
-        }
 
         /**
          * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters

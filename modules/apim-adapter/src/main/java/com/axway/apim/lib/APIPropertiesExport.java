@@ -18,9 +18,6 @@ public class APIPropertiesExport {
 
     private static APIPropertiesExport instance = null;
 
-    private APIPropertiesExport() {
-        super();
-    }
 
     public static APIPropertiesExport getInstance() {
         if (instance == null) {

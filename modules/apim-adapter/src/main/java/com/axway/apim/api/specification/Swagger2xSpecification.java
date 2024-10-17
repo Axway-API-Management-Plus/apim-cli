@@ -23,10 +23,6 @@ public class Swagger2xSpecification extends APISpecification {
     private static final Logger LOG = LoggerFactory.getLogger(Swagger2xSpecification.class);
     private JsonNode swagger = null;
 
-    public Swagger2xSpecification() {
-        super();
-    }
-
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
         if (this.mapper.getFactory() instanceof YAMLFactory) {

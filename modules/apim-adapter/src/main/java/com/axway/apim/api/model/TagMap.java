@@ -7,9 +7,7 @@ import java.util.Objects;
 public class TagMap extends LinkedHashMap<String, String[]> {
 
     private static final long serialVersionUID = 1L;
-    public TagMap() {
-        super();
-    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;

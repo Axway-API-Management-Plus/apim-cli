@@ -21,7 +21,6 @@ public class ExportApplication {
     ClientApplication clientApp;
 
     public ExportApplication(ClientApplication clientApp) {
-        super();
         this.clientApp = clientApp;
     }
 

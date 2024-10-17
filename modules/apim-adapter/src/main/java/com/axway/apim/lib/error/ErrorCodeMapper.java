@@ -8,10 +8,6 @@ public class ErrorCodeMapper {
     private final Map<ErrorCode, ErrorCode> myMap = new HashMap<>();
 
 
-    public ErrorCodeMapper() {
-        super();
-    }
-
     public void setMapConfiguration(String mapConfiguration) {
         if (mapConfiguration == null) return;
         String[] codeMaps = mapConfiguration.split(",");
