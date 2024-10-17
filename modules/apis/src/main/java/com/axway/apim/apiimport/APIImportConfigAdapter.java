@@ -148,7 +148,7 @@ public class APIImportConfigAdapter {
             validateHasQueryStringKey(apiConfig);
             completeCaCerts(apiConfig);
             addQuotaConfiguration(apiConfig);
-            handleAllOrganizations(apiConfig);
+            handleOrganizations(apiConfig);
             completeClientApplications(apiConfig);
             handleVhost(apiConfig);
             validateMethodDescription(apiConfig.getApiMethods());
@@ -181,7 +181,7 @@ public class APIImportConfigAdapter {
     private void addAPISpecification(API apiConfig) throws IOException {
         APISpecification apiSpecification;
         if (((DesiredAPI) apiConfig).getDesiredAPISpecification() != null) {
-            // API-Specification object that might contain filters, the type of an API, etc.
+            // API-Specification object that might contain filters, the type of  API, etc.
             apiSpecification = APISpecificationFactory.getAPISpecification(((DesiredAPI) apiConfig).getDesiredAPISpecification(), this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
         } else if (StringUtils.isNotEmpty(this.pathToAPIDefinition)) {
             apiSpecification = APISpecificationFactory.getAPISpecification(this.pathToAPIDefinition, this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
@@ -196,7 +196,7 @@ public class APIImportConfigAdapter {
         apiConfig.setApiDefinition(apiSpecification);
     }
 
-    private void handleAllOrganizations(API apiConfig) throws AppException {
+    public void handleOrganizations(API apiConfig) throws AppException {
         if (apiConfig.getClientOrganizations() == null) return;
         if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) {
             apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
@@ -204,10 +204,9 @@ public class APIImportConfigAdapter {
         }
         APIManagerOrganizationAdapter organizationAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
         if (apiConfig.getClientOrganizations().contains(new Organization.Builder().hasName("ALL").build())) {
-            List<Organization> allOrgs = organizationAdapter.getAllOrgs();
-            apiConfig.getClientOrganizations().clear();
-            allOrgs.remove(apiConfig.getOrganization());
-            apiConfig.getClientOrganizations().addAll(allOrgs);
+            List<Organization> organizations = organizationAdapter.getAllOrgs();
+            organizations.remove(apiConfig.getOrganization());
+            apiConfig.setClientOrganizations(organizations);
             apiConfig.setRequestForAllOrgs(true);
         } else {
             List<Organization> filteredOrganizations = removeInvalidOrganizations(apiConfig.getClientOrganizations());
@@ -370,7 +369,7 @@ public class APIImportConfigAdapter {
     /**
      * Purpose of this method is to load the actual existing applications from API-Manager
      * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId).
-     * Or, if the APP doesn't exists remove it from the list and log a warning message.
+     * Or, if the APP doesn't exist remove it from the list and log a warning message.
      * Additionally, for each application it's checked, that the organization has access
      * to this API, otherwise it will be removed from the list as well and a warning message is logged.
      *
@@ -436,7 +435,6 @@ public class APIImportConfigAdapter {
         ClientApplication app = APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
         if (app == null) {
             LOG.warn("Unknown application with ({}): {} configured. Ignoring this application.", type, credential);
-            return null;
         }
         return app;
     }
