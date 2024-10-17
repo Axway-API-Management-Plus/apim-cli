@@ -39,6 +39,8 @@ import java.util.*;
 
 public class APIManagerAPIAccessAdapter {
 
+    public static final String APIS = "/apis";
+
     public enum Type {
         organizations("Organization"),
         applications("Application");
@@ -79,7 +81,7 @@ public class APIManagerAPIAccessAdapter {
             return;
         }
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + id + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + id + APIS).build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load API-Access with type: {} from API-Manager with ID: {}", type, id);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
@@ -203,7 +205,7 @@ public class APIManagerAPIAccessAdapter {
 
     public APIAccess createAPIAccessForApplication(APIAccess apiAccess, String applicationId) throws AppException {
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + applicationId + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + applicationId + APIS).build();
             mapper.setSerializationInclusion(Include.NON_NULL);
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                 SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
@@ -213,9 +215,15 @@ public class APIManagerAPIAccessAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
+
                 if (statusCode != 201) {
-                    LOG.error("Error granting access to application id : {} for  API-Proxy  : {} using URI: {} Received Status-Code: {} Response: {}", applicationId, apiAccess.getApiId(), uri, statusCode, response);
-                    throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                    if (statusCode == 409 && response.contains("resource already exists")) {
+                        LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);
+                        return apiAccess;
+                    }else {
+                        LOG.error("Error granting access to application id : {} for  API-Proxy  : {} using URI: {} Received Status-Code: {} Response: {}", applicationId, apiAccess.getApiId(), uri, statusCode, response);
+                        throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                    }
                 }
                 removeApplicationFromCache(applicationId);
                 return mapper.readValue(response, APIAccess.class);
@@ -232,7 +240,7 @@ public class APIManagerAPIAccessAdapter {
             return;
         }
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + APIS).build();
             mapper.setSerializationInclusion(Include.NON_NULL);
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                 SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
