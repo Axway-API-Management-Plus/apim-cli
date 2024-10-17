@@ -10,11 +10,10 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 public class AppExportSerializerModifier extends BeanSerializerModifier {
-	
+
 	File localFolder;
 
 	public AppExportSerializerModifier(File localFolder) {
-		super();
 		this.localFolder = localFolder;
 	}
 
@@ -28,7 +27,7 @@ public class AppExportSerializerModifier extends BeanSerializerModifier {
 		} else if (beanDesc.getBeanClass() == APIQuota.class) {
 			return new AppQuotaSerializer((JsonSerializer<Object>) serializer);
 		}
-			
+
 		return super.modifySerializer(config, beanDesc, serializer);
 	}
 

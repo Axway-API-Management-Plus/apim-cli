@@ -80,7 +80,6 @@ public class ConsolePrinterCustomProperties {
 		private final CustomProperty customProperty;
 
 		public CustomPropertyWithName(CustomProperty customProperty) {
-			super();
 			this.customProperty = customProperty;
 		}
 

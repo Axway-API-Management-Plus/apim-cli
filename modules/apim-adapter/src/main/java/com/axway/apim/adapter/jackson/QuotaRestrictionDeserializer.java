@@ -44,7 +44,6 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
     }
 
     public QuotaRestrictionDeserializer(DeserializeMode deserializeMode, boolean addRestrictedAPI) {
-        super();
         this.deserializeMode = deserializeMode;
         this.addRestrictedAPI = addRestrictedAPI;
         try {

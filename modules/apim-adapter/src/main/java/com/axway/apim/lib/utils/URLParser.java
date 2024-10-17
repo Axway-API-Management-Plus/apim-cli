@@ -5,19 +5,18 @@ import com.axway.apim.lib.error.ErrorCode;
 
 public class URLParser {
 	String username;
-	
+
 	String password;
-	
+
 	String uri;
-	
+
 	String urlToAPIDefinition;
 
 	public URLParser(String urlToAPIDefinition) throws AppException {
-		super();
 		this.urlToAPIDefinition = urlToAPIDefinition;
 		parseUrl();
 	}
-	
+
 	private void parseUrl() throws AppException {
 		if(!urlToAPIDefinition.contains("@")) {
 			this.uri = urlToAPIDefinition;

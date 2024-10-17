@@ -642,7 +642,6 @@ public class APIFilter implements CustomPropertiesFilter {
          * @param loadBackendAPI is search backendEndAPI if set to true
          */
         public Builder(APIType type, boolean loadBackendAPI) {
-            super();
             initType(type);
             this.apiType = type;
             this.loadBackendAPI = loadBackendAPI;

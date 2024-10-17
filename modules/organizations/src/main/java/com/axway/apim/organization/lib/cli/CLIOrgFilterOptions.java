@@ -9,11 +9,10 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.organization.lib.OrgFilterParams;
 
 public class CLIOrgFilterOptions extends CLIOptions {
-	
+
 	private final CLIOptions cliOptions;
 
 	public CLIOrgFilterOptions(CLIOptions cliOptions) {
-		super();
 		this.cliOptions = cliOptions;
 	}
 
@@ -23,7 +22,7 @@ public class CLIOrgFilterOptions extends CLIOptions {
 		params.setName(getValue("name"));
 		params.setId(getValue("id"));
 		params.setDev(getValue("dev"));
-		
+
 		return (Parameters) params;
 	}
 
@@ -37,7 +36,7 @@ public class CLIOrgFilterOptions extends CLIOptions {
 		cliOptions.addOption(option);
 	}
 
-	
+
 	@Override
 	public String getValue(String key) {
 		return cliOptions.getValue(key);
@@ -65,12 +64,12 @@ public class CLIOrgFilterOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("*My organization*");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("id", true, "Filter the export to an organization with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-ORG");
 		cliOptions.addOption(option);
-		
+
 		option = new  Option("dev", true, "Filter organizations based on the development flag: true | false");
 		option.setRequired(false);
 		option.setArgName("true|false");

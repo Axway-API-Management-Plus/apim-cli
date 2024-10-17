@@ -100,7 +100,7 @@ public class ChangeStateTest extends WiremockWrapper {
     }
 
     private static API getTestAPI() {
-        API testAPI = new ActualAPI();
+        API testAPI = new API();
         testAPI.setOrganization(new Organization.Builder().hasName("123").hasId("123").build());
         testAPI.setState(API.STATE_PUBLISHED);
         return testAPI;
