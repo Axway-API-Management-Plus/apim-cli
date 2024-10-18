@@ -39,6 +39,7 @@ import java.util.*;
 
 public class APIManagerAPIAccessAdapter {
 
+    public static final String APIS = "/apis";
     public enum Type {
         organizations("Organization"),
         applications("Application");
@@ -79,7 +80,7 @@ public class APIManagerAPIAccessAdapter {
             return;
         }
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + id + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + id + APIS).build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load API-Access with type: {} from API-Manager with ID: {}", type, id);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
@@ -153,6 +154,13 @@ public class APIManagerAPIAccessAdapter {
         }
     }
 
+    private void removeApplicationFromCache(String id) {
+        Cache<String, String> usedCache = caches.get(Type.applications);
+        if (usedCache != null && usedCache.containsKey(id))
+            usedCache.remove(id);
+
+    }
+
     public void saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
         List<APIAccess> existingAPIAccess = getAPIAccess(entity, type, true);
         List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
@@ -194,6 +202,36 @@ public class APIManagerAPIAccessAdapter {
         }
     }
 
+    public APIAccess createAPIAccessForApplication(APIAccess apiAccess, String applicationId) throws AppException {
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + applicationId + APIS).build();
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+                SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
+            mapper.setFilterProvider(filter);
+            HttpEntity entity = new StringEntity(mapper.writeValueAsString(apiAccess), ContentType.APPLICATION_JSON);
+            RestAPICall request = new POSTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+
+                if (statusCode != 201) {
+                    if (statusCode == 409 && response.contains("resource already exists")) {
+                        LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);
+                        return apiAccess;
+                    }else {
+                        LOG.error("Error granting access to application id : {} for  API-Proxy  : {} using URI: {} Received Status-Code: {} Response: {}", applicationId, apiAccess.getApiId(), uri, statusCode, response);
+                        throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                    }
+                }
+                removeApplicationFromCache(applicationId);
+                return mapper.readValue(response, APIAccess.class);
+            }
+        } catch (Exception e) {
+            throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API, e);
+        }
+    }
+
     public void createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
         List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type, true);
         if (existingAPIAccess != null && existingAPIAccess.contains(apiAccess)) {
@@ -201,7 +239,7 @@ public class APIManagerAPIAccessAdapter {
             return;
         }
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + APIS).build();
             mapper.setSerializationInclusion(Include.NON_NULL);
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                 SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
@@ -252,12 +290,12 @@ public class APIManagerAPIAccessAdapter {
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, errorResponse);
-                    throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode,ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
                 }
                 removeFromCache(parentEntity.getId(), type);
             }
         } catch (Exception e) {
-            throw new AppException("Can't delete API access requests for application.", ErrorCode.CANT_CREATE_API_PROXY, e);
+            throw new AppException("Can't delete API access requests for application.", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR, e);
         }
     }
 

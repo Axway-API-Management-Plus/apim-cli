@@ -127,7 +127,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
             try {
                 APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
                 apiAdapter.addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
-                apiAdapter.addClientOrganizations(api, true);
+                apiAdapter.addClientOrganizations(api);
                 apiAdapter.addQuotaConfiguration(api, true);
             } catch (AppException e) {
                 LOG.error("Error loading API details.", e);

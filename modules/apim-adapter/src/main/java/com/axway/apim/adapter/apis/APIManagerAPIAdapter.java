@@ -98,7 +98,7 @@ public class APIManagerAPIAdapter {
                 API api = apis.get(i);
                 translateMethodIds(api, filter.getTranslateMethodMode());
                 addQuotaConfiguration(api, filter.isIncludeQuotas());
-                addClientOrganizations(api, filter.isIncludeClientOrganizations());
+                addClientOrganizations(api);
                 addClientApplications(api, filter);
                 addExistingClientAppQuotas(api, filter.isIncludeQuotas());
                 addOriginalAPIDefinitionFromAPIM(api, filter);
@@ -439,18 +439,11 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
-        if (!addClientOrganizations || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
-        List<Organization> grantedOrgs;
-        List<Organization> allOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getAllOrgs();
-        grantedOrgs = new ArrayList<>();
-        for (Organization org : allOrgs) {
-            List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(org, APIManagerAPIAccessAdapter.Type.organizations);
-            for (APIAccess access : orgAPIAccess) {
-                if (access.getApiId().equals(api.getId())) {
-                    grantedOrgs.add(org);
-                }
-            }
+    public void addClientOrganizations(API api) throws AppException {
+        List<Organization> grantedOrgs = new ArrayList<>();
+        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = APIManagerAdapter.getInstance().getAccessAdapter().getApiAccess(api.getId());
+        for (ApiOrganizationSubscription apiOrganizationSubscription : apiOrganizationSubscriptions) {
+            grantedOrgs.add(new Organization(apiOrganizationSubscription.getOrganizationName()));
         }
         api.setClientOrganizations(grantedOrgs);
     }

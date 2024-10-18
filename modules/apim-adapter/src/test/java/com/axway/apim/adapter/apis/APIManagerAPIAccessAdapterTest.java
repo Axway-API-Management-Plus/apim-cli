@@ -217,5 +217,13 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         Assert.assertEquals(4, apiOrganizationSubscriptions.size());
     }
 
+    @Test
+    public void createAPIAccessForApplication() throws AppException {
+        String applicationId = "40dd53a4-0b13-4485-82e8-63c687404c2f";
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiId("40dd53a4-0b13-4485-82e8-63c687404c2g");
+        APIAccess response = apiManagerAPIAccessAdapter.createAPIAccessForApplication(apiAccess, applicationId);
+        Assert.assertNotNull(response);
+    }
 
 }

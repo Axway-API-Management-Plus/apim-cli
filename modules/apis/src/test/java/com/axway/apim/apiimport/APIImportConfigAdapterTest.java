@@ -4,6 +4,7 @@ import com.axway.apim.TestSetup;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.CaCert;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
@@ -20,6 +21,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -332,6 +334,68 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         API apiConfig = adapter.getApiConfig();
         Assert.assertEquals("", apiConfig.getAuthenticationProfiles().get(0).getParameters().get("password"));
+    }
+
+    @Test
+    public void handleOrganizationsDoNothing() throws AppException {
+        APIImportParams params = new APIImportParams();
+        params.setHostname("localhost");
+        params.setUsername("test");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound_basic_auth_empty_password.json").getFile();
+        params.setConfig(testConfig);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
+        API api = new API();
+        adapter.handleOrganizations(api);
+        Assert.assertNull(api.getClientOrganizations());
+    }
+
+    @Test
+    public void handleOrganizationsWithUnpublishedApi() throws AppException {
+        APIImportParams params = new APIImportParams();
+        params.setHostname("localhost");
+        params.setUsername("test");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound_basic_auth_empty_password.json").getFile();
+        params.setConfig(testConfig);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
+        API api = new API();
+        api.setState(API.STATE_UNPUBLISHED);
+        api.setClientOrganizations(new ArrayList<>());
+        adapter.handleOrganizations(api);
+        Assert.assertNull(api.getClientOrganizations());
+    }
+
+    @Test
+    public void handleOrganizationsAll() throws AppException {
+        APIImportParams params = new APIImportParams();
+        params.setHostname("localhost");
+        params.setUsername("test");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound_basic_auth_empty_password.json").getFile();
+        params.setConfig(testConfig);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
+        API api = new API();
+        api.setState(API.STATE_PUBLISHED);
+        api.setClientOrganizations(Arrays.asList(new Organization("ALL")));
+        adapter.handleOrganizations(api);
+        Assert.assertEquals(api.getClientOrganizations().size(), 1);
+    }
+
+    @Test
+    public void handleOrganizationsSingle() throws AppException {
+        APIImportParams params = new APIImportParams();
+        params.setHostname("localhost");
+        params.setUsername("test");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound_basic_auth_empty_password.json").getFile();
+        params.setConfig(testConfig);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
+        API api = new API();
+        api.setState(API.STATE_PUBLISHED);
+        api.setClientOrganizations(Arrays.asList(new Organization("orga")));
+        adapter.handleOrganizations(api);
+        Assert.assertEquals(api.getClientOrganizations().size(), 1);
     }
 
 }
