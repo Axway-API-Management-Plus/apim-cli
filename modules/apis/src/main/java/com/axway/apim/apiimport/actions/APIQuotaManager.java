@@ -96,7 +96,7 @@ public class APIQuotaManager {
                 desiredRestriction.setApiId(null);
                 // And compare each desired restriction, if it is already included in the existing restrictions
                 for (QuotaRestriction existingRestriction : existingRestrictions) {
-                    // It's considered as the same restriction when type, method, period & per are equal
+                    // It's considered as the same restriction when quota type, method, period & per are equal
                     if (desiredRestriction.isSameRestriction(existingRestriction, true)) {
                         // If it is the same restriction, we need to update the restriction configuration
                         if (existingRestriction.getType() == QuotaRestrictionType.throttle) {
@@ -144,15 +144,21 @@ public class APIQuotaManager {
             // Additionally, we have to change the methodId
             // Load the method for actualAPI to get the name of the method to which the existing quota is applied to
             if (actualState != null) {
-                APIMethod actualMethod = methodAdapter.getMethodForName(actualState.getId(), restriction.getMethod());
-                if (actualMethod != null) {
-                    // Now load the new method based on the name for the createdAPI
-                    APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
-                    // Finally modify the restriction
+                try {
+                    APIMethod actualMethod = methodAdapter.getMethodForName(actualState.getId(), restriction.getMethod());
+                    if (actualMethod != null) {
+                        // Now load the new method based on the name for the createdAPI
+                        APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
+                        // Finally modify the restriction
+                        restriction.setMethod(newMethod.getId());
+                    }
+                } catch (AppException e) {
+                    LOG.warn("{}", e.getMessage());
+                    // Now load the new method based on the name for the createdAPI as existing api does not have the method.
+                    APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), restriction.getMethod());
                     restriction.setMethod(newMethod.getId());
-                } else {
-                    LOG.warn("API Method Name : {} not found in specification", restriction.getMethod());
                 }
+
             } else {
                 // For new api creation
                 APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), restriction.getMethod());

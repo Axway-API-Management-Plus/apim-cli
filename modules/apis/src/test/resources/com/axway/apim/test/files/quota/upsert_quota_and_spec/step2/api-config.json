@@ -1,0 +1,44 @@
+{
+  "name": "Teste api - Quotas",
+  "path": "/healthcheck/teste/api/versao/1-14-7",
+  "state": "published",
+  "version": "1.0.0",
+  "organization":"API Development ${orgNumber}",
+  "backendBasepath" : "http://127.0.0.1:8080/healthcheck",
+  "tags": {
+    "has-swagger": [
+      "false"
+    ]
+  },
+  "systemQuota": {
+    "restrictions": [
+      {
+        "method": "addPet",
+        "type": "throttle",
+        "config": {
+          "period": "second",
+          "per": "1",
+          "messages": "656"
+        }
+      },
+      {
+        "method": "updatePet",
+        "type": "throttle",
+        "config": {
+          "period": "second",
+          "per": "1",
+          "messages": "750"
+        }
+      },
+      {
+        "method": "findPetsByStatus",
+        "type": "throttle",
+        "config": {
+          "period": "second",
+          "per": "1",
+          "messages": "750"
+        }
+      }
+    ]
+  }
+}

@@ -58,7 +58,7 @@ public class APIManagerAPIMethodAdapter {
         readMethodsFromAPIManager(apiId);
         List<APIMethod> apiMethods;
         try {
-            apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<List<APIMethod>>() {
+            apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiId + "' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
