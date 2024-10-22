@@ -3,33 +3,33 @@ package com.axway.apim.api.model;
 import java.util.List;
 
 public class CustomProperty {
-	
+
 	private String label;
-	
+
 	private String type;
-	
-	private Boolean disabled;
-	
-	private Boolean required;
-	
+
+	private boolean disabled;
+
+	private boolean required;
+
 	private String help;
-	
+
 	private List<Option> options;
-	
+
 	private String defaultValue;
-	
+
 	private String regex;
-	
+
 	private Integer minValue;
-	
+
 	private Integer maxValue;
-	
+
 	private Integer decimalPlaces;
-	
+
 	private String error;
-	
+
 	private Object custom;
-	
+
 	private CustomPropertyPermission permissions;
 
 	public String getLabel() {
@@ -48,19 +48,19 @@ public class CustomProperty {
 		this.type = type;
 	}
 
-	public Boolean getDisabled() {
+	public boolean getDisabled() {
 		return disabled;
 	}
 
-	public void setDisabled(Boolean disabled) {
+	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	}
 
-	public Boolean getRequired() {
+	public boolean getRequired() {
 		return required;
 	}
 
-	public void setRequired(Boolean required) {
+	public void setRequired(boolean required) {
 		this.required = required;
 	}
 
@@ -135,7 +135,7 @@ public class CustomProperty {
 	public void setCustom(Object custom) {
 		this.custom = custom;
 	}
-	
+
 	public CustomPropertyPermission getPermissions() {
 		return permissions;
 	}
@@ -168,29 +168,29 @@ public class CustomProperty {
 		}
 	}
 	public static class Permissions {
-		private Boolean read;
-		private Boolean write;
-		private Boolean visible;
-		public Boolean getRead() {
+		private boolean read;
+		private boolean write;
+		private boolean visible;
+		public boolean getRead() {
 			return read;
 		}
-		public void setRead(Boolean read) {
+		public void setRead(boolean read) {
 			this.read = read;
 		}
-		public Boolean getWrite() {
+		public boolean getWrite() {
 			return write;
 		}
-		public void setWrite(Boolean write) {
+		public void setWrite(boolean write) {
 			this.write = write;
 		}
-		public Boolean getVisible() {
+		public boolean getVisible() {
 			return visible;
 		}
-		public void setVisible(Boolean visible) {
+		public void setVisible(boolean visible) {
 			this.visible = visible;
-		} 
+		}
 	}
-	
+
 	public static class Option {
 		private String value;
 		private String label;

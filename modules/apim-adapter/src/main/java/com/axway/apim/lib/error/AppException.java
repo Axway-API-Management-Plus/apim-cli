@@ -10,7 +10,7 @@ public class AppException extends JsonProcessingException {
 
     private final ErrorCode error;
 
-    private String secondMessage;
+    private final String secondMessage;
 
     public enum LogLevel {
         INFO,
@@ -28,11 +28,13 @@ public class AppException extends JsonProcessingException {
     public AppException(String message, ErrorCode errorCode, Throwable throwable) {
         super(message, throwable);
         this.error = errorCode;
+        this.secondMessage = null;
     }
 
     public AppException(String message, ErrorCode errorCode) {
         super(message);
         this.error = errorCode;
+        this.secondMessage = null;
     }
 
     public ErrorCode getError() {
@@ -70,19 +72,14 @@ public class AppException extends JsonProcessingException {
         }
     }
 
-    public String getSecondMessage() {
-        return secondMessage;
-    }
-
     public String getAllMessages() {
         String message = getMessage();
-        String secondMessageLocal = getSecondMessage();
 
         if (this.getCause() instanceof AppException) {
             message += "\n                                 | " + ((AppException) this.getCause()).getAllMessages();
         }
-        if (secondMessageLocal != null) {
-            message += "\n                                 | " + secondMessageLocal;
+        if (secondMessage != null) {
+            message += "\n                                 | " + secondMessage;
         }
         return message;
     }
