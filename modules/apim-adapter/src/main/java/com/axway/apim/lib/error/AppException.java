@@ -52,7 +52,7 @@ public class AppException extends JsonProcessingException {
         if (error == ErrorCode.SUCCESS || error == ErrorCode.CLI_PARSING)
             return;
         Throwable cause = null;
-        if (error.getPrintStackTrace().booleanValue() || logger.isDebugEnabled()) {
+        if (Boolean.TRUE.equals(error.getPrintStackTrace()) || logger.isDebugEnabled()) {
             cause = this;
         } else {
             logger.info("You may enable debug to get more details. See: https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.1.-Enable-Debug");

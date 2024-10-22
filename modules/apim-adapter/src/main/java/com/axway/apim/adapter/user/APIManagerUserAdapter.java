@@ -98,7 +98,7 @@ public class APIManagerUserAdapter {
     public List<User> getUsers(UserFilter filter) throws AppException {
         readUsersFromAPIManager(filter);
         try {
-            List<User> allUsers = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<User>>() {
+            List<User> allUsers = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
             });
             List<User> foundUsers = new ArrayList<>();
             for (User user : allUsers) {
@@ -232,11 +232,11 @@ public class APIManagerUserAdapter {
                 if (statusCode != 204) {
                     LOG.error("Error changing password of user. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
-                    throw new AppException("Error changing password of user. Response-Code: " + statusCode, ErrorCode.ERROR_CHANGEPASSWORD);
+                    throw new AppException("Error changing password of user. Response-Code: " + statusCode, ErrorCode.ERROR_CHANGE_PASSWORD);
                 }
             }
         } catch (Exception e) {
-            throw new AppException("Error changing password of user.", ErrorCode.ERROR_CHANGEPASSWORD, e);
+            throw new AppException("Error changing password of user.", ErrorCode.ERROR_CHANGE_PASSWORD, e);
         }
     }
 
