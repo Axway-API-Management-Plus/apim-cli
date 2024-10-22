@@ -6,6 +6,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.error.AppException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class JsonAPIExporter extends APIResultHandler {
         LOG.info("Exporting API and configuration as JSON format");
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
-            exportHelper.saveAPILocally(exportAPI, this);
+            exportHelper.saveAPILocally(new ObjectMapper(), exportAPI, "/api-config.json");
         }
     }
 

@@ -2,7 +2,6 @@ package com.axway.apim.api.export.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
@@ -44,7 +43,7 @@ public class ExportHelper {
         this.params = params;
     }
 
-    public void saveAPILocally(ExportAPI exportAPI, APIResultHandler apiResultHandler) throws AppException {
+    public void saveAPILocally(ObjectMapper mapper, ExportAPI exportAPI, String configFile) throws AppException {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(params.getTarget() + File.separator + getVHost(exportAPI) + apiPath);
@@ -61,7 +60,6 @@ public class ExportHelper {
             return;
         }
         String targetFile = null;
-        String configFile;
         try {
             String fileName = Utils.replaceSpecialChars(exportAPI.getName()) + apiDef.getAPIDefinitionType().getFileExtension();
             targetFile = localFolder.getCanonicalPath() + "/" + fileName;
@@ -71,14 +69,6 @@ public class ExportHelper {
             }
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
-        }
-        ObjectMapper mapper;
-        if (apiResultHandler instanceof YamlAPIExporter) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            configFile = "/api-config.yaml";
-        } else {
-            mapper = new ObjectMapper();
-            configFile = "/api-config.json";
         }
         Image image = exportAPI.getAPIImage();
         if (image != null && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
@@ -147,7 +137,7 @@ public class ExportHelper {
                     Map<String, Object> parameters = profile.getParameters();
                     String pfx = (String) parameters.get("pfx");
                     String content = pfx.replaceFirst("data:.+,", "");
-                    byte[] data  = Base64.getMimeDecoder().decode(content.replace("\\r\\n","\n"));
+                    byte[] data = Base64.getMimeDecoder().decode(content.replace("\\r\\n", "\n"));
                     String fileName = "backend_cert.pfx";
                     writeBytesToFile(data, localFolder + "/" + fileName);
                     parameters.remove("pfx");

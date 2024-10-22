@@ -2,7 +2,6 @@ package com.axway.apim.setup.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.Config;
@@ -38,14 +37,12 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 
     @Override
     public void export(APIManagerConfig apimanagerConfig) throws AppException {
-        exportToFile(apimanagerConfig, this);
+        exportToFile(new ObjectMapper(), apimanagerConfig, "/apimanager-config.json");
     }
 
 
-    public void exportToFile(APIManagerConfig apimanagerConfig, APIManagerSetupResultHandler apiManagerSetupResultHandler) throws AppException {
+    public void exportToFile(ObjectMapper mapper, APIManagerConfig apimanagerConfig, String configFile) throws AppException {
         File localFolder = null;
-        ObjectMapper mapper;
-        String configFile;
         if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             String folderName = getExportFolder(apimanagerConfig.getConfig());
             String targetFolder = params.getTarget();
@@ -63,14 +60,6 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
             if (!localFolder.mkdirs()) {
                 throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
             }
-        }
-
-        if (apiManagerSetupResultHandler instanceof YamlAPIManagerSetupExporter) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            configFile = "/apimanager-config.yaml";
-        } else {
-            mapper = new ObjectMapper();
-            configFile = "/apimanager-config.json";
         }
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);

@@ -1,6 +1,5 @@
 package com.axway.apim.users.impl;
 
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
@@ -37,14 +36,12 @@ public class JsonUserExporter extends UserResultHandler {
     @Override
     public void export(List<User> users) throws AppException {
         for (User user : users) {
-            saveUserLocally(new ExportUser(user), this);
+            saveUserLocally(new ObjectMapper(), new ExportUser(user), "/user-config.json");
         }
     }
 
-    public void saveUserLocally(ExportUser user, UserResultHandler userResultHandler) throws AppException {
+    public void saveUserLocally(ObjectMapper mapper, ExportUser user, String configFile) throws AppException {
         File localFolder = null;
-        ObjectMapper mapper;
-        String configFile;
         if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             String folderName = getExportFolder(user);
             String targetFolder = params.getTarget();
@@ -62,13 +59,6 @@ public class JsonUserExporter extends UserResultHandler {
             if (!localFolder.mkdirs()) {
                 throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
             }
-        }
-        if (userResultHandler instanceof YamlUserExporter) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            configFile = "/user-config.yaml";
-        } else {
-            mapper = new ObjectMapper();
-            configFile = "/user-config.json";
         }
         mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
         FilterProvider filters = new SimpleFilterProvider()
