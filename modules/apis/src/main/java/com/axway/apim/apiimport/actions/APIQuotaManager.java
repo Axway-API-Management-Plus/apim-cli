@@ -155,16 +155,19 @@ public class APIQuotaManager {
                 } catch (AppException e) {
                     LOG.warn("{}", e.getMessage());
                     // Now load the new method based on the name for the createdAPI as existing api does not have the method.
-                    APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), restriction.getMethod());
-                    restriction.setMethod(newMethod.getId());
+                    updateMethodId(createdAPI, restriction);
                 }
-
             } else {
                 // For new api creation
-                APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), restriction.getMethod());
-                restriction.setMethod(newMethod.getId());
+                updateMethodId(createdAPI, restriction);
             }
         }
+    }
+
+    public void updateMethodId(API createdAPI, QuotaRestriction restriction) throws AppException {
+        APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
+        APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), restriction.getMethod());
+        restriction.setMethod(newMethod.getId());
     }
 
     private List<QuotaRestriction> getRestrictions(APIQuota quota) {
