@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -294,7 +293,7 @@ public class APIImportConfigAdapter {
                                 throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
                             }
                             LOG.debug("Reading local markdown description file: {}", markdownFile.getPath());
-                            markdownDescription.append(newLine).append(new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8));
+                            markdownDescription.append(newLine).append(Files.readString(markdownFile.toPath()));
                         }
                         newLine = "\n";
                     }
@@ -447,7 +446,7 @@ public class APIImportConfigAdapter {
                 if (cert.getCertBlob() == null) {
                     try (InputStream is = getInputStreamForCertFile(cert)) {
                         String certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
-                        List<CaCert> completedCerts = mapper.readValue(certInfo, new TypeReference<List<CaCert>>() {
+                        List<CaCert> completedCerts = mapper.readValue(certInfo, new TypeReference<>() {
                         });
                         completedCaCerts.addAll(completedCerts);
                     } catch (Exception e) {
@@ -686,7 +685,7 @@ public class APIImportConfigAdapter {
             }
             JsonNode fileData;
             try (InputStream inputStream = Files.newInputStream(clientCertFile.toPath())) {
-                fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(inputStream), keystore, ContentType.create("application/x-pkcs12"));
+                fileData = APIManagerAdapter.getInstance().getFileData(IOUtils.toByteArray(inputStream), keystore, ContentType.create("application/x-pkcs12"));
             }
             CaCert cert = new CaCert();
             cert.setCertFile(clientCertFile.getName());

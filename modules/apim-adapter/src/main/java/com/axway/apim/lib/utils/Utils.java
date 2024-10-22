@@ -135,7 +135,7 @@ public class Utils {
      * @throws IOException if the file can't be found
      */
     public static String substituteVariables(File inputFile) throws IOException {
-        String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
+        String givenConfig = Files.readString(inputFile.toPath());
         givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
         if (CoreParameters.getInstance().getProperties() == null) return givenConfig;
         StringSubstitutor stringSubstitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
@@ -185,7 +185,7 @@ public class Utils {
 
     public static File locateConfigFile(String configFileName) throws AppException {
         try {
-            configFileName = URLDecoder.decode(configFileName, "UTF-8");
+            configFileName = URLDecoder.decode(configFileName, StandardCharsets.UTF_8);
             File configFile = new File(configFileName);
             if (configFile.exists()) return configFile;
             // This is mainly to load the samples sitting inside the package!

@@ -68,8 +68,7 @@ public class APIManagerRemoteHostsAdapter {
     public Map<String, RemoteHost> getRemoteHosts(RemoteHostFilter filter) throws AppException {
         readRemoteHostsFromAPIManager(filter);
         try {
-            List<RemoteHost> remoteHostsList = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<List<RemoteHost>>() {
-            });
+            List<RemoteHost> remoteHostsList = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<>() {});
             remoteHostsList.removeIf(filter::filter);
             Map<String, RemoteHost> remoteHosts = new HashMap<>();
             for (RemoteHost remoteHost : remoteHostsList) {

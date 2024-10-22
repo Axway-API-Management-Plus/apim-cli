@@ -44,10 +44,8 @@ public class APIFilter implements CustomPropertiesFilter {
         ne,
         gt,
         lt,
-        ge,
         le,
-        like,
-        gele
+        like
     }
 
     private String id;

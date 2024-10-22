@@ -441,7 +441,7 @@ public class APIManagerAPIAdapter {
 
     public void addClientOrganizations(API api) throws AppException {
         List<Organization> grantedOrgs = new ArrayList<>();
-        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = APIManagerAdapter.getInstance().getAccessAdapter().getApiAccess(api.getId());
+        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = APIManagerAdapter.getInstance().getAccessAdapter().getSubscribedOrganizationsAndApplications(api.getId());
         for (ApiOrganizationSubscription apiOrganizationSubscription : apiOrganizationSubscriptions) {
             grantedOrgs.add(new Organization(apiOrganizationSubscription.getOrganizationName()));
         }

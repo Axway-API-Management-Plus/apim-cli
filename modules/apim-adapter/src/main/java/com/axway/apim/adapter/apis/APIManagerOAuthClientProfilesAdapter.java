@@ -65,7 +65,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 		readOAuthClientProfilesFromAPIManager();
 		List<OAuthClientProfile> clientProfiles;
 		try {
-			clientProfiles = mapper.readValue(this.apiManagerResponse, new TypeReference<List<OAuthClientProfile>>(){});
+			clientProfiles = mapper.readValue(this.apiManagerResponse, new TypeReference<>() {});
 		} catch (IOException e) {
 			throw new AppException("Can't parse OAuth Client profiles returned from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}

@@ -47,7 +47,7 @@ public class APIManagerCustomPropertiesAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error loading custom-properties from API-Manager. Response-Code: {} Response Body: {}", statusCode, response);
-                    throw new AppException("Error loading custom-properties from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error loading custom-properties from API-Manager. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 apiManagerResponse = response;
             }

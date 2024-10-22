@@ -111,7 +111,7 @@ public class APIManagerAPIAccessAdapter {
         String apiAccessResponse;
         try {
             apiAccessResponse = apiManagerResponse.get(type).get(entity.getId());
-            List<APIAccess> allApiAccess = mapper.readValue(apiAccessResponse, new TypeReference<List<APIAccess>>() {
+            List<APIAccess> allApiAccess = mapper.readValue(apiAccessResponse, new TypeReference<>() {
             });
             if (includeAPIName) {
                 for (APIAccess apiAccess : allApiAccess) {
@@ -329,7 +329,7 @@ public class APIManagerAPIAccessAdapter {
     }
 
 
-    public List<ApiOrganizationSubscription> getApiAccess(String apiId) throws AppException{
+    public List<ApiOrganizationSubscription> getSubscribedOrganizationsAndApplications(String apiId) throws AppException{
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/apiaccess").build();
             RestAPICall request = new GETRequest(uri);
@@ -340,7 +340,7 @@ public class APIManagerAPIAccessAdapter {
                     LOG.error("Can't get API access requests for API. Response-Code: {}. Got response: {}", statusCode, response);
                     throw new AppException("Can't get API access requests for API: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                return mapper.readValue(response, new TypeReference<List<ApiOrganizationSubscription>>(){});
+                return mapper.readValue(response, new TypeReference<>() {});
             }
         } catch (Exception e) {
             throw new AppException("Can't delete API access requests for application.", ErrorCode.API_MANAGER_COMMUNICATION, e);
