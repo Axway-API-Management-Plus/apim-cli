@@ -5,6 +5,7 @@ import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
@@ -48,7 +49,7 @@ public class ManageClientApps {
         }
         if (desiredState.getApplications() != null) { // Happens, when config-file doesn't contain client apps
             // Remove configured apps, for Non-Granted-Orgs!
-            removeNonGrantedClientApps(desiredState.getApplications());
+            removeNonGrantedClientApps(desiredState.getApplications(), desiredState.getOrganization());
         }
         // If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
         // But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
@@ -82,12 +83,14 @@ public class ManageClientApps {
     }
 
 
-    public void removeNonGrantedClientApps(List<ClientApplication> apps) {
+    public void removeNonGrantedClientApps(List<ClientApplication> apps, Organization developmentOrganization) {
         if (apps == null) return;
         ListIterator<ClientApplication> it = apps.listIterator();
         ClientApplication app;
         while (it.hasNext()) {
             app = it.next();
+            if(app.getOrganization().getName().equals(developmentOrganization.getName()))
+                continue;
             if (hasClientAppPermission(app)) {
                 LOG.error("Organization of configured application: {} has NO permission to this API. Ignoring this application.", app.getName());
                 it.remove();
@@ -98,7 +101,7 @@ public class ManageClientApps {
     public boolean hasClientAppPermission(ClientApplication app) {
         LOG.info("Checking Application name : {} belong to granted organization : {}", app.getName(), app.getOrganization().getName());
         if (actualState.getClientOrganizations() == null) {
-            LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
+            LOG.debug("No Client-Orgs configured for this API");
             return true;
         }
         return !actualState.getClientOrganizations().contains(app.getOrganization());
