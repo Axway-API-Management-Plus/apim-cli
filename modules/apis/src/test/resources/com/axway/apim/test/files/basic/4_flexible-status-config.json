@@ -1,34 +1,36 @@
-	
 {
-	"name": "${apiName}",
-	"path": "${apiPath}",
-	"state": "${state}",
-	"version": "${version}",
-	"organization": "API Development ${orgNumber}",
-	"inboundProfiles": {
-		"_default": {
-			"securityProfile": "_default",
-			"corsProfile": "_default",
-			"monitorAPI": true,
-			"monitorSubject": "authentication.subject.id"
-		}
-	},
-    "securityProfiles": [
-     	{
-     		"name": "_default",
-     		"isDefault": true,
-     		"devices": [
-     			{
-     				"name": "API Key",
-     				"type": "apiKey",
-     				"order": 0,
-     				"properties": {
-     					"apiKeyFieldName": "KeyId",
-     					"takeFrom": "QUERY",
-     					"removeCredentialsOnSuccess": "false"
-     				}
-     			}
-     		]
-     	}
-     ]
+  "name": "${apiName}",
+  "path": "${apiPath}",
+  "state": "${state}",
+  "version": "${version}",
+  "organization": "API Development ${orgNumber}",
+  "inboundProfiles": {
+    "_default": {
+      "securityProfile": "_default",
+      "corsProfile": "_default",
+      "monitorAPI": true,
+      "monitorSubject": "authentication.subject.id"
+    }
+  },
+  "securityProfiles": [
+    {
+      "name": "_default",
+      "isDefault": true,
+      "devices": [
+        {
+          "name": "API Key",
+          "type": "apiKey",
+          "order": 0,
+          "properties": {
+            "apiKeyFieldName": "KeyId",
+            "takeFrom": "QUERY",
+            "removeCredentialsOnSuccess": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "clientOrganizations": [
+    "${orgName2}"
+  ]
 }
