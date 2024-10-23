@@ -205,7 +205,7 @@ public class APIManagerAPIAdapter {
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
-        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
+        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>() {
         });
         apis.removeIf(filter::filter);
 
@@ -566,11 +566,13 @@ public class APIManagerAPIAdapter {
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
+        String[] serializeAllExcept = getSerializeAllExcept();
         mapper.setSerializationInclusion(Include.NON_NULL);
-        FilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
+        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+            SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier()));
-        mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
         mapper.setFilterProvider(filter);
+        mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
         translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
@@ -590,7 +592,9 @@ public class APIManagerAPIAdapter {
         }
     }
 
-
+    public String[] getSerializeAllExcept() {
+        return new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+    }
 
     public void deleteAPIProxy(API api) throws AppException {
         LOG.debug("Deleting API-Proxy with Name : {} and Id: {}", api.getName(), api.getId());
