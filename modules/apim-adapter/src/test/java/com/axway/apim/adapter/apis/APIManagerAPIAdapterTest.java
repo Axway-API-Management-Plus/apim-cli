@@ -810,10 +810,9 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         System.out.println(baseConfig.getAuthenticationProfiles());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String[] serializeAllExcept = apiManagerAPIAdapter.getSerializeAllExcept();
+
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-            SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
+        FilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
         objectMapper.setFilterProvider(filter);
 
         System.out.println(objectMapper.writeValueAsString(baseConfig));
