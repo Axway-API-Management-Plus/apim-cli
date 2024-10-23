@@ -69,12 +69,6 @@ public class APIManagerAPIAdapter {
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
-    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228", "7.7.20230530", "7.7.20230830", "7.7.20231130", "7.7.20240228", "7.7.20240530");
-
-    /**
-     * Maps the provided status to the REST-API endpoint to change the status!
-     */
-
 
     public APIManagerAPIAdapter() {
         cmd = CoreParameters.getInstance();
@@ -211,7 +205,7 @@ public class APIManagerAPIAdapter {
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
-        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>() {
+        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
         });
         apis.removeIf(filter::filter);
 
@@ -572,12 +566,8 @@ public class APIManagerAPIAdapter {
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
-        String[] serializeAllExcept = getSerializeAllExcept();
         mapper.setSerializationInclusion(Include.NON_NULL);
-        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-            SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier()));
-        mapper.setFilterProvider(filter);
         mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
         translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
         try {
@@ -598,16 +588,7 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public String[] getSerializeAllExcept() throws AppException {
-        String[] serializeAllExcept;
-        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
-            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        } else {
-            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        }
-        return serializeAllExcept;
-    }
+
 
     public void deleteAPIProxy(API api) throws AppException {
         LOG.debug("Deleting API-Proxy with Name : {} and Id: {}", api.getName(), api.getId());
