@@ -63,7 +63,6 @@ public class CreateNewAPI {
             throw e;
         }
         rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
-
         try {
             if(EnvironmentProperties.OVERRIDE_CERTIFICATES){
                 //Ignore certificates downloaded from backend.
@@ -95,6 +94,8 @@ public class CreateNewAPI {
             if (reCreation && actualAPI.getState().equals(API.STATE_PUBLISHED)) {
                 // In case, the existing API is already in use (Published), we have to grant access to our new imported API
                 apiAdapter.upgradeAccessToNewerAPI(createdAPI, actualAPI);
+                // copy the existing client applications, to avoid granting duplicate access to applications
+                createdAPI.setApplications(actualAPI.getApplications());
             }
             if (EnvironmentProperties.CHECK_CATALOG) {
                 apiAdapter.pollCatalogForPublishedState(createdAPI.getId(), createdAPI.getName(), createdAPI.getState());

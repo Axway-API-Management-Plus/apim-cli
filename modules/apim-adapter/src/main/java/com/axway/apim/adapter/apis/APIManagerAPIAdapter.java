@@ -450,8 +450,8 @@ public class APIManagerAPIAdapter {
 
     public void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
-        List<ClientApplication> apps;
-        apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());
+        List<ClientApplication> apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());
+        LOG.debug("Adding  client-applications : {}", apps);
         api.setApplications(apps);
     }
 
