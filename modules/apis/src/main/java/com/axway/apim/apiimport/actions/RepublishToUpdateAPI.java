@@ -57,9 +57,11 @@ public class RepublishToUpdateAPI {
 
     public List<ClientApplication> keepApplicationFromDevelopmentOrg(List<ClientApplication> applications, Organization developmentOrg) {
         List<ClientApplication> applicationsToKeep = new ArrayList<>();
-        for(ClientApplication app : applications) {
-            if(app.getOrganization().getName().equals(developmentOrg.getName())) {
-                applicationsToKeep.add(app);
+        if(applications != null) {
+            for (ClientApplication app : applications) {
+                if (app.getOrganization().getName().equals(developmentOrg.getName())) {
+                    applicationsToKeep.add(app);
+                }
             }
         }
         return applicationsToKeep;
