@@ -205,7 +205,7 @@ public class APIManagerAPIAdapter {
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
-        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>() {
+        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
         });
         apis.removeIf(filter::filter);
 
@@ -226,7 +226,7 @@ public class APIManagerAPIAdapter {
      * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
      *
      * @param api   in which the methods should be translated
-     * @param apiId the methods are loaded based on this API-ID (this might be an another referenced API)
+     * @param apiId the methods are loaded based on this API-ID (this might be a referenced API)
      * @param mode  translation direction
      * @throws AppException when something goes wrong
      */
@@ -297,9 +297,7 @@ public class APIManagerAPIAdapter {
             RemoteHost remoteHost = APIManagerAdapter.getInstance().getRemoteHostsAdapter().getRemoteHost(url.getHost(), url.getPort());
             api.setRemotehost(remoteHost);
         } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("Error setting remote host for API based on backendBasePath: " + backendBasePath, e);
-            }
+            LOG.error("Error setting remote host for API based on backendBasePath: {}", backendBasePath, e);
         }
     }
 
@@ -343,8 +341,8 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private <ProfileType> void translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
-        Map<String, ProfileType> updatedEntries = new HashMap<>();
+    private <T> void translateMethodIds(Map<String, T> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
+        Map<String, T> updatedEntries = new HashMap<>();
         if (profiles != null) {
             Iterator<String> keys = profiles.keySet().iterator();
             while (keys.hasNext()) {
@@ -359,7 +357,7 @@ public class APIManagerAPIAdapter {
                     }
                     if (method != null) break;
                 }
-                ProfileType profileWithType = profiles.get(key);
+                T profileWithType = profiles.get(key);
                 Profile profile = (Profile) profileWithType;
                 if (profile instanceof OutboundProfile) {
                     if (method != null) {

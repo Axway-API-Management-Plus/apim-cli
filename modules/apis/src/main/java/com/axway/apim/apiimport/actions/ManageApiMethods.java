@@ -8,7 +8,6 @@ import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,6 @@ public class ManageApiMethods {
             if (!desiredApiMethods.isEmpty()) {
                 APIManagerAPIMethodAdapter apiManagerAPIMethodAdapter = apiManager.getMethodAdapter();
                 List<APIMethod> apiMethods = apiManagerAPIMethodAdapter.getAllMethodsForAPI(frontendApiId);
-                List<String> updatedMethodNames = new ArrayList<>();
                 for (APIMethod apiMethod : desiredApiMethods) {
                     for (APIMethod method : apiMethods) {
                         String operationName = method.getName();
@@ -37,7 +35,6 @@ public class ManageApiMethods {
                             apiMethod.setVirtualizedApiId(method.getVirtualizedApiId());
                             apiMethod.setApiMethodId(method.getApiMethodId());
                             apiManagerAPIMethodAdapter.updateApiMethod(apiMethod);
-                            updatedMethodNames.add(operationName);
                             break;
                         }
                     }

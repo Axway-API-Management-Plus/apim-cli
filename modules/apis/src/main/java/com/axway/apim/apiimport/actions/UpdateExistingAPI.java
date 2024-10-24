@@ -43,7 +43,7 @@ public class UpdateExistingAPI {
             // If a proxy update is required
             if (changes.isProxyUpdateRequired()) {
                 // Handle vhost
-                if(desiredAPI.getVhost() == null || desiredAPI.getVhost().isEmpty()){
+                if (desiredAPI.getVhost() == null || desiredAPI.getVhost().isEmpty()) {
                     actualAPI.setVhost(null);
                 }
                 // Update the proxy
@@ -81,14 +81,7 @@ public class UpdateExistingAPI {
             new ManageClientOrganization(desiredAPI, actualAPI).execute(false);
             // Handle subscription to applications
             new ManageClientApps(desiredAPI, actualAPI, null).execute(false);
-            if (actualAPI.getState().equals(API.STATE_DELETED)) {
-                LOG.info("Successfully deleted API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
-            } else {
-                LOG.info("Successfully updated {} API: {} {} (ID: {})", actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
-            }
-            if (!changes.waiting4Approval().isEmpty() && LOG.isInfoEnabled()) {
-                LOG.info("{}", changes.waiting4Approval());
-            }
+            logStatus(actualAPI, changes);
         } catch (Exception e) {
             LOG.error("Error updating existing API", e);
             throw new AppException("Error updating existing API", ErrorCode.BREAKING_CHANGE_DETECTED);
@@ -97,4 +90,14 @@ public class UpdateExistingAPI {
         }
     }
 
+    private void logStatus(API actualAPI, APIChangeState changes) throws AppException {
+        if (actualAPI.getState().equals(API.STATE_DELETED)) {
+            LOG.info("Successfully deleted API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
+        } else {
+            LOG.info("Successfully updated {} API: {} {} (ID: {})", actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
+        }
+        if (!changes.waiting4Approval().isEmpty() && LOG.isInfoEnabled()) {
+            LOG.info("{}", changes.waiting4Approval());
+        }
+    }
 }
