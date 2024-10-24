@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
+import com.axway.apim.OptionsCommon;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
@@ -45,21 +46,7 @@ public class CLIAPIUpgradeAccessOptions extends CLIOptions {
         option.setRequired(false);
         option.setArgName("*Org A*");
         addOption(option);
-
-        option = new Option("refAPIDeprecate", true, "If set the old/reference API will be flagged as deprecated. Defaults to false.");
-        option.setRequired(false);
-        option.setArgName("true");
-        addOption(option);
-
-        option = new Option("refAPIRetire", true, "If set the old/reference API will be retired. Default to false.");
-        option.setRequired(false);
-        option.setArgName("true");
-        addOption(option);
-
-        option = new Option("refAPIRetireDate", true, "Sets the retirement date of the old API. Supported formats: \"dd.MM.yyyy\", \"dd/MM/yyyy\", \"yyyy-MM-dd\", \"dd-MM-yyyy\"");
-        option.setRequired(false);
-        option.setArgName("2021/06/30");
-        addOption(option);
+        new OptionsCommon().addDeprecateAndRetired(this);
     }
 
     @Override
