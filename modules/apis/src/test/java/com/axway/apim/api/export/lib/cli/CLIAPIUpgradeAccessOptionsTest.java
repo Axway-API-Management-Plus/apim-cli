@@ -29,16 +29,16 @@ public class CLIAPIUpgradeAccessOptionsTest {
         Assert.assertEquals(params.getReferenceAPIName(), "myRefOldAPI");
         Assert.assertEquals(params.getReferenceAPIVersion(), "1.2.3");
         Assert.assertEquals(params.getReferenceAPIOrganization(), "RefOrg");
-        Assert.assertTrue(params.getReferenceAPIRetire());
-        Assert.assertTrue(params.getReferenceAPIDeprecate());
+        Assert.assertTrue(params.isReferenceAPIRetire());
+        Assert.assertTrue(params.isReferenceAPIDeprecate());
         Assert.assertEquals(Long.parseLong("1830211200000"), (long) params.getReferenceAPIRetirementDate());
 
         // Make sure, the default handling works for deprecate / and retire
         String[] args2 = {"-s", "prod", "-a", "/api/v1/to/be/upgraded"};
         cliOptions = CLIAPIUpgradeAccessOptions.create(args2);
         params = (APIUpgradeAccessParams)cliOptions.getParams();
-        Assert.assertFalse(params.getReferenceAPIRetire());
-        Assert.assertFalse(params.getReferenceAPIDeprecate());
+        Assert.assertFalse(params.isReferenceAPIRetire());
+        Assert.assertFalse(params.isReferenceAPIDeprecate());
     }
 
     @Test

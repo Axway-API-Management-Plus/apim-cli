@@ -298,7 +298,7 @@ public class Utils {
         }
     }
 
-    public static Long getParsedDate(String date) throws AppException {
+    public static long getParsedDate(String date) throws AppException {
         List<String> dateFormats = Arrays.asList("dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy");
         SimpleDateFormat format;
         Date retDate = null;

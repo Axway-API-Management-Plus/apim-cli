@@ -33,6 +33,7 @@ public class APIChangeState {
     private static final Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
     private API actualAPI;
     private API desiredAPI;
+    private APIImportParams apiImportParams;
     private boolean isBreaking = false;
     private boolean updateExistingAPI = true;
     private boolean recreateAPI = false;
@@ -53,6 +54,14 @@ public class APIChangeState {
         this.desiredAPI = desiredAPI;
         getChanges();
     }
+
+    public APIChangeState(API actualAPI, API desiredAPI, APIImportParams apiImportParams) throws AppException {
+        this.actualAPI = actualAPI;
+        this.desiredAPI = desiredAPI;
+        this.apiImportParams = apiImportParams;
+        getChanges();
+    }
+
 
     /**
      * This method is reading all @APIDefinition annotations to verify which API-Property will
@@ -280,6 +289,10 @@ public class APIChangeState {
             }
         }
         return false;
+    }
+
+    public APIImportParams getApiImportParams() {
+        return apiImportParams;
     }
 
 

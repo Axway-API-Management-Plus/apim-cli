@@ -95,6 +95,21 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option = new Option("zeroDowntimeUpdate", true,"Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
 		addOption(option);
+
+        option = new Option("refAPIDeprecate", true, "If set the old/reference API will be flagged as deprecated. Defaults to false.");
+        option.setRequired(false);
+        option.setArgName("true");
+        addOption(option);
+
+        option = new Option("refAPIRetire", true, "If set the old/reference API will be retired. Default to false.");
+        option.setRequired(false);
+        option.setArgName("true");
+        addOption(option);
+
+        option = new Option("refAPIRetireDate", true, "Sets the retirement date of the old API. Supported formats: \"dd.MM.yyyy\", \"dd/MM/yyyy\", \"yyyy-MM-dd\", \"dd-MM-yyyy\"");
+        option.setRequired(false);
+        option.setArgName("2021/06/30");
+        addOption(option);
 	}
 
 	@Override
@@ -137,6 +152,9 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
+        params.setReferenceAPIDeprecate(Boolean.parseBoolean(getValue("refAPIDeprecate")));
+        params.setReferenceAPIRetire(Boolean.parseBoolean(getValue("refAPIRetire")));
+        params.setReferenceAPIRetirementDate(getValue("refAPIRetireDate"));
         return params;
 	}
 }

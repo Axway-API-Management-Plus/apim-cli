@@ -14,9 +14,9 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
     private String referenceAPIVersion;
     private String referenceAPIOrganization;
 
-    private Boolean referenceAPIDeprecate = false;
-    private Boolean referenceAPIRetire = false;
-    private Long referenceAPIRetirementDate;
+    private boolean referenceAPIDeprecate;
+    private boolean referenceAPIRetire;
+    private long referenceAPIRetirementDate;
 
     private API referenceAPI;
 
@@ -28,23 +28,23 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
         this.referenceAPI = referenceAPI;
     }
 
-    public Boolean getReferenceAPIDeprecate() {
+    public boolean isReferenceAPIDeprecate() {
         return referenceAPIDeprecate;
     }
 
-    public void setReferenceAPIDeprecate(Boolean referenceAPIDeprecate) {
+    public void setReferenceAPIDeprecate(boolean referenceAPIDeprecate) {
         this.referenceAPIDeprecate = referenceAPIDeprecate;
     }
 
-    public Boolean getReferenceAPIRetire() {
+    public boolean isReferenceAPIRetire() {
         return referenceAPIRetire;
     }
 
-    public void setReferenceAPIRetire(Boolean referenceAPIRetire) {
+    public void setReferenceAPIRetire(boolean referenceAPIRetire) {
         this.referenceAPIRetire = referenceAPIRetire;
     }
 
-    public Long getReferenceAPIRetirementDate() {
+    public long getReferenceAPIRetirementDate() {
         return referenceAPIRetirementDate;
     }
 
@@ -99,7 +99,7 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
     @Override
     public void validateRequiredParameters() throws AppException {
         super.validateRequiredParameters();
-        if (getReferenceAPIRetire() != null && getReferenceAPIRetirementDate() == null) {
+        if (isReferenceAPIRetire() && getReferenceAPIRetirementDate() == 0) {
             throw new AppException("If API should be retired, a retirement date is required.", ErrorCode.MISSING_PARAMETER);
         }
     }

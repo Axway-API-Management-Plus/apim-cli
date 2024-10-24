@@ -490,13 +490,13 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void upgradeAccessToNewerAPI() throws AppException {
+    public void upgradeAccessToNewerAPIWrapper() throws AppException {
         APIFilter filter = new APIFilter.Builder()
             .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
             .build();
         API api = apiManagerAPIAdapter.getAPI(filter, true);
         api.setApplications(new ArrayList<>());
-        apiManagerAPIAdapter.upgradeAccessToNewerAPI(api, api);
+        apiManagerAPIAdapter.upgradeAccessToNewerAPIWrapper(api, api, false, false, 0);
     }
 
     @Test

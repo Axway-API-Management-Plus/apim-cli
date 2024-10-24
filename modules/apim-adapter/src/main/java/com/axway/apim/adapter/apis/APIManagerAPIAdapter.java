@@ -882,9 +882,9 @@ public class APIManagerAPIAdapter {
         return createBackend(entity, api);
     }
 
-    public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
+    public void upgradeAccessToNewerAPIWrapper(API apiToUpgradeAccess, API referenceAPI, boolean deprecateRefApi, boolean retireRefApi, long retirementDateRefApi) throws AppException {
         APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
-        upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, null, null, null);
+        upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, deprecateRefApi, retireRefApi, retirementDateRefApi);
         boolean updateAppQuota = false;
         if (!referenceAPI.getApplications().isEmpty()) {
             LOG.debug("Found: {} subscribed applications for this API. Taking over potentially configured quota configuration.", referenceAPI.getApplications().size());
@@ -944,18 +944,18 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public List<NameValuePair> addParam(API apiToUpgradeAccess, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) {
+    public List<NameValuePair> addParam(API apiToUpgradeAccess, boolean deprecateRefApi, boolean retireRefApi, long retirementDateRefAPI) {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
-        if (deprecateRefApi != null) params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
-        if (retireRefApi != null) params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
-        if (retirementDateRefAPI != null)
+        if (deprecateRefApi) params.add(new BasicNameValuePair("deprecate", "true"));
+        if (retireRefApi) params.add(new BasicNameValuePair("retire", "true"));
+        if (retirementDateRefAPI != 0)
             params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
         return params;
 
     }
 
-    public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
+    public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, boolean deprecateRefApi, boolean retireRefApi, long retirementDateRefAPI) throws AppException {
         if (apiToUpgradeAccess.getState().equals(API.STATE_UNPUBLISHED)) {
             LOG.info("API to upgrade access has state unpublished.");
             return false;

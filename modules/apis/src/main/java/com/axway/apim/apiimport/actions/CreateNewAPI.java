@@ -4,8 +4,10 @@ import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.DesiredAPI;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +36,8 @@ public class CreateNewAPI {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
 
-    private API createdAPI = null;
-
-    public void execute(APIChangeState changes, boolean reCreation) throws AppException {
-
+    public String execute(APIChangeState changes, boolean reCreation) throws AppException {
+        API createdAPI;
         API desiredAPI = changes.getDesiredAPI();
         API actualAPI = changes.getActualAPI();
         APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
@@ -64,7 +64,7 @@ public class CreateNewAPI {
         }
         rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
         try {
-            if(EnvironmentProperties.OVERRIDE_CERTIFICATES){
+            if (EnvironmentProperties.OVERRIDE_CERTIFICATES) {
                 //Ignore certificates downloaded from backend.
                 createdAPI.setCaCerts(new ArrayList<>());
             }
@@ -92,10 +92,7 @@ public class CreateNewAPI {
             apiAdapter.updateRetirementDate(createdAPI, desiredAPI.getRetirementDate());
 
             if (reCreation && actualAPI.getState().equals(API.STATE_PUBLISHED)) {
-                // In case, the existing API is already in use (Published), we have to grant access to our new imported API
-                apiAdapter.upgradeAccessToNewerAPI(createdAPI, actualAPI);
-                // copy the existing client applications, to avoid granting duplicate access to applications
-                createdAPI.setApplications(actualAPI.getApplications());
+                upgradeAccess(apiAdapter, changes, actualAPI, createdAPI);
             }
             if (EnvironmentProperties.CHECK_CATALOG) {
                 apiAdapter.pollCatalogForPublishedState(createdAPI.getId(), createdAPI.getName(), createdAPI.getState());
@@ -112,6 +109,7 @@ public class CreateNewAPI {
             if (!changes.waiting4Approval().isEmpty() && LOG.isInfoEnabled()) {
                 LOG.info("{}", changes.waiting4Approval());
             }
+            return createdAPI.getId();
         } finally {
             if (createdAPI == null) {
                 LOG.warn("Can't create PropertiesExport as createdAPI is null");
@@ -121,7 +119,22 @@ public class CreateNewAPI {
         }
     }
 
-    public API getCreatedAPI() {
-        return createdAPI;
+
+    public void upgradeAccess(APIManagerAPIAdapter apiAdapter, APIChangeState changes, API actualAPI, API createdAPI) throws AppException {
+        // In case, the existing API is already in use (Published), we have to grant access to our new imported API
+        APIImportParams apiImportParams = changes.getApiImportParams();
+        boolean referenceAPIRetire = false;
+        long retirementDate = 0;
+        boolean referenceAPIDeprecate = false;
+        if (apiImportParams != null) {
+            referenceAPIDeprecate = apiImportParams.isReferenceAPIDeprecate();
+            referenceAPIRetire = apiImportParams.isReferenceAPIRetire();
+            if (referenceAPIRetire) {
+                retirementDate = Utils.getParsedDate(apiImportParams.getReferenceAPIRetirementDate());
+            }
+        }
+        apiAdapter.upgradeAccessToNewerAPIWrapper(createdAPI, actualAPI, referenceAPIDeprecate, referenceAPIRetire, retirementDate);
+        // copy the existing client applications, to avoid granting duplicate access to applications
+        createdAPI.setApplications(actualAPI.getApplications());
     }
 }
