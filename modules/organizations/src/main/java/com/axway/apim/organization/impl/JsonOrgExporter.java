@@ -1,7 +1,6 @@
 package com.axway.apim.organization.impl;
 
 import com.axway.apim.adapter.apis.OrgFilter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
@@ -37,14 +36,12 @@ public class JsonOrgExporter extends OrgResultHandler {
     @Override
     public void export(List<Organization> orgs) throws AppException {
         for (Organization org : orgs) {
-            saveOrganizationLocally(new ExportOrganization(org), this);
+            saveOrganizationLocally(new ObjectMapper(), new ExportOrganization(org), "/org-config.json");
         }
     }
 
-    public void saveOrganizationLocally(ExportOrganization org, OrgResultHandler orgResultHandler) throws AppException {
+    public void saveOrganizationLocally(ObjectMapper mapper, ExportOrganization org, String configFile) throws AppException {
         File localFolder = null;
-        ObjectMapper mapper;
-        String configFile;
         if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             String folderName = getExportFolder(org);
             String targetFolder = params.getTarget();
@@ -62,13 +59,6 @@ public class JsonOrgExporter extends OrgResultHandler {
             if (!localFolder.mkdirs()) {
                 throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
             }
-        }
-        if (orgResultHandler instanceof YamlOrgExporter) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            configFile = "/org-config.yaml";
-        } else {
-            mapper = new ObjectMapper();
-            configFile = "/org-config.json";
         }
         mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
         FilterProvider filters = new SimpleFilterProvider()

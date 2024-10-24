@@ -12,28 +12,13 @@ import com.axway.apim.setup.model.APIManagerConfig;
 import java.lang.reflect.Constructor;
 
 public abstract class APIManagerSetupResultHandler {
-	public enum ResultHandler {
-		JSON_EXPORTER(JsonAPIManagerSetupExporter.class),
-		YAML_EXPORTER(YamlAPIManagerSetupExporter.class),
-		CONSOLE_EXPORTER(ConsoleAPIManagerSetupExporter.class);
-		
-		private final Class<APIManagerSetupResultHandler> implClass;
-		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		ResultHandler(Class clazz) {
-			this.implClass = clazz;
-		}
 
-		public Class<APIManagerSetupResultHandler> getClazz() {
-			return implClass;
-		}
-	}
-	
+
 	APIManagerSetupExportParams params;
 	ExportResult result;
-	
+
 	boolean hasError = false;
-	
+
 	public static APIManagerSetupResultHandler create(ResultHandler exportImpl, APIManagerSetupExportParams params, Result result) throws AppException {
 		try {
 			Object[] intArgs = new Object[] { params, result };
@@ -49,18 +34,18 @@ public abstract class APIManagerSetupResultHandler {
 		this.params = params;
 		this.result = result;
 	}
-	
+
 	public abstract void export(APIManagerConfig config) throws AppException;
-	
+
 	public boolean hasError() {
 		return this.hasError;
 	}
-	
+
 	protected Builder getRemoteHostBaseFilterBuilder() {
 		return new Builder()
 				.hasName(params.getRemoteHostName())
 				.hasId(params.getRemoteHostId());
 	}
-	
+
 	public abstract RemoteHostFilter getRemoteHostFilter() throws AppException;
 }
