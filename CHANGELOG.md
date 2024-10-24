@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-# [1.14.7]  In progress
+# [1.14.7]  2024-10-24
 ## Fixed
 - NullPointerException: Cannot invoke "com.axway.apim.api.model.APIMethod.getName()  (See issue [#512](https://github.com/Axway-API-Management-Plus/apim-cli/issues/512))
 - Enable caching for API Import action (See issue [#500](https://github.com/Axway-API-Management-Plus/apim-cli/issues/500))
