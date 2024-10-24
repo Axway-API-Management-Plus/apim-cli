@@ -30,7 +30,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
         exporter.export(apiManagerConfig);
@@ -42,7 +42,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setAlerts(apimanagerAdapter.getAlertsAdapter().getAlerts());
         exporter.export(apiManagerConfig);
@@ -54,7 +54,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setRemoteHosts(apimanagerAdapter.getRemoteHostsAdapter().getRemoteHosts(new RemoteHostFilter.Builder().build()));
         exporter.export(apiManagerConfig);
@@ -66,7 +66,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setRemoteHosts(apimanagerAdapter.getRemoteHostsAdapter().getRemoteHosts(new RemoteHostFilter.Builder().build()));
         exporter.export(apiManagerConfig);
@@ -78,7 +78,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setRemoteHosts(apimanagerAdapter.getRemoteHostsAdapter().getRemoteHosts(new RemoteHostFilter.Builder().build()));
         exporter.export(apiManagerConfig);
@@ -90,7 +90,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         String[] args = {"-h", "localhost", "-c", "manager-config.json", "-type", "policies"};
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         exporter.export(apiManagerConfig);
     }
@@ -100,7 +100,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         String[] args = {"-h", "localhost", "-c", "manager-config.json", "-type", "globalquotas"};
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         exporter.export(apiManagerConfig);
     }

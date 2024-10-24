@@ -16,7 +16,6 @@ public class OrganizationImportManager {
     private final APIManagerOrganizationAdapter orgAdapter;
 
     public OrganizationImportManager() throws AppException {
-        super();
         this.orgAdapter = APIManagerAdapter.getInstance().getOrgAdapter();
     }
 

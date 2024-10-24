@@ -212,10 +212,18 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
 
     @Test
     public void getApiAccess() throws AppException {
-        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = apiManagerAPIAccessAdapter.getApiAccess("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = apiManagerAPIAccessAdapter.getSubscribedOrganizationsAndApplications("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
         Assert.assertNotNull(apiOrganizationSubscriptions);
         Assert.assertEquals(4, apiOrganizationSubscriptions.size());
     }
 
+    @Test
+    public void createAPIAccessForApplication() throws AppException {
+        String applicationId = "40dd53a4-0b13-4485-82e8-63c687404c2f";
+        APIAccess apiAccess = new APIAccess();
+        apiAccess.setApiId("40dd53a4-0b13-4485-82e8-63c687404c2g");
+        APIAccess response = apiManagerAPIAccessAdapter.createAPIAccessForApplication(apiAccess, applicationId);
+        Assert.assertNotNull(response);
+    }
 
 }

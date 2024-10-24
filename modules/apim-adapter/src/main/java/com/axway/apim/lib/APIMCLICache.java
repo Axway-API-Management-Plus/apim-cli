@@ -17,7 +17,6 @@ public class APIMCLICache<K, V> implements Cache<K, V> {
 	private final String prefix;
 
 	public APIMCLICache(Cache<K, V> cache, String prefix) {
-		super();
 		this.cache = cache;
 		this.prefix = prefix;
 	}

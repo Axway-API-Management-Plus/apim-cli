@@ -105,8 +105,7 @@ public class APIManagerPoliciesAdapter {
             readPoliciesFromAPIManager(type);
         }
         try {
-            List<Policy> policies = APIManagerAdapter.mapper.readValue(apiManagerResponse.get(type), new TypeReference<List<Policy>>() {
-            });
+            List<Policy> policies = APIManagerAdapter.mapper.readValue(apiManagerResponse.get(type), new TypeReference<>() {});
             for (Policy policy : policies) {
                 policy.setType(type);
             }

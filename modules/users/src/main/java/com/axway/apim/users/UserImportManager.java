@@ -16,7 +16,6 @@ public class UserImportManager {
     private final APIManagerUserAdapter userAdapter;
 
     public UserImportManager() throws AppException {
-        super();
         this.userAdapter = APIManagerAdapter.getInstance().getUserAdapter();
     }
 

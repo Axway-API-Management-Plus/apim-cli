@@ -26,7 +26,7 @@ public enum ErrorCode {
     CANT_UPDATE_QUOTA_CONFIG(47, "Can't update Quota-Configuration."),
     CANT_UPDATE_API_STATUS(50, "Can't update the API-Status."),
     UNKNOWN_USER(51, "Unknown user given."),
-    ERROR_CHANGEPASSWORD(52, "Error changing password of user."),
+    ERROR_CHANGE_PASSWORD(52, "Error changing password of user."),
     QUERY_STRING_ROUTING_DISABLED(53, "Query-String routing option in API-Manager is not enabled", false),
     API_CONFIG_REQUIRES_QUERY_STRING(54, "The given API-Config needs a query string, as API-Manager has it enabled."),
     CANT_UPGRADE_API_ACCESS(55, "Can't upgrade API-Access."),
@@ -74,18 +74,18 @@ public enum ErrorCode {
 
     private final int code;
     private final String description;
-    private final Boolean printStackTrace;
+    private final boolean printStackTrace;
     private final LogLevel logLevel;
 
     ErrorCode(int code, String description) {
         this(code, description, false, LogLevel.ERROR);
     }
 
-    ErrorCode(int code, String description, Boolean printStackTrace) {
+    ErrorCode(int code, String description, boolean printStackTrace) {
         this(code, description, printStackTrace, LogLevel.ERROR);
     }
 
-    ErrorCode(int code, String description, Boolean printStackTrace, LogLevel logLevel) {
+    ErrorCode(int code, String description, boolean printStackTrace, LogLevel logLevel) {
         this.code = code;
         this.description = description;
         this.printStackTrace = printStackTrace;
@@ -100,7 +100,7 @@ public enum ErrorCode {
         return description;
     }
 
-    public Boolean getPrintStackTrace() {
+    public boolean getPrintStackTrace() {
         return printStackTrace;
     }
 

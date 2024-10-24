@@ -74,4 +74,14 @@ public class EnvironmentPropertiesTest {
         Assert.assertEquals("http://${env.HOSTNAME}:${env.PORT.TRAFFIC}", EnvironmentProperties.resolveValueWithEnvVars("http://${env.HOSTNAME}:${env.PORT.TRAFFIC}"));
         Assert.assertNotNull(EnvironmentProperties.resolveValueWithEnvVars("${PATH}"));
     }
+
+    @Test
+    public void testCustomHeader() {
+        String cliHome = System.getenv("AXWAY_APIM_CLI_HOME");
+        if(cliHome != null) {
+            EnvironmentProperties properties = new EnvironmentProperties("anyOtherStage");
+            Assert.assertEquals(properties.get("headers"), "cf-token:xyz123");
+        }
+    }
+
 }

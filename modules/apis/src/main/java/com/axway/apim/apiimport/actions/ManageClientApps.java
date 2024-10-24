@@ -1,16 +1,8 @@
 package com.axway.apim.apiimport.actions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
@@ -18,6 +10,12 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 public class ManageClientApps {
 
@@ -49,24 +47,25 @@ public class ManageClientApps {
             LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
             return;
         }
-        if (desiredState.getApplications() != null) { // Happens, when config-file doesn't contains client apps
+        if (desiredState.getApplications() != null) { // Happens, when config-file doesn't contain client apps
             // Remove configured apps, for Non-Granted-Orgs!
-            removeNonGrantedClientApps(desiredState.getApplications());
+            removeNonGrantedClientApps(desiredState.getApplications(), desiredState.getOrganization());
         }
-        List<ClientApplication> recreateActualApps;
         // If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
         // But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
         if (reCreation && actualState.getState().equals(API.STATE_UNPUBLISHED) && CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.add)) {
-            removeNonGrantedClientApps(oldAPI.getApplications());
-            recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
+            LOG.debug("Copying applications from old api id : {} to new api id: {}", oldAPI.getId(), actualState.getId());
             // Create previously existing App-Subscriptions
-            createAppSubscription(recreateActualApps, actualState.getId());
+            createAppSubscription(oldAPI.getApplications(), actualState.getId());
             // Update the In-Memory actual state for further processing
-            actualState.setApplications(recreateActualApps);
+            actualState.setApplications(oldAPI.getApplications());
         }
+        LOG.debug("Desired applications: {}", desiredState.getApplications());
+        LOG.debug("Actual applications: {}", actualState.getApplications());
         List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
         List<ClientApplication> removingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
-
+        LOG.debug("Missing Apps to be provisioned: {}", missingDesiredApps);
+        LOG.debug("Removing Apps from API access: {}", removingActualApps);
         if (missingDesiredApps.isEmpty() && desiredState.getApplications() != null) {
             LOG.info("All desired applications: {} have already a subscription. Nothing to do.", desiredState.getApplications());
         } else {
@@ -75,19 +74,23 @@ public class ManageClientApps {
         if (!removingActualApps.isEmpty()) {
             if (CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.replace)) {
                 LOG.info("Removing access for applications: {} from API: {} ", removingActualApps, actualState.getName());
-                removeAppSubscription(removingActualApps);
+                removeAppSubscription(removingActualApps, actualState);
             } else {
                 LOG.info("NOT removing access for applications: {} from API: {} as clientAppsMode NOT set to replace.", removingActualApps, actualState.getName());
             }
         }
+
     }
 
-    private void removeNonGrantedClientApps(List<ClientApplication> apps) throws AppException {
+
+    public void removeNonGrantedClientApps(List<ClientApplication> apps, Organization developmentOrganization) {
         if (apps == null) return;
         ListIterator<ClientApplication> it = apps.listIterator();
         ClientApplication app;
         while (it.hasNext()) {
             app = it.next();
+            if(app.getOrganization().getName().equals(developmentOrganization.getName()))
+                continue;
             if (hasClientAppPermission(app)) {
                 LOG.error("Organization of configured application: {} has NO permission to this API. Ignoring this application.", app.getName());
                 it.remove();
@@ -95,46 +98,39 @@ public class ManageClientApps {
         }
     }
 
-    private boolean hasClientAppPermission(ClientApplication app) throws AppException {
-        LOG.info("Application name : {}", app.getName());
-        LOG.info("Organization  : {}", app.getOrganization());
-
-        String appsOrgId = app.getOrganization().getId();
-        Organization appsOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
-        if (appsOrgs == null) return true;
-        // If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
-        if (app.getOrganization().equals((actualState).getOrganization())) return false;
+    public boolean hasClientAppPermission(ClientApplication app) {
+        LOG.info("Checking Application name : {} belong to granted organization : {}", app.getName(), app.getOrganization().getName());
         if (actualState.getClientOrganizations() == null) {
-            LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
+            LOG.debug("No Client-Orgs configured for this API");
             return true;
         }
-        return !actualState.getClientOrganizations().contains(appsOrgs);
+        return !actualState.getClientOrganizations().contains(app.getOrganization());
     }
 
     private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
         if (missingDesiredApps.isEmpty()) return;
         LOG.info("Creating API-Access for the following apps: {}", missingDesiredApps);
         for (ClientApplication app : missingDesiredApps) {
-            try {
-                LOG.info("Creating API-Access for application {}", app.getName());
-                APIAccess apiAccess = new APIAccess();
-                apiAccess.setApiId(apiId);
-                accessAdapter.createAPIAccess(apiAccess, app, Type.applications);
-            } catch (AppException e) {
-                throw new AppException("Failure creating API-Access for application: '" + app.getName() + "'. " + e.getMessage(),
-                        ErrorCode.API_MANAGER_COMMUNICATION, e);
-            }
+            LOG.info("Creating API-Access for application {}", app.getName());
+            APIAccess apiAccess = new APIAccess();
+            apiAccess.setApiId(apiId);
+            APIAccess response = accessAdapter.createAPIAccessForApplication(apiAccess, app.getId());
+            LOG.info("Created API ({}) Access for application {} ", response.getApiId(), app.getName());
         }
     }
 
-    private void removeAppSubscription(List<ClientApplication> removingActualApps) throws AppException {
+    private void removeAppSubscription(List<ClientApplication> removingActualApps, API actualApi) throws AppException {
         for (ClientApplication app : removingActualApps) {
             // A Client-App that doesn't belong to a granted organization, can't have a subscription.
             if (hasClientAppPermission(app)) continue;
             LOG.debug("Removing API-Access for application {}", app.getName());
+            List<APIAccess> apiAccesses = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(app, APIManagerAPIAccessAdapter.Type.applications);
+            LOG.debug("App API Access : {}", app.getApiAccess());
             try {
-                for (APIAccess apiAccess : app.getApiAccess()) {
-                    accessAdapter.deleteAPIAccess(apiAccess, app, Type.applications);
+                for (APIAccess apiAccess : apiAccesses) {
+                    if (apiAccess.getApiId().equals(actualApi.getId())) {
+                        accessAdapter.deleteAPIAccess(apiAccess, app, Type.applications);
+                    }
                 }
             } catch (Exception e) {
                 LOG.error("Can't delete API access requests for application.");
@@ -142,16 +138,30 @@ public class ManageClientApps {
             }
         }
     }
-    private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) {
+
+    public List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) {
         List<ClientApplication> missingApps = new ArrayList<>();
         if (otherApps == null) otherApps = new ArrayList<>();
         if (apps == null) apps = new ArrayList<>();
         for (ClientApplication app : apps) {
-            if (otherApps.contains(app)) {
+            if (containsAppName(otherApps, app)) {
                 continue;
             }
             missingApps.add(app);
         }
         return missingApps;
+    }
+
+
+    public boolean containsAppName(List<ClientApplication> source, ClientApplication clientApplication) {
+        for (ClientApplication app : source) {
+            if (app.getName().equals(clientApplication.getName())) {
+                if (app.getOrganization() != null && clientApplication.getOrganization() != null) {
+                    return app.getOrganization().getName().equals(clientApplication.getOrganization().getName());
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }

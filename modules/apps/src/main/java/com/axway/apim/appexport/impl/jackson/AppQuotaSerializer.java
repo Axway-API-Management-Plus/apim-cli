@@ -30,7 +30,7 @@ public class AppQuotaSerializer extends StdSerializer<APIQuota> {
 		quota.setId(null);
 		quota.setType(null);
 		quota.setDescription(null);
-		quota.setSystem(null);
+		quota.setSystem(false);
 		quota.setName(null);
 		defaultSerializer.serialize(quota, jgen, provider);
 	}

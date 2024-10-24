@@ -2,7 +2,6 @@ package com.axway.apim.appexport.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
-import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionSerializer;
 import com.axway.apim.api.model.Image;
@@ -44,13 +43,11 @@ public class JsonApplicationExporter extends ApplicationExporter {
     @Override
     public void export(List<ClientApplication> apps) throws AppException {
         for (ClientApplication app : apps) {
-            saveApplicationLocally(new ExportApplication(app), this);
+            saveApplicationLocally(new ObjectMapper(), new ExportApplication(app), "/application-config.json");
         }
     }
 
-    public void saveApplicationLocally(ExportApplication app, ApplicationExporter applicationExporter) throws AppException {
-        ObjectMapper mapper;
-        String configFile;
+    public void saveApplicationLocally(ObjectMapper mapper, ExportApplication app, String configFile) throws AppException {
         File localFolder = null;
         if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             String folderName = getExportFolder(app);
@@ -69,14 +66,6 @@ public class JsonApplicationExporter extends ApplicationExporter {
             if (!localFolder.mkdirs()) {
                 throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
             }
-        }
-
-        if (applicationExporter instanceof YamlApplicationExporter) {
-            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-            configFile = "/application-config.yaml";
-        } else {
-            mapper = new ObjectMapper();
-            configFile = "/application-config.json";
         }
         mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
         mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
@@ -117,6 +106,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
             throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
+
     private String getExportFolder(ExportApplication app) {
         return Utils.replaceSpecialChars(app.getName());
     }

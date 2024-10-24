@@ -226,6 +226,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
     /**
      * This avoids, that custom properties are wrapped within customProperties { ... }
      * See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+     *
      * @return custom properties map
      */
     @JsonAnyGetter
@@ -273,6 +274,12 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 
     @Override
     public String toString() {
-        return "[" + getName() + " (" + getId() + ")]";
+        return "ClientApplication{" +
+            "name=" + getName() +
+            ", id=" + getId() +
+            ", enabled=" + enabled +
+            ", state=" + state +
+            ", organization=" + organization +
+            '}';
     }
 }

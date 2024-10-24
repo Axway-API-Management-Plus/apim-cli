@@ -30,7 +30,7 @@ public class APIQuotaSerializer extends StdSerializer<APIQuota> {
         apiQuota.setDescription(null);
         apiQuota.setId(null);
         apiQuota.setName(null);
-        apiQuota.setSystem(null);
+        apiQuota.setSystem(false);
         apiQuota.setType(null);
         for (QuotaRestriction restriction : apiQuota.getRestrictions()) {
             restriction.setApiId(null);

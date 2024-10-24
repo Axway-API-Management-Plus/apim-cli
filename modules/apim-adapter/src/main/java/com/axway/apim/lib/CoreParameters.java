@@ -73,6 +73,7 @@ public class CoreParameters implements Parameters {
     private int timeout;
     private boolean disableCompression;
     private boolean overrideSpecBasePath;
+    private String customHeaders;
 
     public CoreParameters() {
         instance = this;
@@ -454,6 +455,14 @@ public class CoreParameters implements Parameters {
 
     public void setOverrideSpecBasePath(boolean overrideSpecBasePath) {
         this.overrideSpecBasePath = overrideSpecBasePath;
+    }
+
+    public String getCustomHeaders() {
+        return customHeaders;
+    }
+
+    public void setCustomHeaders(String customHeaders) {
+        this.customHeaders = customHeaders;
     }
 
     @Override

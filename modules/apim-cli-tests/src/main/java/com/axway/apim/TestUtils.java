@@ -65,7 +65,7 @@ public class TestUtils {
         if (!sourceDir.exists()) {
             throw new ValidationException("Unable to copy test assets to test directory: '" + testDir + "'. Could not find sourceDir: '" + sourceDir + "'");
         }
-        FileFilter filter = new WildcardFileFilter("*.crt", "*.jpg", "*.png", "*.pem");
+        FileFilter filter =  WildcardFileFilter.builder().setWildcards("*.crt", "*.jpg", "*.png", "*.pem").get();
         try {
             LOG.info("Copy *.crt, *.jpg, *.png, *.pem from source: {} into test-dir: {}", sourceDir, testDir);
             FileUtils.copyDirectory(sourceDir, testDir, filter, true);

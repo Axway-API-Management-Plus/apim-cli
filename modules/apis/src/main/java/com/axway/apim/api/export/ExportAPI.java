@@ -253,22 +253,13 @@ public class ExportAPI {
     }
 
 
-    public APIQuota getApplicationQuota() throws AppException {
-        return translateMethodIds(actualAPIProxy.getApplicationQuota());
+    public APIQuota getApplicationQuota() {
+        return actualAPIProxy.getApplicationQuota();
     }
 
 
-    public APIQuota getSystemQuota() throws AppException {
-        return translateMethodIds(actualAPIProxy.getSystemQuota());
-    }
-
-    private APIQuota translateMethodIds(APIQuota apiQuota) throws AppException {
-        if (apiQuota == null || apiQuota.getRestrictions() == null) return apiQuota;
-        for (QuotaRestriction restriction : apiQuota.getRestrictions()) {
-            if ("*".equals(restriction.getMethod())) continue;
-            restriction.setMethod(APIManagerAdapter.getInstance().getMethodAdapter().getMethodForId(actualAPIProxy.getId(), restriction.getMethod()).getName());
-        }
-        return apiQuota;
+    public APIQuota getSystemQuota() {
+        return actualAPIProxy.getSystemQuota();
     }
 
     @JsonIgnore

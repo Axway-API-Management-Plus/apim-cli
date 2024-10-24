@@ -49,7 +49,7 @@ public class CustomProperties {
 		organization("Organization"),
 		application("Application");
 
-		public String niceName;
+		public final String niceName;
 
 		Type(String niceName) {
 			this.niceName = niceName;

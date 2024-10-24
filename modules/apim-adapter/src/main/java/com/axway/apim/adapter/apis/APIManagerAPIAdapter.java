@@ -69,12 +69,6 @@ public class APIManagerAPIAdapter {
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
-    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228", "7.7.20230530", "7.7.20230830", "7.7.20231130", "7.7.20240228", "7.7.20240530");
-
-    /**
-     * Maps the provided status to the REST-API endpoint to change the status!
-     */
-
 
     public APIManagerAPIAdapter() {
         cmd = CoreParameters.getInstance();
@@ -98,7 +92,7 @@ public class APIManagerAPIAdapter {
                 API api = apis.get(i);
                 translateMethodIds(api, filter.getTranslateMethodMode());
                 addQuotaConfiguration(api, filter.isIncludeQuotas());
-                addClientOrganizations(api, filter.isIncludeClientOrganizations());
+                addClientOrganizations(api);
                 addClientApplications(api, filter);
                 addExistingClientAppQuotas(api, filter.isIncludeQuotas());
                 addOriginalAPIDefinitionFromAPIM(api, filter);
@@ -211,7 +205,7 @@ public class APIManagerAPIAdapter {
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
-        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>() {
+        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
         });
         apis.removeIf(filter::filter);
 
@@ -232,7 +226,7 @@ public class APIManagerAPIAdapter {
      * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
      *
      * @param api   in which the methods should be translated
-     * @param apiId the methods are loaded based on this API-ID (this might be an another referenced API)
+     * @param apiId the methods are loaded based on this API-ID (this might be a referenced API)
      * @param mode  translation direction
      * @throws AppException when something goes wrong
      */
@@ -303,9 +297,7 @@ public class APIManagerAPIAdapter {
             RemoteHost remoteHost = APIManagerAdapter.getInstance().getRemoteHostsAdapter().getRemoteHost(url.getHost(), url.getPort());
             api.setRemotehost(remoteHost);
         } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("Error setting remote host for API based on backendBasePath: " + backendBasePath, e);
-            }
+            LOG.error("Error setting remote host for API based on backendBasePath: {}", backendBasePath, e);
         }
     }
 
@@ -349,8 +341,8 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private <ProfileType> void translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
-        Map<String, ProfileType> updatedEntries = new HashMap<>();
+    private <T> void translateMethodIds(Map<String, T> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
+        Map<String, T> updatedEntries = new HashMap<>();
         if (profiles != null) {
             Iterator<String> keys = profiles.keySet().iterator();
             while (keys.hasNext()) {
@@ -365,7 +357,7 @@ public class APIManagerAPIAdapter {
                     }
                     if (method != null) break;
                 }
-                ProfileType profileWithType = profiles.get(key);
+                T profileWithType = profiles.get(key);
                 Profile profile = (Profile) profileWithType;
                 if (profile instanceof OutboundProfile) {
                     if (method != null) {
@@ -439,26 +431,19 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
-        if (!addClientOrganizations || !APIManagerAdapter.getInstance().hasAdminAccount()) return;
-        List<Organization> grantedOrgs;
-        List<Organization> allOrgs = APIManagerAdapter.getInstance().getOrgAdapter().getAllOrgs();
-        grantedOrgs = new ArrayList<>();
-        for (Organization org : allOrgs) {
-            List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().getAccessAdapter().getAPIAccess(org, APIManagerAPIAccessAdapter.Type.organizations);
-            for (APIAccess access : orgAPIAccess) {
-                if (access.getApiId().equals(api.getId())) {
-                    grantedOrgs.add(org);
-                }
-            }
+    public void addClientOrganizations(API api) throws AppException {
+        List<Organization> grantedOrgs = new ArrayList<>();
+        List<ApiOrganizationSubscription> apiOrganizationSubscriptions = APIManagerAdapter.getInstance().getAccessAdapter().getSubscribedOrganizationsAndApplications(api.getId());
+        for (ApiOrganizationSubscription apiOrganizationSubscription : apiOrganizationSubscriptions) {
+            grantedOrgs.add(new Organization(apiOrganizationSubscription.getOrganizationName()));
         }
         api.setClientOrganizations(grantedOrgs);
     }
 
     public void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
-        List<ClientApplication> apps;
-        apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());
+        List<ClientApplication> apps = APIManagerAdapter.getInstance().getAppAdapter().getAppsSubscribedWithAPI(api.getId());
+        LOG.debug("Adding  client-applications : {}", apps);
         api.setApplications(apps);
     }
 
@@ -605,15 +590,8 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    public String[] getSerializeAllExcept() throws AppException {
-        String[] serializeAllExcept;
-        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
-            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        } else {
-            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        }
-        return serializeAllExcept;
+    public String[] getSerializeAllExcept() {
+        return new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
     }
 
     public void deleteAPIProxy(API api) throws AppException {

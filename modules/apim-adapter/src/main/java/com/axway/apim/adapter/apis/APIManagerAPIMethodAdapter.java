@@ -58,7 +58,7 @@ public class APIManagerAPIMethodAdapter {
         readMethodsFromAPIManager(apiId);
         List<APIMethod> apiMethods;
         try {
-            apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<List<APIMethod>>() {
+            apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiId + "' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -69,7 +69,7 @@ public class APIManagerAPIMethodAdapter {
     public APIMethod getMethodForName(String apiId, String methodName) throws AppException {
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
         if (apiMethods.isEmpty()) {
-            LOG.warn("No operations found for API with id: {}", apiId);
+            logMessage(apiId);
             return null;
         }
         for (APIMethod method : apiMethods) {
@@ -78,16 +78,19 @@ public class APIManagerAPIMethodAdapter {
                 return method;
             }
         }
-        LOG.debug("{} - {}",apiId, methodName);
         throw new AppException("No operation found with name: '" + methodName + "'", ErrorCode.API_OPERATION_NOT_FOUND);
     }
 
+    private void logMessage(String apiId) {
+        LOG.warn("No operations found for API with id: {}", apiId);
+    }
+
     public APIMethod getMethodForId(String apiId, String methodId) throws AppException {
-        if(methodId.equals("*"))
+        if (methodId.equals("*"))
             return null;
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
         if (apiMethods.isEmpty()) {
-            LOG.warn("No operations found for API with id: {}", apiId);
+            logMessage(apiId);
             return null;
         }
         for (APIMethod method : apiMethods) {

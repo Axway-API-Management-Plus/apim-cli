@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+# [1.14.7]  In progress
+## Fixed
+- NullPointerException: Cannot invoke "com.axway.apim.api.model.APIMethod.getName()  (See issue [#512](https://github.com/Axway-API-Management-Plus/apim-cli/issues/512))
+- Enable caching for API Import action (See issue [#500](https://github.com/Axway-API-Management-Plus/apim-cli/issues/500))
+
+### Added
+- allow APIM cli to connect to API Manager protected by Cloudflare  (See issue [#505](https://github.com/Axway-API-Management-Plus/apim-cli/issues/505))
+    
+    - Added new paramater named customHeaders to handle additonal headers. 
+     E.g ./apim.sh api get -n CalculatorService3 -o json -h localhost -u apiadmin  -customHeaders abc:xyz
+- Support August 2024 APIM Release (See issue [#504](https://github.com/Axway-API-Management-Plus/apim-cli/issues/504))
+
 # [1.14.6]  2024-10-11
 ## Fixed
 - Importing SOAP API with different endpoints (for import and for runtime calls)  (See issue [#501](https://github.com/Axway-API-Management-Plus/apim-cli/issues/501))

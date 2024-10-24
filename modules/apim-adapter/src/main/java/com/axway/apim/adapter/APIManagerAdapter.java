@@ -582,17 +582,17 @@ public class APIManagerAdapter {
      * Helper method to translate a Base64 encoded format
      * as it's needed by the API-Manager.
      *
-     * @param fileFontent the certificate content
+     * @param fileContent the certificate content
      * @param filename    the name of the certificate file used as a reference in the generated Json object
      * @param contentType the content type
      * @return a Json-Object structure as needed by the API-Manager
      * @throws AppException when the certificate information can't be created
      */
-    public static JsonNode getFileData(byte[] fileFontent, String filename, ContentType contentType) throws AppException {
+    public JsonNode getFileData(byte[] fileContent, String filename, ContentType contentType) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
             HttpEntity entity = MultipartEntityBuilder.create()
-                .addBinaryBody("file", fileFontent, contentType, filename)
+                .addBinaryBody("file", fileContent, contentType, filename)
                 .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {

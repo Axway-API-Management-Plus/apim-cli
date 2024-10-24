@@ -32,6 +32,10 @@ done
 
 cd "$currentDir"
 
+### Enable Debugging of http headers and payload
+### "$_java" -Xms64m -Xmx256m -Dlog4j.configurationFile=../lib/log4j2.xml  -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog -Dorg.apache.commons.logging.simplelog.showdatetime=true -Dorg.apache.commons.logging.simplelog.log.org.apache.http=DEBUG -classpath "$CP" com.axway.apim.cli.APIManagerCLI "${@}"
+
+
 "$_java" -Xms64m -Xmx256m -Dlog4j.configurationFile=../lib/log4j2.xml -classpath "$CP" com.axway.apim.cli.APIManagerCLI "${@}"
 rc=$?
 exit $rc

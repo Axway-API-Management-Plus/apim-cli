@@ -29,7 +29,7 @@ public class JsonAPIManagerSetupExporterTest extends WiremockWrapper {
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.JSON_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.JSON_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
         exporter.export(apiManagerConfig);

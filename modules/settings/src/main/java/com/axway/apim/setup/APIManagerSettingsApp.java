@@ -17,7 +17,7 @@ import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.setup.adapter.APIManagerConfigAdapter;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler;
-import com.axway.apim.setup.impl.APIManagerSetupResultHandler.ResultHandler;
+import com.axway.apim.setup.impl.ResultHandler;
 import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;

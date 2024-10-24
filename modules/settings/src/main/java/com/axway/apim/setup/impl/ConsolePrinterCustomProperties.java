@@ -48,7 +48,7 @@ public class ConsolePrinterCustomProperties {
 				new Column().header("Label").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getLabel()),
 				new Column().header("Type").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getType()),
 				new Column().header("Default-Value").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getDefaultValue()),
-				new Column().header("Required").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getRequired().toString()),
+				new Column().header("Required").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> String.valueOf(prop.getCustomProperty().getRequired())),
 				new Column().header("Options").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(this::getOptions),
 				new Column().header("RegEx").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getRegex())
 				)));
@@ -80,7 +80,6 @@ public class ConsolePrinterCustomProperties {
 		private final CustomProperty customProperty;
 
 		public CustomPropertyWithName(CustomProperty customProperty) {
-			super();
 			this.customProperty = customProperty;
 		}
 

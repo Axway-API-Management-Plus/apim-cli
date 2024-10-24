@@ -119,7 +119,7 @@ public class APIMgrAppsAdapter {
         List<ClientApplication> apps;
         try {
             if (this.apiManagerResponse.get(filter) == null) return Collections.emptyList();
-            apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>() {
+            apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
             });
             LOG.debug("Found: {} applications", apps.size());
             for (int i = 0; i < apps.size(); i++) {
@@ -152,7 +152,7 @@ public class APIMgrAppsAdapter {
         readAppsSubscribedFromAPIManager(apiId);
         List<ClientApplication> subscribedApps;
         try {
-            subscribedApps = mapper.readValue(this.subscribedAppAPIManagerResponse.get(apiId), new TypeReference<List<ClientApplication>>() {
+            subscribedApps = mapper.readValue(this.subscribedAppAPIManagerResponse.get(apiId), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -244,7 +244,7 @@ public class APIMgrAppsAdapter {
                     LOG.error("Error reading application oauth resources. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error reading application oauth resources' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                TypeReference<List<ClientAppOauthResource>> classType = new TypeReference<List<ClientAppOauthResource>>() {
+                TypeReference<List<ClientAppOauthResource>> classType = new TypeReference<>() {
                 };
                 List<ClientAppOauthResource> oauthResources = mapper.readValue(response, classType);
                 app.getOauthResources().addAll(oauthResources);
@@ -268,7 +268,7 @@ public class APIMgrAppsAdapter {
                     LOG.error("Error reading application permissions. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error reading application permissions' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                TypeReference<List<ApplicationPermission>> classType = new TypeReference<List<ApplicationPermission>>() {
+                TypeReference<List<ApplicationPermission>> classType = new TypeReference<>() {
                 };
                 List<ApplicationPermission> appPermissions = mapper.readValue(response, classType);
                 for (ApplicationPermission permission : appPermissions) {

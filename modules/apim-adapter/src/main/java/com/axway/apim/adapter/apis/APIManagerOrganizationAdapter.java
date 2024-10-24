@@ -202,8 +202,7 @@ public class APIManagerOrganizationAdapter {
     public List<Organization> getOrgs(OrgFilter filter) throws AppException {
         readOrgsFromAPIManager(filter);
         try {
-            List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>() {
-            });
+            List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {});
             allOrgs.removeIf(filter::filter);
             for (Organization org : allOrgs) {
                 addImage(org, filter.isIncludeImage());

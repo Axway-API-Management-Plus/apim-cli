@@ -20,7 +20,6 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
     API rollbackAPI;
 
     public RollbackBackendAPI(API rollbackAPI) {
-        super();
         this.rollbackAPI = rollbackAPI;
         this.executeOrder = 20;
         this.name = "Backend-API";

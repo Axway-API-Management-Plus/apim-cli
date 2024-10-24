@@ -69,7 +69,7 @@ public class AppSubscriptionUnpublishedTestIT extends TestNGCitrusSpringSupport 
         $(echo("####### API has been created with ID: '${apiId}' #######"));
         $(echo("####### Validate the application has already an active subscription to the API (Based on the name) #######"));
         $(http().client(apiManager).send().get("/applications/${testAppId}/apis"));
-        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
+            $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON).validate(jsonPath()
             .expression("$.*.apiId", "${apiId}")));
 
         $(echo("####### Trigger a Re-Create of the API: '${apiName}' - Subscription must stay  #######"));

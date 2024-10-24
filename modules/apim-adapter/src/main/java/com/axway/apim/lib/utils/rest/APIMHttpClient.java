@@ -3,6 +3,7 @@ package com.axway.apim.lib.utils.rest;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -25,11 +26,15 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * The interface to the API-Manager itself responsible to set up the underlying HTTPS-Communication.
@@ -71,9 +76,9 @@ public class APIMHttpClient {
             builder.loadTrustMaterial(null, new TrustAllStrategy());
             SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
             Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register(uri.getScheme(), sslConnectionSocketFactory)
-                    .register("http", PlainConnectionSocketFactory.INSTANCE)
-                    .build();
+                .register(uri.getScheme(), sslConnectionSocketFactory)
+                .register("http", PlainConnectionSocketFactory.INSTANCE)
+                .build();
 
             httpClientConnectionManager = new PoolingHttpClientConnectionManager(r);
             httpClientConnectionManager.setMaxTotal(5);
@@ -88,14 +93,14 @@ public class APIMHttpClient {
             int timeout = params.getTimeout();
             LOG.debug("API Manager CLI http client timeout : {}", timeout);
             RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
-                    .setConnectTimeout(timeout)
-                    .setSocketTimeout(timeout)
-                    .setConnectionRequestTimeout(timeout)
-                    .setCookieSpec(CookieSpecs.STANDARD);
+                .setConnectTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .setConnectionRequestTimeout(timeout)
+                .setCookieSpec(CookieSpecs.STANDARD);
             HttpClientBuilder clientBuilder = HttpClientBuilder.create()
-                    .disableRedirectHandling()
-                    .setConnectionManager(httpClientConnectionManager)
-                    .useSystemProperties();
+                .disableRedirectHandling()
+                .setConnectionManager(httpClientConnectionManager)
+                .useSystemProperties();
 
             // Check if a proxy is configured
             if (params.getProxyHost() != null) {
@@ -114,10 +119,30 @@ public class APIMHttpClient {
             if (params.isDisableCompression())
                 clientBuilder.disableContentCompression();
             clientBuilder.setDefaultRequestConfig(defaultRequestConfig.build());
+            String customHeader = params.getCustomHeaders();
+            if (customHeader != null) {
+                List<Header> headers = splitStringToHttpHeaders(customHeader);
+                clientBuilder.setDefaultHeaders(headers);
+            }
             this.httpClient = clientBuilder.build();
         } catch (Exception e) {
             throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
         }
+    }
+
+    public List<Header> splitStringToHttpHeaders(String input) {
+        List<Header> headers = new ArrayList<>();
+        String[] headersArray = input.split(",");
+        for (String headerStr : headersArray) {
+            StringTokenizer tokenizer = new StringTokenizer(headerStr, ":");
+            while (tokenizer.hasMoreTokens()) {
+                String key = tokenizer.nextToken();
+                String value = tokenizer.nextToken();
+                Header header = new BasicHeader(key, value);
+                headers.add(header);
+            }
+        }
+        return headers;
     }
 
     public HttpClient getHttpClient() {

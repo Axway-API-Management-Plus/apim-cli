@@ -32,7 +32,6 @@ public class APIMCLICacheManager implements CacheManager {
     private List<String> enabledCaches;
 
     public APIMCLICacheManager(CacheManager cacheManager) {
-        super();
         this.cacheManager = cacheManager;
     }
 
