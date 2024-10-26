@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+# [1.14.8]  In progress
+
+## Fixed
+- Removing existing GLOBAL quotas in Api Manager(See issue [#442](https://github.com/Axway-API-Management-Plus/apim-cli/issues/442))
+
+
 # [1.14.7]  2024-10-24
 ## Fixed
 - NullPointerException: Cannot invoke "com.axway.apim.api.model.APIMethod.getName()  (See issue [#512](https://github.com/Axway-API-Management-Plus/apim-cli/issues/512))

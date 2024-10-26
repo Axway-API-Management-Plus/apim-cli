@@ -65,4 +65,13 @@ public class APIManagerSettingsAppTest extends WiremockWrapper {
         int returnCode = APIManagerSettingsApp.importConfig(args);
         Assert.assertEquals(returnCode, 0);
     }
+
+    @Test
+    public void removeGlobalQuotas() {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        String configFile = classLoader.getResource("com/axway/apim/setup/adapter/global-quotas.json").getFile();
+        String[] args = {"-h", "localhost", "-c", configFile, "-type", "globalquotas"};
+        int returnCode = APIManagerSettingsApp.importConfig(args);
+        Assert.assertEquals(returnCode, 0);
+    }
 }
