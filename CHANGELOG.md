@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.8]  In progress
 
-## Fixed
+### Fixed
 - Removing existing GLOBAL quotas in Api Manager(See issue [#442](https://github.com/Axway-API-Management-Plus/apim-cli/issues/442))
+
+### Added
+- Allow APIM Cli to retire old API when importing apis using zeroDowntimeUpdate (See issue [#511](https://github.com/Axway-API-Management-Plus/apim-cli/issues/511))
 
 
 # [1.14.7]  2024-10-24
-## Fixed
+### Fixed
 - NullPointerException: Cannot invoke "com.axway.apim.api.model.APIMethod.getName()  (See issue [#512](https://github.com/Axway-API-Management-Plus/apim-cli/issues/512))
 - Enable caching for API Import action (See issue [#500](https://github.com/Axway-API-Management-Plus/apim-cli/issues/500))
 
@@ -24,7 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support August 2024 APIM Release (See issue [#504](https://github.com/Axway-API-Management-Plus/apim-cli/issues/504))
 
 # [1.14.6]  2024-10-11
-## Fixed
+### Fixed
 - Importing SOAP API with different endpoints (for import and for runtime calls)  (See issue [#501](https://github.com/Axway-API-Management-Plus/apim-cli/issues/501))
 - -returnCodeMapping option does not work on apim-cli org import (See issue [#496](https://github.com/Axway-API-Management-Plus/apim-cli/issues/496))
 - The output of command 'apim api get' is not containing the complete list of client applications (array) of the api (See issue [#495](https://github.com/Axway-API-Management-Plus/apim-cli/issues/495))
@@ -41,7 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.5] 2024-07-12
 
-## Fixed
+### Fixed
 - Outside environment variables should not affect tests  (See issue [#488](https://github.com/Axway-API-Management-Plus/apim-cli/issues/488))
 - API deployment does not set new auth basic password (See issue [#481](https://github.com/Axway-API-Management-Plus/apim-cli/issues/481))
 - Issue on Windows where exporting all Applications  (See issue [#483](https://github.com/Axway-API-Management-Plus/apim-cli/issues/483))

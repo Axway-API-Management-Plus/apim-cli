@@ -201,6 +201,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             }
 
         }else { // Removing system quota
+            LOG.debug("removing System Global Quota ");
             if (systemQuota.getRestrictions() != null) {
                 removeExistingGlobalQuota(systemQuota);
             }
@@ -225,6 +226,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
                 applicationQuota.getRestrictions().add(applicationQuotaRestriction);
             }
         }else {
+            LOG.debug("removing Application Global Quota ");
             if (applicationQuota.getRestrictions() != null) {
                 removeExistingGlobalQuota(applicationQuota);
             }
