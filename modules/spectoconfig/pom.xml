@@ -7,9 +7,11 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>apimcli-spectoconfig</artifactId>
     <name>Axway API-Manager CLI API Configuration Template Creation</name>
+    <properties>
+        <jetty.version>9.4.56.v20240826</jetty.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
@@ -37,13 +39,13 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.51.v20230217</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.51.v20230217</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
