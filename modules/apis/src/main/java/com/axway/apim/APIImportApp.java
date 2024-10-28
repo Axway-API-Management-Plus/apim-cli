@@ -92,7 +92,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
                 .useFEAPIDefinition(params.isUseFEAPIDefinition()) // Should API-Definition load from the FE-API?
                 .build();
             API actualAPI = apimAdapter.getApiAdapter().getAPI(filter, true);
-            APIChangeState changes = new APIChangeState(actualAPI, desiredAPI);
+            APIChangeState changes = new APIChangeState(actualAPI, desiredAPI, params);
             new APIImportManager().applyChanges(changes, params.isForceUpdate(), params.isUpdateOnly());
             APIPropertiesExport.getInstance().store();
             return 0;

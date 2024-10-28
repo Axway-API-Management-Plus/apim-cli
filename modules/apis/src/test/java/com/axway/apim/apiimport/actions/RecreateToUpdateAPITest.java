@@ -8,9 +8,11 @@ import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.DesiredAPI;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -22,6 +24,10 @@ public class RecreateToUpdateAPITest extends WiremockWrapper {
     @BeforeClass
     public void initWiremock() {
         super.initWiremock();
+        CoreParameters coreParameters = new CoreParameters();
+        coreParameters.setHostname("localhost");
+        coreParameters.setUsername("test");
+        coreParameters.setPassword(Utils.getEncryptedPassword());
     }
 
     @AfterClass
@@ -29,12 +35,11 @@ public class RecreateToUpdateAPITest extends WiremockWrapper {
         super.close();
     }
 
+
+
     @Test
     public void testRepublishToUpdateApi() throws AppException {
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
+
         APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         Organization organization = apiManagerAdapter.getOrgAdapter().getOrgForName("orga");
         RecreateToUpdateAPI recreateToUpdateAPI = new RecreateToUpdateAPI();
@@ -67,4 +72,47 @@ public class RecreateToUpdateAPITest extends WiremockWrapper {
         recreateToUpdateAPI.execute(apiChangeState);
         apiManagerAdapter.deleteInstance();
     }
+
+    @Test
+    public void handleApiDontDelete() throws AppException {
+        RecreateToUpdateAPI recreateToUpdateAPI = new RecreateToUpdateAPI();
+        APIImportParams apiImportParams =   new APIImportParams();
+        apiImportParams.setReferenceAPIRetire(true);
+        Assert.assertTrue(recreateToUpdateAPI.handleOldApi(apiImportParams, null));
+    }
+
+    @Test
+    public void handleApiDontDeleteDeprecate() throws AppException {
+        RecreateToUpdateAPI recreateToUpdateAPI = new RecreateToUpdateAPI();
+        APIImportParams apiImportParams =   new APIImportParams();
+        apiImportParams.setReferenceAPIDeprecate(true);
+        Assert.assertTrue(recreateToUpdateAPI.handleOldApi(apiImportParams, null));
+    }
+
+    @Test
+    public void handleApiDontDeleteDeprecateAndRetire() throws AppException {
+        RecreateToUpdateAPI recreateToUpdateAPI = new RecreateToUpdateAPI();
+        APIImportParams apiImportParams =   new APIImportParams();
+        apiImportParams.setReferenceAPIDeprecate(true);
+        apiImportParams.setReferenceAPIRetire(true);
+        Assert.assertTrue(recreateToUpdateAPI.handleOldApi(apiImportParams, null));
+    }
+
+    @Test
+    public void handleApiDelete() throws AppException {
+        API actualAPI = new API();
+        actualAPI.setName("petstore");
+        actualAPI.setPath("/api/v3");
+        actualAPI.setVersion("1.1");
+        actualAPI.setDescriptionType("original");
+        actualAPI.setSummary("Petstore api");
+        actualAPI.setState("published");
+        actualAPI.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        actualAPI.setApplications(new ArrayList<>());
+        actualAPI.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        RecreateToUpdateAPI recreateToUpdateAPI = new RecreateToUpdateAPI();
+        Assert.assertFalse(recreateToUpdateAPI.handleOldApi(null, actualAPI));
+    }
+
 }

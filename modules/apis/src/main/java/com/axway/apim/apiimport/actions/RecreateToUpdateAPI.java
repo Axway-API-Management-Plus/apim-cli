@@ -34,16 +34,23 @@ public class RecreateToUpdateAPI {
         APIImportParams apiImportParams =  changes.getApiImportParams();
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		String createdApiId = createNewAPI.execute(changes, true);
-        if(apiImportParams != null && (apiImportParams.isReferenceAPIDeprecate() || apiImportParams.isReferenceAPIRetire())){
+        if(handleOldApi(apiImportParams, actualAPI)){
             LOG.info("New API successfully created");
-        }else {
-            LOG.info("New API successfully created. Going to delete old API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
-            // Delete the existing old API!
-            new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
         }
 		// Maintain the Ehcache
 		// All cached entities referencing this API must be updated with the correct API-ID
 		APIManagerAdapter.getInstance().getCacheManager().flipApiId(changes.getActualAPI().getId(), createdApiId);
 	}
+
+    public boolean handleOldApi( APIImportParams apiImportParams, API actualAPI) throws AppException {
+        if(apiImportParams != null && (apiImportParams.isReferenceAPIDeprecate() || apiImportParams.isReferenceAPIRetire())){
+            return true;
+        }else {
+            LOG.info("New API successfully created. Going to delete old API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
+            // Delete the existing old API!
+            new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
+        }
+        return false;
+    }
 
 }
