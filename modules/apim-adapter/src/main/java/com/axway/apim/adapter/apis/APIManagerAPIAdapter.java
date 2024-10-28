@@ -15,6 +15,7 @@ import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.*;
@@ -191,9 +192,22 @@ public class APIManagerAPIAdapter {
             if (apisPerKey.get(filterKey) != null && apisPerKey.get(filterKey).size() == 1) {
                 return apisPerKey.get(filterKey).get(0);
             }
-            throw new AppException("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API);
+            LOG.debug("More than one API found based on filter path: {}, vhost : {} and version : {}", filter.getApiPath(), filter.getVhost(), filter.getVersion());
+            return filterApiBasedOnState(foundAPIs, filter);
+            // If more than one api exists with different api state
         }
         return foundAPIs.get(0);
+    }
+
+    public API filterApiBasedOnState(List<API> foundAPIs, APIFilter filter) throws AppException {
+        LOG.debug("Filtering based on state  published");
+        for (API api : foundAPIs) {
+            if (api.getState().equals(Constants.API_PUBLISHED) && api.getPath().equals(filter.getApiPath()) && Objects.equals(api.getVhost(), filter.getVhost())) {
+                LOG.debug("Found an api with published state : {} - {}", api.getName(), api.getId());
+                return api;
+            }
+        }
+        throw new AppException("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API);
     }
 
     public String getVersion(API api) {
@@ -672,11 +686,11 @@ public class APIManagerAPIAdapter {
     }
 
     public void publishAPI(API api, String vhost) throws AppException {
-        if (API.STATE_PUBLISHED.equals(api.getState())) {
+        if (Constants.API_PUBLISHED.equals(api.getState())) {
             LOG.info("API is already published");
             return;
         }
-        updateAPIStatus(api, API.STATE_PUBLISHED, vhost);
+        updateAPIStatus(api, Constants.API_PUBLISHED, vhost);
     }
 
     public byte[] getAPIDatFile(API api, String password) throws AppException {
@@ -724,7 +738,7 @@ public class APIManagerAPIAdapter {
                 .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
                 .build();
             HttpEntity entity;
-            if (vhost != null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
+            if (vhost != null && desiredState.equals(Constants.API_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
                 entity = new StringEntity("vhost=" + vhost, ContentType.APPLICATION_FORM_URLENCODED);
             } else {
                 entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
@@ -760,7 +774,7 @@ public class APIManagerAPIAdapter {
         try {
             if (retirementDate == null || retirementDate == 0) return;
             // Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
-            if (!api.getState().equals(API.STATE_DEPRECATED)) {
+            if (!api.getState().equals(Constants.API_DEPRECATED)) {
                 LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
                 return;
             }
@@ -956,7 +970,7 @@ public class APIManagerAPIAdapter {
     }
 
     public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, boolean deprecateRefApi, boolean retireRefApi, long retirementDateRefAPI) throws AppException {
-        if (apiToUpgradeAccess.getState().equals(API.STATE_UNPUBLISHED)) {
+        if (apiToUpgradeAccess.getState().equals(Constants.API_UNPUBLISHED)) {
             LOG.info("API to upgrade access has state unpublished.");
             return false;
         }

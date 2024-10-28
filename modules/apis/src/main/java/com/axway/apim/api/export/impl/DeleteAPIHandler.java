@@ -8,6 +8,7 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 		}
 		for(API api : apis) {
 			try {
-				statusManager.update(api, API.STATE_DELETED, true);
+				statusManager.update(api, Constants.API_DELETED, true);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_DELETING_API);
 				LOG.error("Error deleting API: {}" , api.getName());

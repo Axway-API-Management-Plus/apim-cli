@@ -7,6 +7,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class RepublishToUpdateAPI {
             changes.getDesiredAPI().setState(actualState);
         }
         APIStatusManager statusManager = new APIStatusManager();
-        statusManager.update(actualAPI, API.STATE_UNPUBLISHED, true);
+        statusManager.update(actualAPI, Constants.API_UNPUBLISHED, true);
         actualAPI.setClientOrganizations(new ArrayList<>()); // remove all client organizations
         actualAPI.setApplications(keepApplicationFromDevelopmentOrg(actualAPI.getApplications(), actualAPI.getOrganization())); // remove all consumer applications
         UpdateExistingAPI updateExistingAPI = new UpdateExistingAPI();

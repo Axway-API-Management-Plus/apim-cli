@@ -7,6 +7,7 @@ import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
                 LOG.info("Rollback FE-API: {} (ID: {} / State: {})", this.rollbackAPI.getName(), this.rollbackAPI.getId(), this.rollbackAPI.getState());
                 if (rollbackAPI.getId() != null) {
                     this.rollbackAPI = apiAdapter.getAPIWithId(this.rollbackAPI.getId());
-                    new APIStatusManager().update(rollbackAPI, API.STATE_UNPUBLISHED, true);
+                    new APIStatusManager().update(rollbackAPI, Constants.API_UNPUBLISHED, true);
                 }
                 apiAdapter.deleteAPIProxy(this.rollbackAPI);
             } else {
@@ -43,8 +44,8 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
                 API existingAPI = apiAdapter.getAPI(filter, false);// The path is not set at this point, hence we provide null
                 if (existingAPI != null) {
                     LOG.info("Rollback FE-API: {} (ID: {} / State: {})", existingAPI.getName(), existingAPI.getId(), existingAPI.getState());
-                    if (existingAPI.getState() != null && existingAPI.getState().equals(API.STATE_PUBLISHED)) {
-                        new APIStatusManager().update(existingAPI, API.STATE_UNPUBLISHED, true);
+                    if (existingAPI.getState() != null && existingAPI.getState().equals(Constants.API_PUBLISHED)) {
+                        new APIStatusManager().update(existingAPI, Constants.API_UNPUBLISHED, true);
                     }
                     apiAdapter.deleteAPIProxy(existingAPI);
                 } else {

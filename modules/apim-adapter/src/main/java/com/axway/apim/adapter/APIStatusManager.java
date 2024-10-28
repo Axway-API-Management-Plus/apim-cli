@@ -5,6 +5,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,25 +16,15 @@ public class APIStatusManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
 
-    private static final String PUBLISHED = "published";
-    private static final String UNPUBLISHED = "unpublished";
-
-    private static final String DELETED = "deleted";
-    private static final String DEPRECATED = "deprecated";
-    private static final String UNDEPRECATED = "undeprecated";
-
-
-    private final APIManagerAdapter apimAdapter;
-
     private boolean updateVHostRequired = false;
 
     private enum StatusChangeMap {
-        unpublished(new String[]{APIStatusManager.PUBLISHED, APIStatusManager.DELETED}),
-        published(new String[]{APIStatusManager.UNPUBLISHED, APIStatusManager.DEPRECATED}),
+        unpublished(new String[]{Constants.API_PUBLISHED, Constants.API_DELETED}),
+        published(new String[]{Constants.API_UNPUBLISHED, Constants.API_DEPRECATED}),
         deleted(new String[]{}),
-        deprecated(new String[]{APIStatusManager.UNPUBLISHED, APIStatusManager.UNDEPRECATED}),
-        undeprecated(new String[]{APIStatusManager.PUBLISHED, APIStatusManager.UNPUBLISHED}),
-        pending(new String[]{APIStatusManager.DELETED});
+        deprecated(new String[]{Constants.API_UNPUBLISHED, Constants.API_UNDEPRECATED}),
+        undeprecated(new String[]{Constants.API_PUBLISHED, Constants.API_UNPUBLISHED}),
+        pending(new String[]{Constants.API_DELETED});
 
         private final String[] possibleStates;
 
@@ -43,8 +34,8 @@ public class APIStatusManager {
     }
 
     private enum StatusChangeRequiresEnforce {
-        published(new String[]{APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED}),
-        deprecated(new String[]{APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED});
+        published(new String[]{Constants.API_UNPUBLISHED, Constants.API_DELETED}),
+        deprecated(new String[]{Constants.API_UNPUBLISHED, Constants.API_DELETED});
 
         private final List<String> enforceRequired;
 
@@ -59,10 +50,6 @@ public class APIStatusManager {
                 return null;
             }
         }
-    }
-
-    public APIStatusManager() throws AppException {
-        this.apimAdapter = APIManagerAdapter.getInstance();
     }
 
     public void update(API apiToUpdate, String desiredState, boolean enforceBreakingChange) throws AppException {
@@ -90,8 +77,8 @@ public class APIStatusManager {
                     + "is breaking. Enforce change with option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 
         }
-
         try {
+            APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
             String[] possibleStatus = StatusChangeMap.valueOf(apiToUpdate.getState()).possibleStates;
             String intermediateState = null;
             boolean statusMovePossible = false;
@@ -125,7 +112,7 @@ public class APIStatusManager {
                 throw new AppException("The status change from: '" + apiToUpdate.getState() + "' to '" + desiredState + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
             }
             apiToUpdate.setState(desiredState);
-            if (desiredState.equals(API.STATE_DELETED)) {
+            if (desiredState.equals(Constants.API_DELETED)) {
                 // If an API in state unpublished or pending, also an orgAdmin can delete it
                 if (apiAdapter.isFrontendApiExists(apiToUpdate))
                     apiAdapter.deleteAPIProxy(apiToUpdate);
@@ -134,18 +121,18 @@ public class APIStatusManager {
                     apiAdapter.deleteBackendAPI(apiToUpdate);
             } else {
                 apiAdapter.updateAPIStatus(apiToUpdate, desiredState, vhost);
-                if (vhost != null && desiredState.equals(API.STATE_UNPUBLISHED)) {
+                if (vhost != null && desiredState.equals(Constants.API_UNPUBLISHED)) {
                     this.updateVHostRequired = true; // Flag to control update of the VHost
                 }
             }
             // Take over the status, as it has been updated now
             apiToUpdate.setState(desiredState);
             // When deprecation or undeprecation is requested, we have to set the actual API accordingly!
-            if (desiredState.equals(APIStatusManager.UNDEPRECATED)) {
+            if (desiredState.equals(Constants.API_UNDEPRECATED)) {
                 apiToUpdate.setDeprecated("false");
-                apiToUpdate.setState(API.STATE_PUBLISHED);
-            } else if (desiredState.equals(APIStatusManager.DEPRECATED)) {
-                apiToUpdate.setState(API.STATE_PUBLISHED);
+                apiToUpdate.setState(Constants.API_PUBLISHED);
+            } else if (desiredState.equals(Constants.API_DEPRECATED)) {
+                apiToUpdate.setState(Constants.API_PUBLISHED);
                 apiToUpdate.setDeprecated("true");
             }
         } catch (Exception e) {

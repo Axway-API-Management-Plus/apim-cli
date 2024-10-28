@@ -7,6 +7,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -86,11 +87,11 @@ public class ChangeStateTest extends WiremockWrapper {
         API importAPI = getTestAPI();
         API managerAPI = getTestAPI();
 
-        importAPI.setState(API.STATE_DELETED);
+        importAPI.setState(Constants.API_DELETED);
         importAPI.setDescriptionType("ANY-TYPE");
 
 
-        managerAPI.setState(API.STATE_PUBLISHED);
+        managerAPI.setState(Constants.API_PUBLISHED);
         importAPI.setDescriptionType("ANY-OTHER-TYPE");
 
         APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
@@ -102,7 +103,7 @@ public class ChangeStateTest extends WiremockWrapper {
     private static API getTestAPI() {
         API testAPI = new API();
         testAPI.setOrganization(new Organization.Builder().hasName("123").hasId("123").build());
-        testAPI.setState(API.STATE_PUBLISHED);
+        testAPI.setState(Constants.API_PUBLISHED);
         return testAPI;
     }
 

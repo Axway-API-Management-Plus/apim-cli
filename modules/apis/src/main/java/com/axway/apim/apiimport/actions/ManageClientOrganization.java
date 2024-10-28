@@ -3,6 +3,7 @@ package com.axway.apim.apiimport.actions;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.axway.apim.lib.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class ManageClientOrganization {
             LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
             return;
         }
-        if (desiredState.getState().equals(API.STATE_UNPUBLISHED)) return;
+        if (desiredState.getState().equals(Constants.API_UNPUBLISHED)) return;
         // The API isn't Re-Created (to take over manually created ClientOrgs) and there are no orgs configured - We can skip the rest
         if (desiredState.getClientOrganizations() == null && !reCreation) return;
 

@@ -10,6 +10,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class ManageClientApps {
         }
         // If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
         // But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
-        if (reCreation && actualState.getState().equals(API.STATE_UNPUBLISHED) && CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.add)) {
+        if (reCreation && actualState.getState().equals(Constants.API_UNPUBLISHED) && CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.add)) {
             LOG.debug("Copying applications from old api id : {} to new api id: {}", oldAPI.getId(), actualState.getId());
             // Create previously existing App-Subscriptions
             createAppSubscription(oldAPI.getApplications(), actualState.getId());

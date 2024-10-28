@@ -7,6 +7,7 @@ import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ public class CreateNewAPI {
             statusManager.update(createdAPI, desiredAPI.getState(), desiredAPI.getVhost());
             apiAdapter.updateRetirementDate(createdAPI, desiredAPI.getRetirementDate());
 
-            if (reCreation && actualAPI.getState().equals(API.STATE_PUBLISHED)) {
+            if (reCreation && actualAPI.getState().equals(Constants.API_PUBLISHED)) {
                 upgradeAccess(apiAdapter, changes, actualAPI, createdAPI);
             }
             if (EnvironmentProperties.CHECK_CATALOG) {
@@ -129,7 +130,7 @@ public class CreateNewAPI {
         if (apiImportParams != null) {
             referenceAPIDeprecate = apiImportParams.isReferenceAPIDeprecate();
             referenceAPIRetire = apiImportParams.isReferenceAPIRetire();
-            if (referenceAPIRetire) {
+            if (referenceAPIRetire && apiImportParams.getReferenceAPIRetirementDate() != null) {
                 retirementDate = Utils.getParsedDate(apiImportParams.getReferenceAPIRetirementDate());
             }
         }

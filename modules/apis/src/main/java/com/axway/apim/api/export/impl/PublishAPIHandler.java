@@ -8,6 +8,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class PublishAPIHandler extends APIResultHandler {
 		Console.println("Going to publish: " + apis.size() + " API(s)");
 		for(API api : apis) {
 			try {
-				statusManager.update(api, API.STATE_PUBLISHED, api.getVhost(), true);
+				statusManager.update(api, Constants.API_PUBLISHED, api.getVhost(), true);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_PUBLISH_API);
 				LOG.error("Error publishing API: {} " , api.getName());

@@ -5,6 +5,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIUpgradeAccessParams extends APIExportParams implements Parameters, APIFilterParams {
@@ -92,7 +93,7 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
             .hasName(getReferenceAPIName())
             .hasVHost(getReferenceAPIVersion())
             .hasOrganization(getReferenceAPIOrganization())
-            .hasState(API.STATE_PUBLISHED)
+            .hasState(Constants.API_PUBLISHED)
             .build();
     }
 

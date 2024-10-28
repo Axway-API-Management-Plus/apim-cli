@@ -13,6 +13,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
@@ -101,7 +102,7 @@ public class RevokeAccessAPIHandler extends APIResultHandler {
     @Override
     public APIFilter getFilter() {
         APIFilter.Builder builder = getBaseAPIFilterBuilder();
-        builder.hasState(API.STATE_PUBLISHED);
+        builder.hasState(Constants.API_PUBLISHED);
         return builder.build();
     }
 }
