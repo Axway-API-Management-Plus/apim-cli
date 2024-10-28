@@ -4,6 +4,7 @@ import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.lib.error.InternalException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,7 +48,7 @@ public class AppCredentialsDeserializer extends StdDeserializer<ClientAppCredent
 					cred.setId(node.get("apiKey").asText());
 					break;
 				default:
-					throw new RuntimeException("Unsupported credentialType: " + credentialType);
+					throw new InternalException("Unsupported credentialType: " + credentialType);
 			}
 		} catch (NullPointerException e) {
 			throw new IOException("Cannot parse application credential type: " + credentialType + ". Please make sure 'clientId' or 'apiKey' is given.");

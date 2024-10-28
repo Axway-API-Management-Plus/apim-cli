@@ -5,6 +5,7 @@ import com.axway.apim.api.specification.filter.JsonNodeOpenAPI3SpecFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.InternalException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -42,7 +43,7 @@ public class Swagger2xSpecification extends APISpecification {
         try {
             return mapper.writeValueAsBytes(swagger);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error parsing API-Specification", e);
+            throw new InternalException("Error parsing API-Specification", e);
         }
     }
 

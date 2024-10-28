@@ -5,6 +5,7 @@ import com.axway.apim.adapter.CacheType;
 import com.axway.apim.lib.DoNothingCacheManager.DoNothingCache;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.InternalException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -70,7 +71,7 @@ public class APIMCLICacheManager implements CacheManager {
         try {
             cachePrefix = CoreParameters.getInstance().getAPIManagerURL().toString();
         } catch (AppException e) {
-            throw new RuntimeException(e);
+            throw new InternalException(e);
         }
         if (this.enabledCaches == null) {
             // Caches not specified, return requested cache
@@ -143,7 +144,7 @@ public class APIMCLICacheManager implements CacheManager {
                         }
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException("There was an error updating the cache.", e);
+                    throw new InternalException("There was an error updating the cache.", e);
                 }
             });
         } catch (Exception e) {
