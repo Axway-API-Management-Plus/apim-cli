@@ -380,6 +380,8 @@ public class Utils {
 
     public static boolean equalsTagMap(TagMap source, TagMap target) {
         if (source == target) return true;
+        if ((source != null && source.isEmpty()) && (target == null)) return true;
+        if (source == null && target.isEmpty()) return true;
         if (source == null || target == null)
             return false;
         if (source.size() != target.size()) return false;
@@ -471,13 +473,13 @@ public class Utils {
         }
     }
 
-    public static Map<String,String> removeEmptyValuesFromMap(Map<String, String> map){
+    public static Map<String, String> removeEmptyValuesFromMap(Map<String, String> map) {
         return map.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public static String replaceSpecialChars(String fileName){
+    public static String replaceSpecialChars(String fileName) {
         return fileName.replaceAll("[\\\\/:*?\"<>|]", "");
     }
 }

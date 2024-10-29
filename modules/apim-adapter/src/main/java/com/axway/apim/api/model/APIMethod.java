@@ -154,6 +154,20 @@ public class APIMethod {
     public int hashCode() {
         return Objects.hash(name, summary, descriptionType, tags);
     }
+
+    @Override
+    public String toString() {
+        return "APIMethod{" +
+            "tags=" + tags +
+            ", descriptionType='" + descriptionType + '\'' +
+            ", descriptionUrl='" + descriptionUrl + '\'' +
+            ", descriptionMarkdown='" + descriptionMarkdown + '\'' +
+            ", descriptionManual='" + descriptionManual + '\'' +
+            ", original='" + original + '\'' +
+            ", summary='" + summary + '\'' +
+            ", name='" + name + '\'' +
+            '}';
+    }
 }
 
 

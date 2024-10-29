@@ -98,16 +98,19 @@ public class APIQuotaManager {
                 for (QuotaRestriction existingRestriction : existingRestrictions) {
                     // It's considered as the same restriction when quota type, method, period & per are equal
                     if (desiredRestriction.isSameRestriction(existingRestriction, true)) {
+                        mergedRestrictions.remove(existingRestriction);
                         // If it is the same restriction, we need to update the restriction configuration
                         if (existingRestriction.getType() == QuotaRestrictionType.throttle) {
                             existingRestriction.getConfig().put("messages", desiredRestriction.getConfig().get("messages"));
                         } else {
                             existingRestriction.getConfig().put("mb", desiredRestriction.getConfig().get("mb"));
                         }
+                        mergedRestrictions.add(existingRestriction);
                         break;
                     }
                 }
             }
+
             // Add missing desired restrictions to actual restriction
             for (QuotaRestriction desiredRestriction : desiredRestrictions) {
                 if (!quotaApiMethodExists(existingRestrictions, desiredRestriction)) {

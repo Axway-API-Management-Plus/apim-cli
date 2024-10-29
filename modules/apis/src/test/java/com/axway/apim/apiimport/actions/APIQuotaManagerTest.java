@@ -507,7 +507,6 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
-      //  CoreParameters.getInstance().setQuotaMode(CoreParameters.Mode.replace);
 
         String actualQuota = "[\n" +
             "      {\n" +
@@ -524,6 +523,7 @@ public class APIQuotaManagerTest extends WiremockWrapper {
 
         String desiredQuota = "[\n" +
             "      {\n" +
+            "        \"api\": \"*\",\n" +
             "        \"method\": \"*\",\n" +
             "        \"type\": \"throttle\",\n" +
             "        \"config\": {\n" +
