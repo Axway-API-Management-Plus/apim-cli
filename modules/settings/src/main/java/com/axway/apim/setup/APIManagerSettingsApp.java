@@ -66,14 +66,16 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
     @CLIServiceMethod(name = "import", description = "Import configuration into API-Manager")
     public static int importConfig(String[] args) {
         StandardImportParams params;
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
         } catch (AppException e) {
             LOG.error("Error {}", e.getMessage());
-            return e.getError().getCode();
+            return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
         }
         APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
-        return managerConfigApp.importConfig(params).getRc();
+        return errorCodeMapper.getMapedErrorCode(managerConfigApp.importConfig(params).getErrorCode()).getCode();
     }
 
     public ExportResult runExport(APIManagerSetupExportParams params) {
