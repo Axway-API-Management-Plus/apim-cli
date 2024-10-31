@@ -482,4 +482,10 @@ public class Utils {
     public static String replaceSpecialChars(String fileName) {
         return fileName.replaceAll("[\\\\/:*?\"<>|]", "");
     }
+
+    public static String formatPort(URL url){
+        String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
+        if (port.equals(":443") || port.equals(":80")) port = "";
+        return port;
+    }
 }
