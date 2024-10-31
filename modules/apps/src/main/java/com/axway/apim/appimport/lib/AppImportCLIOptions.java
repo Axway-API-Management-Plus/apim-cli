@@ -16,7 +16,6 @@ public class AppImportCLIOptions extends CLIOptions {
 
     public static CLIOptions create(String[] args) throws AppException {
         CLIOptions cliOptions = new AppImportCLIOptions(args);
-        cliOptions = new StandardImportCLIOptions(cliOptions);
         cliOptions = new CoreCLIOptions(cliOptions);
         cliOptions.addOptions();
         cliOptions.parse();
@@ -30,6 +29,7 @@ public class AppImportCLIOptions extends CLIOptions {
         option.setRequired(true);
         option.setArgName("app_config.json");
         addOption(option);
+        new StandardImportCLIOptions().addOptions(this);
     }
 
     @Override
@@ -55,6 +55,8 @@ public class AppImportCLIOptions extends CLIOptions {
     @Override
     public Parameters getParams() {
         AppImportParams params = new AppImportParams();
+        params.setEnabledCaches(getValue("enabledCaches"));
+        params.setStageConfig(getValue("stageConfig"));
         params.setConfig(getValue("c"));
         return params;
     }

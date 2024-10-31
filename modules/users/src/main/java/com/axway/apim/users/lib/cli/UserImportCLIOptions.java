@@ -17,7 +17,6 @@ public class UserImportCLIOptions extends CLIOptions {
 
     public static CLIOptions create(String[] args) throws AppException {
         CLIOptions cliOptions = new UserImportCLIOptions(args);
-        cliOptions = new StandardImportCLIOptions(cliOptions);
         cliOptions = new CoreCLIOptions(cliOptions);
         cliOptions.addOptions();
         cliOptions.parse();
@@ -31,6 +30,8 @@ public class UserImportCLIOptions extends CLIOptions {
         option.setRequired(true);
         option.setArgName("user_config.json");
         addOption(option);
+        new StandardImportCLIOptions().addOptions(this);
+
     }
 
     @Override
@@ -56,6 +57,8 @@ public class UserImportCLIOptions extends CLIOptions {
     @Override
     public Parameters getParams() {
         UserImportParams params = new UserImportParams();
+        params.setEnabledCaches(getValue("enabledCaches"));
+        params.setStageConfig(getValue("stageConfig"));
         params.setConfig(getValue("config"));
         return params;
     }

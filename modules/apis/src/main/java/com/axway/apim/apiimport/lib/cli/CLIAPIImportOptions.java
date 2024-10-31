@@ -22,7 +22,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIImportOptions(args);
-		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -98,8 +97,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 		addOption(option);
 
         new OptionsCommon().addDeprecateAndRetired(this);
-
-
+        new StandardImportCLIOptions().addOptions(this);
 	}
 
 	@Override
@@ -128,8 +126,9 @@ public class CLIAPIImportOptions extends CLIOptions {
 	@Override
 	public Parameters getParams() {
 		APIImportParams params = new APIImportParams();
+        params.setEnabledCaches(getValue("enabledCaches"));
+        params.setStageConfig(getValue("stageConfig"));
 		params.setConfig(getValue("config"));
-		params.setStageConfig(getValue("stagedConfig"));
 		params.setApiDefinition(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));

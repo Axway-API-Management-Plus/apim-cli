@@ -13,10 +13,9 @@ public class OrgImportCLIOptions extends CLIOptions {
 	private OrgImportCLIOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new OrgImportCLIOptions(args);
-		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -30,11 +29,12 @@ public class OrgImportCLIOptions extends CLIOptions {
 		option.setRequired(true);
 		option.setArgName("org_config.json");
 		addOption(option);
-	}
+        new StandardImportCLIOptions().addOptions(this);
+    }
 
 	@Override
 	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);		
+		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
 		Console.println("How to imports organizations using the JSON-Config format");
 		Console.println("Import an organization using enviornment properties: env.api-env.properties:");
@@ -50,10 +50,12 @@ public class OrgImportCLIOptions extends CLIOptions {
 	protected String getAppName() {
 		return "Organization-Import";
 	}
-	
+
 	@Override
 	public Parameters getParams() {
 		OrgImportParams params = new OrgImportParams();
+        params.setEnabledCaches(getValue("enabledCaches"));
+        params.setStageConfig(getValue("stageConfig"));
 		params.setConfig(getValue("config"));
 		return params;
 	}
