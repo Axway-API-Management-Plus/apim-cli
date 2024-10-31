@@ -323,4 +323,38 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
         Assert.assertFalse(optionalClientAppCredential.isPresent());
     }
+
+    @Test
+    public void searchForExistingCredentialNull() {
+        String credentialId = "1234";
+        Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(null, credentialId);
+        Assert.assertFalse(optionalClientAppCredential.isPresent());
+    }
+
+    @Test
+    public void copyClientAppCredential() {
+        ClientAppCredential clientAppCredential = new ExtClients();
+        clientAppCredential.setId("1234");
+        clientAppCredential.setApplicationId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        clientAppCredential.setSecret("");
+        ClientAppCredential target = new ExtClients();
+        clientAppAdapter.copyClientAppCredential( target, clientAppCredential, false);
+        Assert.assertTrue(clientAppCredential.getId().equals(target.getId()));
+        Assert.assertTrue(clientAppCredential.getApplicationId().equals(target.getApplicationId()));
+        Assert.assertNull(target.getSecret());
+    }
+
+
+    @Test
+    public void copyClientAppCredentialSecret() {
+        ClientAppCredential clientAppCredential = new ExtClients();
+        clientAppCredential.setId("1234");
+        clientAppCredential.setApplicationId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        clientAppCredential.setSecret("");
+        ClientAppCredential target = new ExtClients();
+        clientAppAdapter.copyClientAppCredential( target, clientAppCredential, true);
+        Assert.assertTrue(clientAppCredential.getId().equals(target.getId()));
+        Assert.assertTrue(clientAppCredential.getApplicationId().equals(target.getApplicationId()));
+        Assert.assertNotNull(target.getSecret());
+    }
 }
