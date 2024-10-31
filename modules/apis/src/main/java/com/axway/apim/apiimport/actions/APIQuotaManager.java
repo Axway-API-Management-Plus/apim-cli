@@ -21,6 +21,10 @@ import java.util.List;
 public class APIQuotaManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIQuotaManager.class);
+    public static final String PERIOD = "period";
+    public static final String MESSAGES = "messages";
+    public static final String PER = "per";
+    public static final String MB = "mb";
 
     private final API desiredState;
 
@@ -94,16 +98,23 @@ public class APIQuotaManager {
             // Iterate over the given desired restrictions and copy quota
             for (QuotaRestriction desiredRestriction : desiredRestrictions) {
                 desiredRestriction.setApiId(null);
-                // And compare each desired restriction, if it is already included in the existing restrictions
+                // Update restriction if actual and desired are same.
                 for (QuotaRestriction existingRestriction : existingRestrictions) {
                     // It's considered as the same restriction when quota type, method, period & per are equal
-                    if (desiredRestriction.isSameRestriction(existingRestriction, true)) {
+                    if (desiredRestriction.getMethod().equals(existingRestriction.getMethod())) {
                         mergedRestrictions.remove(existingRestriction);
+                        if(existingRestriction.getType() != desiredRestriction.getType()){
+                            existingRestriction.setType(desiredRestriction.getType());
+                        }
                         // If it is the same restriction, we need to update the restriction configuration
                         if (existingRestriction.getType() == QuotaRestrictionType.throttle) {
-                            existingRestriction.getConfig().put("messages", desiredRestriction.getConfig().get("messages"));
+                            existingRestriction.getConfig().put(MESSAGES, desiredRestriction.getConfig().get(MESSAGES));
+                            existingRestriction.getConfig().put(PERIOD, desiredRestriction.getConfig().get(PERIOD));
+                            existingRestriction.getConfig().put(PER, desiredRestriction.getConfig().get(PER));
                         } else {
-                            existingRestriction.getConfig().put("mb", desiredRestriction.getConfig().get("mb"));
+                            existingRestriction.getConfig().put(MB, desiredRestriction.getConfig().get(MB));
+                            existingRestriction.getConfig().put(PER, desiredRestriction.getConfig().get(PER));
+                            existingRestriction.getConfig().put(PERIOD, desiredRestriction.getConfig().get(PERIOD));
                         }
                         mergedRestrictions.add(existingRestriction);
                         break;

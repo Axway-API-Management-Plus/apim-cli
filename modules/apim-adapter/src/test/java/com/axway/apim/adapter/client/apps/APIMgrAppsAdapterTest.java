@@ -3,7 +3,7 @@ package com.axway.apim.adapter.client.apps;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIQuota;
-import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.model.apps.*;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class APIMgrAppsAdapterTest extends WiremockWrapper {
@@ -254,5 +255,72 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         RestAPICall request = clientAppAdapter.createUpsertUri(entity, uri, actualApp);
         Assert.assertNotNull(request);
         Assert.assertTrue(request instanceof POSTRequest);
+    }
+
+    @Test
+    public void deleteApplicationQuota() throws AppException, URISyntaxException {
+        CoreParameters cmd = CoreParameters.getInstance();
+        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/1d2aeeca-2716-449e-a7a0-5d7213dbcbaf" + "/quota").build();
+        clientAppAdapter.deleteApplicationQuota(uri);
+    }
+
+    @Test
+    public void searchForExistingCredential() {
+        String credentialId = "1234";
+        ClientApplication clientApplication = new ClientApplication();
+        clientApplication.setName("test");
+        clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        ClientAppCredential clientAppCredential = new OAuth();
+        clientAppCredential.setId(credentialId);
+        List<ClientAppCredential> credentials = new ArrayList<>();
+        credentials.add(clientAppCredential);
+        clientApplication.setCredentials(credentials);
+        Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
+        Assert.assertTrue(optionalClientAppCredential.isPresent());
+        Assert.assertEquals(clientAppCredential, optionalClientAppCredential.get());
+    }
+
+    @Test
+    public void searchForExistingCredentialApikey() {
+        String credentialId = "1234";
+        ClientApplication clientApplication = new ClientApplication();
+        clientApplication.setName("test");
+        clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        ClientAppCredential clientAppCredential = new APIKey();
+        clientAppCredential.setId(credentialId);
+        List<ClientAppCredential> credentials = new ArrayList<>();
+        credentials.add(clientAppCredential);
+        clientApplication.setCredentials(credentials);
+        Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
+        Assert.assertTrue(optionalClientAppCredential.isPresent());
+        Assert.assertEquals(clientAppCredential, optionalClientAppCredential.get());
+    }
+
+
+    @Test
+    public void searchForExistingCredentialExtClients() {
+        String credentialId = "1234";
+        ClientApplication clientApplication = new ClientApplication();
+        clientApplication.setName("test");
+        clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        ClientAppCredential clientAppCredential = new ExtClients();
+        clientAppCredential.setId(credentialId);
+        List<ClientAppCredential> credentials = new ArrayList<>();
+        credentials.add(clientAppCredential);
+        clientApplication.setCredentials(credentials);
+        Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
+        Assert.assertTrue(optionalClientAppCredential.isPresent());
+        Assert.assertEquals(clientAppCredential, optionalClientAppCredential.get());
+    }
+
+    @Test
+    public void searchForExistingCredentialNone() {
+        String credentialId = "1234";
+        ClientApplication clientApplication = new ClientApplication();
+        clientApplication.setName("test");
+        clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+
+        Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
+        Assert.assertFalse(optionalClientAppCredential.isPresent());
     }
 }
