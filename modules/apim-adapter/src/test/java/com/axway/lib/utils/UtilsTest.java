@@ -198,6 +198,15 @@ public class UtilsTest {
     }
 
     @Test
+    public void handleBasePath() throws MalformedURLException {
+        String url = "https://www.sella.it";
+        String backendBasePath = "/hbfree";
+
+        String result = Utils.handleOpenAPIServerUrl(url, backendBasePath);
+        Assert.assertEquals("/hbfree", result);
+    }
+
+    @Test
     public void ignoreBasePath() {
         String serverUrl = "https://petstore3.swagger.io/api/v3";
         String result = Utils.ignoreBasePath(serverUrl);
