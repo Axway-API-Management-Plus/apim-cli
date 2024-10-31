@@ -391,4 +391,18 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         HttpEntity entity = clientAppAdapter.createHttpEntity(filter, clientAppOauthResource);
         Assert.assertNotNull(entity);
     }
+
+    @Test
+    public void addAPIAccess() throws JsonProcessingException {
+        String credentialId = "1234";
+        ClientApplication clientApplication = new ClientApplication();
+        clientApplication.setName("test");
+        clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        ClientAppCredential clientAppCredential = new ExtClients();
+        clientAppCredential.setId(credentialId);
+        List<ClientAppCredential> credentials = new ArrayList<>();
+        credentials.add(clientAppCredential);
+        clientApplication.setCredentials(credentials);
+        clientAppAdapter.addAPIAccess(clientApplication, true);
+    }
 }
