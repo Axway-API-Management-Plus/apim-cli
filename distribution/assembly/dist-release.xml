@@ -37,6 +37,8 @@
                             <exclude>*.formatted</exclude>
                             <exclude>scripts/*</exclude>
                             <exclude>samples/**</exclude>
+                            <exclude>conf/*.sample</exclude>
+                            <exclude>conf/*.properties</exclude>
                         </excludes>
                     </fileSet>
                     <fileSet>
