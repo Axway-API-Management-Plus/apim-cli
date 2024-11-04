@@ -64,7 +64,8 @@ public class ExportHelper {
             String fileName = Utils.replaceSpecialChars(exportAPI.getName()) + apiDef.getAPIDefinitionType().getFileExtension();
             targetFile = localFolder.getCanonicalPath() + "/" + fileName;
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
-                writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+                Object spec = mapper.readValue(apiDef.getApiSpecificationContent(), Object.class);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(new File(targetFile), spec);
                 exportAPI.getAPIDefinition().setApiSpecificationFile(fileName);
             }
         } catch (IOException e) {

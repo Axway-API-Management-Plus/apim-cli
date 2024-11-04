@@ -57,7 +57,7 @@ public class OAS3xSpecification extends APISpecification {
         // Return the original given API-Spec if no filters are applied
         if (this.filterConfig == null) return this.apiSpecificationContent;
         try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(openApiNode);
+            return mapper.writeValueAsBytes(openApiNode);
         } catch (JsonProcessingException e) {
             throw new InternalException("Error parsing API-Specification", e);
         }

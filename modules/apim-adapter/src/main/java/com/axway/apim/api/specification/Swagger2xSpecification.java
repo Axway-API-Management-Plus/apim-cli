@@ -42,7 +42,7 @@ public class Swagger2xSpecification extends APISpecification {
         // Return the original given API-Spec if no filters are applied
         if (this.filterConfig == null) return this.apiSpecificationContent;
         try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(swagger);
+            return mapper.writeValueAsBytes(swagger);
         } catch (JsonProcessingException e) {
             throw new InternalException("Error parsing API-Specification", e);
         }
