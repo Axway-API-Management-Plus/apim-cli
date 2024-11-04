@@ -605,7 +605,7 @@ public class APIManagerAPIAdapter {
     }
 
     public String[] getSerializeAllExcept() {
-        return new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+        return new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
     }
 
     public void deleteAPIProxy(API api) throws AppException {
