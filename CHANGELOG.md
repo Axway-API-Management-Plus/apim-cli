@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Removing existing GLOBAL quotas in Api Manager(See issue [#442](https://github.com/Axway-API-Management-Plus/apim-cli/issues/442))
+- Property "queryStringPassThrough" (See issue [#517](https://github.com/Axway-API-Management-Plus/apim-cli/issues/517))
+- Axway apimcli: Format and version discrepancies - read-only (Swagger 2.0, single-line) vs editable APIs (Swagger 1.1, formatted) (See issue [#516](https://github.com/Axway-API-Management-Plus/apim-cli/issues/516))
+- Quota replacement for method: *  (See issue [#514](https://github.com/Axway-API-Management-Plus/apim-cli/issues/514))
 
 ### Added
 - Allow APIM Cli to retire old API when importing apis using zeroDowntimeUpdate (See issue [#511](https://github.com/Axway-API-Management-Plus/apim-cli/issues/511))
