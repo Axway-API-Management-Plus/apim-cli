@@ -31,7 +31,7 @@ public class Swagger2xSpecification extends APISpecification {
 
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
-        if (this.mapper.getFactory() instanceof YAMLFactory) {
+        if (mapper.getFactory() instanceof YAMLFactory) {
             return APISpecType.SWAGGER_API_20_YAML;
         }
         return APISpecType.SWAGGER_API_20;

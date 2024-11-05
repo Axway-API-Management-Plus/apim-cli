@@ -31,7 +31,7 @@ public class OAS3xSpecification extends APISpecification {
 
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
-        if (this.mapper.getFactory() instanceof YAMLFactory) {
+        if (mapper.getFactory() instanceof YAMLFactory) {
             return APISpecType.OPEN_API_30_YAML;
         }
         return APISpecType.OPEN_API_30;

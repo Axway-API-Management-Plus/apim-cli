@@ -10,6 +10,8 @@ import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.OAS3xSpecification;
+import com.axway.apim.api.specification.Swagger2xSpecification;
 import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,18 +62,7 @@ public class ExportHelper {
                 throw new AppException("Backend API Definition is not available for the API : " + exportAPI.getName() + ", hence use the option -useFEAPIDefinition to export API", ErrorCode.BACKEND_API_DEF_NA);
             return;
         }
-        String targetFile = null;
-        try {
-            String fileName = Utils.replaceSpecialChars(exportAPI.getName()) + apiDef.getAPIDefinitionType().getFileExtension();
-            targetFile = localFolder.getCanonicalPath() + "/" + fileName;
-            if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
-                Object spec = mapper.readValue(apiDef.getApiSpecificationContent(), Object.class);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(new File(targetFile), spec);
-                exportAPI.getAPIDefinition().setApiSpecificationFile(fileName);
-            }
-        } catch (IOException e) {
-            throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
-        }
+        writeSpec(mapper, apiDef, exportAPI, localFolder);
         Image image = exportAPI.getAPIImage();
         if (image != null && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
             writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
@@ -148,6 +140,32 @@ public class ExportHelper {
                     throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
                 }
             }
+        }
+    }
+
+    public void writeSpec(ObjectMapper mapper, APISpecification apiDef, ExportAPI exportAPI, File localFolder) throws AppException {
+        String targetFile = null;
+        try {
+            if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
+                String fileName = Utils.replaceSpecialChars(exportAPI.getName());
+                String fileExtension = apiDef.getAPIDefinitionType().getFileExtension();
+                if(apiDef instanceof Swagger2xSpecification || apiDef instanceof OAS3xSpecification){
+                    if (mapper.getFactory() instanceof YAMLFactory) {
+                        fileExtension =  APISpecification.APISpecType.SWAGGER_API_20_YAML.getFileExtension();
+                    }else {
+                        fileExtension =  APISpecification.APISpecType.SWAGGER_API_20.getFileExtension();
+                    }
+                    targetFile = localFolder.getCanonicalPath() + "/" + fileName + fileExtension;
+                    Object spec = mapper.readValue(apiDef.getApiSpecificationContent(), Object.class);
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(new File(targetFile), spec);
+                }else {
+                    targetFile = localFolder.getCanonicalPath() + "/" + fileName + fileExtension;
+                    writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+                }
+                exportAPI.getAPIDefinition().setApiSpecificationFile(fileName);
+            }
+        } catch (IOException e) {
+            throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 
