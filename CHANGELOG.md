@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-# [1.14.8]  In progress
+# [1.14.8]  2024-11-05
 
 ### Fixed
 - Removing existing GLOBAL quotas in Api Manager(See issue [#442](https://github.com/Axway-API-Management-Plus/apim-cli/issues/442))
@@ -76,7 +76,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - APIM CLI to check/skip already removed API (See issue [#417](https://github.com/Axway-API-Management-Plus/apim-cli/issues/417))
 - Error mapping is not applied when importing "app" (See issue [#437](https://github.com/Axway-API-Management-Plus/apim-cli/issues/437))
-- Handling backend changes and removal of organization from api-config json file in one command  [#441](https://github.com/Axway-API-Management-Plus/apim-cli/issues/441))
+- Handling backend changes and removal of organization from api-config json file in one command  [#441](https://github.com/Axway-API-Management-Plus/apim-cli/issues/441)
 - Handling removing of existing quota in API (See issue [#438](https://github.com/Axway-API-Management-Plus/apim-cli/issues/438))
 - Regression in handling removing existing quota in API Manager  (See issue [#434](https://github.com/Axway-API-Management-Plus/apim-cli/issues/434))
 ### Added
@@ -142,7 +142,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support of All / Global quotas for API and application. (See issue [#362](https://github.com/Axway-API-Management-Plus/apim-cli/issues/362))
-- Host docker cli images on github docker registry [#373](https://github.com/Axway-API-Management-Plus/apim-cli/issues/373))
+- Host docker cli images on github docker registry (See issue [#373](https://github.com/Axway-API-Management-Plus/apim-cli/issues/373)
 
 
 ## [1.13.5] 2023-03-15
@@ -166,7 +166,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support yaml configuration for apim cli (Beta)
-- Support for APIM February 2023 release [#346](https://github.com/Axway-API-Management-Plus/apim-cli/issues/346))
+- Support for APIM February 2023 release [#346](https://github.com/Axway-API-Management-Plus/apim-cli/issues/346)
 
 
 ## [1.13.3] 2023-02-08
