@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-# [1.14.8]  2024-11-05
+# [1.14.8]  2024-11-06
 
 ### Fixed
 - Removing existing GLOBAL quotas in Api Manager(See issue [#442](https://github.com/Axway-API-Management-Plus/apim-cli/issues/442))
