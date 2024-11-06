@@ -145,4 +145,20 @@ public class CoreCLIOptionsTest {
         Assert.assertNull(params.getCustomHeaders());
 
     }
+
+    @Test(expectedExceptions = AppException.class)
+    public void testHelpMessage() throws AppException {
+        String[] args = {"-help"};
+        CLIOptions options = SampleCLIOptions.create(args);
+        options.addHelpAndVersion();
+        options.parse();
+    }
+
+    @Test(expectedExceptions = AppException.class)
+    public void testVersionMessage() throws AppException {
+        String[] args = {"-version"};
+        CLIOptions options = SampleCLIOptions.create(args);
+        options.addHelpAndVersion();
+        options.parse();
+    }
 }

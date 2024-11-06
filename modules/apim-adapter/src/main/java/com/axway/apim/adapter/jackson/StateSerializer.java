@@ -1,6 +1,6 @@
 package com.axway.apim.adapter.jackson;
 
-import com.axway.apim.api.API;
+import com.axway.apim.lib.utils.Constants;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -24,8 +24,8 @@ public class StateSerializer extends BeanPropertyWriter {
                                  SerializerProvider prov) throws Exception {
         Object value = writer.get(bean);
         if (value instanceof String) {
-        	if(value.equals(API.STATE_DEPRECATED)) {
-        		gen.writeStringField(writer.getName(), API.STATE_PUBLISHED);
+        	if(value.equals(Constants.API_DEPRECATED)) {
+        		gen.writeStringField(writer.getName(), Constants.API_PUBLISHED);
         	} else {
         		gen.writeStringField(writer.getName(), (String)value);
         	}

@@ -1,5 +1,6 @@
 package com.axway.apim.apiimport.lib.cli;
 
+import com.axway.apim.OptionsCommon;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
@@ -21,7 +22,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIImportOptions(args);
-		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -95,6 +95,9 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option = new Option("zeroDowntimeUpdate", true,"Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
 		addOption(option);
+
+        new OptionsCommon().addDeprecateAndRetired(this);
+        new StandardImportCLIOptions().addOptions(this);
 	}
 
 	@Override
@@ -123,8 +126,9 @@ public class CLIAPIImportOptions extends CLIOptions {
 	@Override
 	public Parameters getParams() {
 		APIImportParams params = new APIImportParams();
+        params.setEnabledCaches(getValue("enabledCaches"));
+        params.setStageConfig(getValue("stageConfig"));
 		params.setConfig(getValue("config"));
-		params.setStageConfig(getValue("stagedConfig"));
 		params.setApiDefinition(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
@@ -137,6 +141,9 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
+        params.setReferenceAPIDeprecate(Boolean.parseBoolean(getValue("refAPIDeprecate")));
+        params.setReferenceAPIRetire(Boolean.parseBoolean(getValue("refAPIRetire")));
+        params.setReferenceAPIRetirementDate(getValue("refAPIRetireDate"));
         return params;
 	}
 }

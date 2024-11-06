@@ -5,6 +5,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIUpgradeAccessParams extends APIExportParams implements Parameters, APIFilterParams {
@@ -14,9 +15,9 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
     private String referenceAPIVersion;
     private String referenceAPIOrganization;
 
-    private Boolean referenceAPIDeprecate = false;
-    private Boolean referenceAPIRetire = false;
-    private Long referenceAPIRetirementDate;
+    private boolean referenceAPIDeprecate;
+    private boolean referenceAPIRetire;
+    private long referenceAPIRetirementDate;
 
     private API referenceAPI;
 
@@ -28,23 +29,23 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
         this.referenceAPI = referenceAPI;
     }
 
-    public Boolean getReferenceAPIDeprecate() {
+    public boolean isReferenceAPIDeprecate() {
         return referenceAPIDeprecate;
     }
 
-    public void setReferenceAPIDeprecate(Boolean referenceAPIDeprecate) {
+    public void setReferenceAPIDeprecate(boolean referenceAPIDeprecate) {
         this.referenceAPIDeprecate = referenceAPIDeprecate;
     }
 
-    public Boolean getReferenceAPIRetire() {
+    public boolean isReferenceAPIRetire() {
         return referenceAPIRetire;
     }
 
-    public void setReferenceAPIRetire(Boolean referenceAPIRetire) {
+    public void setReferenceAPIRetire(boolean referenceAPIRetire) {
         this.referenceAPIRetire = referenceAPIRetire;
     }
 
-    public Long getReferenceAPIRetirementDate() {
+    public long getReferenceAPIRetirementDate() {
         return referenceAPIRetirementDate;
     }
 
@@ -92,14 +93,14 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
             .hasName(getReferenceAPIName())
             .hasVHost(getReferenceAPIVersion())
             .hasOrganization(getReferenceAPIOrganization())
-            .hasState(API.STATE_PUBLISHED)
+            .hasState(Constants.API_PUBLISHED)
             .build();
     }
 
     @Override
     public void validateRequiredParameters() throws AppException {
         super.validateRequiredParameters();
-        if (getReferenceAPIRetire() != null && getReferenceAPIRetirementDate() == null) {
+        if (isReferenceAPIRetire() && getReferenceAPIRetirementDate() == 0) {
             throw new AppException("If API should be retired, a retirement date is required.", ErrorCode.MISSING_PARAMETER);
         }
     }

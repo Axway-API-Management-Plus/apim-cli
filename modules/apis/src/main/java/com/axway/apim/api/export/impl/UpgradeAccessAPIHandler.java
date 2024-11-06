@@ -9,6 +9,7 @@ import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
             throw new AppException("Reference API for upgrade is missing.", ErrorCode.UNKNOWN_API);
         }
         Console.println(apis.size() + " API(s) selected for upgrade based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
-        Console.println("Old/Reference API: deprecate: " + upgradeParams.getReferenceAPIDeprecate() + ", retired: " + upgradeParams.getReferenceAPIRetire() + ", retirementDate: " + getRetirementDate(upgradeParams.getReferenceAPIRetirementDate()));
+        Console.println("Old/Reference API: deprecate: " + upgradeParams.isReferenceAPIDeprecate() + ", retired: " + upgradeParams.isReferenceAPIRetire() + ", retirementDate: " + getRetirementDate(upgradeParams.getReferenceAPIRetirementDate()));
         if (CoreParameters.getInstance().isForce()) {
             Console.println("Force flag given to upgrade: " + apis.size() + " API(s)");
         } else {
@@ -47,7 +48,7 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
         for (API api : apis) {
             try {
                 if (APIManagerAdapter.getInstance().getApiAdapter().upgradeAccessToNewerAPI(api, referenceAPI,
-                        upgradeParams.getReferenceAPIDeprecate(), upgradeParams.getReferenceAPIRetire(), upgradeParams.getReferenceAPIRetirementDate())) {
+                        upgradeParams.isReferenceAPIDeprecate(), upgradeParams.isReferenceAPIRetire(), upgradeParams.getReferenceAPIRetirementDate())) {
                     LOG.info("API: {} {} {} successfully upgraded.", api.getName(), api.getVersion(), api.getId());
                 }
             } catch (Exception e) {
@@ -60,7 +61,7 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
     @Override
     public APIFilter getFilter() {
         Builder builder = getBaseAPIFilterBuilder();
-        builder.hasState(API.STATE_PUBLISHED);
+        builder.hasState(Constants.API_PUBLISHED);
         return builder.build();
     }
 

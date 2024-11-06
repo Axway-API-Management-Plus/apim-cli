@@ -48,13 +48,15 @@ public class OrganizationApp implements APIMCLIServiceProvider {
     @CLIServiceMethod(name = "get", description = "Get Organizations from API-Manager in different formats")
     public static int exportOrgs(String[] args) {
         OrgExportParams params;
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
         } catch (AppException e) {
             LOG.error("Error {}", e.getMessage());
-            return e.getError().getCode();
+            return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
         }
-        return exportOrgs(params).getRc();
+        return  errorCodeMapper.getMapedErrorCode(exportOrgs(params).getErrorCode()).getCode();
     }
 
     public static ExportResult exportOrgs(OrgExportParams params) {
@@ -72,7 +74,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
             }
         } catch (AppException e) {
             e.logException(LOG);
-            result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
+            result.setError(e.getError());
             return result;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -117,6 +119,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             params = (OrgImportParams) OrgImportCLIOptions.create(args).getParams();
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
         } catch (AppException e) {
             LOG.error("Error importing org {}", e.getMessage());
             return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();

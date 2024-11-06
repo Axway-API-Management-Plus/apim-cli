@@ -5,6 +5,7 @@ import com.axway.apim.api.specification.filter.JsonNodeOpenAPI3SpecFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.InternalException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +31,7 @@ public class OAS3xSpecification extends APISpecification {
 
     @Override
     public APISpecType getAPIDefinitionType() throws AppException {
-        if (this.mapper.getFactory() instanceof YAMLFactory) {
+        if (mapper.getFactory() instanceof YAMLFactory) {
             return APISpecType.OPEN_API_30_YAML;
         }
         return APISpecType.OPEN_API_30;
@@ -58,7 +59,7 @@ public class OAS3xSpecification extends APISpecification {
         try {
             return mapper.writeValueAsBytes(openApiNode);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error parsing API-Specification", e);
+            throw new InternalException("Error parsing API-Specification", e);
         }
     }
 
@@ -68,7 +69,6 @@ public class OAS3xSpecification extends APISpecification {
             String url = Utils.handleOpenAPIServerUrl(host, basePath);
             ObjectNode newServer = createObjectNode("url", url);
             ((ObjectNode) openApiNode).set(SERVERS, mapper.createArrayNode().add(newServer));
-            configureBasePath(basePath, null);
             this.apiSpecificationContent = this.mapper.writeValueAsBytes(openApiNode);
         } catch (AppException e) {
             LOG.error("Cannot replace servers in openapi.", e);
@@ -96,29 +96,37 @@ public class OAS3xSpecification extends APISpecification {
                 if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
                     JsonNode server = servers.get(0);
                     JsonNode urlJsonNode = server.get("url");
-                    if (urlJsonNode != null) {
-                        String serverUrl = urlJsonNode.asText();
-                        if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
-                            overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
-                        } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
-                            LOG.info("servers.url does not contain host name hence updating host value from backendBasepath : {}", backendBasePath);
-                            updateServerSection(backendBasePath, serverUrl);
-                        }
-                    }
+                    updateServer(urlJsonNode, backendBasePath);
                 }
             } else {
-                LOG.info("Server element not found");
-                if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
-                    if (backendBasePath != null)
-                        overrideServerSection(backendBasePath); // override openapi url to fix issue #412
-                } else {
-                    LOG.info("Setting up server element as /");
-                    updateServerSection(backendBasePath, "/");
-                }
+                updateServer(backendBasePath);
             }
             this.apiSpecificationContent = this.mapper.writeValueAsBytes(openApiNode);
         } catch (Exception e) {
             LOG.error("Cannot replace host in provided Open API. Continue with given host.", e);
+        }
+    }
+
+    private void updateServer(JsonNode urlJsonNode, String backendBasePath) throws MalformedURLException {
+        if (urlJsonNode != null) {
+            String serverUrl = urlJsonNode.asText();
+            if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
+            } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
+                LOG.info("servers.url does not contain host name hence updating host value from backendBasepath : {}", backendBasePath);
+                updateServerSection(backendBasePath, serverUrl);
+            }
+        }
+    }
+
+    private void updateServer(String backendBasePath) throws MalformedURLException {
+        LOG.info("Server element not found");
+        if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+            if (backendBasePath != null)
+                overrideServerSection(backendBasePath); // override openapi url to fix issue #412
+        } else {
+            LOG.info("Setting up server element as /");
+            updateServerSection(backendBasePath, "/");
         }
     }
 

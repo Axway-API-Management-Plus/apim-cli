@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class APIMethodTest {
@@ -324,6 +325,36 @@ public class APIMethodTest {
             "  }]";
         List<APIMethod> apiMethodsDesired = objectMapper.readValue(desired, apiMethodsTypeRef);
         Assert.assertFalse(Utils.compareValues(apiMethods, apiMethodsDesired));
+    }
+
+    @Test
+    public void testAPIMethodsWithEmptyTags() {
+        List<APIMethod> sourceAPIMethods = new ArrayList<>();
+        APIMethod apiMethod = new APIMethod();
+        apiMethod.setName("POST /web/auth/greenBees/setContact");
+        apiMethod.setDescriptionType("original");
+        sourceAPIMethods.add(apiMethod);
+
+        APIMethod apiMethod1 = new APIMethod();
+        apiMethod1.setName("POST /readAvailability");
+        apiMethod1.setDescriptionType("original");
+        sourceAPIMethods.add(apiMethod1);
+
+        List<APIMethod> targetAPIMethods = new ArrayList<>();
+        APIMethod apiMethod2 = new APIMethod();
+        apiMethod2.setName("POST /web/auth/greenBees/setContact");
+        apiMethod2.setDescriptionType("original");
+        apiMethod2.setTags(new TagMap());
+        targetAPIMethods.add(apiMethod2);
+
+        APIMethod apiMethod21 = new APIMethod();
+        apiMethod21.setName("POST /readAvailability");
+        apiMethod21.setDescriptionType("original");
+        apiMethod21.setTags(new TagMap());
+        targetAPIMethods.add(apiMethod21);
+        System.out.println(sourceAPIMethods);
+        System.out.println(targetAPIMethods);
+        Assert.assertTrue(Utils.compareValues(sourceAPIMethods, targetAPIMethods));
     }
 
 }

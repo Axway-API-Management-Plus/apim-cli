@@ -9,8 +9,11 @@ public class APIImportParams extends StandardImportParams implements Parameters 
     private boolean forceUpdate;
     private boolean useFEAPIDefinition;
     private boolean validateRemoteHost;
-    private boolean updateOnly = false;
-    private boolean changeOrganization = false;
+    private boolean updateOnly;
+    private boolean changeOrganization;
+    private boolean referenceAPIRetire;
+    private boolean referenceAPIDeprecate;
+    private String referenceAPIRetirementDate;
 
 
     private String apiDefinition;
@@ -52,5 +55,29 @@ public class APIImportParams extends StandardImportParams implements Parameters 
     }
     public void setChangeOrganization(boolean changeOrganization) {
         this.changeOrganization = changeOrganization;
+    }
+
+    public boolean isReferenceAPIRetire() {
+        return referenceAPIRetire;
+    }
+
+    public void setReferenceAPIRetire(boolean referenceAPIRetire) {
+        this.referenceAPIRetire = referenceAPIRetire;
+    }
+
+    public String getReferenceAPIRetirementDate() {
+        return referenceAPIRetirementDate;
+    }
+
+    public void setReferenceAPIRetirementDate(String referenceAPIRetirementDate) {
+        this.referenceAPIRetirementDate = referenceAPIRetirementDate;
+    }
+
+    public boolean isReferenceAPIDeprecate() {
+        return referenceAPIDeprecate;
+    }
+
+    public void setReferenceAPIDeprecate(boolean referenceAPIDeprecate) {
+        this.referenceAPIDeprecate = referenceAPIDeprecate;
     }
 }

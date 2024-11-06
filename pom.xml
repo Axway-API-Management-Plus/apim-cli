@@ -19,7 +19,7 @@
 
     <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
     <artifactId>parent</artifactId>
-    <version>1.14.7-SNAPSHOT</version>
+    <version>1.14.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Axway API-Manager CLI Parent</name>
@@ -462,10 +462,4 @@
             </properties>
         </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>spring-repo</id>
-            <url>https://repository.springsource.com/maven/bundles/external</url>
-        </repository>
-    </repositories>
 </project>

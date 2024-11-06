@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.springframework.integration.annotation.Filters;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -191,6 +192,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         testAPI.setPath(apiPath);
         testAPI.setVhost(vhost);
         testAPI.setApiRoutingKey(queryVersion);
+        testAPI.setState("unpublished");
         return testAPI;
     }
 
@@ -490,13 +492,13 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void upgradeAccessToNewerAPI() throws AppException {
+    public void upgradeAccessToNewerAPIWrapper() throws AppException {
         APIFilter filter = new APIFilter.Builder()
             .hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
             .build();
         API api = apiManagerAPIAdapter.getAPI(filter, true);
         api.setApplications(new ArrayList<>());
-        apiManagerAPIAdapter.upgradeAccessToNewerAPI(api, api);
+        apiManagerAPIAdapter.upgradeAccessToNewerAPIWrapper(api, api, false, false, 0);
     }
 
     @Test
@@ -817,6 +819,90 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         objectMapper.setFilterProvider(filter);
 
         System.out.println(objectMapper.writeValueAsString(baseConfig));
+    }
+
+    @Test
+    public void filterApiBasedOnStatePublished() throws AppException {
+        API api = new API();
+        api.setState("published");
+        api.setPath("/v1/api");
+        api.setVersion("1.0.2");
+        api.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        API deprecated = new API();
+        deprecated.setState("deprecated");
+        deprecated.setPath("/v1/api");
+        deprecated.setVersion("1.0.1");
+
+        deprecated.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        List<API> apis = new ArrayList<>();
+        apis.add(api);
+        apis.add(deprecated);
+        APIFilter apiFilter = new APIFilter.Builder().hasApiPath("/v1/api").build();
+        API result = apiManagerAPIAdapter.filterApiBasedOnState(apis, apiFilter );
+        Assert.assertEquals(result.getVersion(), "1.0.2");
+    }
+
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "No unique API found.*")
+    public void filterApiBasedOnStateUnPublished() throws AppException {
+        API api = new API();
+        api.setState("unpublished");
+        api.setPath("/v1/api");
+        api.setVersion("1.0.2");
+        api.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        API deprecated = new API();
+        deprecated.setState("deprecated");
+        deprecated.setPath("/v1/api");
+        deprecated.setVersion("1.0.1");
+
+        deprecated.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        List<API> apis = new ArrayList<>();
+        apis.add(api);
+        apis.add(deprecated);
+        APIFilter apiFilter = new APIFilter.Builder().hasApiPath("/v1/api").build();
+        API result = apiManagerAPIAdapter.filterApiBasedOnState(apis, apiFilter );
+        Assert.assertEquals(result.getVersion(), "1.0.2");
+    }
+
+
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "No unique API found.*")
+    public void filterApiBasedOnStateDeprecate() throws AppException {
+        API api = new API();
+        api.setState("delete");
+        api.setPath("/v1/api");
+        api.setVersion("1.0.2");
+        api.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        API deprecated = new API();
+        deprecated.setState("deprecated");
+        deprecated.setPath("/v1/api");
+        deprecated.setVersion("1.0.1");
+
+        deprecated.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+
+        List<API> apis = new ArrayList<>();
+        apis.add(api);
+        apis.add(deprecated);
+        APIFilter apiFilter = new APIFilter.Builder().hasApiPath("/v1/api").build();
+        API result = apiManagerAPIAdapter.filterApiBasedOnState(apis, apiFilter );
+        Assert.assertEquals(result.getVersion(), "1.0.1");
+    }
+
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "No unique API found.*")
+    public void filterApiBasedOnStateNoMatch() throws AppException {
+        API api = new API();
+        api.setState("delete");
+        api.setPath("/v1/api");
+        api.setVersion("1.0.2");
+        api.setApiId("1f4263ca-7f03-41d9-9d34-9eff79d29bd8");
+        List<API> apis = new ArrayList<>();
+        apis.add(api);
+        APIFilter apiFilter = new APIFilter.Builder().hasApiPath("/v1/api").build();
+        apiManagerAPIAdapter.filterApiBasedOnState(apis, apiFilter );
+
     }
 
 }

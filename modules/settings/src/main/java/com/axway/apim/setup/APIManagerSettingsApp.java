@@ -26,8 +26,6 @@ import com.axway.apim.setup.model.Quotas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-
 public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerSettingsApp.class);
@@ -58,7 +56,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         try {
             params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         } catch (AppException e) {
-            LOG.error("Error {}", e.getMessage());
+            LOG.error("Error processing get", e);
             return e.getError().getCode();
         }
         APIManagerSettingsApp app = new APIManagerSettingsApp();
@@ -68,14 +66,16 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
     @CLIServiceMethod(name = "import", description = "Import configuration into API-Manager")
     public static int importConfig(String[] args) {
         StandardImportParams params;
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
         } catch (AppException e) {
             LOG.error("Error {}", e.getMessage());
-            return e.getError().getCode();
+            return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
         }
         APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
-        return managerConfigApp.importConfig(params).getRc();
+        return errorCodeMapper.getMapedErrorCode(managerConfigApp.importConfig(params).getErrorCode()).getCode();
     }
 
     public ExportResult runExport(APIManagerSetupExportParams params) {
@@ -194,43 +194,46 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
         APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction systemQuotaRestriction = quotas.getSystemQuota();
-        if (systemQuotaRestriction != null) {
+        APIQuota systemQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
+        if (systemQuotaRestriction != null && systemQuotaRestriction.getApi() != null) { // Updating quota
             LOG.debug("Updating System Global Quota : {}", systemQuotaRestriction);
-            APIQuota systemQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
             if (systemQuota.getRestrictions() != null) {
-                for (Iterator<QuotaRestriction> iterator = systemQuota.getRestrictions().iterator(); iterator.hasNext(); ) {
-                    QuotaRestriction quotaRestriction = iterator.next();
-                    if (quotaRestriction.getApi().equals("*")) {
-                        iterator.remove();
-                        LOG.debug("Removing exiting System Global Quota for update");
-                    }
-                }
+                removeExistingGlobalQuota(systemQuota); // Remove exising quota to update
                 systemQuota.getRestrictions().add(systemQuotaRestriction);
             }
-            quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
-            LOG.debug("System Global Quota is updated");
+
+        }else { // Removing system quota
+            LOG.debug("removing System Global Quota ");
+            if (systemQuota.getRestrictions() != null) {
+                removeExistingGlobalQuota(systemQuota);
+            }
         }
+        quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
+        LOG.debug("System Global Quota is updated");
+    }
+
+    public void removeExistingGlobalQuota( APIQuota systemQuota) {
+        systemQuota.getRestrictions().removeIf(quotaRestriction -> quotaRestriction.getApi().equals("*"));
     }
 
     public void upsertGlobalApplicationQuota(Quotas quotas) throws AppException {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
         APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
-        if (applicationQuotaRestriction != null) {
+        APIQuota applicationQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
+        if (applicationQuotaRestriction != null && applicationQuotaRestriction.getApi() != null) {
             LOG.debug("Updating Application Global Quota : {}", applicationQuotaRestriction);
-            APIQuota applicationQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
             if (applicationQuota.getRestrictions() != null) {
-                for (Iterator<QuotaRestriction> iterator = applicationQuota.getRestrictions().iterator(); iterator.hasNext(); ) {
-                    QuotaRestriction quotaRestriction = iterator.next();
-                    if (quotaRestriction.getApi().equals("*")) {
-                        iterator.remove();
-                        LOG.debug("Removing exiting Application Global Quota for update");
-                    }
-                }
+                removeExistingGlobalQuota(applicationQuota);
                 applicationQuota.getRestrictions().add(applicationQuotaRestriction);
             }
-            quotaAdapter.saveQuota(applicationQuota, APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId());
-            LOG.debug("Application Global Quota is updated");
+        }else {
+            LOG.debug("removing Application Global Quota ");
+            if (applicationQuota.getRestrictions() != null) {
+                removeExistingGlobalQuota(applicationQuota);
+            }
         }
+        quotaAdapter.saveQuota(applicationQuota, APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId());
+        LOG.debug("Application Global Quota is updated");
     }
 }

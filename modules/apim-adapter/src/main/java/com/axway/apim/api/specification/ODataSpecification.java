@@ -70,7 +70,7 @@ public abstract class ODataSpecification extends APISpecification {
             return mapper.writeValueAsBytes(openAPI);
         } catch (JsonProcessingException e) {
             LOG.error("Error creating OpenAPI specification based on OData specification", e);
-            return null;
+            return new byte[0];
         }
     }
 

@@ -13,10 +13,9 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 	private APIManagerSetupImportCLIOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new APIManagerSetupImportCLIOptions(args);
-		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -29,11 +28,12 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 		option.setRequired(true);
 		option.setArgName("api-manager.json");
 		addOption(option);
-	}
+        new StandardImportCLIOptions().addOptions(this);
+    }
 
 	@Override
 	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);		
+		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
 		Console.println("How to import API-Manager configuration");
 		Console.println("Import the API-Manager configuration:");
@@ -48,10 +48,12 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 	protected String getAppName() {
 		return "API-Manager Config-Import";
 	}
-	
+
 	@Override
 	public StandardImportParams getParams() {
 		StandardImportParams params = new StandardImportParams();
+        params.setEnabledCaches(getValue("enabledCaches"));
+        params.setStageConfig(getValue("stageConfig"));
 		params.setConfig(getValue("config"));
 		return params;
 	}

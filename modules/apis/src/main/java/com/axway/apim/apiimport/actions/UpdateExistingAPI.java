@@ -11,6 +11,7 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +92,7 @@ public class UpdateExistingAPI {
     }
 
     private void logStatus(API actualAPI, APIChangeState changes) throws AppException {
-        if (actualAPI.getState().equals(API.STATE_DELETED)) {
+        if (actualAPI.getState().equals(Constants.API_DELETED)) {
             LOG.info("Successfully deleted API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
         } else {
             LOG.info("Successfully updated {} API: {} {} (ID: {})", actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());

@@ -9,7 +9,7 @@ jobs:
     name: Publish Choco package
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Check-Out
     - name: Fetch release package
       uses: wyozi/download-gh-release-asset@master
@@ -31,7 +31,7 @@ jobs:
       name: Choco pack
       with:
         args: pack tools/choco/axway-apim-cli/axway-apim-cli.nuspec
-    - uses: crazy-max/ghaction-chocolatey@v1
+    - uses: crazy-max/ghaction-chocolatey@v3
       name: Choco push
       with:
         args: push --api-key ${{ secrets.CHOCO_API_KEY }} axway-apim-cli.${{ github.event.release.tag_name }}.nupkg

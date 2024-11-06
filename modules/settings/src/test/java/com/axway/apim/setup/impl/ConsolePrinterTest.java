@@ -104,4 +104,14 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         exporter.export(apiManagerConfig);
     }
+
+    @Test
+    public void testConsoleExportCustomProperties() throws AppException {
+        String[] args = {"-h", "localhost", "-c", "manager-config.json", "-type", "CUSTOMPROPERTIES"};
+        APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
+        ExportResult result = new ExportResult();
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerConfig apiManagerConfig = new APIManagerConfig();
+        exporter.export(apiManagerConfig);
+    }
 }

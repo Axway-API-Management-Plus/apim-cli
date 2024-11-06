@@ -118,13 +118,15 @@ public class UserApp implements APIMCLIServiceProvider {
 
     @CLIServiceMethod(name = "import", description = "Import user(s) into the API-Manager")
     public static int importUsers(String[] args) {
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             UserImportParams params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
             UserApp app = new UserApp();
-            return app.importUsers(params).getRc();
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
+            return errorCodeMapper.getMapedErrorCode(app.importUsers(params).getErrorCode()).getCode();
         } catch (AppException e) {
             LOG.error("Error importing user(s): ", e);
-            return e.getError().getCode();
+            return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
         }
     }
 

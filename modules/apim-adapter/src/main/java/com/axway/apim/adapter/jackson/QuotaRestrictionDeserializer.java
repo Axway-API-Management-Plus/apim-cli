@@ -10,6 +10,7 @@ import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictionType;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.InternalException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -50,7 +51,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
             this.apiAdapter = APIManagerAdapter.getInstance().getApiAdapter();
             this.apiMethodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
         } catch (AppException e) {
-            throw new RuntimeException(e);
+            throw new InternalException(e);
         }
     }
 

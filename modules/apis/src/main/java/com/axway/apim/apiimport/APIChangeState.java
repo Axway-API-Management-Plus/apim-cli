@@ -6,6 +6,7 @@ import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class APIChangeState {
     private static final Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
     private API actualAPI;
     private API desiredAPI;
+    private APIImportParams apiImportParams;
     private boolean isBreaking = false;
     private boolean updateExistingAPI = true;
     private boolean recreateAPI = false;
@@ -54,6 +56,14 @@ public class APIChangeState {
         getChanges();
     }
 
+    public APIChangeState(API actualAPI, API desiredAPI, APIImportParams apiImportParams) throws AppException {
+        this.actualAPI = actualAPI;
+        this.desiredAPI = desiredAPI;
+        this.apiImportParams = apiImportParams;
+        getChanges();
+    }
+
+
     /**
      * This method is reading all @APIDefinition annotations to verify which API-Property will
      * result in a breaking change. For that, it calls the equals methods on each property
@@ -72,7 +82,7 @@ public class APIChangeState {
             LOG.debug("You may set the toggle: changeOrganization=true to allow to changing the organization of an existing API.");
             throw new AppException("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS);
         }
-        if (API.STATE_DELETED.equals(desiredAPI.getState())) {
+        if (Constants.API_DELETED.equals(desiredAPI.getState())) {
             nonBreakingChanges.add("state");
             return;
         }
@@ -218,8 +228,8 @@ public class APIChangeState {
      */
     public boolean isBreaking() {
         // We will only break API, if the API is no longer in state: "unpublished"
-        if (this.actualAPI.getState().equals(API.STATE_UNPUBLISHED)) return false;
-        if (this.actualAPI.getState().equals(API.STATE_PENDING)) return false;
+        if (this.actualAPI.getState().equals(Constants.API_UNPUBLISHED)) return false;
+        if (this.actualAPI.getState().equals(Constants.API_PENDING)) return false;
         return isBreaking;
     }
 
@@ -282,12 +292,16 @@ public class APIChangeState {
         return false;
     }
 
+    public APIImportParams getApiImportParams() {
+        return apiImportParams;
+    }
+
 
     public boolean isAdminAccountNeeded() throws AppException {
         boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
         if (orgAdminSelfServiceEnabled) return false;
-        return (!getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && !getDesiredAPI().getState().equals(API.STATE_DELETED)) ||
-            (getActualAPI() != null && !getActualAPI().getState().equals(API.STATE_UNPUBLISHED));
+        return (!getDesiredAPI().getState().equals(Constants.API_UNPUBLISHED) && !getDesiredAPI().getState().equals(Constants.API_DELETED)) ||
+            (getActualAPI() != null && !getActualAPI().getState().equals(Constants.API_UNPUBLISHED));
     }
 
     public String waiting4Approval() throws AppException {

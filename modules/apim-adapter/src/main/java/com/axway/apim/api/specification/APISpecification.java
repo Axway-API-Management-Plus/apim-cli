@@ -170,7 +170,7 @@ public abstract class APISpecification {
     public boolean compareString(byte[] sourceSpec, byte[] gatewaySpec) {
         boolean rc = new String(sourceSpec, StandardCharsets.UTF_8).contentEquals(new String(gatewaySpec, StandardCharsets.UTF_8));
         if (!rc) {
-            LOG.info("Detected API-Definition-File sizes: API-Manager: {} vs Import: {}", gatewaySpec.length, sourceSpec.length);
+            LOG.info("Detected API-Definition-File sizes: API-Manager: {} vs Local: {}", gatewaySpec.length, sourceSpec.length);
         }
         return rc;
     }

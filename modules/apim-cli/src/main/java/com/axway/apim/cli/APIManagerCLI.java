@@ -120,7 +120,10 @@ public class APIManagerCLI {
     int run(String[] args) {
         int rc = 0;
         LOG.info("API-Manager CLI: {}", APIManagerCLI.class.getPackage().getImplementationVersion());
-        LOG.debug("Java Version: {}", System.getProperty("java.version"));
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("API-Manager CLI args: {}", Arrays.toString(args));
+            LOG.debug("Java Version: {}", System.getProperty("java.version"));
+        }
         if (this.selectedMethod == null) {
             this.printUsage();
             return rc;

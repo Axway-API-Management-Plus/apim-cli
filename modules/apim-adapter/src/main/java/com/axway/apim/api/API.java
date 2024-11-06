@@ -23,6 +23,7 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.APIPropertyAnnotation;
+import com.axway.apim.lib.utils.Constants;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -49,12 +50,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonFilter("APIFilter")
 public class API implements CustomPropertiesEntity {
 
-    public static final String STATE_PUBLISHED = "published";
-    public static final String STATE_UNPUBLISHED = "unpublished";
-    public static final String STATE_DEPRECATED = "deprecated";
-    public static final String STATE_DELETED = "deleted";
-    public static final String STATE_PENDING = "pending";
-
     JsonNode apiConfiguration;
 
     @JsonIgnore
@@ -63,52 +58,52 @@ public class API implements CustomPropertiesEntity {
     @APIPropertyAnnotation(isBreaking = true, writableStates = {}, isRecreate = true)
     protected APISpecification apiDefinition = null;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     protected List<CaCert> caCerts = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected String descriptionType = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected String descriptionManual = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected String descriptionMarkdown = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected String descriptionUrl = null;
 
     @JsonDeserialize(using = MarkdownLocalDeserializer.class)
     protected List<String> markdownLocal = null;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     @JsonSetter(nulls = Nulls.SKIP)
     protected List<SecurityProfile> securityProfiles = null;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     @JsonSetter(nulls = Nulls.SKIP)
     protected List<AuthenticationProfile> authenticationProfiles = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED})
     protected TagMap tags = null;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     protected Map<String, OutboundProfile> outboundProfiles = null;
 
-    @APIPropertyAnnotation(copyProp = false, isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(copyProp = false, isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     protected Map<String, ServiceProfile> serviceProfiles = null;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     protected Map<String, InboundProfile> inboundProfiles = null;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED})
     protected List<CorsProfile> corsProfiles;
 
-    @APIPropertyAnnotation(copyProp = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(copyProp = false, writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected List<Organization> clientOrganizations;
 
     @APIPropertyAnnotation(copyProp = false,
-        writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+        writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     @JsonSetter(nulls = Nulls.SKIP)
     protected List<ClientApplication> applications = null;
 
@@ -116,20 +111,20 @@ public class API implements CustomPropertiesEntity {
     protected String path = null;
 
     @APIPropertyAnnotation(copyProp = false,
-        writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+        writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected String state = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED})
     protected String version;
 
-    @APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, ignoreNull = false)
+    @APIPropertyAnnotation(isBreaking = true, writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED}, ignoreNull = false)
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     protected String vhost = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED})
     protected String name = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED, Constants.API_DEPRECATED})
     protected String summary = null;
 
     protected Long createdOn = null;
@@ -137,23 +132,23 @@ public class API implements CustomPropertiesEntity {
     protected String createdBy = null;
 
     @APIPropertyAnnotation(
-        writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+        writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected Image image = null;
 
     @APIPropertyAnnotation(
-        writableStates = {API.STATE_UNPUBLISHED})
+        writableStates = {Constants.API_UNPUBLISHED})
     protected Map<String, String> customProperties = null;
 
     @APIPropertyAnnotation(copyProp = false,
-        writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+        writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected APIQuota applicationQuota = null;
 
     @APIPropertyAnnotation(copyProp = false,
-        writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+        writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected APIQuota systemQuota = null;
 
     @APIPropertyAnnotation(isBreaking = true,
-        writableStates = {API.STATE_UNPUBLISHED})
+        writableStates = {Constants.API_UNPUBLISHED})
     protected String apiRoutingKey = null;
 
     @APIPropertyAnnotation(writableStates = {}, isRecreate = true)
@@ -175,13 +170,13 @@ public class API implements CustomPropertiesEntity {
     protected String resourcePath = null;
 
     @APIPropertyAnnotation(copyProp = false,
-        writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+        writableStates = {Constants.API_UNPUBLISHED, Constants.API_PUBLISHED, Constants.API_DEPRECATED})
     protected Long retirementDate = null;
 
     @JsonDeserialize(using = RemotehostDeserializer.class)
     protected RemoteHost remoteHost = null;
 
-    @APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
+    @APIPropertyAnnotation(writableStates = {Constants.API_UNPUBLISHED})
     protected List<APIMethod> apiMethods = null;
 
     public APISpecification getApiDefinition() {
@@ -258,7 +253,7 @@ public class API implements CustomPropertiesEntity {
      */
     public String getState() {
         if (this.deprecated != null
-            && this.deprecated.equals("true")) return STATE_DEPRECATED;
+            && this.deprecated.equals("true")) return Constants.API_DEPRECATED;
         return this.state;
     }
 

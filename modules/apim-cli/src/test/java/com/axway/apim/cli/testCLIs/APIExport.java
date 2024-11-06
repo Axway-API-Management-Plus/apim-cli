@@ -2,9 +2,10 @@ package com.axway.apim.cli.testCLIs;
 
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
+import com.axway.apim.lib.error.InternalException;
 
 /**
- * 
+ *
  * @author cwiechmann@axway.com
  */
 public class APIExport implements APIMCLIServiceProvider {
@@ -13,7 +14,7 @@ public class APIExport implements APIMCLIServiceProvider {
 		int rc = export(args);
 		System.exit(rc);
 	}
-	
+
 	@CLIServiceMethod(name="export", description = "Export APIs from the API-Manager")
 	public static int export(String[] args) {
 		return 0;
@@ -22,7 +23,7 @@ public class APIExport implements APIMCLIServiceProvider {
 
 	@CLIServiceMethod(name="delete", description = "Export APIs from the API-Manager")
 	public static int delete(String[] args) {
-		throw new RuntimeException("Invalid operation");
+		throw new InternalException("Invalid operation");
 	}
 	@Override
 	public String getName() {
@@ -33,12 +34,12 @@ public class APIExport implements APIMCLIServiceProvider {
 	public String getGroupId() {
 		return "api";
 	}
-	
+
 	@Override
 	public String getGroupDescription() {
 		return "Manage your APIs";
 	}
-	
+
 	@Override
 	public String getVersion() {
 		return APIExport.class.getPackage().getImplementationVersion();

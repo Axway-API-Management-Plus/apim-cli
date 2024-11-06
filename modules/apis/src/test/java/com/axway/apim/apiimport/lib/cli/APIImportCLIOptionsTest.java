@@ -79,4 +79,21 @@ public class APIImportCLIOptionsTest {
 		Assert.assertEquals(params.getConfig(), "myConfig.json");
 		Assert.assertEquals(params.getApiDefinition(), "thisIsMyAPIDefinition");
 	}
+
+    @Test
+    public void testDeprecateFlag() throws AppException {
+        String[] args = {"-c", "myConfig.json","-refAPIDeprecate", "true"};
+        CLIOptions options = CLIAPIImportOptions.create(args);
+        APIImportParams params = (APIImportParams) options.getParams();
+        Assert.assertTrue(params.isReferenceAPIDeprecate());
+    }
+
+    @Test
+    public void testRetireFlagAndDate() throws AppException {
+        String[] args = {"-c", "myConfig.json","-refAPIRetire", "true","-refAPIRetireDate", "31.12.2027"};
+        CLIOptions options = CLIAPIImportOptions.create(args);
+        APIImportParams params = (APIImportParams) options.getParams();
+        Assert.assertTrue(params.isReferenceAPIRetire());
+        Assert.assertEquals(params.getReferenceAPIRetirementDate(), "31.12.2027");
+    }
 }

@@ -10,6 +10,7 @@ import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -360,7 +361,7 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         params.setConfig(testConfig);
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
         API api = new API();
-        api.setState(API.STATE_UNPUBLISHED);
+        api.setState(Constants.API_UNPUBLISHED);
         api.setClientOrganizations(new ArrayList<>());
         adapter.handleOrganizations(api);
         Assert.assertNull(api.getClientOrganizations());
@@ -376,7 +377,7 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         params.setConfig(testConfig);
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
         API api = new API();
-        api.setState(API.STATE_PUBLISHED);
+        api.setState(Constants.API_PUBLISHED);
         api.setClientOrganizations(Arrays.asList(new Organization("ALL")));
         adapter.handleOrganizations(api);
         Assert.assertEquals(api.getClientOrganizations().size(), 1);
@@ -392,7 +393,7 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         params.setConfig(testConfig);
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
         API api = new API();
-        api.setState(API.STATE_PUBLISHED);
+        api.setState(Constants.API_PUBLISHED);
         api.setClientOrganizations(Arrays.asList(new Organization("orga")));
         adapter.handleOrganizations(api);
         Assert.assertEquals(api.getClientOrganizations().size(), 1);

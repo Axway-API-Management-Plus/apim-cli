@@ -10,6 +10,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Constants;
 
 public class APIGrantAccessParams extends APIExportParams implements Parameters, APIFilterParams {
 
@@ -79,7 +80,7 @@ public class APIGrantAccessParams extends APIExportParams implements Parameters,
 				.hasPolicyName(getPolicy())
 				.hasInboundSecurity(getInboundSecurity())
 				.hasTag(getTag())
-				.hasState(API.STATE_PUBLISHED) // Only published APIs are considered
+				.hasState(Constants.API_PUBLISHED) // Only published APIs are considered
 				.build();
 	}
 

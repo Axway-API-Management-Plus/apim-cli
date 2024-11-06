@@ -38,16 +38,16 @@ public class APIManagerAPIMethodAdapter {
         cmd = CoreParameters.getInstance();
     }
 
-    Map<String, String> apiManagerResponse = new HashMap<>();
+    private final Map<String, String> apiManagerResponse = new HashMap<>();
 
     private void readMethodsFromAPIManager(String apiId) throws AppException {
-        if (this.apiManagerResponse.get(apiId) != null) return;
+        if (apiManagerResponse.get(apiId) != null) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/operations").build();
             LOG.debug("Load API-Methods for API: {} from API-Manager", apiId);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                this.apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
+                apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
             }
         } catch (Exception e) {
             throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiId + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -58,7 +58,7 @@ public class APIManagerAPIMethodAdapter {
         readMethodsFromAPIManager(apiId);
         List<APIMethod> apiMethods;
         try {
-            apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<>() {
+            apiMethods = mapper.readValue(apiManagerResponse.get(apiId), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiId + "' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -113,7 +113,8 @@ public class APIManagerAPIMethodAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 if (statusCode < 200 || statusCode > 299) {
-                    throw new AppException("Can't update API-Manager Method. Response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
+                    LOG.debug("Response from server: {}", response);
+                    throw new AppException("Can't update API-Manager Method.", ErrorCode.API_MANAGER_COMMUNICATION);
                 } else {
                     LOG.info("Successfully updated API Method. Received Status-Code: {}", statusCode);
                 }

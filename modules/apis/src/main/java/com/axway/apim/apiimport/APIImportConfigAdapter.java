@@ -18,6 +18,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.utils.Constants;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -197,7 +198,7 @@ public class APIImportConfigAdapter {
 
     public void handleOrganizations(API apiConfig) throws AppException {
         if (apiConfig.getClientOrganizations() == null) return;
-        if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) {
+        if (apiConfig.getState().equals(Constants.API_UNPUBLISHED)) {
             apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
             return;
         }
@@ -233,7 +234,7 @@ public class APIImportConfigAdapter {
 
 
     private void addQuotaConfiguration(API apiConfig) {
-        if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
+        if (apiConfig.getState().equals(Constants.API_UNPUBLISHED)) return;
         initQuota(apiConfig.getSystemQuota());
         initQuota(apiConfig.getApplicationQuota());
     }
