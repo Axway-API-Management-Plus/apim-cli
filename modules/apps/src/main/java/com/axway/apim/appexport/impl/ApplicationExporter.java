@@ -48,8 +48,6 @@ public abstract class ApplicationExporter {
     AppExportParams params;
     ExportResult result;
 
-    boolean hasError = false;
-
     public static ApplicationExporter create(ResultHandler exportImpl, AppExportParams params, ExportResult result) throws AppException {
         try {
             Object[] intArgs = new Object[]{params, result};
@@ -67,10 +65,6 @@ public abstract class ApplicationExporter {
     }
 
     public abstract void export(List<ClientApplication> apps) throws AppException;
-
-    public boolean hasError() {
-        return this.hasError;
-    }
 
     public abstract ClientAppFilter getFilter() throws AppException;
 

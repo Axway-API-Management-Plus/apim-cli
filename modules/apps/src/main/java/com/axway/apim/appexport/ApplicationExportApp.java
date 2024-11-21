@@ -121,12 +121,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
             } else {
                 LOG.info("Found {} application(s).", apps.size());
                 exporter.export(apps);
-                if (exporter.hasError()) {
-                    LOG.info("");
-                    LOG.error("Please check the log. At least one error was recorded.");
-                } else {
-                    LOG.debug("Successfully exported {} application(s).", apps.size());
-                }
             }
             return result;
         }finally {
