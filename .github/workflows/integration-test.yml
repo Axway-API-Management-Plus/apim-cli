@@ -35,7 +35,7 @@ jobs:
           path: ~/cache-docker
           key: docker-image-cache-${{ runner.os }}
       - if: steps.cache-docker.outputs.cache-hit != 'true'
-        name: Login to Axway demo docker registry
+        name: Login to Axway docker registry
         uses: docker/login-action@v2
         with:
           registry: docker.repository.axway.com

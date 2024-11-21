@@ -67,12 +67,12 @@ public class APIMgrAppsAdapter {
      * @throws AppException if applications cannot be retrieved
      */
     private void readApplicationsFromAPIManager(ClientAppFilter filter) throws AppException {
-        if (this.apiManagerResponse.get(filter) != null) return;
+        if (apiManagerResponse.get(filter) != null) return;
         try {
             String requestedId = "";
             if (filter.getApplicationId() != null) {
                 if (applicationsCache.containsKey(filter.getApplicationId())) {
-                    this.apiManagerResponse.put(filter, applicationsCache.get(filter.getApplicationId()));
+                    apiManagerResponse.put(filter, applicationsCache.get(filter.getApplicationId()));
                     return;
                 }
                 requestedId = "/" + filter.getApplicationId();
@@ -86,14 +86,14 @@ public class APIMgrAppsAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode == 404) {
                     // Nothing found - Simulate an empty response
-                    this.apiManagerResponse.put(filter, "[]");
+                    apiManagerResponse.put(filter, "[]");
                     return;
                 }
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 if (response.startsWith("{")) { // Got a single response!
                     response = "[" + response + "]";
                 }
-                this.apiManagerResponse.put(filter, response);
+                apiManagerResponse.put(filter, response);
                 if (filter.getApplicationId() != null) {
                     applicationsCache.put(filter.getApplicationId(), response);
                 }
@@ -118,8 +118,8 @@ public class APIMgrAppsAdapter {
         readApplicationsFromAPIManager(filter);
         List<ClientApplication> apps;
         try {
-            if (this.apiManagerResponse.get(filter) == null) return Collections.emptyList();
-            apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
+            if (apiManagerResponse.get(filter) == null) return Collections.emptyList();
+            apps = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<>() {
             });
             LOG.debug("Found: {} applications", apps.size());
             for (int i = 0; i < apps.size(); i++) {
@@ -136,7 +136,7 @@ public class APIMgrAppsAdapter {
                     Utils.progressPercentage(i, apps.size(), "Loading details of " + apps.size() + " applications");
             }
             apps.removeIf(filter::filter);
-            Utils.addCustomPropertiesForEntity(apps, this.apiManagerResponse.get(filter), filter);
+            Utils.addCustomPropertiesForEntity(apps, apiManagerResponse.get(filter), filter);
             if (logProgress && apps.size() > 5) Console.print("\n");
         } catch (Exception e) {
             throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -152,7 +152,7 @@ public class APIMgrAppsAdapter {
         readAppsSubscribedFromAPIManager(apiId);
         List<ClientApplication> subscribedApps;
         try {
-            subscribedApps = mapper.readValue(this.subscribedAppAPIManagerResponse.get(apiId), new TypeReference<>() {
+            subscribedApps = mapper.readValue(subscribedAppAPIManagerResponse.get(apiId), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -161,7 +161,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void readAppsSubscribedFromAPIManager(String apiId) throws AppException {
-        if (this.subscribedAppAPIManagerResponse.get(apiId) != null) return;
+        if (subscribedAppAPIManagerResponse.get(apiId) != null) return;
         if (applicationsSubscriptionCache.containsKey(apiId)) {
             subscribedAppAPIManagerResponse.put(apiId, applicationsSubscriptionCache.get(apiId));
             return;
@@ -171,7 +171,12 @@ public class APIMgrAppsAdapter {
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load subscribed applications for API-ID: {} from API-Manager", apiId);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 200) {
+                    LOG.error("Response from API Manager : {}", response);
+                    throw new AppException("Error from API Manager", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
                 subscribedAppAPIManagerResponse.put(apiId, response);
                 applicationsSubscriptionCache.put(apiId, response);
             }

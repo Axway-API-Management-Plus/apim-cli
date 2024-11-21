@@ -24,21 +24,13 @@ public class APIManagerCustomPropertiesAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerCustomPropertiesAdapter.class);
 
-    ObjectMapper mapper = APIManagerAdapter.mapper;
-
-    CoreParameters cmd = CoreParameters.getInstance();
-
     public APIManagerCustomPropertiesAdapter() {
         // Default constructor
     }
 
-    String apiManagerResponse;
-
-    CustomProperties customProperties;
-
-    private void readCustomPropertiesFromAPIManager() throws AppException {
-        if (apiManagerResponse != null) return;
+    private String readCustomPropertiesFromAPIManager() throws AppException {
         try {
+            CoreParameters cmd = CoreParameters.getInstance();
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config/customproperties").build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Read configured custom properties from API-Manager");
@@ -49,7 +41,7 @@ public class APIManagerCustomPropertiesAdapter {
                     LOG.error("Error loading custom-properties from API-Manager. Response-Code: {} Response Body: {}", statusCode, response);
                     throw new AppException("Error loading custom-properties from API-Manager. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                apiManagerResponse = response;
+                return response;
             }
         } catch (Exception e) {
             throw new AppException("Can't read configuration from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -57,12 +49,10 @@ public class APIManagerCustomPropertiesAdapter {
     }
 
     public CustomProperties getCustomProperties() throws AppException {
-        if (customProperties != null) return customProperties;
-        readCustomPropertiesFromAPIManager();
+        String apiManagerResponse = readCustomPropertiesFromAPIManager();
         try {
-            CustomProperties props = mapper.readValue(apiManagerResponse, CustomProperties.class);
-            customProperties = props;
-            return props;
+            ObjectMapper mapper = APIManagerAdapter.mapper;
+            return mapper.readValue(apiManagerResponse, CustomProperties.class);
         } catch (IOException e) {
             throw new AppException("Error parsing API-Manager custom properties", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
