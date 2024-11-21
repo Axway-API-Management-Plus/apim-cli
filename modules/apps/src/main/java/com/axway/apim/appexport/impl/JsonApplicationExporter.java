@@ -59,7 +59,6 @@ public class JsonApplicationExporter extends ApplicationExporter {
                     Utils.deleteDirectory(localFolder);
                 } else {
                     LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
-                    this.hasError = true;
                     return;
                 }
             }
@@ -100,7 +99,6 @@ public class JsonApplicationExporter extends ApplicationExporter {
                 mapper.writeValue(System.out, app);
             } else {
                 mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
-                this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
             }
         } catch (Exception e) {
             throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
