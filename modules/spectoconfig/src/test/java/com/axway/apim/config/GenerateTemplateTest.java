@@ -198,41 +198,28 @@ public class GenerateTemplateTest {
     }
 
     @Test
-    public void generateApiMethods() throws IOException {
-
-        OpenAPI openAPI = new OpenAPIV3Parser().read("src/test/resources/methods.yaml");
+    public void generateApiMethods() {
+        OpenAPI openAPI = new OpenAPIV3Parser().read("methods.yaml");
         GenerateTemplate generateTemplate = new GenerateTemplate();
         List<APIMethod> apiMethods = generateTemplate.addMethods(openAPI);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiMethods));
-      //  System.out.println(openAPI);
-
+        Assert.assertEquals(3, apiMethods.size());
+        Assert.assertNotNull(apiMethods.get(0).getTags().get("public"));
     }
 
     @Test
-    public void includeInboundPerMethodOverride() throws IOException {
-
-        OpenAPI openAPI = new OpenAPIV3Parser().read("src/test/resources/methods.yaml");
+    public void includeInboundPerMethodOverride() {
+        OpenAPI openAPI = new OpenAPIV3Parser().read("methods.yaml");
         GenerateTemplate generateTemplate = new GenerateTemplate();
         List<SecurityProfile> securityProfiles = new ArrayList<>();
         API api = new API();
-        generateTemplate.addInboundPerMethodOverride(openAPI, api, securityProfiles);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        FilterProvider filters = new SimpleFilterProvider()
-
-            .addFilter("ProfileFilter",
-                SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
-            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
-        objectMapper.setFilterProvider(filters);
-        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(api.getInboundProfiles()));
+        Map<String, InboundProfile> inboundProfileMap = generateTemplate.addInboundPerMethodOverride(openAPI, api, securityProfiles);
+        Assert.assertNotNull(inboundProfileMap);
     }
 
 
     @Test
     public void testInboundOverride() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.yaml", "-a", "src/test/resources/methods.yaml",  "-frontendAuthType", "apiKey", "-inboundPerMethodOverride", "-o", "yaml"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "src/test/resources/methods.yaml", "-frontendAuthType", "apiKey", "-inboundPerMethodOverride", "-o", "json"};
         GenerateTemplate.generate(args);
 //        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
 //        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));

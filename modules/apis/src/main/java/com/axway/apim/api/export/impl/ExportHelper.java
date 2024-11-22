@@ -62,7 +62,7 @@ public class ExportHelper {
                 throw new AppException("Backend API Definition is not available for the API : " + exportAPI.getName() + ", hence use the option -useFEAPIDefinition to export API", ErrorCode.BACKEND_API_DEF_NA);
             return;
         }
-        writeSpec(mapper, apiDef, exportAPI, localFolder);
+        writeSpec(apiDef, exportAPI, localFolder);
         Image image = exportAPI.getAPIImage();
         if (image != null && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
             writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
@@ -143,22 +143,23 @@ public class ExportHelper {
         }
     }
 
-    public void writeSpec(ObjectMapper mapper, APISpecification apiDef, ExportAPI exportAPI, File localFolder) throws AppException {
+    public void writeSpec(APISpecification apiDef, ExportAPI exportAPI, File localFolder) throws AppException {
         String targetFile = null;
         try {
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
                 String fileName = Utils.replaceSpecialChars(exportAPI.getName());
                 String fileExtension = apiDef.getAPIDefinitionType().getFileExtension();
-                if(apiDef instanceof Swagger2xSpecification || apiDef instanceof OAS3xSpecification){
+                if (apiDef instanceof Swagger2xSpecification || apiDef instanceof OAS3xSpecification) {
+                    ObjectMapper mapper = apiDef.getMapper();
                     if (mapper.getFactory() instanceof YAMLFactory) {
-                        fileExtension =  APISpecification.APISpecType.SWAGGER_API_20_YAML.getFileExtension();
-                    }else {
-                        fileExtension =  APISpecification.APISpecType.SWAGGER_API_20.getFileExtension();
+                        fileExtension = APISpecification.APISpecType.SWAGGER_API_20_YAML.getFileExtension();
+                    } else {
+                        fileExtension = APISpecification.APISpecType.SWAGGER_API_20.getFileExtension();
                     }
                     targetFile = localFolder.getCanonicalPath() + "/" + fileName + fileExtension;
                     Object spec = mapper.readValue(apiDef.getApiSpecificationContent(), Object.class);
                     mapper.writerWithDefaultPrettyPrinter().writeValue(new File(targetFile), spec);
-                }else {
+                } else {
                     targetFile = localFolder.getCanonicalPath() + "/" + fileName + fileExtension;
                     writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
                 }
