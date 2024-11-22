@@ -219,7 +219,7 @@ public class GenerateTemplateTest {
 
     @Test
     public void testInboundOverride() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "src/test/resources/methods.yaml", "-frontendAuthType", "apiKey", "-inboundPerMethodOverride", "-o", "json"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "methods.yaml", "-frontendAuthType", "apiKey", "-inboundPerMethodOverride", "-o", "json"};
         GenerateTemplate.generate(args);
 //        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
 //        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
