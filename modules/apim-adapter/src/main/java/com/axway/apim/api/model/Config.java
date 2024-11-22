@@ -3,11 +3,9 @@ package com.axway.apim.api.model;
 import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonFilter("ConfigFilter")
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class Config {
