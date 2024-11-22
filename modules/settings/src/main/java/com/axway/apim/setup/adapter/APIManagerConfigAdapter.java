@@ -19,47 +19,42 @@ import java.util.Map;
 public class APIManagerConfigAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerConfigAdapter.class);
-    private APIManagerConfig managerConfig;
     private final StandardImportParams importParams;
 
     public APIManagerConfigAdapter(StandardImportParams params) {
         this.importParams = params;
     }
 
-    private void readConfig() throws AppException {
+
+    public APIManagerConfig getManagerConfig() throws AppException {
         ObjectMapper mapper;
         String config = importParams.getConfig();
         String stage = importParams.getStage();
         File configFile = Utils.locateConfigFile(config);
-        if (!configFile.exists()) return;
+        if (!configFile.exists()) return null;
         File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
         APIManagerConfig baseConfig;
         try {
             mapper = Utils.createObjectMapper(configFile);
             mapper.configOverride(Map.class).setMergeable(true);
             baseConfig = mapper.reader()
-                    .withAttribute(UserDeserializer.Params.USE_LOGIN_NAME, true)
-                    .withAttribute(RemotehostDeserializer.Params.validateRemoteHost, true)
-                    .forType(APIManagerConfig.class)
-                    .readValue(Utils.substituteVariables(configFile));
+                .withAttribute(UserDeserializer.Params.USE_LOGIN_NAME, true)
+                .withAttribute(RemotehostDeserializer.Params.validateRemoteHost, true)
+                .forType(APIManagerConfig.class)
+                .readValue(Utils.substituteVariables(configFile));
         } catch (Exception e) {
             throw new AppException("Cannot read API-Manager configuration from config file: " + config, ErrorCode.CANT_READ_CONFIG_FILE, e);
         }
         if (stageConfig != null) {
             try {
                 ObjectReader updater = mapper.readerForUpdating(baseConfig);
-                this.managerConfig = updater.readValue(Utils.substituteVariables(stageConfig));
+                APIManagerConfig managerConfig = updater.readValue(Utils.substituteVariables(stageConfig));
                 LOG.info("Successfully read stage configuration file: {}", stageConfig);
+                return managerConfig;
             } catch (IOException e) {
                 LOG.warn("No config file found for stage: {}", stage);
             }
-        } else {
-            this.managerConfig = baseConfig;
         }
-    }
-
-    public APIManagerConfig getManagerConfig() throws AppException {
-        if (this.managerConfig == null) readConfig();
-        return this.managerConfig;
+        return baseConfig;
     }
 }
