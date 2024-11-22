@@ -2,11 +2,13 @@ package com.axway.apim.config;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
-import com.axway.apim.config.model.APISecurity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonPropertyOrder({"name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
     "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
@@ -16,12 +18,10 @@ public class APIConfig {
     public static final String DEFAULT = "_default";
     private final API api;
     private final String apiDefinition;
-    private final Map<String, Object> securityProfiles;
 
-    public APIConfig(API api, String apiDefinition, Map<String, Object> securityProfiles) {
+    public APIConfig(API api, String apiDefinition) {
         this.api = api;
         this.apiDefinition = apiDefinition;
-        this.securityProfiles = securityProfiles;
     }
 
     public Map<String, OutboundProfile> getOutboundProfiles() {
@@ -46,15 +46,11 @@ public class APIConfig {
     }
 
 
-    public List<Map<String, Object>> getSecurityProfiles() {
-        if (securityProfiles.size() == 1) {
-            List<APISecurity> apiSecurities = (List<APISecurity>) securityProfiles.get("devices");
-            if (apiSecurities.get(0).getType().equals(DeviceType.passThrough.getName()))
-                return Collections.emptyList();
+    public List<SecurityProfile> getSecurityProfiles() {
+        if (api.getSecurityProfiles().size() == 1) {
+            return Collections.emptyList();
         }
-        List<Map<String, Object>> list = new ArrayList<>();
-        list.add(securityProfiles);
-        return list;
+        return api.getSecurityProfiles();
     }
 
     public String getPath() {

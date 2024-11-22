@@ -55,6 +55,15 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
         addOption(option);
 
 
+        option = new Option("includeMethods", false, "Include API Methods");
+        option.setRequired(false);
+        addOption(option);
+
+        option = new Option("inboundPerMethodOverride", false, "Include Inbound per Methods overrides");
+        option.setRequired(false);
+        addOption(option);
+
+
     }
 
     @Override
@@ -90,6 +99,8 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
             frontendAuthType = "passThrough";
         }
         params.setFrontendAuthType(frontendAuthType);
+        params.setInboundPerMethodOverride(hasOption("inboundPerMethodOverride"));
+        params.setIncludeMethods(hasOption("includeMethods"));
         return params;
     }
 }
