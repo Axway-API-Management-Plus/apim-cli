@@ -28,7 +28,7 @@ public class APIImportManager {
      */
     public void applyChanges(APIChangeState changeState, boolean forceUpdate, boolean updateOnly) throws AppException {
         boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
-        boolean orgAdminSelfService = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
+        boolean orgAdminSelfService = APIManagerAdapter.getInstance().getConfigAdapter().getConfig().getOadminSelfServiceEnabled();
         if (!APIManagerAdapter.getInstance().hasAdminAccount() && changeState.isAdminAccountNeeded()) {
             if (orgAdminSelfService) {
                 LOG.info("Desired API-State set to published using OrgAdmin account only. Going to create a publish request.");

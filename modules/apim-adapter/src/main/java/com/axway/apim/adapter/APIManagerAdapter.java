@@ -126,7 +126,7 @@ public class APIManagerAdapter {
     }
 
     private void setApiManagerVersion() throws AppException {
-        Config config = configAdapter.getConfig(false);
+        Config config = configAdapter.getConfig();
         apiManagerVersion = config.getProductVersion();
         if (usingOrgAdmin)
             LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
@@ -539,7 +539,7 @@ public class APIManagerAdapter {
         if (apiManagerVersion != null) {
             return apiManagerVersion;
         }
-        apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getProductVersion();
+        apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getConfig().getProductVersion();
         return apiManagerVersion;
     }
 
@@ -547,7 +547,7 @@ public class APIManagerAdapter {
         if (apiManagerName != null) {
             return apiManagerName;
         }
-        apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
+        apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig().getPortalName();
         return apiManagerName;
     }
 

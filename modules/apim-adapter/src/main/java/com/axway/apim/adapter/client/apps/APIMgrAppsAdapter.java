@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class APIMgrAppsAdapter {
 
@@ -44,8 +45,8 @@ public class APIMgrAppsAdapter {
     public static final String API_KEY = "apiKey";
     public static final String CREDENTIAL_TYPE = "credentialType";
 
-    Map<ClientAppFilter, String> apiManagerResponse = new HashMap<>();
-    Map<String, String> subscribedAppAPIManagerResponse = new HashMap<>();
+    Map<ClientAppFilter, String> apiManagerResponse = new ConcurrentHashMap<>();
+    Map<String, String> subscribedAppAPIManagerResponse = new ConcurrentHashMap<>();
     CoreParameters cmd = CoreParameters.getInstance();
     ObjectMapper mapper = APIManagerAdapter.mapper;
     Cache<String, String> applicationsCache;

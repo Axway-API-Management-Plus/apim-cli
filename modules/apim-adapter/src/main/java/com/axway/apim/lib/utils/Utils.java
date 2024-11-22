@@ -267,6 +267,14 @@ public class Utils {
         }
     }
 
+    /**
+     * Read custom properties from payload and create in a different format.
+     * @param entities api, app, org and user
+     * @param json raw json message
+     * @param filter filter
+     * @throws IOException
+     */
+
     public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         // Custom-Properties will be added depending on the given Properties in the filter

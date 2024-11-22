@@ -68,7 +68,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
             // If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins
             // the unpublished or pending APIs become the actual API
             boolean isAdminAccount = APIManagerAdapter.getInstance().hasAdminAccount();
-            boolean orgAdminSelfService = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(isAdminAccount).getOadminSelfServiceEnabled();
+            boolean orgAdminSelfService = APIManagerAdapter.getInstance().getConfigAdapter().getConfig().getOadminSelfServiceEnabled();
             if (!isAdminAccount && !orgAdminSelfService) {
                 filters.add(new BasicNameValuePair("field", "state"));
                 filters.add(new BasicNameValuePair("op", "ne"));

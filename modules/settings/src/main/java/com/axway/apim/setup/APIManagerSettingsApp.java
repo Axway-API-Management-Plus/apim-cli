@@ -105,7 +105,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(exportImpl, params, result);
             APIManagerConfig apiManagerConfig = new APIManagerConfig();
             if (params.isExportConfig()) {
-                apiManagerConfig.setConfig(adapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
+                apiManagerConfig.setConfig(adapter.getConfigAdapter().getConfig());
             }
             if (params.isExportAlerts()) {
                 apiManagerConfig.setAlerts(adapter.getAlertsAdapter().getAlerts());

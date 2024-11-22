@@ -89,7 +89,7 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
     private String getExportFolder(Config config) {
         try {
             if (config == null) {
-                config = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount());
+                config = APIManagerAdapter.getInstance().getConfigAdapter().getConfig();
             }
             String name = config.getPortalName().toLowerCase();
             name = name.replace(" ", "-");

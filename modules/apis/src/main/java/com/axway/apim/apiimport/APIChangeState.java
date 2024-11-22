@@ -298,7 +298,7 @@ public class APIChangeState {
 
 
     public boolean isAdminAccountNeeded() throws AppException {
-        boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()).getOadminSelfServiceEnabled();
+        boolean orgAdminSelfServiceEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig().getOadminSelfServiceEnabled();
         if (orgAdminSelfServiceEnabled) return false;
         return (!getDesiredAPI().getState().equals(Constants.API_UNPUBLISHED) && !getDesiredAPI().getState().equals(Constants.API_DELETED)) ||
             (getActualAPI() != null && !getActualAPI().getState().equals(Constants.API_UNPUBLISHED));

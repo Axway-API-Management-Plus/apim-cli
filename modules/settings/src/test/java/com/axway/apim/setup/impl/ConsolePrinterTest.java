@@ -32,7 +32,7 @@ public class ConsolePrinterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.CONSOLE_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
+        apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig());
         exporter.export(apiManagerConfig);
     }
 

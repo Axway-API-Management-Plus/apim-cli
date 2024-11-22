@@ -705,7 +705,7 @@ public class APIImportConfigAdapter {
     private void validateHasQueryStringKey(API importApi) throws AppException {
         if (importApi.getApiRoutingKey() == null) return; // Nothing to check
         if (APIManagerAdapter.getInstance().hasAdminAccount()) {
-            boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig(true).getApiRoutingKeyEnabled();
+            boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().getConfigAdapter().getConfig().getApiRoutingKeyEnabled();
             if (!apiRoutingKeyEnabled) {
                 throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
             }

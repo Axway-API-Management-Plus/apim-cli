@@ -31,7 +31,7 @@ public class YamlAPIManagerSetupExporterTest extends WiremockWrapper {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(ResultHandler.YAML_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
-        apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig(APIManagerAdapter.getInstance().hasAdminAccount()));
+        apiManagerConfig.setConfig(apimanagerAdapter.getConfigAdapter().getConfig());
         exporter.export(apiManagerConfig);
     }
 }
