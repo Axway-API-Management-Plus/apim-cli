@@ -214,6 +214,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         String frontendAuthType = parameters.getFrontendAuthType();
         // If frontendAuthType is null, use authentication from openapi spec. If none found, set it as pass through
         List<SecurityProfile> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
+        api.setSecurityProfiles(securityProfiles);
         String backendAuthType = parameters.getBackendAuthType();
         addOutboundSecurityToAPI(api, backendAuthType);
         String apiSpecLocation;
@@ -228,7 +229,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             List<APIMethod> methods = addMethods(openAPI);
             api.setApiMethods(methods);
         }
-
         if (parameters.isInboundPerMethodOverride()) {
             Map<String, InboundProfile> inboundProfileMap = addInboundPerMethodOverride(openAPI, api, securityProfiles);
             api.setInboundProfiles(inboundProfileMap);

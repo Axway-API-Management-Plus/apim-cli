@@ -47,9 +47,6 @@ public class APIConfig {
 
 
     public List<SecurityProfile> getSecurityProfiles() {
-        if (api.getSecurityProfiles().size() == 1) {
-            return Collections.emptyList();
-        }
         return api.getSecurityProfiles();
     }
 
