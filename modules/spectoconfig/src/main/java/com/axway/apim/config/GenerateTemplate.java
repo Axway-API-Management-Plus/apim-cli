@@ -345,10 +345,10 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     public SecurityProfile createOauthSecurityProfile(String operationId, List<String> scopes) {
         SecurityProfile profile = new SecurityProfile();
-        profile.setName("Oauth2");
+        profile.setName("Oauth2 " + operationId);
         profile.setIsDefault(false);
         SecurityDevice securityDevice = new SecurityDevice();
-        securityDevice.setName("Oauth2 " + operationId);
+        securityDevice.setName("Oauth2");
         securityDevice.setType(DeviceType.oauth);
         securityDevice.setOrder(0);
         Map<String, String> properties = new HashMap<>();
