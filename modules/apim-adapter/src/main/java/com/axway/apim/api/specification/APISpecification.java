@@ -182,4 +182,8 @@ public abstract class APISpecification {
         this.filterConfig = filterConfig;
         return this;
     }
+
+    public ObjectMapper getMapper() {
+        return mapper;
+    }
 }

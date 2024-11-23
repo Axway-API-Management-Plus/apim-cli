@@ -61,9 +61,9 @@ public class GenerateTemplateCLIOptionsTest {
         Assert.assertEquals(openApiLocation, documentContext.read("$.apiSpecification.resource"));
         Assert.assertEquals("https://localhost", documentContext.read("$.backendBasepath"));
 
-        Assert.assertEquals("pet", documentContext.read("$.tags.pet[0]"));
-        Assert.assertEquals("store", documentContext.read("$.tags.store[0]"));
-        Assert.assertEquals("user", documentContext.read("$.tags.user[0]"));
+        Assert.assertEquals("Everything about your Pets", documentContext.read("$.tags.pet[0]"));
+        Assert.assertEquals("Access to Petstore orders", documentContext.read("$.tags.store[0]"));
+        Assert.assertEquals("Operations about user", documentContext.read("$.tags.user[0]"));
 
         Assert.assertEquals("_default", documentContext.read("$.corsProfiles[0].name"));
         Assert.assertEquals("*", documentContext.read("$.corsProfiles[0].origins[0]"));
@@ -82,7 +82,7 @@ public class GenerateTemplateCLIOptionsTest {
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
 
         Assert.assertEquals("apiKey", documentContext.read("$.securityProfiles[0].devices[0].type"));
-        Assert.assertEquals("API Key", documentContext.read("$.securityProfiles[0].devices[0].name"));
+        Assert.assertEquals("_default", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
         Assert.assertEquals("KeyId", documentContext.read("$.securityProfiles[0].devices[0].properties.apiKeyFieldName"));
         Assert.assertEquals("HEADER", documentContext.read("$.securityProfiles[0].devices[0].properties.takeFrom"));
@@ -96,19 +96,19 @@ public class GenerateTemplateCLIOptionsTest {
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("oauth", documentContext.read("$.securityProfiles[0].devices[0].type"));
-        Assert.assertEquals("OAuth", documentContext.read("$.securityProfiles[0].devices[0].name"));
+        Assert.assertEquals("_default", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
         Assert.assertEquals("OAuth Access Token Store", documentContext.read("$.securityProfiles[0].devices[0].properties.tokenStore"));
         Assert.assertEquals("HEADER", documentContext.read("$.securityProfiles[0].devices[0].properties.accessTokenLocation"));
         Assert.assertEquals("Bearer", documentContext.read("$.securityProfiles[0].devices[0].properties.authorizationHeaderPrefix"));
         //Assert.assertEquals("", documentContext.read("$.securityProfiles.devices[0].properties.accessTokenLocationQueryString"));
-        Assert.assertEquals("Any", documentContext.read("$.securityProfiles[0].devices[0].properties.scopesMustMatch"));
+        Assert.assertEquals("All", documentContext.read("$.securityProfiles[0].devices[0].properties.scopesMustMatch"));
         Assert.assertEquals("resource.WRITE, resource.READ", documentContext.read("$.securityProfiles[0].devices[0].properties.scopes"));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", Boolean.class));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled", Boolean.class));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess"));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled"));
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginEndpointUrl"));
         Assert.assertEquals("access_token", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginTokenName"));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled", Boolean.class));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled"));
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestEndpointUrl"));
         Assert.assertEquals("client_id", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestClientIdName"));
         Assert.assertEquals("client_secret", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestSecretName"));
@@ -124,22 +124,22 @@ public class GenerateTemplateCLIOptionsTest {
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("test/api-config.json")));
         Assert.assertEquals("oauthExternal", documentContext.read("$.securityProfiles[0].devices[0].type"));
-        Assert.assertEquals("OAuth (External)", documentContext.read("$.securityProfiles[0].devices[0].name"));
+        Assert.assertEquals("_default", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
         Assert.assertEquals("Tokeninfo policy 1", documentContext.read("$.securityProfiles[0].devices[0].properties.tokenStore"));
         Assert.assertEquals("HEADER", documentContext.read("$.securityProfiles[0].devices[0].properties.accessTokenLocation"));
         Assert.assertEquals("Bearer", documentContext.read("$.securityProfiles[0].devices[0].properties.authorizationHeaderPrefix"));
         //Assert.assertEquals("", documentContext.read("$.securityProfiles.devices[0].properties.accessTokenLocationQueryString"));
-        Assert.assertEquals("Any", documentContext.read("$.securityProfiles[0].devices[0].properties.scopesMustMatch"));
+        Assert.assertEquals("All", documentContext.read("$.securityProfiles[0].devices[0].properties.scopesMustMatch"));
         Assert.assertEquals("resource.WRITE, resource.READ", documentContext.read("$.securityProfiles[0].devices[0].properties.scopes"));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", Boolean.class));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled", Boolean.class));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.useClientRegistry", Boolean.class));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess"));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled"));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.useClientRegistry"));
 
         Assert.assertEquals("${oauth.token.client_id}", documentContext.read("$.securityProfiles[0].devices[0].properties.subjectSelector"));
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginEndpointUrl"));
         Assert.assertEquals("access_token", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginTokenName"));
-        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled", Boolean.class));
+        Assert.assertEquals("true", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled"));
 
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestEndpointUrl"));
         Assert.assertEquals("client_id", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestClientIdName"));

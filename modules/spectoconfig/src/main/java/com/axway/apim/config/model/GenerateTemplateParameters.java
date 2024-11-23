@@ -9,6 +9,8 @@ public class GenerateTemplateParameters extends StandardExportParams implements 
     private String config;
     private String backendAuthType;
     private String frontendAuthType;
+    private boolean includeMethods;
+    private boolean inboundPerMethodOverride;
 
     public String getApiDefinition() {
         return apiDefinition;
@@ -40,5 +42,21 @@ public class GenerateTemplateParameters extends StandardExportParams implements 
 
     public void setFrontendAuthType(String frontendAuthType) {
         this.frontendAuthType = frontendAuthType;
+    }
+
+    public boolean isIncludeMethods() {
+        return includeMethods;
+    }
+
+    public void setIncludeMethods(boolean includeMethods) {
+        this.includeMethods = includeMethods;
+    }
+
+    public boolean isInboundPerMethodOverride() {
+        return inboundPerMethodOverride;
+    }
+
+    public void setInboundPerMethodOverride(boolean inboundPerMethodOverride) {
+        this.inboundPerMethodOverride = inboundPerMethodOverride;
     }
 }

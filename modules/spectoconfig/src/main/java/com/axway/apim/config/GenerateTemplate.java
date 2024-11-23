@@ -5,7 +5,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
-import com.axway.apim.config.model.APISecurity;
 import com.axway.apim.config.model.GenerateTemplateParameters;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.error.AppException;
@@ -19,7 +18,12 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import io.swagger.v3.parser.OpenAPIV3Parser;
@@ -46,11 +50,24 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+import static io.swagger.v3.oas.models.security.SecurityScheme.In.QUERY;
+import static io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER;
+
+
 public class GenerateTemplate implements APIMCLIServiceProvider {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(GenerateTemplate.class);
     public static final String DEFAULT = "_default";
+    public static final String ORIGINAL = "original";
+    public static final String PASS_THROUGH = "Pass Through";
+    public static final String REMOVE_CREDENTIALS_ON_SUCCESS = "removeCredentialsOnSuccess";
+    public static final String TOKEN_STORE = "tokenStore";
+    public static final String TAKE_FROM = "takeFrom";
+    public static final String OAUTH_TOKEN_CLIENT_ID = "${oauth.token.client_id}";
+    public static final String USE_CLIENT_REGISTRY = "useClientRegistry";
+    public static final String SUBJECT_SELECTOR = "subjectSelector";
+    public static final String HEADER_STR = "HEADER";
 
     @Override
     public String getName() {
@@ -89,8 +106,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         GenerateTemplate app = new GenerateTemplate();
         try {
             File file = new File(params.getConfig());
-            if(file.getParentFile() != null && !file.getParentFile().exists() && (file.getParentFile().mkdirs())){
-                    LOG.info("Created new Directory : {}", file.getParentFile());
+            if (file.getParentFile() != null && !file.getParentFile().exists() && (file.getParentFile().mkdirs())) {
+                LOG.info("Created new Directory : {}", file.getParentFile());
             }
             APIConfig apiConfig = app.generateTemplate(params);
             try (FileWriter fileWriter = new FileWriter(params.getConfig())) {
@@ -104,13 +121,13 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
                 JsonNode jsonNode = objectMapper.convertValue(apiConfig, JsonNode.class);
-                objectMapper.writeValue(fileWriter, jsonNode);
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(fileWriter, jsonNode);
                 LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
             }
         } catch (AppException e) {
             LOG.error("{} : Error code {}", e.getError().getDescription(), e.getError().getCode());
             return e.getError().getCode();
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("Error in processing :", e);
             return 1;
         }
@@ -171,7 +188,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setPath(basePath);
         api.setName(info.getTitle());
         api.setVersion(info.getVersion());
-        api.setDescriptionType("original");
+        api.setDescriptionType(ORIGINAL);
         CorsProfile corsProfile = new CorsProfile();
         corsProfile.setName("Custom CORS");
         corsProfile.setIsDefault(false);
@@ -205,7 +222,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setInboundProfiles(inboundProfiles);
         String frontendAuthType = parameters.getFrontendAuthType();
         // If frontendAuthType is null, use authentication from openapi spec. If none found, set it as pass through
-        Map<String, Object> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
+        List<SecurityProfile> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
+        api.setSecurityProfiles(securityProfiles);
         String backendAuthType = parameters.getBackendAuthType();
         addOutboundSecurityToAPI(api, backendAuthType);
         String apiSpecLocation;
@@ -216,19 +234,250 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         } else {
             apiSpecLocation = parameters.getApiDefinition();
         }
+        if (parameters.isIncludeMethods()) {
+            List<APIMethod> methods = addMethods(openAPI);
+            api.setApiMethods(methods);
+        }
+        if (parameters.isInboundPerMethodOverride()) {
+            Map<String, InboundProfile> inboundProfileMap = addInboundPerMethodOverride(openAPI, api, securityProfiles);
+            api.setInboundProfiles(inboundProfileMap);
+        }
 
-        return new APIConfig(api, apiSpecLocation, securityProfiles);
+        return new APIConfig(api, apiSpecLocation);
     }
 
-    public void addTags(API api, OpenAPI openAPI){
-        List<Tag> tags = openAPI.getTags();
-        if(tags != null) {
-            TagMap apiManagerTags = new TagMap();
-            for (Tag tag : tags) {
-                String[] value = new String[1];
-                value[0] = tag.getName();
-                apiManagerTags.put(tag.getName(), value);
+    public List<APIMethod> addMethods(OpenAPI openAPI) {
+        List<APIMethod> methods = new ArrayList<>();
+        Paths paths = openAPI.getPaths();
+        for (Map.Entry<String, PathItem> pathItem : paths.entrySet()) {
+            APIMethod method = new APIMethod();
+            String key = pathItem.getKey();
+            PathItem item = pathItem.getValue();
+            Map<PathItem.HttpMethod, Operation> operationsMap = item.readOperationsMap();
+            for (Map.Entry<PathItem.HttpMethod, Operation> operationEntry : operationsMap.entrySet()) {
+                PathItem.HttpMethod httpMethod = operationEntry.getKey();
+                Operation operation = operationEntry.getValue();
+                List<String> tags = operation.getTags();
+                List<Tag> globalTags = openAPI.getTags();
+                TagMap apiManagerTags = new TagMap();
+                for (String tag : tags) {
+                    Tag globalTag = findTag(tag, globalTags);
+                    if (globalTag == null) {
+                        continue;
+                    }
+                    String[] value = new String[1];
+                    value[0] = globalTag.getDescription();
+                    apiManagerTags.put(globalTag.getName(), value);
+                }
+                String operationId = operation.getOperationId();
+                if (operationId == null) {
+                    operationId = httpMethod.name() + " " + key;
+                }
+                method.setName(operationId);
+                method.setTags(apiManagerTags);
+                method.setDescriptionType(ORIGINAL);
+                methods.add(method);
             }
+        }
+        return methods;
+    }
+
+    public Map<String, InboundProfile> addInboundPerMethodOverride(OpenAPI openAPI, API api, List<SecurityProfile> securityProfiles) {
+        Map<String, InboundProfile> inboundProfiles = new LinkedHashMap<>();
+        inboundProfiles.put(DEFAULT, InboundProfile.getDefaultInboundProfile());
+        Paths paths = openAPI.getPaths();
+        for (Map.Entry<String, PathItem> pathItem : paths.entrySet()) {
+            InboundProfile inboundProfile = new InboundProfile();
+            inboundProfile.setMonitorAPI(true);
+            inboundProfile.setQueryStringPassThrough(false);
+            String key = pathItem.getKey();
+            PathItem item = pathItem.getValue();
+            Map<PathItem.HttpMethod, Operation> operationsMap = item.readOperationsMap();
+            for (Map.Entry<PathItem.HttpMethod, Operation> operationEntry : operationsMap.entrySet()) {
+                PathItem.HttpMethod httpMethod = operationEntry.getKey();
+                Operation operation = operationEntry.getValue();
+                String operationId = operation.getOperationId();
+                if (operationId == null) {
+                    operationId = httpMethod.name() + " " + key;
+                }
+                List<SecurityRequirement> securityRequirements = operation.getSecurity();
+                handleSecurity(openAPI, inboundProfiles, securityRequirements, securityProfiles, inboundProfile, operationId);
+            }
+        }
+        api.setSecurityProfiles(securityProfiles);
+        return inboundProfiles;
+    }
+
+
+    public void handleSecurity(OpenAPI openAPI, Map<String, InboundProfile> inboundProfiles, List<SecurityRequirement> securityRequirements, List<SecurityProfile> securityProfiles, InboundProfile inboundProfile, String operationId) {
+        if (securityRequirements == null || securityRequirements.isEmpty()) {
+            SecurityProfile passThroughProfile = createPassThroughSecurityProfile(operationId);
+            inboundProfile.setSecurityProfile(passThroughProfile.getName());
+            inboundProfiles.put(operationId, inboundProfile);
+            securityProfiles.add(passThroughProfile);
+        } else {
+            for (SecurityRequirement securityRequirement : securityRequirements) {
+                Set<String> keys = securityRequirement.keySet();
+                for (String securityKey : keys) {
+                    SecurityScheme securityScheme = openAPI.getComponents().getSecuritySchemes().get(securityKey);
+                    mapAPIMSecurity(securityRequirement, securityScheme, inboundProfiles, inboundProfile, securityProfiles, operationId, securityKey);
+                }
+            }
+        }
+    }
+
+    public void mapAPIMSecurity(SecurityRequirement securityRequirement, SecurityScheme securityScheme, Map<String, InboundProfile> inboundProfiles, InboundProfile inboundProfile, List<SecurityProfile> securityProfiles, String operationId, String securityKey) {
+        SecurityScheme.Type type = securityScheme.getType();
+        if (type == SecurityScheme.Type.OAUTH2) {
+            LOG.info("mapping oauth2 profile");
+            List<String> scopes = securityRequirement.get(securityKey);
+            SecurityProfile oauth2SecurityProfile = createOauthSecurityProfile(operationId, scopes);
+            inboundProfile.setSecurityProfile(oauth2SecurityProfile.getName());
+            inboundProfiles.put(operationId, inboundProfile);
+            securityProfiles.add(oauth2SecurityProfile);
+        } else if (type == SecurityScheme.Type.APIKEY) {
+            LOG.info("mapping API key profile");
+            List<String> scopes = securityRequirement.get(securityKey);
+            SecurityScheme.In in = securityScheme.getIn();
+            if (in == SecurityScheme.In.COOKIE) {
+                LOG.warn("API key in cookie not supported");
+                return;
+            }
+            String apikeyLocation = in.name();
+            String fieldName = securityScheme.getName();
+            SecurityProfile apiKeySecurityProfile = createApiKeySecurityProfile(operationId, apikeyLocation, fieldName, scopes);
+            inboundProfile.setSecurityProfile(apiKeySecurityProfile.getName());
+            inboundProfiles.put(operationId, inboundProfile);
+            securityProfiles.add(apiKeySecurityProfile);
+        } else if (type == SecurityScheme.Type.MUTUALTLS) {
+            LOG.warn("Mutual auth is not handled");
+        } else if (type == SecurityScheme.Type.OPENIDCONNECT || type == SecurityScheme.Type.HTTP && securityScheme.getScheme().equalsIgnoreCase("bearer")) {
+            LOG.info("External auth / openid connect is not handled");
+            List<String> scopes = securityRequirement.get(securityKey);
+            SecurityProfile oauth2ExternalSecurityProfile = createOauthExternalSecurityProfile(operationId, scopes);
+            inboundProfile.setSecurityProfile(oauth2ExternalSecurityProfile.getName());
+            inboundProfiles.put(operationId, inboundProfile);
+            securityProfiles.add(oauth2ExternalSecurityProfile);
+        } else if (type == SecurityScheme.Type.HTTP && securityScheme.getScheme().equalsIgnoreCase("basic")) {
+            LOG.warn("Basic Auth is not handled");
+        }
+    }
+
+    public SecurityProfile createPassThroughSecurityProfile(String operationId) {
+        SecurityProfile profile = new SecurityProfile();
+        profile.setName(PASS_THROUGH + " " + operationId);
+        profile.setIsDefault(false);
+        SecurityDevice securityDevice = new SecurityDevice();
+        securityDevice.setName(PASS_THROUGH);
+        securityDevice.setType(DeviceType.passThrough);
+        securityDevice.setOrder(0);
+        Map<String, String> properties = new HashMap<>();
+        properties.put("subjectIdFieldName", PASS_THROUGH);
+        properties.put(REMOVE_CREDENTIALS_ON_SUCCESS, "true");
+        securityDevice.setProperties(properties);
+        List<SecurityDevice> securityDevices = new ArrayList<>();
+        securityDevices.add(securityDevice);
+        profile.setDevices(securityDevices);
+        return profile;
+    }
+
+    public SecurityProfile createApiKeySecurityProfile(String operationId, String apikeyLocation, String fieldName, List<String> scopes) {
+        SecurityProfile profile = new SecurityProfile();
+        profile.setName("apikey " + operationId);
+        profile.setIsDefault(false);
+        SecurityDevice securityDevice = new SecurityDevice();
+        securityDevice.setName("API Key");
+        securityDevice.setType(DeviceType.apiKey);
+        securityDevice.setOrder(0);
+        Map<String, String> properties = new HashMap<>();
+        properties.put(REMOVE_CREDENTIALS_ON_SUCCESS, "true");
+        if (apikeyLocation.equals(HEADER.name())) {
+            properties.put(TAKE_FROM, HEADER_STR);
+        } else if (apikeyLocation.equals(QUERY.name())) {
+            properties.put(TAKE_FROM, "QUERY");
+        }
+        properties.put("apiKeyFieldName", fieldName);
+        if (scopes != null && !scopes.isEmpty()) {
+            String scope = String.join(" ", scopes);
+            properties.put("scopes", scope);
+            properties.put("scopesMustMatch", "All");
+        }
+        securityDevice.setProperties(properties);
+        List<SecurityDevice> securityDevices = new ArrayList<>();
+        securityDevices.add(securityDevice);
+        profile.setDevices(securityDevices);
+        return profile;
+    }
+
+
+    public SecurityProfile createOauthExternalSecurityProfile(String operationId, List<String> scopes) {
+        SecurityProfile profile = new SecurityProfile();
+        profile.setName("External Oauth2 " + operationId);
+        profile.setIsDefault(false);
+        SecurityDevice securityDevice = new SecurityDevice();
+        securityDevice.setName("OAuth (External)");
+        securityDevice.setType(DeviceType.oauthExternal);
+        securityDevice.setOrder(0);
+        Map<String, String> properties = new HashMap<>();
+        properties.put(TOKEN_STORE, "Tokeninfo policy 1");
+        properties.put(USE_CLIENT_REGISTRY, "true");
+        properties.put(SUBJECT_SELECTOR, OAUTH_TOKEN_CLIENT_ID);
+        properties.put("oauth.token.client_id", OAUTH_TOKEN_CLIENT_ID);
+        properties.put("oauth.token.scopes", "${oauth.token.scopes}");
+        properties.put("oauth.token.valid", "${oauth.token.valid}");
+        String scope = String.join(" ", scopes);
+        setupOauthProperties(properties, scope);
+        securityDevice.setProperties(properties);
+        List<SecurityDevice> securityDevices = new ArrayList<>();
+        securityDevices.add(securityDevice);
+        profile.setDevices(securityDevices);
+        return profile;
+    }
+
+
+    public SecurityProfile createOauthSecurityProfile(String operationId, List<String> scopes) {
+        SecurityProfile profile = new SecurityProfile();
+        profile.setName("Oauth2 " + operationId);
+        profile.setIsDefault(false);
+        SecurityDevice securityDevice = new SecurityDevice();
+        securityDevice.setName("Oauth2");
+        securityDevice.setType(DeviceType.oauth);
+        securityDevice.setOrder(0);
+        Map<String, String> properties = new HashMap<>();
+        properties.put(TOKEN_STORE, "OAuth Access Token Store");
+        String scope = String.join(" ", scopes);
+        setupOauthProperties(properties, scope);
+        securityDevice.setProperties(properties);
+        List<SecurityDevice> securityDevices = new ArrayList<>();
+        securityDevices.add(securityDevice);
+        profile.setDevices(securityDevices);
+        return profile;
+    }
+
+    public Tag findTag(String tagName, List<Tag> tags) {
+        if (tags == null || tags.isEmpty()) return null;
+        for (Tag tag : tags) {
+            if (tag.getName().equals(tagName)) {
+                return tag;
+            }
+        }
+        return null;
+    }
+
+    public TagMap parseTags(List<Tag> tags) {
+        TagMap apiManagerTags = new TagMap();
+        for (Tag tag : tags) {
+            String[] value = new String[1];
+            value[0] = tag.getDescription();
+            apiManagerTags.put(tag.getName(), value);
+        }
+        return apiManagerTags;
+    }
+
+    public void addTags(API api, OpenAPI openAPI) {
+        List<Tag> tags = openAPI.getTags();
+        if (tags != null) {
+            TagMap apiManagerTags = parseTags(tags);
             api.setTags(apiManagerTags);
         }
     }
@@ -319,64 +568,69 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         return deviceType;
     }
 
-    private Map<String, Object> addInboundSecurityToAPI(String frontendAuthType) throws AppException {
+    private List<SecurityProfile> addInboundSecurityToAPI(String frontendAuthType) throws AppException {
+        List<SecurityProfile> securityProfiles = new ArrayList<>();
         DeviceType deviceType = matchDeviceType(frontendAuthType);
         LOG.info("Frontend Authentication type : {}", frontendAuthType);
         if (deviceType == null) {
             throw new AppException("frontendAuthType : " + frontendAuthType + "  is invalid", ErrorCode.INVALID_PARAMETER);
         }
-        APISecurity apiSecurity = new APISecurity();
-        apiSecurity.setType(deviceType.toString());
-        apiSecurity.setName(deviceType.getName());
-        Map<String, Object> properties = new HashMap<>();
+        SecurityProfile securityProfile = new SecurityProfile();
+        securityProfile.setIsDefault(true);
+        securityProfile.setName(DEFAULT);
+        SecurityDevice securityDevice = new SecurityDevice();
+        Map<String, String> properties = new HashMap<>();
         if (deviceType.equals(DeviceType.apiKey)) {
             properties.put("apiKeyFieldName", "KeyId");
-            properties.put("takeFrom", "HEADER");
-            properties.put("removeCredentialsOnSuccess", "true");
+            properties.put(TAKE_FROM, HEADER_STR);
+            properties.put(REMOVE_CREDENTIALS_ON_SUCCESS, "true");
         } else if (deviceType.equals(DeviceType.oauth)) {
-            properties.put("tokenStore", "OAuth Access Token Store");
-            properties.put("scopes", "resource.WRITE, resource.READ");
-            setupOauthProperties(properties);
+            properties.put(TOKEN_STORE, "OAuth Access Token Store");
+            setupOauthProperties(properties, "resource.WRITE, resource.READ");
         } else if (deviceType.equals(DeviceType.oauthExternal)) {
-            properties.put("tokenStore", "Tokeninfo policy 1");
-            properties.put("useClientRegistry", true);
-            properties.put("subjectSelector", "${oauth.token.client_id}");
-            setupOauthProperties(properties);
+            properties.put(TOKEN_STORE, "Tokeninfo policy 1");
+            properties.put(USE_CLIENT_REGISTRY, "true");
+            properties.put(SUBJECT_SELECTOR, OAUTH_TOKEN_CLIENT_ID);
+            setupOauthProperties(properties, "resource.WRITE, resource.READ");
         } else if (deviceType.equals(DeviceType.authPolicy)) {
             properties.put("authenticationPolicy", "Custom authentication policy");
-            properties.put("useClientRegistry", true);
-            properties.put("subjectSelector", "authentication.subject.id");
-            properties.put("descriptionType", "original");
+            properties.put(USE_CLIENT_REGISTRY, "true");
+            properties.put(SUBJECT_SELECTOR, "authentication.subject.id");
+            properties.put("descriptionType", ORIGINAL);
             properties.put("descriptionUrl", "");
             properties.put("descriptionMarkdown", "");
             properties.put("description", "");
         }
-        apiSecurity.setProperties(properties);
-        Map<String, Object> securityProfile = new LinkedHashMap<>();
-        securityProfile.put("name", DEFAULT);
-        securityProfile.put("isDefault", true);
-        List<APISecurity> apiSecurities = new ArrayList<>();
-        apiSecurities.add(apiSecurity);
-        securityProfile.put("devices", apiSecurities);
-        return securityProfile;
+        securityDevice.setProperties(properties);
+        securityDevice.setOrder(1);
+        securityDevice.setName(DEFAULT);
+        securityDevice.setType(deviceType);
+        List<SecurityDevice> securityDevices = new ArrayList<>();
+        securityDevices.add(securityDevice);
+        securityProfile.setDevices(securityDevices);
+        securityProfiles.add(securityProfile);
+        return securityProfiles;
     }
 
-    private void setupOauthProperties(Map<String, Object> properties) {
-        properties.put("accessTokenLocation", "HEADER");
+    private void setupOauthProperties(Map<String, String> properties, String scopes) {
+        properties.put("accessTokenLocation", HEADER_STR);
         properties.put("authorizationHeaderPrefix", "Bearer");
         properties.put("accessTokenLocationQueryString", "");
-        properties.put("scopesMustMatch", "Any");
-        properties.put("scopes", "resource.WRITE, resource.READ");
-        properties.put("removeCredentialsOnSuccess", true);
-        properties.put("implicitGrantEnabled", true);
+        properties.put("scopesMustMatch", "All");
+        properties.put("scopes", scopes);
+        properties.put(REMOVE_CREDENTIALS_ON_SUCCESS, "true");
+        properties.put("implicitGrantEnabled", "true");
         properties.put("implicitGrantLoginEndpointUrl", "https://localhost:8089/api/oauth/authorize");
         properties.put("implicitGrantLoginTokenName", "access_token");
-        properties.put("authCodeGrantTypeEnabled", true);
+        properties.put("authCodeGrantTypeEnabled", "true");
         properties.put("authCodeGrantTypeRequestEndpointUrl", "https://localhost:8089/api/oauth/authorize");
         properties.put("authCodeGrantTypeRequestClientIdName", "client_id");
         properties.put("authCodeGrantTypeRequestSecretName", "client_secret");
         properties.put("authCodeGrantTypeTokenEndpointUrl", "https://localhost:8089/api/oauth/token");
         properties.put("authCodeGrantTypeTokenEndpointTokenName", "access_code");
+        properties.put("clientCredentialsGrantTypeEnabled", "true");
+        properties.put("clientCredentialsGrantTypeTokenEndpointUrl", "https://localhost:8089/api/oauth/token");
+        properties.put("clientCredentialsGrantTypeTokenName", "access_token");
     }
 
     public String writeAPISpecification(String url, String configPath, InputStream inputStream) throws IOException {
@@ -408,7 +662,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         HttpURLConnection httpURLConnection = (HttpURLConnection) httpURL.openConnection();
         int responseCode = httpURLConnection.getResponseCode();
         String filePath = null;
-        LOG.debug("Response Code : {}", responseCode);
+        LOG.debug("Http Response Code : {}", responseCode);
         if (responseCode == HttpURLConnection.HTTP_OK) {
             filePath = writeAPISpecification(url, configPath, httpURLConnection.getInputStream());
         }
@@ -416,7 +670,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
     }
 
 
-    public String downloadCertificatesAndContent(API api, String configPath, String url) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
+    public String downloadCertificatesAndContent(API api, String configPath, String url) throws
+        IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];

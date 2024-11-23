@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+    title: Sample API
+    description: This is a sample API demonstrating OAuth 2.0 client credentials flow with scopes defined at the service and path levels.
+    version: 1.0.0
+
+servers:
+    - url: https://api.example.com/v1
+
+components:
+    securitySchemes:
+        oauth2ClientCredentials:
+            type: oauth2
+            flows:
+                clientCredentials:
+                    tokenUrl: https://auth.example.com/oauth2/token
+                    scopes:
+                        read: Grants read access
+                        write: Grants write access
+                        admin: Grants admin access
+
+    schemas:
+        SampleResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+
+security:
+    - oauth2ClientCredentials:
+          - read
+          - write
+tags:
+    - name: public
+      description: public desc
+      externalDocs:
+          url: http://docs.my-api.com/pet-operations.htm
+    - name: data
+      description: data desc
+      externalDocs:
+          url: http://docs.my-api.com/store-orders.htm
+    - name: admin
+      description: admin desc
+      externalDocs:
+          url: http://docs.my-api.com/store-orders.htm
+
+
+paths:
+    /public:
+        get:
+            summary: Public endpoint
+            tags:
+                - public
+            description: This endpoint is public and does not require authentication.
+            responses:
+                '200':
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SampleResponse'
+
+    /secure-data:
+        get:
+            summary: Secure data endpoint
+            tags:
+                - data
+            description: This endpoint requires OAuth with 'read' scope.
+            security:
+                - oauth2ClientCredentials:
+                      - read
+            responses:
+                '200':
+                    description: Secured data retrieved successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SampleResponse'
+
+    /admin:
+        post:
+            summary: Admin-only endpoint
+            tags:
+                - admin
+            description: This endpoint requires OAuth with 'admin' scope.
+            security:
+                - oauth2ClientCredentials:
+                      - admin
+            requestBody:
+                description: Request payload for admin operation
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                action:
+                                    type: string
+                                    example: "update"
+            responses:
+                '201':
+                    description: Admin operation successful
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SampleResponse'
