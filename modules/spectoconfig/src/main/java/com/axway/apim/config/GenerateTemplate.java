@@ -121,7 +121,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
                 JsonNode jsonNode = objectMapper.convertValue(apiConfig, JsonNode.class);
-                objectMapper.writeValue(fileWriter, jsonNode);
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(fileWriter, jsonNode);
                 LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
             }
         } catch (AppException e) {
