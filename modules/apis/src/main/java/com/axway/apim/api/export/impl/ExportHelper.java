@@ -163,7 +163,7 @@ public class ExportHelper {
                     targetFile = localFolder.getCanonicalPath() + "/" + fileName + fileExtension;
                     writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
                 }
-                exportAPI.getAPIDefinition().setApiSpecificationFile(fileName);
+                exportAPI.getAPIDefinition().setApiSpecificationFile(fileName + fileExtension);
             }
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
