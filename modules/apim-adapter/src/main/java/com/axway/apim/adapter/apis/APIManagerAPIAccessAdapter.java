@@ -253,8 +253,14 @@ public class APIManagerAPIAccessAdapter {
                     response = httpResponse.getResponseBody();
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
-                        throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        //even in second attempt we have to ignore 409 error (resource already exists)
+                        if (statusCode == 409 && response.contains("resource already exists")) {
+                            LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);
+                            return;
+                        } else {
+                            LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
+                            throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        }
                     } else {
                         LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
                     }
