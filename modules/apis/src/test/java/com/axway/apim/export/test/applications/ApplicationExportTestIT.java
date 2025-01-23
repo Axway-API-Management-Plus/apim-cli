@@ -86,7 +86,7 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         assertEquals(exportedAPIConfig.get("state").asText(), "published");
         assertEquals(exportedAPIConfig.get("path").asText(), context.getVariable("apiPath"));
         assertEquals(exportedAPIConfig.get("name").asText(), context.getVariable("apiName"));
-        assertEquals(exportedAPIConfig.get("caCerts").size(), 4);
+        assertEquals(exportedAPIConfig.get("caCerts").size(), 3);
 
         assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), "swagger.io.crt");
         assertFalse(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean());

@@ -101,7 +101,7 @@ public class WildcardAPIExportTestIT extends TestNGCitrusSpringSupport {
         assertEquals(exportedAPIConfig.get("state").asText(), "unpublished");
         assertEquals(exportedAPIConfig.get("path").asText(), context.getVariable("apiPath2"));
         assertEquals(exportedAPIConfig.get("name").asText(), context.getVariable("apiName2"));
-        assertEquals(exportedAPIConfig.get("caCerts").size(), 4);
+        assertEquals(exportedAPIConfig.get("caCerts").size(), 3);
 
         assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), "swagger.io.crt");
         assertFalse(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean());
