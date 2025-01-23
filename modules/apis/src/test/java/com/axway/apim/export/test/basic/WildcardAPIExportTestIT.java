@@ -108,7 +108,7 @@ public class WildcardAPIExportTestIT extends TestNGCitrusSpringSupport {
         assertTrue(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean());
 
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder2") + "/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder2") + "/StarfieldServicesRootCertificateAuthority-G2.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder2") + "/AmazonRSA2048M02.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder2") + "/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
         //assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/Amazon.crt").exists(), "Certificate Amazon.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder2") + "/" + context.getVariable("exportAPIName2")).exists(), "Exported Swagger-File is missing");
