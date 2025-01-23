@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+# [1.14.9]  In progress
+
+### Fixed
+
+- File extension is missing in apiSpecification.resource when exporting API(See issue [#528](https://github.com/Axway-API-Management-Plus/apim-cli/issues/528))
+
+### Added
+- Support csv format for organization export (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/534))
+- Generate api-config.json with permethod override and methods tags (See issue [#522](https://github.com/Axway-API-Management-Plus/apim-cli/issues/522))
+- import .dat APIs (See issue [#532](https://github.com/Axway-API-Management-Plus/apim-cli/issues/532))
+
+
+
 # [1.14.8]  2024-11-06
 
 ### Fixed

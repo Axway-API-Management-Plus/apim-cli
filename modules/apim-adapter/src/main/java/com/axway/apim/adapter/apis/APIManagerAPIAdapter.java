@@ -45,6 +45,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -67,6 +68,9 @@ public class APIManagerAPIAdapter {
     public static final String APPLICATIONS = "/applications/";
     public static final String FILENAME = "filename";
     public static final String CONTENT_TYPE = "text/plain";
+    public static final String PASSWORD = "password";
+    public static final String HTML_5 = "html5";
+    public static final String UPLOAD_TYPE = "uploadType";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
@@ -698,7 +702,7 @@ public class APIManagerAPIAdapter {
             String locationHeader;
             List<NameValuePair> parameters = new ArrayList<>();
             parameters.add(new BasicNameValuePair(FILENAME, "api-export.dat"));
-            parameters.add(new BasicNameValuePair("password", password));
+            parameters.add(new BasicNameValuePair(PASSWORD, password));
             parameters.add(new BasicNameValuePair("id", api.getId()));
             HttpEntity entity = new UrlEncodedFormEntity(parameters);
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
@@ -728,6 +732,32 @@ public class APIManagerAPIAdapter {
             }
         } catch (Exception e) {
             throw new AppException("Cannot export API-DAT file.", ErrorCode.ERR_EXPORTING_API_DAT_FILE, e);
+        }
+    }
+
+    public void importAPIDatFile(File file, String password, String orgId) throws AppException {
+        try {
+            MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
+                .addBinaryBody("file", file)
+                .addTextBody(ORGANIZATION_ID, orgId)
+                .addTextBody(UPLOAD_TYPE, HTML_5);
+            if (password != null) multipartEntityBuilder.addTextBody(PASSWORD, password);
+            HttpEntity entity = multipartEntityBuilder.build();
+
+            URI uri = new URIBuilder(cmd.getAPIManagerURL())
+                .setPath(cmd.getApiBasepath() + "/proxies/import")
+                .build();
+            RestAPICall request = new POSTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error import DAT-File representation of API, Received Status-Code: {} Response: {}", statusCode, response);
+                    throw new AppException("Error importing DAT-File representation of API", ErrorCode.ERR_IMPORTING_API_DAT_FILE);
+                }
+            }
+        } catch (Exception e) {
+            throw new AppException("Cannot export API-DAT file.", ErrorCode.ERR_IMPORTING_API_DAT_FILE, e);
         }
     }
 
@@ -835,7 +865,7 @@ public class APIManagerAPIAdapter {
             nameValuePairs.add(new BasicNameValuePair("name", api.getName()));
             if (username != null) {
                 nameValuePairs.add(new BasicNameValuePair("username", username));
-                nameValuePairs.add(new BasicNameValuePair("password", pass));
+                nameValuePairs.add(new BasicNameValuePair(PASSWORD, pass));
             }
             HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
             RestAPICall importWSDL = new POSTRequest(entity, uri);
@@ -861,7 +891,7 @@ public class APIManagerAPIAdapter {
             .addTextBody("type", "swagger")
             .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), FILENAME)
             .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
-            .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+            .addTextBody("integral", "false").addTextBody(UPLOAD_TYPE, HTML_5).build();
         return createBackend(entity, api);
     }
 
@@ -892,7 +922,7 @@ public class APIManagerAPIAdapter {
             .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/octet-stream"), FILENAME)
             .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
             .addTextBody("backendUrl", backendBasePath)
-            .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+            .addTextBody("integral", "false").addTextBody(UPLOAD_TYPE, HTML_5).build();
         return createBackend(entity, api);
     }
 

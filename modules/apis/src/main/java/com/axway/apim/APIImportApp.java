@@ -3,11 +3,16 @@ package com.axway.apim;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
+import com.axway.apim.apiimport.lib.cli.CLIAPIImportDatOptions;
 import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
+import com.axway.apim.apiimport.lib.params.APIImportDatParams;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.cli.APIMCLIServiceProvider;
@@ -22,6 +27,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +54,36 @@ public class APIImportApp implements APIMCLIServiceProvider {
             e.logException(LOG);
             return e.getError().getCode();
         }
-        APIImportApp apiImportApp = new APIImportApp();
-        return apiImportApp.importAPI(params);
+        return new APIImportApp().importAPI(params);
+    }
+
+    @CLIServiceMethod(name = "import-dat", description = "Import API collection using.dat file.")
+    public int importDat(String[] args) {
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+        APIManagerAdapter apimAdapter = null;
+        try {
+            APIImportDatParams  params = (APIImportDatParams) CLIAPIImportDatOptions.create(args).getParams();
+            params.validateRequiredParameters();
+            String orgName = params.getOrgName();
+            apimAdapter = APIManagerAdapter.getInstance();
+            APIManagerOrganizationAdapter organizationAdapter = apimAdapter.getOrgAdapter();
+            Organization organization = organizationAdapter.getOrgForName(orgName);
+            if (organization == null) {
+                throw new AppException("Invalid orgName " + orgName, ErrorCode.UNKNOWN_ORGANIZATION);
+            }
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
+            APIManagerAPIAdapter apimApiAdapter = apimAdapter.getApiAdapter();
+            String apiDatFilePath = params.getApiDefinition();
+            apimApiAdapter.importAPIDatFile(new File(apiDatFilePath),   params.getDatPassword(), organization.getId());
+            return 0;
+        } catch (AppException ap) {
+            return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return ErrorCode.UNXPECTED_ERROR.getCode();
+        } finally {
+            Utils.deleteInstance(apimAdapter);
+        }
     }
 
     public int importAPI(APIImportParams params) {

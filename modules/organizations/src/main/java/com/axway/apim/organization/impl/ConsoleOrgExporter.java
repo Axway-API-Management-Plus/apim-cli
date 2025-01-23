@@ -17,6 +17,7 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
+import com.axway.apim.organization.Constants;
 import com.axway.apim.organization.lib.OrgExportParams;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -24,14 +25,8 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleOrgExporter extends OrgResultHandler {
 
-    public static final String ORGANIZATION_ID = "Organization-Id";
-    public static final String NAME = "Name";
-    public static final String V_HOST = "V-Host";
-    public static final String DEV = "Dev";
-    public static final String EMAIL = "Email";
-    public static final String ENABLED = "Enabled";
-    APIManagerAdapter adapter;
 
+    APIManagerAdapter adapter;
     Map<String, Integer> apiCountPerOrg = null;
     Map<String, Integer> appCountPerOrg = null;
 
@@ -62,23 +57,23 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 
     private void printStandard(List<Organization> orgs) {
         Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
-            new Column().header(ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
-            new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
-            new Column().header(V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
-            new Column().header(DEV).with(org -> Boolean.toString(org.isDevelopment())),
-            new Column().header(EMAIL).with(Organization::getEmail),
-            new Column().header(ENABLED).with(org -> Boolean.toString(org.isEnabled()))
+            new Column().header(Constants.ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+            new Column().header(Constants.NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
+            new Column().header(Constants.V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
+            new Column().header(Constants.DEV).with(org -> Boolean.toString(org.isDevelopment())),
+            new Column().header(Constants.EMAIL).with(Organization::getEmail),
+            new Column().header(Constants.ENABLED).with(org -> Boolean.toString(org.isEnabled()))
         )));
     }
 
     private void printWide(List<Organization> orgs) {
         Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
-            new Column().header(ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
-            new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
-            new Column().header(V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
-            new Column().header(DEV).with(org -> Boolean.toString(org.isDevelopment())),
-            new Column().header(EMAIL).with(Organization::getEmail),
-            new Column().header(ENABLED).with(org -> Boolean.toString(org.isEnabled())),
+            new Column().header(Constants.ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+            new Column().header(Constants.NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
+            new Column().header(Constants.V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
+            new Column().header(Constants.DEV).with(org -> Boolean.toString(org.isDevelopment())),
+            new Column().header(Constants.EMAIL).with(Organization::getEmail),
+            new Column().header(Constants.ENABLED).with(org -> Boolean.toString(org.isEnabled())),
             new Column().header("Created on").with(org -> new Date(org.getCreatedOn()).toString()),
             new Column().header("Restricted").with(org -> Boolean.toString(org.isRestricted()))
         )));
@@ -86,12 +81,12 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 
     private void printUltra(List<Organization> orgs) {
         Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
-            new Column().header(ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
-            new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
-            new Column().header(V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
-            new Column().header(DEV).with(org -> Boolean.toString(org.isDevelopment())),
-            new Column().header(EMAIL).with(Organization::getEmail),
-            new Column().header(ENABLED).with(org -> Boolean.toString(org.isEnabled())),
+            new Column().header(Constants.ORGANIZATION_ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+            new Column().header(Constants.NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
+            new Column().header(Constants.V_HOST).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
+            new Column().header(Constants.DEV).with(org -> Boolean.toString(org.isDevelopment())),
+            new Column().header(Constants.EMAIL).with(Organization::getEmail),
+            new Column().header(Constants.ENABLED).with(org -> Boolean.toString(org.isEnabled())),
             new Column().header("Created on").with(org -> new Date(org.getCreatedOn()).toString()),
             new Column().header("Restricted").with(org -> Boolean.toString(org.isRestricted())),
             new Column().header("APIs").with(this::getNoOfAPIsForOrg),

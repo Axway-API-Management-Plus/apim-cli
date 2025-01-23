@@ -905,4 +905,11 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     }
 
+    @Test
+    public void importAPIDatFileTest() throws AppException {
+        Organization organization = orgAdapter.getOrgForName("orga");
+        String filePath = this.getClass().getClassLoader().getResource("com/axway/apim/adapter/api-export.dat").getFile();
+        apiManagerAPIAdapter.importAPIDatFile(new File(filePath),"changeme", organization.getId());
+    }
+
 }

@@ -25,6 +25,7 @@ public abstract class OrgResultHandler {
 		JSON_EXPORTER(JsonOrgExporter.class),
 		YAML_EXPORTER(YamlOrgExporter.class),
 		CONSOLE_EXPORTER(ConsoleOrgExporter.class),
+        CSV_EXPORTER(CsvOrgExporter.class),
 		ORG_DELETE_HANDLER(DeleteOrgHandler.class);
 
 		private final Class<OrgResultHandler> implClass;

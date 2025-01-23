@@ -60,7 +60,7 @@ public enum ErrorCode {
     ERR_DELETING_API(91, "API could not be deleted.", false),
     ERR_DELETING_ORG(92, "Organization could not be deleted.", false),
     ERR_GRANTING_ACCESS_TO_API(93, "Error granting access to an API.", false),
-    ERR_EXPORTING_API_DAT_FILE(94, "Error exporting API-Date file.", false),
+    ERR_EXPORTING_API_DAT_FILE(94, "Error exporting API-Dat file.", false),
     ERR_CREATING_APPLICATION(95, "Error creating/updating an application.", false),
     ERR_PUBLISH_API(96, "API could not be changed to publish state", false),
     ERR_UNPUBSLISH_API(97, "API could not be changed to unpublish state", false),
@@ -69,7 +69,8 @@ public enum ErrorCode {
     CHECK_CERTS_FOUND_CERTS(101, "Certificates found that will expire within the given number of days.", false),
     GRANT_ACCESS_APPLICATION_ERR(102, "Error granting application access to API."),
     REVOKE_ACCESS_APPLICATION_ERR(103, "Error revoking application access to API."),
-    INVALID_SECURITY_PROFILE_CONFIG(104, "The given security profile is invalid.", false);
+    INVALID_SECURITY_PROFILE_CONFIG(104, "The given security profile is invalid.", false),
+    ERR_IMPORTING_API_DAT_FILE(105, "Error importing API-Dat file.", false);
 
 
     private final int code;
