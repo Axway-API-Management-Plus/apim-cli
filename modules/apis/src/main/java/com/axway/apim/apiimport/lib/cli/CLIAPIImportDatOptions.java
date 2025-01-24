@@ -60,7 +60,7 @@ public class CLIAPIImportDatOptions extends CLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return "API-Import";
+		return "API-Import Dat";
 	}
 
 	@Override
