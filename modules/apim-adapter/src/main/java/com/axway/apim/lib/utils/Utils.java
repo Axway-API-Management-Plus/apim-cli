@@ -47,6 +47,7 @@ public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
     public static final String MASKED_VALUE = "********";
+    public static final String FILE_SEPARATOR = "/";
 
     public enum FedKeyType {
         FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>"), OAuthTokenProfile("<key type='AccessTokenPersist'>");
@@ -171,7 +172,7 @@ public class Utils {
         } else {
             if (!stage.equals("NOT_SET")) {
                 File stageFile = new File(baseConfig.substring(0, baseConfig.lastIndexOf(".") + 1) + stage + baseConfig.substring(baseConfig.lastIndexOf(".")));
-                File subDirStageFile = new File(stageFile.getParentFile() + "/" + stage + "/" + stageFile.getName());
+                File subDirStageFile = new File(stageFile.getParentFile() + File.separator + stage + File.separator + stageFile.getName());
                 if (stageFile.exists()) {
                     return stageFile;
                 } else if (subDirStageFile.exists()) {
@@ -288,9 +289,9 @@ public class Utils {
             String apiId = node.get("id").asText();
             entityAsJsonMappedWithId.put(apiId, node);
         }
-        Map<String, String> customProperties = new LinkedHashMap<>();
         // Iterate over all APIs (at this point not yet having the custom-properties serialized)
         for (CustomPropertiesEntity entity : entities) {
+            Map<String, String> customProperties = new LinkedHashMap<>();
             // Get the original JSON-Payload for the current API fetched from API-Manager
             JsonNode node = entityAsJsonMappedWithId.get(entity.getId());
             // Iterate over all requested Custom-Properties that should be returned
@@ -344,15 +345,15 @@ public class Utils {
         if (isHttpUri(serverUrl)) {
             URL openApiUrl = new URL(serverUrl);
             String path = openApiUrl.getPath();
-            if (backendBasePath.endsWith("/")) {
+            if (backendBasePath.endsWith(FILE_SEPARATOR)) {
                 newBackendBasePath = backendBasePath.substring(0, backendBasePath.length() - 1) + path;
             } else newBackendBasePath = backendBasePath + path;
         } else {
-            if (serverUrl.startsWith("/") && !backendBasePath.endsWith("/"))
+            if (serverUrl.startsWith(FILE_SEPARATOR) && !backendBasePath.endsWith(FILE_SEPARATOR))
                 newBackendBasePath = backendBasePath + serverUrl;
-            else if (backendBasePath.endsWith("/"))
+            else if (backendBasePath.endsWith(FILE_SEPARATOR))
                 newBackendBasePath = backendBasePath.substring(0, backendBasePath.length() - 1) + serverUrl;
-            else newBackendBasePath = backendBasePath + "/" + serverUrl;
+            else newBackendBasePath = backendBasePath + FILE_SEPARATOR + serverUrl;
         }
         return newBackendBasePath;
     }
