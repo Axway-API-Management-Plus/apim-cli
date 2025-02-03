@@ -616,7 +616,7 @@ public class APIManagerAPIAdapter {
         } else {
             serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
         }
-        LOG.debug("serializeAllExcept={}", serializeAllExcept);
+        LOG.debug("serializeAllExcept={}",  Arrays.asList(serializeAllExcept));
         return serializeAllExcept;
     }
 
