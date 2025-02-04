@@ -5,7 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-# [1.14.9]  2025-01-24
+# [1.14.10]  2025-02-04
+
+### Fixed
+-Regression when updating API proxy(See issue [#535](https://github.com/Axway-API-Management-Plus/apim-cli/issues/535))
+- Custom Properties not exported correctly (empty or with wrong value)(See issue [#473](https://github.com/Axway-API-Management-Plus/apim-cli/issues/473))
+
+# [1.14.9]  2025-01-27
 
 ### Fixed
 
