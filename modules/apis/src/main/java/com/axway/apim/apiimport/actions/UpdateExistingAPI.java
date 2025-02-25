@@ -38,7 +38,9 @@ public class UpdateExistingAPI {
             // Copy all desired proxy changes into the actual API
             APIChangeState.copyChangedProps(desiredAPI, actualAPI, changes.getAllChanges());
             actualAPI.setApiMethods(null);
-            actualAPI.setAuthenticationProfiles(desiredAPI.getAuthenticationProfiles());
+            if (desiredAPI.getAuthenticationProfiles() != null) {
+                actualAPI.setAuthenticationProfiles(desiredAPI.getAuthenticationProfiles());
+            }
             List<APIMethod> desiredAPIMethods = desiredAPI.getApiMethods();
             ManageApiMethods manageApiMethods = new ManageApiMethods();
             manageApiMethods.isMethodMismatch(actualAPIMethods, desiredAPIMethods);
