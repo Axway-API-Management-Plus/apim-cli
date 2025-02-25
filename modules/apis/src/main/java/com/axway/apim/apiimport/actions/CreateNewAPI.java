@@ -81,6 +81,8 @@ public class CreateNewAPI {
                     serviceProfile.setBasePath(backendBasePath);
                 }
             }
+            //Copy password as gateway responds with empty password for ssl and basic
+            createdAPI.setAuthenticationProfiles(desiredAPI.getAuthenticationProfiles());
             // But without updating the Swagger, as we have just imported it!
             createdAPI = apiAdapter.updateAPIProxy(createdAPI);
             // If an image is included, update it
