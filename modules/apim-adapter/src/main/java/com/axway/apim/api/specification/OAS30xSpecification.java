@@ -18,14 +18,14 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
-public class OAS3xSpecification extends APISpecification {
-    private static final Logger LOG = LoggerFactory.getLogger(OAS3xSpecification.class);
+public class OAS30xSpecification extends APISpecification {
+    private static final Logger LOG = LoggerFactory.getLogger(OAS30xSpecification.class);
     public static final String SERVERS = "servers";
     public static final String OPENAPI = "openapi";
 
     private JsonNode openApiNode = null;
 
-    public OAS3xSpecification() {
+    public OAS30xSpecification() {
         super();
     }
 

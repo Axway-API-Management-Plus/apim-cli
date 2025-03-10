@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Objects;
 
-public class APISpecificationOpenAPI3xTest {
+public class APISpecificationOpenAPI31xTest {
 
 	private static final String TEST_PACKAGE = "/com/axway/apim/adapter/spec";
 
@@ -29,63 +29,63 @@ public class APISpecificationOpenAPI3xTest {
 	public void replaceServerURLIfHostNameIsNotPresent() throws IOException {
         CoreParameters coreParameters = CoreParameters.getInstance();
         coreParameters.setOverrideSpecBasePath(false);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsPresent() throws IOException {
 		CoreParameters coreParameters = CoreParameters.getInstance();
 		coreParameters.setOverrideSpecBasePath(false);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi-with-host.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31-with-host.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsPresent2() throws IOException {
 		CoreParameters coreParameters = CoreParameters.getInstance();
 		coreParameters.setOverrideSpecBasePath(true);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi-with-host.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31-with-host.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v3", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v31", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsNotPresentWithBackendBasePath() throws IOException {
         CoreParameters coreParameters = CoreParameters.getInstance();
         coreParameters.setOverrideSpecBasePath(false);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/test", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void testBerlinGroupYAM_API() throws IOException {
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/psd2-api_1.3.6_errata20200327.yaml");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/museum-openapi31.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
 		JsonNode swagger = ymlMapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -267,11 +267,11 @@ public class APISpecificationOpenAPI3xTest {
     public void overrideServerURLWithBackendBasePath() throws IOException {
         CoreParameters coreParameters = CoreParameters.getInstance();
         coreParameters.setOverrideSpecBasePath(true);
-        byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+        byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
         apiDefinition.configureBasePath("https://myhost.customer.com:8767/test", null);
         // Check if the Swagger-File has been changed
-        Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+        Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
         Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
         Assert.assertEquals("https://myhost.customer.com:8767/test", swagger.get("servers").get(0).get("url").asText());
@@ -281,11 +281,11 @@ public class APISpecificationOpenAPI3xTest {
 	public void overrideServerURLWithBackendBasePath2() throws IOException {
 		CoreParameters coreParameters = CoreParameters.getInstance();
 		coreParameters.setOverrideSpecBasePath(true);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v3", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
 		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
