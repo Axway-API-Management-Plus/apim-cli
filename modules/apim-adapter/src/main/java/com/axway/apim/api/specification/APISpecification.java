@@ -28,7 +28,9 @@ public abstract class APISpecification {
         SWAGGER_API_20("Swagger 2.0", JSON),
         SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", YAML),
         OPEN_API_30("Open API 3.0", JSON),
+        OPEN_API_31("Open API 3.1", JSON),
         OPEN_API_30_YAML("Open API 3.0 (YAML)", YAML),
+        OPEN_API_31_YAML("Open API 3.1 (YAML)", YAML),
         WSDL_API("WSDL", ".xml"),
         WADL_API("Web Application Description Language (WADL)", ".wadl"),
         ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", METADATA, "Given OData specification is converted into an OpenAPI 3 specification.",
@@ -96,11 +98,14 @@ public abstract class APISpecification {
             APISpecification otherSwagger = (APISpecification) other;
             if (other instanceof Swagger2xSpecification) {
                 return compareJSON(otherSwagger, this);
-            } else if (other instanceof OAS3xSpecification) {
+            } else if (other instanceof OAS30xSpecification) {
+                return compareJSON(otherSwagger, this);
+            } else if (other instanceof OAS31xSpecification) {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof ODataSpecification) {
                 ODataSpecification importSpec = (ODataSpecification) other;
-                OAS3xSpecification specFromGateway = (OAS3xSpecification) this; // Gateway stores as openapi
+                //TODO: always 3.0.2?
+                OAS30xSpecification specFromGateway = (OAS30xSpecification) this; // Gateway stores as openapi
                 return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
             } else if (other instanceof Swagger1xSpecification) {
                 return compareJSON(otherSwagger, this);
