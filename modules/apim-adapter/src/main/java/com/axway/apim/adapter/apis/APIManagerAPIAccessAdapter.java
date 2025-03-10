@@ -40,6 +40,8 @@ import java.util.*;
 public class APIManagerAPIAccessAdapter {
 
     public static final String APIS = "/apis";
+    public static final String ERROR = "Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.";
+    public static final String RESOURCE_ALREADY_EXISTS = "resource already exists";
 
     public enum Type {
         organizations("Organization"),
@@ -216,8 +218,13 @@ public class APIManagerAPIAccessAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
-                    LOG.error("Error granting access to application id : {} for  API-Proxy  : {} using URI: {} Received Status-Code: {} Response: {}", applicationId, apiAccess.getApiId(), uri, statusCode, response);
-                    throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                    if (statusCode == 409 && response.contains(RESOURCE_ALREADY_EXISTS)) {
+                        LOG.info(ERROR, apiAccess, statusCode, response);
+                        return apiAccess;
+                    }else {
+                        LOG.error("Error granting access to application id : {} for  API-Proxy  : {} using URI: {} Received Status-Code: {} Response: {}", applicationId, apiAccess.getApiId(), uri, statusCode, response);
+                        throw new AppException("Can't grant access to API.", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                    }
                 }
                 removeApplicationFromCache(applicationId);
                 return mapper.readValue(response, APIAccess.class);
@@ -254,8 +261,8 @@ public class APIManagerAPIAccessAdapter {
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         //even in second attempt we have to ignore 409 error (resource already exists)
-                        if (statusCode == 409 && response.contains("resource already exists")) {
-                            LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);
+                        if (statusCode == 409 && response.contains(RESOURCE_ALREADY_EXISTS)) {
+                            LOG.info(ERROR, apiAccess, statusCode, response);
                             return;
                         } else {
                             LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
@@ -264,8 +271,8 @@ public class APIManagerAPIAccessAdapter {
                     } else {
                         LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
                     }
-                } else if (statusCode == 409 && response.contains("resource already exists")) {
-                    LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);
+                } else if (statusCode == 409 && response.contains(RESOURCE_ALREADY_EXISTS)) {
+                    LOG.info(ERROR, apiAccess, statusCode, response);
                     return;
                 } else {
                     LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);

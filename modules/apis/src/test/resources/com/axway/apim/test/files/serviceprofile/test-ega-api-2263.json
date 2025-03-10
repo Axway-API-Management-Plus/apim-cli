@@ -1,0 +1,103 @@
+{
+    "openapi": "3.0.0",
+    "info":
+    {
+        "title": "Test EGA API-2263",
+        "version": "1.0",
+        "description": "Test EGA API-2263",
+        "contact":
+        {
+            "name": "Axway",
+            "email": "api@axway.com",
+            "url" :  "https://axway.com"
+        }
+    },
+    "servers":
+    [
+        {
+            "description": "DEV",
+            "url": "https://api-gw-dev.axway.com:8443/test-ega-api-2263"
+        },
+        {
+            "description": "QA",
+            "url": "https://api-gw-qa.axway.com/test-ega-api-2263"
+        },
+        {
+            "description": "PROD",
+            "url": "https://api-gw.axway.com/test-ega-api-2263"
+        }
+    ],
+    "paths":
+    {
+        "/healthcheck":
+        {
+            "get":
+            {
+                "summary": "Healthcheck",
+                "tags":
+                [
+                    "Healthcheck"
+                ],
+                "responses":
+                {
+                    "200":
+                    {
+                        "description": "OK",
+                        "content":
+                        {
+                            "application/json":
+                            {
+                                "schema":
+                                {
+                                    "type": "object",
+                                    "properties":
+                                    {
+                                        "status":
+                                        {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "get-healthcheck",
+                "description": "The healthcheck confirms that everything is working!",
+                "x-internal": false
+            }
+        }
+    },
+    "components":
+        {
+            "schemas":
+            {},
+            "securitySchemes":
+            {
+                "apiKey":
+                {
+                    "type": "apiKey",
+                    "in": "header",
+                    "name": "KeyId",
+                    "description": "API Key"
+                },
+                "http":
+                {
+                    "type": "http",
+                    "scheme": "basic",
+                    "description": "HTTP Basic"
+                }
+            }
+        },
+        "tags":
+        [
+            {
+                "name": "Healthcheck",
+                "description": "Healthcheck"
+            },
+            {
+                "name": "Function",
+				"description": "(Sandbox)"
+            }
+        ]
+}
