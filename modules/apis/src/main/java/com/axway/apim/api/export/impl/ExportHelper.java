@@ -9,10 +9,7 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.specification.APISpecification;
-import com.axway.apim.api.specification.OAS3xSpecification;
-import com.axway.apim.api.specification.Swagger2xSpecification;
-import com.axway.apim.api.specification.WSDLSpecification;
+import com.axway.apim.api.specification.*;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -149,7 +146,7 @@ public class ExportHelper {
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) && (!EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
                 String fileName = Utils.replaceSpecialChars(exportAPI.getName());
                 String fileExtension = apiDef.getAPIDefinitionType().getFileExtension();
-                if (apiDef instanceof Swagger2xSpecification || apiDef instanceof OAS3xSpecification) {
+                if (apiDef instanceof Swagger2xSpecification || apiDef instanceof OAS30xSpecification || apiDef instanceof OAS31xSpecification ) {
                     ObjectMapper mapper = apiDef.getMapper();
                     if (mapper.getFactory() instanceof YAMLFactory) {
                         fileExtension = APISpecification.APISpecType.SWAGGER_API_20_YAML.getFileExtension();
