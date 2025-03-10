@@ -44,6 +44,15 @@ public class APISpecificationFactoryTest extends WiremockWrapper {
     }
 
     @Test
+    public void getAPISpecificationOpenApi31() throws AppException {
+        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
+        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("openapi31.json", specDirPath, "petstore");
+        Assert.assertEquals(APISpecification.APISpecType.valueOf("OPEN_API_31"), apiSpecification.getAPIDefinitionType());
+        Assert.assertNotNull(apiSpecification.getDescription());
+        Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
+    }
+
+    @Test
     public void getAPISpecificationSwagger2() throws AppException {
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("airports_swagger_20.json", specDirPath, "petstore");

@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Objects;
 
-public class APISpecificationOpenAPI3xTest {
+public class APISpecificationOpenAPI31xTest {
 
 	private static final String TEST_PACKAGE = "/com/axway/apim/adapter/spec";
 
@@ -29,63 +29,63 @@ public class APISpecificationOpenAPI3xTest {
 	public void replaceServerURLIfHostNameIsNotPresent() throws IOException {
         CoreParameters coreParameters = CoreParameters.getInstance();
         coreParameters.setOverrideSpecBasePath(false);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsPresent() throws IOException {
 		CoreParameters coreParameters = CoreParameters.getInstance();
 		coreParameters.setOverrideSpecBasePath(false);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi-with-host.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31-with-host.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsPresent2() throws IOException {
 		CoreParameters coreParameters = CoreParameters.getInstance();
 		coreParameters.setOverrideSpecBasePath(true);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi-with-host.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31-with-host.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v3", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v31", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void replaceServerURLIfHostNameIsNotPresentWithBackendBasePath() throws IOException {
         CoreParameters coreParameters = CoreParameters.getInstance();
         coreParameters.setOverrideSpecBasePath(false);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/test", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
-		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v31", swagger.get("servers").get(0).get("url").asText());
 	}
 
 	@Test
 	public void testBerlinGroupYAM_API() throws IOException {
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/psd2-api_1.3.6_errata20200327.yaml");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/museum-openapi31.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
 		JsonNode swagger = ymlMapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -99,12 +99,12 @@ public class APISpecificationOpenAPI3xTest {
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"/pet/{petId}:GET"}, null); // Only this single method should be included
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertEquals(filteredSpec.get("paths").size(), 1, "Only one remaining method should be left.");
@@ -117,15 +117,15 @@ public class APISpecificationOpenAPI3xTest {
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"*:GET"}, null);
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
-		Assert.assertEquals(filteredSpec.get("paths").size(), 8, "/ GET Methods are expected");
+		Assert.assertEquals(filteredSpec.get("paths").size(), 5, "/ GET Methods are expected");
 		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("get"), "/pet/{petId}:GET is one of the remaining methods.");
 	}
 
@@ -137,14 +137,14 @@ public class APISpecificationOpenAPI3xTest {
 		filterConfig.addExclude(new String[] {"/pet/{petId}/uploadImage:POST"}, null); // Last operation - Path should have been removed
 		filterConfig.addExclude(new String[] {"/store/order/{orderId}:*"}, null); // Remove all operations for this path
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "/pet/{petId}:DELETE should have been removed.");
@@ -158,15 +158,15 @@ public class APISpecificationOpenAPI3xTest {
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addExclude(new String[] {"*:DELETE"}, null);
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
-		Assert.assertEquals(filteredSpec.get("paths").size(), 14, "All DELETE Methods are excluded");
+		Assert.assertEquals(filteredSpec.get("paths").size(), 8, "All DELETE Methods are excluded");
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "Delete operation for /pet/{petId} should have been removed.");
 		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}").get("delete"), "Delete operation for /user/{username} should have been removed.");
 		Assert.assertNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("delete"), "Delete operation for /store/order/{orderId} should have been removed.");
@@ -181,12 +181,12 @@ public class APISpecificationOpenAPI3xTest {
 		filterConfig.addExclude(null, new String[] {"store"});
 		filterConfig.addExclude(new String[] { "/pet/{petId}/uploadImage:POST" }, null);
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
@@ -220,12 +220,12 @@ public class APISpecificationOpenAPI3xTest {
 		// But in general POST methods should be removed
 		filterConfig.addExclude(new String[] {"*:POST"}, null, new String[] {"Order"});
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
@@ -267,11 +267,11 @@ public class APISpecificationOpenAPI3xTest {
     public void overrideServerURLWithBackendBasePath() throws IOException {
         CoreParameters coreParameters = CoreParameters.getInstance();
         coreParameters.setOverrideSpecBasePath(true);
-        byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+        byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
         apiDefinition.configureBasePath("https://myhost.customer.com:8767/test", null);
         // Check if the Swagger-File has been changed
-        Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+        Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
         Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
         Assert.assertEquals("https://myhost.customer.com:8767/test", swagger.get("servers").get(0).get("url").asText());
@@ -281,11 +281,11 @@ public class APISpecificationOpenAPI3xTest {
 	public void overrideServerURLWithBackendBasePath2() throws IOException {
 		CoreParameters coreParameters = CoreParameters.getInstance();
 		coreParameters.setOverrideSpecBasePath(true);
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi31.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v3", null);
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		Assert.assertTrue(apiDefinition instanceof OAS31xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
 		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
