@@ -99,12 +99,12 @@ public class APISpecificationOpenAPI31xTest {
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"/pet/{petId}:GET"}, null); // Only this single method should be included
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertEquals(filteredSpec.get("paths").size(), 1, "Only one remaining method should be left.");
@@ -117,15 +117,15 @@ public class APISpecificationOpenAPI31xTest {
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"*:GET"}, null);
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
-		Assert.assertEquals(filteredSpec.get("paths").size(), 8, "/ GET Methods are expected");
+		Assert.assertEquals(filteredSpec.get("paths").size(), 5, "/ GET Methods are expected");
 		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("get"), "/pet/{petId}:GET is one of the remaining methods.");
 	}
 
@@ -137,14 +137,14 @@ public class APISpecificationOpenAPI31xTest {
 		filterConfig.addExclude(new String[] {"/pet/{petId}/uploadImage:POST"}, null); // Last operation - Path should have been removed
 		filterConfig.addExclude(new String[] {"/store/order/{orderId}:*"}, null); // Remove all operations for this path
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "/pet/{petId}:DELETE should have been removed.");
@@ -158,15 +158,15 @@ public class APISpecificationOpenAPI31xTest {
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addExclude(new String[] {"*:DELETE"}, null);
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
-		Assert.assertEquals(filteredSpec.get("paths").size(), 14, "All DELETE Methods are excluded");
+		Assert.assertEquals(filteredSpec.get("paths").size(), 8, "All DELETE Methods are excluded");
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "Delete operation for /pet/{petId} should have been removed.");
 		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}").get("delete"), "Delete operation for /user/{username} should have been removed.");
 		Assert.assertNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("delete"), "Delete operation for /store/order/{orderId} should have been removed.");
@@ -181,12 +181,12 @@ public class APISpecificationOpenAPI31xTest {
 		filterConfig.addExclude(null, new String[] {"store"});
 		filterConfig.addExclude(new String[] { "/pet/{petId}/uploadImage:POST" }, null);
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
@@ -220,12 +220,12 @@ public class APISpecificationOpenAPI31xTest {
 		// But in general POST methods should be removed
 		filterConfig.addExclude(new String[] {"*:POST"}, null, new String[] {"Order"});
 
-		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi31.json");
 		desiredAPISpec.setFilter(filterConfig);
 
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 
-		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_31);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 
 		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
