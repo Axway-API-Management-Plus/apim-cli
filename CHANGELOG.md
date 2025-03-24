@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+# [1.14.11]  2025-02-26
+
+### Fixed
+- Error 409 from API Gateway API when creating API-Access for application(See issue [#538](https://github.com/Axway-API-Management-Plus/apim-cli/issues/538))
+- APIM-cli import breaks feAPIs with basic auth w/out password(See issue [#470](https://github.com/Axway-API-Management-Plus/apim-cli/issues/470))
+
 # [1.14.10]  2025-02-04
 
 ### Fixed
