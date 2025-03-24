@@ -104,7 +104,7 @@ public abstract class APISpecification {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof ODataSpecification) {
                 ODataSpecification importSpec = (ODataSpecification) other;
-                //TODO: always 3.0.2?
+                //TODO: always 3.0.x from gateway?
                 OAS30xSpecification specFromGateway = (OAS30xSpecification) this; // Gateway stores as openapi
                 return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
             } else if (other instanceof Swagger1xSpecification) {
