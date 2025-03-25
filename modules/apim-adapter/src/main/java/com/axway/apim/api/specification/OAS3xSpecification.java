@@ -154,10 +154,10 @@ public class OAS3xSpecification extends APISpecification {
             if (this.mapper == null) return false;
             openApiNode = this.mapper.readTree(apiSpecificationContent);
             LOG.debug("openapi tag value : {}", openApiNode.get(OPENAPI));
-            return openApiNode.has(OPENAPI) && openApiNode.get(OPENAPI).asText().startsWith("3.0.");
+            return openApiNode.has(OPENAPI) && openApiNode.get(OPENAPI).asText().startsWith("3.");
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
-                LOG.error("No OpenAPI 3.0 specification.", e);
+                LOG.error("No OpenAPI 3.x specification.", e);
             }
             return false;
         }
