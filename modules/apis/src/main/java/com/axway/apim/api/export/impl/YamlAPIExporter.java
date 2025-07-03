@@ -22,9 +22,10 @@ public class YamlAPIExporter extends JsonAPIExporter {
     @Override
     public void execute(List<API> apis) throws AppException {
         LOG.info("Export API and configuration as Yaml format");
+        int size = apis.size();
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
-            exportHelper.saveAPILocally(new ObjectMapper(CustomYamlFactory.createYamlFactory()), exportAPI, "/api-config.yaml");
+            exportHelper.saveAPILocally(new ObjectMapper(CustomYamlFactory.createYamlFactory()), exportAPI, "/api-config.yaml", size);
         }
     }
 }

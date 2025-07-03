@@ -46,10 +46,13 @@ public class ExportHelper {
         this.params = params;
     }
 
-    public void saveAPILocally(ObjectMapper mapper, ExportAPI exportAPI, String configFile) throws AppException {
+    public void saveAPILocally(ObjectMapper mapper, ExportAPI exportAPI, String configFile, int size) throws AppException {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(params.getTarget() + File.separator + getVHost(exportAPI) + apiPath);
+        if (size > 1 && localFolder.exists()) {
+            localFolder = new File(params.getTarget() + File.separator + getVHost(exportAPI) + apiPath + "-" + System.currentTimeMillis());
+        }
         if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             LOG.debug("Going to export API: {} into folder: {} ", exportAPI.getName(), localFolder);
             validateFolder(localFolder);

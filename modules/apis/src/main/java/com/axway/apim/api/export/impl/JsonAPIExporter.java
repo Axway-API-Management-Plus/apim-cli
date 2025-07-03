@@ -28,9 +28,10 @@ public class JsonAPIExporter extends APIResultHandler {
     @Override
     public void execute(List<API> apis) throws AppException {
         LOG.info("Exporting API and configuration as JSON format");
+        int size = apis.size();
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
-            exportHelper.saveAPILocally(new ObjectMapper(), exportAPI, "/api-config.json");
+            exportHelper.saveAPILocally(new ObjectMapper(), exportAPI, "/api-config.json", size);
         }
     }
 
