@@ -7,6 +7,7 @@ import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.util.Asserts;
@@ -41,6 +42,23 @@ public class APISpecificationFactoryTest extends WiremockWrapper {
         Assert.assertEquals(APISpecification.APISpecType.valueOf("OPEN_API_30"), apiSpecification.getAPIDefinitionType());
         Assert.assertNotNull(apiSpecification.getDescription());
         Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
+    }
+
+    @Test
+    public void getAPISpecificationOpenApi31() throws AppException {
+        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
+        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("openapi31.json", specDirPath, "petstore");
+        Assert.assertEquals(APISpecification.APISpecType.valueOf("OPEN_API_30"), apiSpecification.getAPIDefinitionType());
+        Assert.assertNotNull(apiSpecification.getDescription());
+        Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
+        // openapi 3.1 specific attribute
+        ObjectMapper mapper = apiSpecification.getMapper();
+        try {
+            JsonNode node = mapper.readTree(apiSpecification.getApiSpecificationContent());
+            Assert.assertNotNull(node.get("info").get("summary").asText());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
