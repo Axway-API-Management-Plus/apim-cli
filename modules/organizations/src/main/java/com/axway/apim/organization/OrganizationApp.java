@@ -88,6 +88,8 @@ public class OrganizationApp implements APIMCLIServiceProvider {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
         try {
             OrgResultHandler exporter = OrgResultHandler.create(exportImpl, params, result);
+
+
             List<Organization> orgs = adapter.getOrgAdapter().getOrgs(exporter.getFilter());
             if (orgs.isEmpty()) {
                 if (LOG.isDebugEnabled()) {

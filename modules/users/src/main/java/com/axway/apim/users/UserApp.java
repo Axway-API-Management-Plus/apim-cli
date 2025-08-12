@@ -3,6 +3,7 @@ package com.axway.apim.users;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.User;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -94,10 +95,18 @@ public class UserApp implements APIMCLIServiceProvider {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
         try {
             UserResultHandler exporter = UserResultHandler.create(exportImpl, params, result);
+            UserFilter userFilter = exporter.getFilter();
+            if (params.getOrg() != null) {
+                Organization organization = adapter.getOrgAdapter().getOrgForName(params.getOrg());
+                User user = APIManagerAdapter.getCurrentUser();
+                APIManagerAdapter.getInstance().switchOrgAndRole(user, params.getOrg());
+                userFilter.setOrganizationId(organization.getId());
+            }
+
             List<User> users = adapter.getUserAdapter().getUsers(exporter.getFilter());
             if (users.isEmpty()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("No users found using filter: {}", exporter.getFilter());
+                    LOG.debug("No users found using filter: {}", userFilter);
                 } else {
                     LOG.info("No users found based on the given criteria.");
                 }
