@@ -225,6 +225,7 @@ public class APIManagerAPIAdapter {
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
+        LOG.debug("Filtering APIs based on filter path: {}", filter);
         List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
         });
         apis.removeIf(filter::filter);

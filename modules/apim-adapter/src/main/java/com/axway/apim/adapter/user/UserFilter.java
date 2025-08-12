@@ -28,8 +28,11 @@ public class UserFilter implements CustomPropertiesFilter {
     String type;
 
     String organizationName;
+    private String organizationId; // To support multi org
+
 
     boolean includeImage;
+
 
     private List<String> customProperties;
 
@@ -299,4 +302,15 @@ public class UserFilter implements CustomPropertiesFilter {
             return this;
         }
     }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+        if (organizationId == null) return;
+        filters.add(new BasicNameValuePair("organizationId", organizationId));
+    }
+
 }
