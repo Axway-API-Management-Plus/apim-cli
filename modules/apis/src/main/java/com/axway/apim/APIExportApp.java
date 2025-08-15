@@ -171,7 +171,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
             apimanagerAdapter = APIManagerAdapter.getInstance();
             APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
             APIFilter filter = resultHandler.getFilter();
-            LOG.debug("Organization : {}", params.getOrganization());
             if(params.getOrganization() != null) {
                 Organization organization = apimanagerAdapter.getOrgAdapter().getOrgForName(params.getOrganization());
                 User user = APIManagerAdapter.getCurrentUser();
