@@ -104,6 +104,10 @@
             <artifactId>testng</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-tests</artifactId>
             <version>${project.version}</version>

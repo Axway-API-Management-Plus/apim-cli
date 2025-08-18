@@ -3,6 +3,7 @@ package com.axway.apim.api.specification;
 import com.axway.apim.api.API;
 import com.axway.apim.api.specification.filter.JsonNodeOpenAPI3SpecFilter;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.InternalException;
@@ -12,6 +13,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +155,9 @@ public class OAS3xSpecification extends APISpecification {
         try {
             this.apiSpecificationContent = apiSpecificationContent;
             setMapperForDataFormat();
+            if(EnvironmentProperties.RESOLVE_OPENAPI_REF){
+                this.apiSpecificationContent = resolveReferences(apiSpecificationContent);
+            }
             if (this.mapper == null) return false;
             openApiNode = this.mapper.readTree(apiSpecificationContent);
             LOG.debug("openapi tag value : {}", openApiNode.get(OPENAPI));
@@ -161,6 +168,15 @@ public class OAS3xSpecification extends APISpecification {
             }
             return false;
         }
+    }
+
+    public byte[] resolveReferences(byte[] apiSpecificationContent) throws JsonProcessingException {
+        OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true); // Enable resolution of $ref references
+        parseOptions.setFlatten(true);
+        SwaggerParseResult swaggerParseResult = openAPIV3Parser.readContents(new String(apiSpecificationContent), null, parseOptions);
+        return mapper.writeValueAsBytes(swaggerParseResult.getOpenAPI());
     }
 
     @Override

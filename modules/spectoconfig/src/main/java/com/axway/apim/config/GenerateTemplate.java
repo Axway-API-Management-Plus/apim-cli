@@ -139,6 +139,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         List<AuthorizationValue> authorizationValues = new ArrayList<>();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setResolve(true); // implicit
+        parseOptions.setFlatten(true);
         String apiDefinition = parameters.getApiDefinition();
         URLParser urlParser = new URLParser(apiDefinition);
         String uri = urlParser.getUri();
@@ -150,7 +151,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             AuthorizationValue authorizationValue = new AuthorizationValue(HttpHeaders.AUTHORIZATION, credential, "header");
             authorizationValues.add(authorizationValue);
         }
-        SwaggerParseResult result = new OpenAPIV3Parser().readLocation(uri, authorizationValues, parseOptions);
+        OpenAPIV3Parser parser = new OpenAPIV3Parser();
+        SwaggerParseResult result = parser.readLocation(uri, authorizationValues, parseOptions);
         List<String> messages = result.getMessages();
         if (!messages.isEmpty()) {
             throw new AppException(messages.toString(), ErrorCode.UNSUPPORTED_API_SPECIFICATION);

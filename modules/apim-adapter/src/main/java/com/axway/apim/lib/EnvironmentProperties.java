@@ -24,6 +24,7 @@ public class EnvironmentProperties implements Map<String, String> {
     public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_console", FALSE));
     public static final boolean OVERRIDE_CERTIFICATES = Boolean.parseBoolean(System.getenv().getOrDefault("override_certificates", FALSE));
     public static final boolean CHECK_CATALOG = Boolean.parseBoolean(System.getenv().getOrDefault("check_catalog", FALSE));
+    public static final boolean RESOLVE_OPENAPI_REF = Boolean.parseBoolean(System.getenv().getOrDefault("resolve_openapi_ref", FALSE));
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 
     private final String stage;
