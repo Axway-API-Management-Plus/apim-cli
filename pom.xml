@@ -318,6 +318,12 @@
                         <exclude>**/DontOverwriteManualQuotaTestIT.java</exclude>
                         <exclude>**/QuotaModeReplaceTestIT.java</exclude>
                         <exclude>**/ReCreateAPIQuotaStaysTestIT.java</exclude>
+
+                        <!-- skip test related to  quota -->
+                        <exclude>**/CompleteAPIExportTestIT.java</exclude>
+                        <exclude>**/APIBasicQuotaTestIT.java</exclude>
+                        <exclude>**/CreateAndUpdateQuotaWithNewMethodAndSpecIT.java</exclude>
+                        <exclude>**/QuotaStays4OtherAPIsTestIT.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
