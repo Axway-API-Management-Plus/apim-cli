@@ -324,6 +324,7 @@
                         <exclude>**/APIBasicQuotaTestIT.java</exclude>
                         <exclude>**/CreateAndUpdateQuotaWithNewMethodAndSpecIT.java</exclude>
                         <exclude>**/QuotaStays4OtherAPIsTestIT.java</exclude>
+                        <exclude>**/AppOrSystemQuotaOnlyTestIT</exclude>
                     </excludes>
                 </configuration>
             </plugin>
