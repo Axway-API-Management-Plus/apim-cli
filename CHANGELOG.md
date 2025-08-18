@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-# [1.14.11]  2025-08-17
+# [1.14.12]  2025-08-17
 
 ### Fixed
 - Exporting multiple APIs with the same path overwrites configuration files in the same target directory (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/545))
