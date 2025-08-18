@@ -3,18 +3,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+# [1.14.13]  In progress
 
+
+
+### Added
+- Full export API in JSON file (See issue [#557](https://github.com/Axway-API-Management-Plus/apim-cli/issues/557))
+  - Added new environment parameter RESOLVE_OPENAPI_REF to resolve open api references
 
 # [1.14.12]  2025-08-17
 
 ### Fixed
-- Exporting multiple APIs with the same path overwrites configuration files in the same target directory (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/545))
-- apim api get doesn't give the list of APIs (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/543))
+- Exporting multiple APIs with the same path overwrites configuration files in the same target directory (See issue [#545](https://github.com/Axway-API-Management-Plus/apim-cli/issues/545))
+- apim api get doesn't give the list of APIs (See issue [#543](https://github.com/Axway-API-Management-Plus/apim-cli/issues/543))
 
 ### Added
-- Full export API in JSON file (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/559))
-- Support may 2025 APIM release (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/562))
-- Support OpenAPI 3.1.x (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/537))
+- Full export API in JSON file (See issue [#559](https://github.com/Axway-API-Management-Plus/apim-cli/issues/559))
+- Support may 2025 APIM release (See issue [#562](https://github.com/Axway-API-Management-Plus/apim-cli/issues/562))
+- Support OpenAPI 3.1.x (See issue [#537](https://github.com/Axway-API-Management-Plus/apim-cli/issues/537))
 
 # [1.14.11]  2025-02-26
 
