@@ -78,6 +78,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 "Application Name",
                 "Application ID",
                 "Application Organization",
+                "Application Created On",
             CREATED_ON
         });
 
@@ -192,7 +193,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 api.getName(),
                 api.getPath(),
                 api.getVersion(),
-                getFormattedDate(api)
+                getFormattedDate(api.getCreatedOn())
         );
     }
 
@@ -210,7 +211,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 getUsedPolicies(api, PolicyType.ROUTING).toString().replace("[", "").replace("]", ""),
                 getUsedPolicies(api, PolicyType.RESPONSE).toString().replace("[", "").replace("]", ""),
                 getUsedPolicies(api, PolicyType.FAULT_HANDLER).toString().replace("[", "").replace("]", ""),
-                getFormattedDate(api)
+                getFormattedDate(api.getCreatedOn())
         );
     }
 
@@ -235,13 +236,14 @@ public class CSVAPIExporter extends APIResultHandler {
                 app.getName(),
                 app.getId(),
                 app.getOrganization().getName(),
-                getFormattedDate(api)
+                getFormattedDate(app.getCreatedOn()),
+                getFormattedDate(api.getCreatedOn())
         );
     }
 
-    private String getFormattedDate(API api) {
-        if (api.getCreatedOn() == null) return "N/A";
-        return isoDateFormatter.format(api.getCreatedOn());
+    private String getFormattedDate(Long longDate) {
+        if (longDate == null) return "N/A";
+        return isoDateFormatter.format(longDate);
     }
 
     @Override
