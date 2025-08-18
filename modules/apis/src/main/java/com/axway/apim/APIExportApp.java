@@ -9,6 +9,7 @@ import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
 import com.axway.apim.api.export.lib.cli.*;
 import com.axway.apim.api.export.lib.params.*;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -170,6 +171,12 @@ public class APIExportApp implements APIMCLIServiceProvider {
             apimanagerAdapter = APIManagerAdapter.getInstance();
             APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
             APIFilter filter = resultHandler.getFilter();
+            if(params.getOrganization() != null) {
+                Organization organization = apimanagerAdapter.getOrgAdapter().getOrgForName(params.getOrganization());
+                User user = APIManagerAdapter.getCurrentUser();
+                APIManagerAdapter.getInstance().switchOrgAndRole(user, params.getOrganization());
+                filter.setOrganizationId(organization.getId());
+            }
             Result result = resultHandler.getResult();
             List<API> apis = apimanagerAdapter.getApiAdapter().getAPIs(filter, true);
 

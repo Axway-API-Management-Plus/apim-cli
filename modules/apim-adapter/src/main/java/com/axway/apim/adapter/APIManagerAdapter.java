@@ -4,10 +4,7 @@ import com.axway.apim.adapter.apis.*;
 import com.axway.apim.adapter.client.apps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
-import com.axway.apim.api.model.CaCert;
-import com.axway.apim.api.model.Config;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.APIMCLICacheManager;
 import com.axway.apim.lib.CoreParameters;
@@ -232,17 +229,40 @@ public class APIManagerAdapter {
             }
             User user = getCurrentUser();
             String role = getHigherRole(user);
-            if (role.equals(ADMIN)) {
-                hasAdminAccount = true;
-                // Also register this client as an Admin-Client
-            } else if (role.equals(OADMIN)) {
-                usingOrgAdmin = true;
-            }
+            assignRoles(role);
         } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public void assignRoles(String role) {
+        if (role.equals(ADMIN)) {
+            hasAdminAccount = true;
+            // Also register this client as an Admin-Client
+        } else if (role.equals(OADMIN)) {
+            usingOrgAdmin = true;
+        }
+    }
+
+    public void switchOrgAndRole(User user, String targetOrgName) {
+        Map<String, String> organizationsIdToName = user.getOrgs2Name();
+        if (organizationsIdToName == null)
+            return;
+
+        for (Map.Entry<String,String> entry : organizationsIdToName.entrySet()) {
+            String orgName = entry.getValue();
+            if (orgName.equals(targetOrgName)) {
+                String role = user.getOrgs2Role().get(entry.getKey());
+                // Reset roles
+                hasAdminAccount = false;
+                usingOrgAdmin = false;
+                // Assign roles
+                assignRoles(role);
+            }
+        }
+
     }
 
     public String getHigherRole(User user) {

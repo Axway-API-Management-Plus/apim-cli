@@ -1,6 +1,9 @@
 package com.axway.apim.appexport;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
+import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.ApplicationExporter.ResultHandler;
@@ -111,10 +114,18 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         try {
             ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params, result);
-            List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(exporter.getFilter(), true);
+            ClientAppFilter clientAppFilter = exporter.getFilter();
+
+            if(params.getOrgName() != null) {
+                Organization organization = apimanagerAdapter.getOrgAdapter().getOrgForName(params.getOrgName());
+                User user = APIManagerAdapter.getCurrentUser();
+                APIManagerAdapter.getInstance().switchOrgAndRole(user, params.getOrgName());
+                clientAppFilter.setOrganizationId(organization.getId());
+            }
+            List<ClientApplication> apps = apimanagerAdapter.getAppAdapter().getApplications(clientAppFilter, true);
             if (apps.isEmpty()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.info("No applications found using filter: {}", exporter.getFilter());
+                    LOG.info("No applications found using filter: {}", clientAppFilter);
                 } else {
                     LOG.info("No applications found based on the given filters.");
                 }

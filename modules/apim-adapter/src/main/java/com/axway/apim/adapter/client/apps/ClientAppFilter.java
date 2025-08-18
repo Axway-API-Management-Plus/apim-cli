@@ -60,6 +60,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     boolean includeOauthResources;
 
     private List<String> customProperties;
+    private String organizationId; // To support multi org
+
 
     List<NameValuePair> filters = new ArrayList<>();
 
@@ -492,5 +494,15 @@ public class ClientAppFilter implements CustomPropertiesFilter {
             this.apiName = apiName;
             return this;
         }
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+        if (organizationId == null) return;
+        filters.add(new BasicNameValuePair("organizationId", organizationId));
     }
 }

@@ -13,6 +13,7 @@ import com.axway.apim.api.specification.APISpecification;
 import com.axway.apim.api.specification.APISpecification.APISpecType;
 import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Constants;
@@ -104,8 +105,9 @@ public class APIManagerAPIAdapter {
                 addImageFromAPIM(api, filter.isIncludeImage());
                 addRemoteHost(api, filter.isIncludeRemoteHost());
                 addMethods(api, filter.isIncludeMethods());
-                if (logProgress && apis.size() > 5)
+                if (logProgress && apis.size() > 5 && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
                     Utils.progressPercentage(i, apis.size(), "Loading details of " + apis.size() + " APIs");
+                }
             }
             Utils.addCustomPropertiesForEntity(apis, this.apiManagerResponse.get(filter), filter);
             if (logProgress && apis.size() > 5) Console.print("\n");
@@ -223,6 +225,7 @@ public class APIManagerAPIAdapter {
     }
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
+        LOG.debug("Filtering APIs based on filter path: {}", filter);
         List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
         });
         apis.removeIf(filter::filter);
@@ -616,16 +619,16 @@ public class APIManagerAPIAdapter {
         } else {
             serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
         }
-        LOG.debug("serializeAllExcept={}",  Arrays.asList(serializeAllExcept));
+        LOG.debug("serializeAllExcept={}", Arrays.asList(serializeAllExcept));
         return serializeAllExcept;
     }
 
     private boolean isAPIManagerVersionGreaterThan7720220530(String apiManagerVersion) {
         try {
             apiManagerVersion = apiManagerVersion.replace("7.7.", "");
-            LOG.debug("apiManagerVersion for conversion: {}",apiManagerVersion);
+            LOG.debug("apiManagerVersion for conversion: {}", apiManagerVersion);
             return (Integer.parseInt(apiManagerVersion) >= 20220530);
-        } catch (NumberFormatException nfe){
+        } catch (NumberFormatException nfe) {
             LOG.warn("Failed to convert API Manager version to integer: {}, returning false", apiManagerVersion);
             return false;
         }

@@ -76,6 +76,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 "Tags",
                 "Granted Organization",
                 "Application Name",
+                "Application ID",
                 "Application Organization",
             CREATED_ON
         });
@@ -232,6 +233,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 getTags(api),
                 org.getName(),
                 app.getName(),
+                app.getId(),
                 app.getOrganization().getName(),
                 getFormattedDate(api)
         );

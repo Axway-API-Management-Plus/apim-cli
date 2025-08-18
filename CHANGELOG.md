@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+# [1.14.11]  2025-08-25
+
+### Fixed
+- Exporting multiple APIs with the same path overwrites configuration files in the same target directory (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/545))
+- apim api get doesn't give the list of APIs (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/543))
+
+### Added
+- Full export API in JSON file (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/559))
+- Support may 2025 APIM release (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/562))
+- Support OpenAPI 3.1.x (See issue [#534](https://github.com/Axway-API-Management-Plus/apim-cli/issues/537))
+
 # [1.14.11]  2025-02-26
 
 ### Fixed

@@ -67,6 +67,7 @@ public class APIFilter implements CustomPropertiesFilter {
     private List<String> customProperties;
     private boolean deprecated;
     private boolean retired;
+    private String organizationId; // To support multi org
 
     private METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
 
@@ -922,5 +923,15 @@ public class APIFilter implements CustomPropertiesFilter {
             }
         }
         return false;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+        if (organizationId == null) return;
+        filters.add(new BasicNameValuePair("organizationId", organizationId));
     }
 }
