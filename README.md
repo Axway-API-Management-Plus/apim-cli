@@ -70,7 +70,8 @@ The automated End-2-End test suite contains of __116__ different scenarios, whic
 
 | Version      | Branch                 | Status | Comment                                                            | 
 |:-------------|:-----------------------| :---:  |:-------------------------------------------------------------------|
-| 7.7-20240830 | develop                |![Build Status](https://github.com/Axway-API-Management-Plus/apim-cli/actions/workflows/integration-test.yml/badge.svg)| Requires version >=1.14.7                                          |
+| 7.7-20250228 | develop                |![Build Status](https://github.com/Axway-API-Management-Plus/apim-cli/actions/workflows/integration-test.yml/badge.svg)| Requires version >=1.14.12                                         |
+| 7.7-20240830 | test-with-7.7-20240830 |![Build Status](https://github.com/Axway-API-Management-Plus/apim-cli/actions/workflows/integration-test.yml/badge.svg)| Requires version >=1.14.7                                          |
 | 7.7-20240530 | test-with-7.7-20240530 |![Build Status](https://github.com/Axway-API-Management-Plus/apim-cli/actions/workflows/integration-test.yml/badge.svg)| Requires version >=1.14.5                                          |
 | 7.7-20240228 | test-with-7.7-20240228 |![Build Status](https://github.com/Axway-API-Management-Plus/apim-cli/actions/workflows/integration-test.yml/badge.svg)| Requires version >=1.14.4                                          |
 | 7.7-20230130 | test-with-7.7-20231130 |![Build Status](https://github.com/Axway-API-Management-Plus/apim-cli/actions/workflows/integration-test.yml/badge.svg)| Requires version >=1.14.3                                          |   
