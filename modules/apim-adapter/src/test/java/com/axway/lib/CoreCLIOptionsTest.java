@@ -40,7 +40,7 @@ public class CoreCLIOptionsTest {
         String[] args = {"-apimanagerUrl", "https://manager.k8s.com/some/path", "-u", "apiadmin", "-p", "changeme"};
         CLIOptions options = SampleCLIOptions.create(args);
         CoreParameters params = (CoreParameters) options.getParams();
-        Assert.assertEquals(params.getAPIManagerURL().toString(), "https://manager.k8s.com/some/path");
+        Assert.assertEquals(params.getAPIManagerURL().toString(), "https://manager.k8s.com");
     }
 
     @Test
