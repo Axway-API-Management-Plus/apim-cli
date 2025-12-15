@@ -144,7 +144,7 @@ public class CoreParameters implements Parameters {
 
 
     public String getApiBasepath() {
-        if (apiManagerUrl != null) {
+        if (apiBasepath != null) {
             return apiBasepath;
         }
         return DEFAULT_API_BASEPATH;
@@ -251,7 +251,8 @@ public class CoreParameters implements Parameters {
         if (apiManagerUrl == null) return;
         try {
             this.apiManagerUrl = new URI(apiManagerUrl);
-            this.apiBasepath = this.apiManagerUrl.getPath();
+            if (!this.apiManagerUrl.getPath().isEmpty())
+                this.apiBasepath = this.apiManagerUrl.getPath();
         } catch (URISyntaxException e) {
             throw new AppException("Error parsing up API-Manager URL: " + apiManagerUrl, ErrorCode.INVALID_PARAMETER, e);
         }

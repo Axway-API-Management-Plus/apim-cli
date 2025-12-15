@@ -57,8 +57,6 @@ public class APIImportAppTest extends WiremockWrapper {
         // Creates an API-Representation of the desired API
         API desiredAPI = configAdapter.getDesiredAPI();
         Assert.assertEquals("",desiredAPI.getAuthenticationProfiles().get(0).getParameters().get("password"));
-//        ObjectMapper mapper = new ObjectMapper();
-//
-//        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(desiredAPI.getAuthenticationProfiles()));
+
     }
 }
