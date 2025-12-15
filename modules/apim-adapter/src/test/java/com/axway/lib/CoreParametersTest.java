@@ -7,6 +7,9 @@ import org.testng.annotations.Test;
 import com.axway.apim.adapter.CacheType;
 import com.axway.apim.lib.CoreParameters;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class CoreParametersTest {
 
 	@Test
@@ -137,4 +140,32 @@ public class CoreParametersTest {
 		params.setIgnoreQuotas(true);
 		Assert.assertTrue(params.isIgnoreQuotas());
 	}
+
+    @Test
+    public void testCustomBasepath() throws AppException {
+        CoreParameters params = new CoreParameters();
+        params.setAPIManagerURL("https://localhost:8075/api/portal/v1.4/test");
+        Assert.assertEquals(params.getApiBasepath(), "/api/portal/v1.4/test");
+    }
+
+    @Test
+    public void testDefaultBasepath()  {
+        CoreParameters params = new CoreParameters();
+        Assert.assertEquals(params.getApiBasepath(), "/api/portal/v1.4");
+    }
+
+    @Test
+    public void testApiManagerUrl() throws AppException, URISyntaxException {
+        CoreParameters params = new CoreParameters();
+        params.setAPIManagerURL("https://localhost:8075/api/portal/v1.4/test");
+        Assert.assertEquals(params.getAPIManagerURL(), new URI("https://localhost:8075"));
+    }
+
+    @Test
+    public void testApiManagerUrlWithoutBasepath() throws AppException, URISyntaxException {
+        CoreParameters params = new CoreParameters();
+        params.setAPIManagerURL("https://localhost:8075");
+        Assert.assertEquals(params.getAPIManagerURL(), new URI("https://localhost:8075"));
+    }
+
 }

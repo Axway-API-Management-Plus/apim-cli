@@ -74,6 +74,7 @@ public class CoreParameters implements Parameters {
     private boolean disableCompression;
     private boolean overrideSpecBasePath;
     private String customHeaders;
+    private String apiBasepath;
 
     public CoreParameters() {
         instance = this;
@@ -143,6 +144,9 @@ public class CoreParameters implements Parameters {
 
 
     public String getApiBasepath() {
+        if (apiManagerUrl != null) {
+            return apiBasepath;
+        }
         return DEFAULT_API_BASEPATH;
     }
 
@@ -247,6 +251,7 @@ public class CoreParameters implements Parameters {
         if (apiManagerUrl == null) return;
         try {
             this.apiManagerUrl = new URI(apiManagerUrl);
+            this.apiBasepath = this.apiManagerUrl.getPath();
         } catch (URISyntaxException e) {
             throw new AppException("Error parsing up API-Manager URL: " + apiManagerUrl, ErrorCode.INVALID_PARAMETER, e);
         }
@@ -257,7 +262,13 @@ public class CoreParameters implements Parameters {
             if (apiManagerUrl == null) {
                 return new URI("https://" + this.getHostname2() + ":" + this.getPort2());
             }
-            return apiManagerUrl;
+            URI uri = apiManagerUrl.resolve("/");
+            String uriStr = uri.toString();
+            if (uriStr.endsWith("/")) {
+                return new URI(uriStr.substring(0, uriStr.length() - 1));
+            }
+            return uri;
+
         } catch (URISyntaxException e) {
             throw new AppException("Error setting up API-Manager URL", ErrorCode.INVALID_PARAMETER, e);
         }
