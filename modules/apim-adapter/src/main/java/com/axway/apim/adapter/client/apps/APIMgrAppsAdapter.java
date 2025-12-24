@@ -443,9 +443,10 @@ public class APIMgrAppsAdapter {
                 if (opt.isPresent()) {
                     LOG.info("Found extclients credential with same ID");
                     //I found a credential with same id name but different in some properties, I have to update it
-                    endpoint.append("/" + cred.getId());
+                    ClientAppCredential target = opt.get();
+                    endpoint.append("/" + target.getId());
                     update = true;
-                    copyClientAppCredential(cred, opt.get(), false);
+                    copyClientAppCredential(cred, target, false);
                 }
             } else if (cred instanceof APIKey) {
                 final String credentialId = ((APIKey) cred).getApiKey();
@@ -504,7 +505,7 @@ public class APIMgrAppsAdapter {
                 if (o instanceof OAuth)
                     return ((OAuth) o).getClientId().equals(credentialId);
                 if (o instanceof ExtClients)
-                    return o.getId().equals(credentialId);
+                    return ((ExtClients) o).getClientId().equals(credentialId);
                 if (o instanceof APIKey)
                     return o.getId().equals(credentialId);
                 return false;
@@ -512,7 +513,6 @@ public class APIMgrAppsAdapter {
         } else {
             return Optional.empty();
         }
-
     }
 
     public RestAPICall createUpsertUri(HttpEntity entity, URI uri, ClientApplication actualApp) {
