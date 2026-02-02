@@ -6,10 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.13]  In progress
 
 
+### Fixed
+- Parameter to override apiBasepath doesn't work [#568](https://github.com/Axway-API-Management-Plus/apim-cli/issues/568))
+- Fix issue with updating of external credentials [#570](https://github.com/Axway-API-Management-Plus/apim-cli/issues/570))
 
 ### Added
 - Full export API in JSON file (See issue [#557](https://github.com/Axway-API-Management-Plus/apim-cli/issues/557))
   - Added new environment parameter RESOLVE_OPENAPI_REF to resolve open api references
+
 
 # [1.14.12]  2025-08-17
 
