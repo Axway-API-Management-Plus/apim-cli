@@ -307,10 +307,13 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         ClientApplication clientApplication = new ClientApplication();
         clientApplication.setName("test");
         clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
-        ClientAppCredential clientAppCredential = new ExtClients();
+        ExtClients clientAppCredential = new ExtClients();
+        clientAppCredential.setClientId(credentialId);
         clientAppCredential.setId(credentialId);
+
         List<ClientAppCredential> credentials = new ArrayList<>();
         credentials.add(clientAppCredential);
+
         clientApplication.setCredentials(credentials);
         Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
         Assert.assertTrue(optionalClientAppCredential.isPresent());
