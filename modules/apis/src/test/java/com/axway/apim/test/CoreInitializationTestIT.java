@@ -61,6 +61,12 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";
 
         try {
+            testRunner.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");
+            String request = IOUtils.toString(new ClassPathResource("/com/axway/apim/test/files/config/apimanager-test-config.json").getInputStream(), StandardCharsets.UTF_8);
+
+            testRunner.http(action -> action.client(apiManager).send().put("/config").header("Content-Type", "application/json")
+                .payload(request));
+
             String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), "UTF-8");
             String response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName, authorizationHeaderValue);
             DocumentContext documentContext = JsonPath.parse(response);
@@ -187,11 +193,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
 
             }
             // Adjusting the API-Manager config in preparation to run integration tests
-            testRunner.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");
-            String request = IOUtils.toString(new ClassPathResource("/com/axway/apim/test/files/config/apimanager-test-config.json").getInputStream(), StandardCharsets.UTF_8);
 
-            testRunner.http(action -> action.client(apiManager).send().put("/config").header("Content-Type", "application/json")
-                .payload(request));
             testRunner.run(new AbstractTestAction() {
                 @Override
                 public void doExecute(TestContext testContext) {
