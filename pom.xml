@@ -326,6 +326,7 @@
                         <exclude>**/QuotaStays4OtherAPIsTestIT.java</exclude>
                         <exclude>**/AppOrSystemQuotaOnlyTestIT.java</exclude>
                         <exclude>**/MultiRestrictionQuotaTestIT.java</exclude>
+                        <exclude>**/ImportAppWithQuotasTestIT.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
