@@ -3,12 +3,16 @@ package com.axway.apim.test;
 import com.axway.apim.EndpointConfig;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.http.client.utils.URIBuilder;
 import org.citrusframework.actions.AbstractTestAction;
 import org.citrusframework.context.TestContext;
 import org.citrusframework.dsl.runner.TestRunner;
@@ -17,13 +21,14 @@ import org.citrusframework.message.MessageType;
 import org.citrusframework.variable.GlobalVariables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -53,21 +58,21 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
     @Autowired
     GlobalVariables globalVariables;
 
+    private final static String DEFAULT_PASSWORD = "changeme";
+
 
     @Override
     public void beforeSuite(TestRunner testRunner) {
-        String format = username + ":" + password;
+
+        String format = username + ":" + DEFAULT_PASSWORD;
         String authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";
 
         try {
-            testRunner.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");
-            String request = IOUtils.toString(new ClassPathResource("/com/axway/apim/test/files/config/apimanager-test-config.json").getInputStream(), StandardCharsets.UTF_8);
+            testRunner.echo("Change password of user for initial setup");
+            postRequest(url + "/currentuser/changepassword", authorizationHeaderValue);
 
-            testRunner.http(action -> action.client(apiManager).send().put("/config").header("Content-Type", "application/json")
-                .payload(request));
-
-            String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), "UTF-8");
+            String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), StandardCharsets.UTF_8);
             String response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName, authorizationHeaderValue);
             DocumentContext documentContext = JsonPath.parse(response);
             if (!response.equals("[]")) {
@@ -93,7 +98,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             }
 
             testRunner.echo("Creating second organization");
-            String orgName2 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName2"), "UTF-8");
+            String orgName2 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName2"), StandardCharsets.UTF_8);
             response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName2, authorizationHeaderValue);
             if (!response.equals("[]")) {
                 testRunner.echo("Organization ${orgName2} Already exists");
@@ -119,7 +124,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             }
 
             testRunner.echo("Creating third organization");
-            String orgName3 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName3"), "UTF-8");
+            String orgName3 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName3"), StandardCharsets.UTF_8);
             response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName3, authorizationHeaderValue);
             if (!response.equals("[]")) {
                 testRunner.echo("Organization ${orgName3} Already exists");
@@ -215,6 +220,25 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
         try (CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(httpGet)) {
             return EntityUtils.toString(response.getEntity());
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void postRequest(String url, String authorizationHeaderValue) throws URISyntaxException {
+        URI uri = new URIBuilder(url).build();
+        HttpEntity entity = new StringEntity("newPassword=" + password + "&oldPassword="+DEFAULT_PASSWORD, ContentType.APPLICATION_FORM_URLENCODED);
+        HttpPost post = new HttpPost(uri);
+        post.setEntity(entity);
+        post.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
+
+        try (CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(post)) {
+            int statusCode = response.getCode();
+            if (statusCode != 204) {
+                throw new RuntimeException("Error changing password of user. Response-Code: " + EntityUtils.toString(response.getEntity()));
+            }
+
+
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
