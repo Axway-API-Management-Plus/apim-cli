@@ -69,9 +69,12 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";
 
         try {
-            testRunner.echo("Change password of user for initial setup");
-            postRequest(url + "/currentuser/changepassword", authorizationHeaderValue);
-
+            if (System.getenv("reset_password") != null && System.getenv("reset_password").equalsIgnoreCase("true")) {
+                testRunner.echo("Change password of user for initial setup");
+                postRequest(url + "/currentuser/changepassword", authorizationHeaderValue);
+                format = username + ":" + password;
+                authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
+            }
             String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), StandardCharsets.UTF_8);
             String response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName, authorizationHeaderValue);
             DocumentContext documentContext = JsonPath.parse(response);
@@ -227,7 +230,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
 
     public void postRequest(String url, String authorizationHeaderValue) throws URISyntaxException {
         URI uri = new URIBuilder(url).build();
-        HttpEntity entity = new StringEntity("newPassword=" + password + "&oldPassword="+DEFAULT_PASSWORD, ContentType.APPLICATION_FORM_URLENCODED);
+        HttpEntity entity = new StringEntity("newPassword=" + password + "&oldPassword=" + DEFAULT_PASSWORD, ContentType.APPLICATION_FORM_URLENCODED);
         HttpPost post = new HttpPost(uri);
         post.setEntity(entity);
         post.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
