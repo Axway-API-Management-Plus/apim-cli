@@ -55,6 +55,9 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
     @Value("${apiManagerPass}")
     private String password;
 
+    @Value(("${oadminPassword1}"))
+    private String orgAdminPassword;
+
     @Autowired
     GlobalVariables globalVariables;
 
@@ -71,7 +74,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
         try {
             if (System.getenv("reset_password") != null && System.getenv("reset_password").equalsIgnoreCase("true")) {
                 testRunner.echo("Change password of user for initial setup");
-                postRequest(url + "/currentuser/changepassword", authorizationHeaderValue);
+                postRequest(url + "/currentuser/changepassword", authorizationHeaderValue, password);
                 format = username + ":" + password;
                 authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
             }
@@ -172,8 +175,11 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                 testRunner.http(action -> action.client(apiManager).send()
                     .post("/users/${oadminUserId1}/changepassword/")
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .payload("newPassword=${oadminPassword1}"));
+                    .payload("newPassword="+DEFAULT_PASSWORD));
                 testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
+                format = username + ":" + DEFAULT_PASSWORD;
+                authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
+                postRequest(url + "/currentuser/changepassword", authorizationHeaderValue, orgAdminPassword);
             }
             String appName = (String) globalVariables.getVariables().get("testAppName");
             response = getRequest(url + "/applications?field=name&op=eq&value=" + appName, authorizationHeaderValue);
@@ -228,9 +234,9 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
         }
     }
 
-    public void postRequest(String url, String authorizationHeaderValue) throws URISyntaxException {
+    public void postRequest(String url, String authorizationHeaderValue, String newPassword) throws URISyntaxException {
         URI uri = new URIBuilder(url).build();
-        HttpEntity entity = new StringEntity("newPassword=" + password + "&oldPassword=" + DEFAULT_PASSWORD, ContentType.APPLICATION_FORM_URLENCODED);
+        HttpEntity entity = new StringEntity("newPassword=" + newPassword + "&oldPassword=" + DEFAULT_PASSWORD, ContentType.APPLICATION_FORM_URLENCODED);
         HttpPost post = new HttpPost(uri);
         post.setEntity(entity);
         post.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
