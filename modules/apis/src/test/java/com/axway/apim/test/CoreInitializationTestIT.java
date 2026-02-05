@@ -180,9 +180,9 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .payload("newPassword="+DEFAULT_PASSWORD));
                 testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
-                format = orgAdminUsername + ":" + DEFAULT_PASSWORD;
-                authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
-                postRequest(url + "/currentuser/changepassword", authorizationHeaderValue, orgAdminPassword);
+                String orgAdminformat = orgAdminUsername + ":" + DEFAULT_PASSWORD;
+                String orgAdminAuthorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(orgAdminformat.getBytes());
+                postRequest(url + "/currentuser/changepassword", orgAdminAuthorizationHeaderValue, orgAdminPassword);
             }
             String appName = (String) globalVariables.getVariables().get("testAppName");
             response = getRequest(url + "/applications?field=name&op=eq&value=" + appName, authorizationHeaderValue);
