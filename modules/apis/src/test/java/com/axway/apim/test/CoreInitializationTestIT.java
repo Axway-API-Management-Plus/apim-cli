@@ -55,8 +55,11 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
     @Value("${apiManagerPass}")
     private String password;
 
-    @Value(("${oadminPassword1}"))
+    @Value("${oadminPassword1}")
     private String orgAdminPassword;
+
+    @Value("${oadminUsername1}")
+    private String orgAdminUsername;
 
     @Autowired
     GlobalVariables globalVariables;
@@ -177,7 +180,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .payload("newPassword="+DEFAULT_PASSWORD));
                 testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
-                format = username + ":" + DEFAULT_PASSWORD;
+                format = orgAdminUsername + ":" + DEFAULT_PASSWORD;
                 authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
                 postRequest(url + "/currentuser/changepassword", authorizationHeaderValue, orgAdminPassword);
             }
