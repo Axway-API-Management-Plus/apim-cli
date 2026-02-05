@@ -7,6 +7,7 @@ import org.citrusframework.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
@@ -16,8 +17,12 @@ import static org.citrusframework.actions.EchoAction.Builder.echo;
 @ContextConfiguration(classes = {EndpointConfig.class})
 public class UsingEnvironmentTestIT extends TestNGCitrusSpringSupport {
 
-    @Autowired
-    HttpClient apiManager;
+    @Value("${apiManagerUser}")
+    private String username;
+
+    @Value("${apiManagerPass}")
+    private String password;
+
 
 
     @CitrusTest(name = "UsingEnvironmentTestIT")
@@ -28,7 +33,8 @@ public class UsingEnvironmentTestIT extends TestNGCitrusSpringSupport {
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/envrionment-stage-api-${apiNumber}");
         variable("apiName", "envrionment-stage-API-${apiNumber}");
-
+        variable("oadminUsername1", username);
+        variable("oadminPassword1", password);
 
         $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######"));
         variable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");

@@ -10,6 +10,7 @@ import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
@@ -29,6 +30,12 @@ public class VhostConfigOrgWithVHostTestIT extends TestNGCitrusSpringSupport {
     @Autowired
     HttpClient apiManager;
 
+    @Value("${apiManagerUser}")
+    private String username;
+
+    @Value("${apiManagerPass}")
+    private String password;
+
 
 	@CitrusTest
 	@Test
@@ -42,8 +49,8 @@ public class VhostConfigOrgWithVHostTestIT extends TestNGCitrusSpringSupport {
 		variable("vhost", "abc.company.com");
 		variable("vhostOrgName", "VHost Org ${orgNumber}");
 		// Directly use an admin-account, otherwise the OrgAdmin organization is used by default
-		variable("oadminUsername1", "apiadmin");
-		variable("oadminPassword1", "changeme");
+		variable("oadminUsername1", username);
+		variable("oadminPassword1", password);
 
         $(http().client(apiManager).send().post("/organizations").message().header("Content-Type", "application/json")
 				.body("{\"name\": \"${vhostOrgName}\", \"description\": \"Org 1 with dev permission and VHost\", \"enabled\": true, \"development\": true, \"virtualHost\": \"${vhost}\" }"));

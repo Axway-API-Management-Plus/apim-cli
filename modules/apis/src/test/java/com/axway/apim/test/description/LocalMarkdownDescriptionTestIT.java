@@ -8,6 +8,7 @@ import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
@@ -24,6 +25,12 @@ public class LocalMarkdownDescriptionTestIT extends TestNGCitrusSpringSupport {
     @Autowired
     HttpClient apiManager;
 
+    @Value("${apiManagerUser}")
+    private String username;
+
+    @Value("${apiManagerPass}")
+    private String password;
+
     @CitrusTest
     @Test
     public void importAPIWithLocalMarkdown() {
@@ -33,6 +40,11 @@ public class LocalMarkdownDescriptionTestIT extends TestNGCitrusSpringSupport {
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/localmarkdown-api-${apiNumber}");
         variable("apiName", "LocalMarkDown-API-${apiNumber}");
+
+        // Directly use an admin-account, otherwise the OrgAdmin organization is used by default
+        variable("oadminUsername1", username);
+        variable("oadminPassword1", password);
+
 
         $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' #######"));
 

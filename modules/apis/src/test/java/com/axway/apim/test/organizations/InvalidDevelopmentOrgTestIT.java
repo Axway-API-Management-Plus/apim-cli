@@ -7,6 +7,7 @@ import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
@@ -21,6 +22,13 @@ import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.
 @ContextConfiguration(classes = {EndpointConfig.class})
 public class InvalidDevelopmentOrgTestIT extends TestNGCitrusSpringSupport {
 
+
+    @Value("${apiManagerUser}")
+    private String username;
+
+    @Value("${apiManagerPass}")
+    private String password;
+
     @Autowired
     HttpClient apiManager;
 
@@ -33,8 +41,8 @@ public class InvalidDevelopmentOrgTestIT extends TestNGCitrusSpringSupport {
 		variable("apiPath", "/invalid-org-${apiNumber}");
 		variable("apiName", "Invalid organization ${apiNumber}");
 		// Directly use an admin-account, otherwise the OrgAdmin organization is used by default
-		variable("oadminUsername1", "apiadmin");
-		variable("oadminPassword1", "changeme");
+		variable("oadminUsername1", username);
+		variable("oadminPassword1", password);
 		variable("testOrgName", "Invalid organization ${orgNumber}");
 		variable("testOrgName", "Org without permission ${apiNumber}");
 		$(echo("####### Try to import an API with an invalid organization - Must be handled with a proper error-code and message #######"));
@@ -53,8 +61,8 @@ public class InvalidDevelopmentOrgTestIT extends TestNGCitrusSpringSupport {
 		variable("apiPath", "/invalid-org-${apiNumber}");
 		variable("apiName", "Invalid organization ${apiNumber}");
 		// Directly use an admin-account, otherwise the OrgAdmin organization is used by default
-		variable("oadminUsername1", "apiadmin");
-		variable("oadminPassword1", "changeme");
+		variable("oadminUsername1", username);
+		variable("oadminPassword1", password);
 		variable("testOrgName", "NonDevOrg ${apiNumber}");
 
         $(http().client(apiManager).send().post("/organizations").name("anotherOrgCreatedRequest").message()

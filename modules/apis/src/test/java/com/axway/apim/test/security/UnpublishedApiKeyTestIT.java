@@ -8,6 +8,7 @@ import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
@@ -23,6 +24,11 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusSpringSupport {
 
     @Autowired
     HttpClient apiManager;
+    @Value("${apiManagerUser}")
+    private String username;
+
+    @Value("${apiManagerPass}")
+    private String password;
 
     @CitrusTest(name = "UnpublishedApiKeyTest")
     @Test
@@ -34,6 +40,10 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusSpringSupport {
         variable("apiPath", "/api-key-test-${apiNumber}");
         variable("apiName", "API Key Test ${apiNumber}");
         variable("status", "unpublished");
+
+        // Directly use an admin-account, otherwise the OrgAdmin organization is used by default
+        variable("oadminUsername1", username);
+        variable("oadminPassword1", password);
 
         $(echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######"));
         variable("apiKeyFieldName", "KeyId");
