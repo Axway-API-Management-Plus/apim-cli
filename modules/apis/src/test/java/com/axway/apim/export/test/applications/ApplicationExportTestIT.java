@@ -92,7 +92,7 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         assertFalse(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean());
         assertTrue(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean());
 
-        List<ClientApplication> exportedApps = mapper.convertValue(exportedAPIConfig.get("applications"), new TypeReference<List<ClientApplication>>() {
+        List<ClientApplication> exportedApps = mapper.convertValue(exportedAPIConfig.get("applications"), new TypeReference<>() {
         });
         assertEquals(exportedApps.size(), 1, "Number of exported apps not correct");
         ClientApplication app = exportedApps.get(0);
@@ -100,7 +100,8 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         assertNull(app.getId(), "The ID of an application shouldn't be exported.");
         assertNull(app.getAppQuota(), "The application quota should not be exported. It's not supported by the export!");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/WE1.crt").exists(), "Certificate WE1.crt is missing");
+        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M04.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/" + context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
     }
 }
