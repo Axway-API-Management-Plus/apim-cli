@@ -49,7 +49,7 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusSpringSupport {
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
 
-        String exportedConfig = new File(tmpDirPath, "axway-api-manager").listFiles()[0].getPath();
+        String exportedConfig = new File(tmpDirPath, "api-manager").listFiles()[0].getPath();
         JsonNode config = mapper.readTree(new File(exportedConfig));
         Assert.assertTrue(config.get("config").get("registrationEnabled").asBoolean());
         Assert.assertEquals(config.get("config").get("apiDefaultVirtualHost").asText(), "");

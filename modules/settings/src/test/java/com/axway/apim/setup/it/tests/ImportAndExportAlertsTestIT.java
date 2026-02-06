@@ -41,7 +41,7 @@ public class ImportAndExportAlertsTestIT extends TestNGCitrusSpringSupport {
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
-        String exportedAlerts = new File(tmpDirPath, "axway-api-manager").listFiles()[0].getPath();
+        String exportedAlerts = new File(tmpDirPath, "api-manager").listFiles()[0].getPath();
 
         $(echo("####### Re-Import unchanged exported alerts: " + exportedAlerts + " #######"));
         $(testContext -> {

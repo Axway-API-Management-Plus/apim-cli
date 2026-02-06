@@ -108,6 +108,6 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusSpringSupport 
             if (returnCode != 0)
                 throw new ValidationException("Expected RC was: 0 but got: " + returnCode);
         });
-        Assert.assertEquals(new File(tmpDirPath, "axway-api-manager").list().length, 1, "One remote host is expected");
+        Assert.assertEquals(new File(tmpDirPath, "api-manager").list().length, 1, "One remote host is expected");
     }
 }
