@@ -99,7 +99,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusSpringSupport {
         assertFalse(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean());
         assertTrue(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean());
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M04.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M04.crt").exists(), "Certificate AmazonRSA2048M04.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
         File exportedAPISpecFile = new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/" + context.getVariable("exportAPIName"));
         assertTrue(exportedAPISpecFile.exists(), "Exported API-Specification is missing");

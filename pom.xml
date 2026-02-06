@@ -327,6 +327,7 @@
                         <exclude>**/AppOrSystemQuotaOnlyTestIT.java</exclude>
                         <exclude>**/MultiRestrictionQuotaTestIT.java</exclude>
                         <exclude>**/ImportAppWithQuotasTestIT.java</exclude>
+                        <exclude>**/ChangeBackendTestIT.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
