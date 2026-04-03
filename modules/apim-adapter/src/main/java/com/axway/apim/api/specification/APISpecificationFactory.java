@@ -101,7 +101,7 @@ public class APISpecificationFactory {
             return getAPIDefinitionFromURL(Utils.getAPIDefinitionUriFromFile(apiDefinitionFile));
         } else if (Utils.isHttpUri(apiDefinitionFile)) {
             return getAPIDefinitionFromURL(apiDefinitionFile);
-        } else if (apiDefinitionFile.startsWith("data")) {
+        } else if (apiDefinitionFile.startsWith("data:")) {
             byte[] data = Base64.getDecoder().decode(apiDefinitionFile.replaceFirst("data:.+,", ""));
             return new ByteArrayInputStream(data);
         } else {

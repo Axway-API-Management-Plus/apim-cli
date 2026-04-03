@@ -156,9 +156,6 @@ public class APIImportConfigAdapter {
         } catch (AppException e) {
             throw e;
         } catch (Exception e) {
-            if (e.getCause() instanceof AppException) {
-                throw (AppException) e.getCause();
-            }
             throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
         }
     }

@@ -939,12 +939,14 @@ public class APIManagerAPIAdapter {
 
     public JsonNode importGraphql(API api, String backendBasePath) throws AppException {
         HttpEntity entity = MultipartEntityBuilder.create()
-            .addTextBody("name", api.getName(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
+            .addTextBody("name", api.getName())
             .addTextBody("type", "graphql")
             .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/octet-stream"), FILENAME)
-            .addTextBody("fileName", "XYZ").addTextBody(ORGANIZATION_ID, api.getOrganization().getId(), ContentType.create(CONTENT_TYPE, StandardCharsets.UTF_8))
+            .addTextBody("fileName", "XYZ")
+            .addTextBody(ORGANIZATION_ID, api.getOrganization().getId())
             .addTextBody("backendUrl", backendBasePath)
-            .addTextBody("integral", "false").addTextBody(UPLOAD_TYPE, HTML_5).build();
+            .addTextBody("integral", "false")
+            .addTextBody(UPLOAD_TYPE, HTML_5).build();
         return createBackend(entity, api);
     }
 
