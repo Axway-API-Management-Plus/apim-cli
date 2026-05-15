@@ -151,17 +151,12 @@ public class APIManagerQuotaAdapter {
             int statusCode = httpResponse.getStatusCode();
             String response = httpResponse.getResponseBody();
             if (statusCode < 200 || statusCode > 299) {
-                if ((statusCode == 400) && (response.contains("API not found"))) {
-                    LOG.warn("Got unexpected error: 'API not found' while saving quota configuration ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
+                if ((statusCode == 400 && response.contains("API not found"))
+                 || (statusCode == 500 && response.contains("Internal server error"))
+                ) {
+                    LOG.warn("Got unexpected error while saving quota configuration ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
-                    httpResponse = httpHelper.execute(request, true);
-                    response = httpResponse.getResponseBody();
-                    statusCode = httpResponse.getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        throw new AppException("Can't update API-Manager Quota-Configuration. Response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
-                    } else {
-                        LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
-                    }
+                    retrySaveQuota(request);
                 } else {
                     throw new AppException("Can't update API-Manager Quota-Configuration. Response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
@@ -186,6 +181,17 @@ public class APIManagerQuotaAdapter {
             throw new AppException("Error cant load default quotas from API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
         }
         return quotaConfig;
+    }
+
+    private static void retrySaveQuota(RestAPICall request) throws IOException {
+        Response httpResponse = httpHelper.execute(request, true);
+        String response = httpResponse.getResponseBody();
+        int statusCode = httpResponse.getStatusCode();
+        if (statusCode < 200 || statusCode > 299) {
+            throw new AppException("Can't update API-Manager Quota-Configuration. Response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
+        } else {
+            LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
+        }
     }
 
     private static APIQuota filterQuotaForAPI(APIQuota quotaConfig, API api) throws AppException {
