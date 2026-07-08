@@ -210,6 +210,8 @@ public class CSVAPIExporter extends APIResultHandler {
                 api.getVhost(),
                 api.getState(),
                 getBackendPath(api),
+                getUsedSecurity(api),
+                getUsedOutboundAuthentication(api),
                 getUsedPolicies(api, PolicyType.REQUEST).toString().replace("[", "").replace("]", ""),
                 getUsedPolicies(api, PolicyType.ROUTING).toString().replace("[", "").replace("]", ""),
                 getUsedPolicies(api, PolicyType.RESPONSE).toString().replace("[", "").replace("]", ""),
