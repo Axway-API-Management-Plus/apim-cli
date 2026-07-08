@@ -156,6 +156,54 @@ public abstract class APIResultHandler {
         return usedSecurity.toString().replace("[", "").replace("]", "");
     }
 
+    protected static String getUsedOutboundAuthentication(API api) {
+
+        List<String> result = new ArrayList<>();
+
+        if (api.getOutboundProfiles() == null) {
+            return "";
+        }
+
+        for (OutboundProfile profile : api.getOutboundProfiles().values()) {
+
+            if (profile.getAuthenticationProfile() == null) {
+                continue;
+            }
+
+            for (AuthenticationProfile authProfile : api.getAuthenticationProfiles()) {
+
+                if (!authProfile.getName().equals(profile.getAuthenticationProfile())) {
+                    continue;
+                }
+
+                String authType = authProfile.getType().getName();
+
+                if (!result.contains(authType)) {
+                    result.add(authType);
+                }
+
+                if (authProfile.getType() == AuthType.oauth) {
+
+                    String providerProfile =
+                            (String) authProfile.getParameters().get("providerProfile");
+
+                    if (providerProfile != null) {
+                        providerProfile =
+                                Utils.getExternalPolicyName(
+                                        providerProfile,
+                                        Utils.FedKeyType.OAuthAppProfile);
+
+                        if (!result.contains(providerProfile)) {
+                            result.add(providerProfile);
+                        }
+                    }
+                }
+            }
+        }
+
+        return String.join(", ", result);
+    }
+
     protected static List<String> getUsedPolicies(API api, PolicyType type) {
         return getUsedPolicies(api).get(type);
     }
