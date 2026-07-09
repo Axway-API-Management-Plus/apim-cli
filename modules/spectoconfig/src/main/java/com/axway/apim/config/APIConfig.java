@@ -12,7 +12,7 @@ import java.util.Map;
 
 @JsonPropertyOrder({"name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
     "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
-    "corsProfiles", "caCerts"})
+    "corsProfiles", "caCerts", "apiMethods"})
 public class APIConfig {
 
     public static final String DEFAULT = "_default";
@@ -71,6 +71,10 @@ public class APIConfig {
                 && defaultProfile.getCorsProfile().equals(DEFAULT)) return Collections.emptyMap();
         }
         return api.getInboundProfiles();
+    }
+
+    public List<APIMethod> getApiMethods() {
+        return api.getApiMethods();
     }
 
     public List<CorsProfile> getCorsProfiles() {

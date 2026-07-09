@@ -9,6 +9,7 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Constants;
@@ -80,6 +81,9 @@ public class UpdateExistingAPI {
             // In that case, the V-Host is reset to null - But we still want to use the configured V-Host
             if (statusUpdate.isUpdateVHostRequired() && desiredAPI.getVhost() != null) {
                 apiAdapter.updateAPIProxy(actualAPI);
+            }
+            if (EnvironmentProperties.CHECK_CATALOG) {
+                apiAdapter.pollCatalogForPublishedState(actualAPI.getId(), actualAPI.getName(), actualAPI.getState());
             }
             new APIQuotaManager(desiredAPI, actualAPI).execute(actualAPI);
             new ManageClientOrganization(desiredAPI, actualAPI).execute(false);

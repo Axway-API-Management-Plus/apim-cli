@@ -58,10 +58,10 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void testCustomActualAPI() {
         APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
-                .includeClientApplications(false)
-                .includeClientOrganizations(false)
-                .includeQuotas(false)
-                .build();
+            .includeClientApplications(false)
+            .includeClientOrganizations(false)
+            .includeQuotas(false)
+            .build();
         assertFalse(filter.isIncludeClientApplications());
         assertFalse(filter.isIncludeClientOrganizations());
         assertFalse(filter.isIncludeQuotas());
@@ -71,8 +71,8 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void filterWithId() {
         APIFilter filter = new APIFilter.Builder()
-                .hasId("9878973123")
-                .build();
+            .hasId("9878973123")
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 0);
         Assert.assertEquals(filter.getId(), "9878973123");
     }
@@ -82,8 +82,8 @@ public class APIFilterTest extends WiremockWrapper {
         // For this test, we must simulate API-Manager version >7.7
         apiManagerAdapter.setApiManagerVersion("7.7.20200130");
         APIFilter filter = new APIFilter.Builder()
-                .hasApiPath("/v1/api")
-                .build();
+            .hasApiPath("/v1/api")
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 3);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "path");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
@@ -94,8 +94,8 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void filterWithName() {
         APIFilter filter = new APIFilter.Builder()
-                .hasName("The name I want")
-                .build();
+            .hasName("The name I want")
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 3);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "name");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
@@ -105,16 +105,16 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void hasFullWildCardName() {
         APIFilter filter = new APIFilter.Builder()
-                .hasName("*")
-                .build();
+            .hasName("*")
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 0);
     }
 
     @Test
     public void filterWithBackendApiID() {
         APIFilter filter = new APIFilter.Builder()
-                .hasApiId("7868768768")
-                .build();
+            .hasApiId("7868768768")
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 3);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "apiid");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
@@ -124,8 +124,8 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void filterWithDeprecated() {
         APIFilter filter = new APIFilter.Builder()
-                .isDeprecated(true)
-                .build();
+            .isDeprecated(true)
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 3);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "deprecated");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
@@ -135,8 +135,8 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void filterWithRetired() {
         APIFilter filter = new APIFilter.Builder()
-                .isRetired(true)
-                .build();
+            .isRetired(true)
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 3);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "retired");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
@@ -146,8 +146,8 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void filterWithState() {
         APIFilter filter = new APIFilter.Builder()
-                .hasState("unpublished")
-                .build();
+            .hasState("unpublished")
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 3);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "state");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
@@ -157,9 +157,9 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void filterWithCreatedOn() {
         APIFilter filter = new APIFilter.Builder()
-                .isCreatedOnAfter("1623915264000")    // 17.06.2021
-                .isCreatedOnBefore("1624865664000") // 28.06.2021
-                .build();
+            .isCreatedOnAfter("1623915264000")    // 17.06.2021
+            .isCreatedOnBefore("1624865664000") // 28.06.2021
+            .build();
         Assert.assertEquals(filter.getFilters().size(), 6);
         Assert.assertEquals(filter.getFilters().get(0).getValue(), "createdOn");
         Assert.assertEquals(filter.getFilters().get(1).getValue(), "gt");
@@ -172,29 +172,56 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void apiFilterEqualTest() {
         APIFilter filter1 = new APIFilter.Builder()
-                .hasId("12345")
-                .build();
+            .hasId("12345")
+            .build();
 
         APIFilter filter2 = new APIFilter.Builder()
-                .hasId("12345")
-                .build();
+            .hasId("12345")
+            .build();
 
         Assert.assertEquals(filter1, filter2, "Both filters should be equal");
     }
 
     @Test
+    public void apiFilterNotEqualForDifferentPathTest() {
+        APIFilter filter1 = new APIFilter.Builder()
+            .hasApiPath("/api/one")
+            .build();
+
+        APIFilter filter2 = new APIFilter.Builder()
+            .hasApiPath("/api/two")
+            .build();
+
+        Assert.assertNotEquals(filter1, filter2, "Filters with different apiPath must not be equal");
+        Assert.assertNotEquals(filter1.hashCode(), filter2.hashCode(), "Filters with different apiPath should have different hashcode");
+    }
+
+    @Test
+    public void testApiPathFilterMatchAndMismatch() {
+        APIFilter filter = new APIFilter.Builder().hasApiPath("/test/path/*").build();
+
+        API matchingApi = new API();
+        matchingApi.setPath("/test/path/v1");
+        assertFalse(filter.filter(matchingApi), "API path /test/path/v1 should match /test/path/*");
+
+        API nonMatchingApi = new API();
+        nonMatchingApi.setPath("/other/path/v1");
+        assertTrue(filter.filter(nonMatchingApi), "API path /other/path/v1 should not match /test/path/*");
+    }
+
+    @Test
     public void testBackendBasepathFilter() {
         APIFilter filter = new APIFilter.Builder()
-                .hasBackendBasepath("*emr-system*")
-                .build();
+            .hasBackendBasepath("*emr-system*")
+            .build();
         API testAPI = getAPIWithBackendBasepath("http://emr-system:8081");
         assertFalse(filter.filter(testAPI), "API with base-path: http://emr-system:8081 should match to filter: *emr-system*");
         testAPI = getAPIWithBackendBasepath("http://sec.hipaa:8086");
         assertTrue(filter.filter(testAPI), "API with base-path: http://sec.hipaa:8086 should NOT match to filter: *emr-system*");
 
         filter = new APIFilter.Builder()
-                .hasBackendBasepath("http://emr-system:8081")
-                .build();
+            .hasBackendBasepath("http://emr-system:8081")
+            .build();
 
         testAPI = getAPIWithBackendBasepath("http://emr-system:8081");
         assertFalse(filter.filter(testAPI), "API with base-path: http://emr-system:8081 should match to filter: http://emr-system:8081");
@@ -223,46 +250,46 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void testPolicyFilter() throws AppException {
         APIFilter filter = new APIFilter.Builder()
-                .hasPolicyName("*Policy*")
-                .build();
+            .hasPolicyName("*Policy*")
+            .build();
         API testAPI = new API();
         addPolicy(testAPI, "Request Policy 1", PolicyType.REQUEST);
         addPolicy(testAPI, "Routing Policy 1", PolicyType.ROUTING);
         assertFalse(filter.filter(testAPI), "API must match to pattern '*Policy*'");
 
         filter = new APIFilter.Builder()
-                .hasPolicyName("*Response*")
-                .build();
+            .hasPolicyName("*Response*")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "Request Policy 1", PolicyType.REQUEST);
         addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
         assertFalse(filter.filter(testAPI), "API must match to pattern '*Response*'");
 
         filter = new APIFilter.Builder()
-                .hasPolicyName("*Routing*")
-                .build();
+            .hasPolicyName("*Routing*")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "Request Policy 1", PolicyType.REQUEST);
         addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
         assertTrue(filter.filter(testAPI), "API must NOT match to pattern '*Response*'");
 
         filter = new APIFilter.Builder()
-                .hasPolicyName("Response Policy 1")
-                .build();
+            .hasPolicyName("Response Policy 1")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
         assertFalse(filter.filter(testAPI), "API must match to pattern 'Response Policy 1'");
 
         filter = new APIFilter.Builder()
-                .hasPolicyName("Response Policy 2")
-                .build();
+            .hasPolicyName("Response Policy 2")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
         assertTrue(filter.filter(testAPI), "API must NOT match to pattern 'Response Policy 2' as it is using 'Response Policy 1'");
 
         filter = new APIFilter.Builder()
-                .hasPolicyName("Not used policy")
-                .build();
+            .hasPolicyName("Not used policy")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
         assertTrue(filter.filter(testAPI), "API must NOT match to pattern 'Not used policy' as it is using 'Response Policy 1'");
@@ -271,24 +298,24 @@ public class APIFilterTest extends WiremockWrapper {
     @Test
     public void testPolicyFilterWithSpecialCaracter() throws AppException {
         APIFilter filter = new APIFilter.Builder()
-                .hasPolicyName("*(Policy)*")
-                .build();
+            .hasPolicyName("*(Policy)*")
+            .build();
         API testAPI = new API();
         addPolicy(testAPI, "Request (Policy) 1", PolicyType.REQUEST);
         assertFalse(filter.filter(testAPI), "API must match to pattern '*(Policy)*'");
 
         filter = new APIFilter.Builder() {
         }
-                .hasPolicyName("()*{}()[].+?^$|")
-                .build();
+            .hasPolicyName("()*{}()[].+?^$|")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "(){}()[].+?^$|", PolicyType.REQUEST);
         assertFalse(filter.filter(testAPI), "API must match to pattern '*(Policy)*'");
 
         filter = new APIFilter.Builder() {
         }
-                .hasPolicyName("*(policy)*")
-                .build();
+            .hasPolicyName("*(policy)*")
+            .build();
         testAPI = new API();
         addPolicy(testAPI, "Request policy", PolicyType.REQUEST);
         assertTrue(filter.filter(testAPI), "API must not match to pattern '*(Policy)*'");
@@ -331,8 +358,8 @@ public class APIFilterTest extends WiremockWrapper {
         addInboundSecurityPolicy(testAPI, "Inbound Security Policy 1");
 
         APIFilter filter = new APIFilter.Builder()
-                .hasPolicyName("Inbound Security*")
-                .build();
+            .hasPolicyName("Inbound Security*")
+            .build();
         assertFalse(filter.filter(testAPI), "API must match to pattern 'Inbound Security*'");
     }
 
@@ -403,7 +430,7 @@ public class APIFilterTest extends WiremockWrapper {
         return api;
     }
 
-    private void addPolicy(API api, String policyName, PolicyType type) throws AppException {
+    private void addPolicy(API api, String policyName, PolicyType type) {
         OutboundProfile outboundProfile = new OutboundProfile();
         Policy policy = new Policy(policyName);
         switch (type) {
@@ -432,7 +459,7 @@ public class APIFilterTest extends WiremockWrapper {
         properties.put("authenticationPolicy", "<key type='CircuitContainer'><id field='name' value='API Keys'/><key type='FilterCircuit'><id field='name' value='" + policyName + "'/></key></key>");
         SecurityDevice securityDevice = new SecurityDevice();
         securityDevice.setType(DeviceType.authPolicy);
-       // securityDevice.setConvertPolicies(false);
+        // securityDevice.setConvertPolicies(false);
         securityDevice.setProperties(properties);
         List<SecurityDevice> devices = new ArrayList<>();
         devices.add(securityDevice);
@@ -469,7 +496,7 @@ public class APIFilterTest extends WiremockWrapper {
         api.setInboundProfiles(inboundProfiles);
     }
 
-    private void addOutboundSecurityToAPI(API api, AuthType authType) throws AppException {
+    private void addOutboundSecurityToAPI(API api, AuthType authType) {
         List<AuthenticationProfile> authnProfiles = new ArrayList<>();
         AuthenticationProfile authNProfile = new AuthenticationProfile();
         authNProfile.setName("_default");

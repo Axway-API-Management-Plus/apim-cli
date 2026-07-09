@@ -254,6 +254,8 @@ public class CSVAPIExporter extends APIResultHandler {
 
     @Override
     public APIFilter getFilter() {
-        return createFilter();
+        APIFilter apiFilter = createFilter();
+        apiFilter.setState(params.getState());
+        return apiFilter;
     }
 }
