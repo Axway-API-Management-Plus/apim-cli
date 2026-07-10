@@ -455,14 +455,17 @@ public class APIFilter implements CustomPropertiesFilter {
     }
 
     public boolean filter(API api) {
-        if (this.getApiPath() == null && this.getVhost() == null && this.getQueryStringVersion() == null && this.getPolicyName() == null && this.getBackendBasepath() == null
-            && this.getTag() == null && this.getInboundSecurity() == null && this.getOutboundAuthentication() == null && this.getOrganization() == null) { // Nothing given to filter out.
+        if (getApiPath() == null && getVhost() == null && getQueryStringVersion() == null && getPolicyName() == null && getBackendBasepath() == null
+            && getTag() == null && getInboundSecurity() == null && getOutboundAuthentication() == null && getOrganization() == null && state == null) { // Nothing given to filter out.
             return false;
         }
-        if (this.getPolicyName() != null && (!isPolicyUsed(api, this.getPolicyName()))) {
+        if (getPolicyName() != null && (!isPolicyUsed(api, getPolicyName()))) {
             return true;
         }
-        if (this.getInboundSecurity() != null) {
+        if (state != null && !state.equalsIgnoreCase(api.getState())) {
+            return true;
+        }
+        if (getInboundSecurity() != null) {
             boolean match = false;
             if (api.getInboundProfiles() != null) {
                 for (InboundProfile profile : api.getInboundProfiles().values()) {
@@ -470,7 +473,7 @@ public class APIFilter implements CustomPropertiesFilter {
                         for (SecurityProfile securityProfile : api.getSecurityProfiles()) {
                             for (SecurityDevice securityDevice : securityProfile.getDevices()) {
                                 List<String> deviceNames = Arrays.asList(securityDevice.getType().getAlternativeNames());
-                                if (deviceNames.contains(this.getInboundSecurity().toLowerCase())) {
+                                if (deviceNames.contains(getInboundSecurity().toLowerCase())) {
                                     match = true;
                                     break;
                                 }
@@ -480,29 +483,29 @@ public class APIFilter implements CustomPropertiesFilter {
                 }
             }
             if (!match) { // No match found so far, check policy names
-                match = isPolicyUsed(api, this.getInboundSecurity());
+                match = isPolicyUsed(api, getInboundSecurity());
             }
             if (!match) return true; // Requested security is finally not found, return true
         }
-        if (this.getBackendBasepath() != null) {
-            Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
+        if (getBackendBasepath() != null) {
+            Pattern pattern = Pattern.compile(getBackendBasepath().replace("*", ".*"));
             Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
             if (!matcher.matches()) {
                 return true;
             }
         }
-        if (this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
-            if (this.getVhost() != null && !this.getVhost().equals(api.getVhost())) return true;
-            if (this.getQueryStringVersion() != null && !this.getQueryStringVersion().equals(api.getApiRoutingKey()))
+        if (getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
+            if (getVhost() != null && !getVhost().equals(api.getVhost())) return true;
+            if (getQueryStringVersion() != null && !getQueryStringVersion().equals(api.getApiRoutingKey()))
                 return true;
         }
-        if (this.getTag() != null) {
+        if (getTag() != null) {
             // Simple filter format tag: "tagValue*"
-            String tagGroupFilter = this.getTag();
-            String tagValueFilter = this.getTag();
-            if (this.getTag().contains("=")) { // Group specific format: "tagGroup=tagValue*"
-                tagGroupFilter = this.getTag().split("=")[0];
-                tagValueFilter = this.getTag().split("=")[1];
+            String tagGroupFilter = getTag();
+            String tagValueFilter = getTag();
+            if (getTag().contains("=")) { // Group specific format: "tagGroup=tagValue*"
+                tagGroupFilter = getTag().split("=")[0];
+                tagValueFilter = getTag().split("=")[1];
             }
             Pattern groupPattern = Pattern.compile(tagGroupFilter.toLowerCase().replace("*", ".*"));
             Pattern valuePattern = Pattern.compile(tagValueFilter.toLowerCase().replace("*", ".*"));
@@ -531,7 +534,7 @@ public class APIFilter implements CustomPropertiesFilter {
             // If none of the tags match, filter out this API
             if (!match) return true;
         }
-        if (this.getOutboundAuthentication() != null) {
+        if (getOutboundAuthentication() != null) {
             boolean match = false;
             if (api.getOutboundProfiles() != null) {
                 for (OutboundProfile profile : api.getOutboundProfiles().values()) {
@@ -539,14 +542,14 @@ public class APIFilter implements CustomPropertiesFilter {
                         for (AuthenticationProfile authnProfile : api.getAuthenticationProfiles()) {
                             if (authnProfile.getName().equals(profile.getAuthenticationProfile())) {
                                 List<String> authnNames = Arrays.asList(authnProfile.getType().getAlternativeNames());
-                                if (authnNames.contains(this.getOutboundAuthentication().toLowerCase())) {
+                                if (authnNames.contains(getOutboundAuthentication().toLowerCase())) {
                                     match = true;
                                     break;
                                 }
                                 if (authnProfile.getType() == AuthType.oauth) {
                                     String providerProfile = (String) authnProfile.getParameters().get("providerProfile");
                                     providerProfile = Utils.getExternalPolicyName(providerProfile, FedKeyType.OAuthAppProfile);
-                                    Pattern pattern = Pattern.compile(this.getOutboundAuthentication().toLowerCase().replace("*", ".*"));
+                                    Pattern pattern = Pattern.compile(getOutboundAuthentication().toLowerCase().replace("*", ".*"));
                                     Matcher matcher = pattern.matcher(providerProfile.toLowerCase());
                                     if (matcher.matches()) {
                                         match = true;
@@ -560,8 +563,8 @@ public class APIFilter implements CustomPropertiesFilter {
             }
             if (!match) return true;
         }
-        if (this.getOrganization() != null) {
-            Pattern pattern = Pattern.compile(this.getOrganization().toLowerCase().replace("*", ".*"));
+        if (getOrganization() != null) {
+            Pattern pattern = Pattern.compile(getOrganization().toLowerCase().replace("*", ".*"));
             Matcher matcher = pattern.matcher(api.getOrganization().getName().toLowerCase());
             return !matcher.matches();
         }

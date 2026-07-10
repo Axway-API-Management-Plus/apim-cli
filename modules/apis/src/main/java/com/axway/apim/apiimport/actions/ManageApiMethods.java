@@ -31,6 +31,7 @@ public class ManageApiMethods {
                         if (operationName.equals(apiMethod.getName())) {
                             LOG.info("Updating API method : {}", apiMethod.getName());
                             apiMethod.setId(method.getId());
+                            apiMethod.setSummary(method.getSummary());
                             apiMethod.setApiId(method.getApiId());
                             apiMethod.setVirtualizedApiId(method.getVirtualizedApiId());
                             apiMethod.setApiMethodId(method.getApiMethodId());

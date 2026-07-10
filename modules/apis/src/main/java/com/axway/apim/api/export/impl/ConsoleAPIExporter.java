@@ -54,51 +54,51 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
     private void printStandard(List<API> apis) {
         Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-                new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
-                new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
-                new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
-                new Column().header(VERSION).with(API::getVersion),
-                new Column().header(CREATED_ON).with(this::getFormattedDate)
+            new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+            new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+            new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+            new Column().header(VERSION).with(API::getVersion),
+            new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
     }
 
     private void printWide(List<API> apis) {
         Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-                new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
-                new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
-                new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
-                new Column().header(VERSION).with(API::getVersion),
-                new Column().header("V-Host").with(API::getVhost),
-                new Column().header("State").with(this::getState),
-                new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
-                new Column().header("Inbound Security").with(APIResultHandler::getUsedSecurity),
-                new Column().header("Outbound Security").with(APIResultHandler::getUsedOutboundAuthentication),
-                new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(this::getUsedPoliciesForConsole),
-                new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
-                new Column().header(CREATED_ON).with(this::getFormattedDate)
+            new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+            new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+            new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+            new Column().header(VERSION).with(API::getVersion),
+            new Column().header("V-Host").with(API::getVhost),
+            new Column().header("State").with(this::getState),
+            new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
+            new Column().header("Inbound Security").with(APIResultHandler::getUsedSecurity),
+            new Column().header("Outbound Security").with(APIResultHandler::getUsedOutboundAuthentication),
+            new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(this::getUsedPoliciesForConsole),
+            new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
+            new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
     }
 
     private void printUltra(List<API> apis) {
         Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-                new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
-                new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
-                new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
-                new Column().header(VERSION).with(API::getVersion),
-                new Column().header("V-Host").with(API::getVhost),
-                new Column().header("State").with(this::getState),
-                new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
-                new Column().header("Inbound Security").with(APIResultHandler::getUsedSecurity),
-                new Column().header("Outbound Security").with(APIResultHandler::getUsedOutboundAuthentication),
-                new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(this::getUsedPoliciesForConsole),
-                new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
-                new Column().header("Orgs").with(this::getOrgCount),
-                new Column().header("Apps").with(this::getAppCount),
-                new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
-                new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(api -> Boolean.toString(hasTags(api))),
-                new Column().header(CREATED_ON).with(this::getFormattedDate)
+            new Column().header(ID).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+            new Column().header(PATH).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+            new Column().header(NAME).headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+            new Column().header(VERSION).with(API::getVersion),
+            new Column().header("V-Host").with(API::getVhost),
+            new Column().header("State").with(this::getState),
+            new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
+            new Column().header("Inbound Security").with(APIResultHandler::getUsedSecurity),
+            new Column().header("Outbound Security").with(APIResultHandler::getUsedOutboundAuthentication),
+            new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(this::getUsedPoliciesForConsole),
+            new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
+            new Column().header("Orgs").with(this::getOrgCount),
+            new Column().header("Apps").with(this::getAppCount),
+            new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
+            new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxWidth(30).with(api -> Boolean.toString(hasTags(api))),
+            new Column().header(CREATED_ON).with(this::getFormattedDate)
         )));
         printDetails(apis);
     }
@@ -148,12 +148,12 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
     private boolean hasQuota(API api) {
         return (api.getApplicationQuota() != null &&
-                api.getApplicationQuota().getRestrictions() != null &&
-                !api.getApplicationQuota().getRestrictions().isEmpty()) ||
-                (api.getSystemQuota() != null &&
-                        api.getSystemQuota().getRestrictions() != null &&
-                        !api.getSystemQuota().getRestrictions().isEmpty())
-                ;
+            api.getApplicationQuota().getRestrictions() != null &&
+            !api.getApplicationQuota().getRestrictions().isEmpty()) ||
+            (api.getSystemQuota() != null &&
+                api.getSystemQuota().getRestrictions() != null &&
+                !api.getSystemQuota().getRestrictions().isEmpty())
+            ;
     }
 
     private String getState(API api) {
@@ -195,8 +195,15 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
     @Override
     public APIFilter getFilter() {
-        APIFilter apiFilter = createFilter();
-        apiFilter.setState(params.getState());
-        return apiFilter;
+        APIFilter.Builder builder = createFilterBuilder();
+        if (params.getState() != null && params.getState().equalsIgnoreCase("deprecated")) {
+            builder.isDeprecated(true);
+            builder.hasState(null);
+        }
+        if (params.getState() != null && params.getState().equalsIgnoreCase("retired")) {
+            builder.isDeprecated(true);
+            builder.hasState(null);
+        }
+        return builder.build();
     }
 }

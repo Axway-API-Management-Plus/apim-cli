@@ -276,7 +276,8 @@ public abstract class APIResultHandler {
             return grantedOrgs;
         }
     }
-    protected APIFilter createFilter() {
+
+    protected Builder createFilterBuilder() {
         Builder builder = getBaseAPIFilterBuilder();
         switch (params.getWide()) {
             case standard:
@@ -294,6 +295,6 @@ public abstract class APIResultHandler {
                 builder.includeClientOrganizations(true);
                 break;
         }
-        return builder.build();
+        return builder;
     }
 }

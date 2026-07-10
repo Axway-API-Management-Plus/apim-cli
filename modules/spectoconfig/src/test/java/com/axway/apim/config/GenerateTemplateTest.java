@@ -220,5 +220,11 @@ public class GenerateTemplateTest {
 //        Assert.assertEquals("passThrough", documentContext.read("$.securityProfiles[0].devices[0].type"));
     }
 
+    @Test
+    public void testInboundMethods() throws IOException {
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "methods.yaml", "-frontendAuthType", "apiKey", "-inboundPerMethodOverride", "-o", "json", "-includeMethods"};
+        GenerateTemplate.generate(args);
+    }
+
 
 }

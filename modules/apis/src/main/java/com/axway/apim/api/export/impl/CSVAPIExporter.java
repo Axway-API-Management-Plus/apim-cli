@@ -254,8 +254,15 @@ public class CSVAPIExporter extends APIResultHandler {
 
     @Override
     public APIFilter getFilter() {
-        APIFilter apiFilter = createFilter();
-        apiFilter.setState(params.getState());
-        return apiFilter;
+        APIFilter.Builder builder = createFilterBuilder();
+        if (params.getState() != null && params.getState().equalsIgnoreCase("deprecated")) {
+            builder.isDeprecated(true);
+            builder.hasState(null);
+        }
+        if (params.getState() != null && params.getState().equalsIgnoreCase("retired")) {
+            builder.isDeprecated(true);
+            builder.hasState(null);
+        }
+        return builder.build();
     }
 }

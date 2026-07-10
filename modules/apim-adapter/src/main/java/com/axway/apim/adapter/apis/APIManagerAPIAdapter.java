@@ -109,7 +109,7 @@ public class APIManagerAPIAdapter {
                     Utils.progressPercentage(i, apis.size(), "Loading details of " + apis.size() + " APIs");
                 }
             }
-            Utils.addCustomPropertiesForEntity(apis, this.apiManagerResponse.get(filter), filter);
+            Utils.addCustomPropertiesForEntity(apis, apiManagerResponse.get(filter), filter);
             if (logProgress && apis.size() > 5) Console.print("\n");
         } catch (IOException e) {
             throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -136,7 +136,7 @@ public class APIManagerAPIAdapter {
      * @throws AppException if the API representation cannot be created
      */
     private void readAPIsFromAPIManager(APIFilter filter) throws AppException {
-        if (this.apiManagerResponse.get(filter) != null) return;
+        if (apiManagerResponse.get(filter) != null) return;
         try {
             URI uri = getAPIRequestUri(filter);
             RestAPICall getRequest = new GETRequest(uri);
@@ -226,7 +226,7 @@ public class APIManagerAPIAdapter {
 
     private List<API> filterAPIs(APIFilter filter) throws IOException {
         LOG.debug("Filtering APIs based on filter path: {}", filter);
-        List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<>() {
+        List<API> apis = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<>() {
         });
         apis.removeIf(filter::filter);
 

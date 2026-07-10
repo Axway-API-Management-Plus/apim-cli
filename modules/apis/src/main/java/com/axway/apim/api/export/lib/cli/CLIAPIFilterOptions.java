@@ -178,7 +178,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
         option.setArgName("vhost.customer.com");
         cliOptions.addOption(option);
 
-        option = new Option("state", true, "Filter APIs with specific state: unpublished | pending | published");
+        option = new Option("state", true, "Filter APIs with specific state: unpublished | pending | published | deprecated | retired.");
         option.setRequired(false);
         option.setArgName("published");
         cliOptions.addOption(option);

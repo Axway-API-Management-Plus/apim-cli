@@ -121,7 +121,7 @@ public class APIManagerCLI {
         int rc = 0;
         LOG.info("API-Manager CLI: {}", APIManagerCLI.class.getPackage().getImplementationVersion());
         if(LOG.isDebugEnabled()) {
-            LOG.debug("API-Manager CLI args: {}", Arrays.toString(args));
+            LOG.debug("API-Manager CLI args: {}", maskArgs(args));
             LOG.debug("Java Version: {}", System.getProperty("java.version"));
         }
         if (this.selectedMethod == null) {
@@ -140,6 +140,18 @@ public class APIManagerCLI {
 
     private String getMethodName(Method m) {
         return (m.getAnnotation(CLIServiceMethod.class).name().isEmpty()) ? m.getName() : m.getAnnotation(CLIServiceMethod.class).name();
+    }
+
+    public static String maskArgs(String[] args) {
+        String[] masked = args.clone();
+        for (int i = 0; i < masked.length; i++) {
+            if (masked[i].equalsIgnoreCase("--password") || masked[i].equalsIgnoreCase("-p")) {
+                if (i + 1 < masked.length) {
+                    masked[i + 1] = "****";
+                }
+            }
+        }
+        return Arrays.toString(masked);
     }
 
 }

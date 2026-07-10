@@ -20,11 +20,9 @@ public class JsonAPIExporter extends APIResultHandler {
     /**
      * Where to store the exported API-Definition
      */
-    private final boolean exportMethods;
 
     public JsonAPIExporter(APIExportParams params) {
         super(params);
-        this.exportMethods = params.isExportMethods();
     }
 
     @Override
@@ -44,7 +42,6 @@ public class JsonAPIExporter extends APIResultHandler {
     }
 
 
-
     @Override
     public APIFilter getFilter() {
         Builder builder = getBaseAPIFilterBuilder()
@@ -54,8 +51,16 @@ public class JsonAPIExporter extends APIResultHandler {
             .includeClientOrganizations(true)
             .includeOriginalAPIDefinition(true)
             .includeRemoteHost(true);
-        if (exportMethods)
+        if (params.isExportMethods())
             builder.includeMethods(true);
+        if (params.getState() != null && params.getState().equalsIgnoreCase("deprecated")) {
+            builder.isDeprecated(true);
+            builder.hasState(null);
+        }
+        if (params.getState() != null && params.getState().equalsIgnoreCase("retired")) {
+            builder.isRetired(true);
+            builder.hasState(null);
+        }
         return builder.build();
     }
 }
