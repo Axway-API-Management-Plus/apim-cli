@@ -39,7 +39,7 @@ public class UserConfigAdapter extends UserAdapter {
         // Try to read a list of users
         try {
             mapper = Utils.createObjectMapper(configFile);
-            baseUsers = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<User>>() {
+            baseUsers = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<>() {
             });
             if (stageConfig != null) {
                 throw new AppException("Stage overrides are not supported for users lists.", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -64,7 +64,6 @@ public class UserConfigAdapter extends UserAdapter {
             throw new AppException("Cannot read image for user(s) from config file: " + config, ErrorCode.UNKNOWN_USER, e);
         }
         validateCustomProperties(users);
-        setInternalUser(users);
     }
 
     public void addImage(List<User> users, File parentFolder) throws AppException {
@@ -82,12 +81,6 @@ public class UserConfigAdapter extends UserAdapter {
     private void validateCustomProperties(List<User> users) throws AppException {
         for (User user : users) {
             Utils.validateCustomProperties(user.getCustomProperties(), Type.user);
-        }
-    }
-
-    private void setInternalUser(List<User> users) {
-        for (User user : users) {
-            user.setType("internal"); // Default to internal, as external makes no sense using the CLI
         }
     }
 
