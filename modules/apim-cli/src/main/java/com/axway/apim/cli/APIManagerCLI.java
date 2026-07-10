@@ -143,15 +143,18 @@ public class APIManagerCLI {
     }
 
     public static String maskArgs(String[] args) {
-        String[] masked = args.clone();
-        for (int i = 0; i < masked.length; i++) {
-            if (masked[i].equalsIgnoreCase("--password") || masked[i].equalsIgnoreCase("-p")) {
-                if (i + 1 < masked.length) {
-                    masked[i + 1] = "****";
+        if(args !=null) {
+            String[] masked = args.clone();
+            for (int i = 0; i < masked.length; i++) {
+                if (masked[i].equalsIgnoreCase("--password") || masked[i].equalsIgnoreCase("-p")) {
+                    if (i + 1 < masked.length) {
+                        masked[i + 1] = "****";
+                    }
                 }
             }
+            return Arrays.toString(masked);
         }
-        return Arrays.toString(masked);
+        return "";
     }
 
 }
