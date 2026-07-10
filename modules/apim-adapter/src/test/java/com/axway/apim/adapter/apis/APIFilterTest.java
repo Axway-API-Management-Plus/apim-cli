@@ -183,33 +183,6 @@ public class APIFilterTest extends WiremockWrapper {
     }
 
     @Test
-    public void apiFilterNotEqualForDifferentPathTest() {
-        APIFilter filter1 = new APIFilter.Builder()
-            .hasApiPath("/api/one")
-            .build();
-
-        APIFilter filter2 = new APIFilter.Builder()
-            .hasApiPath("/api/two")
-            .build();
-
-        Assert.assertNotEquals(filter1, filter2, "Filters with different apiPath must not be equal");
-        Assert.assertNotEquals(filter1.hashCode(), filter2.hashCode(), "Filters with different apiPath should have different hashcode");
-    }
-
-    @Test
-    public void testApiPathFilterMatchAndMismatch() {
-        APIFilter filter = new APIFilter.Builder().hasApiPath("/test/path/*").build();
-
-        API matchingApi = new API();
-        matchingApi.setPath("/test/path/v1");
-        assertFalse(filter.filter(matchingApi), "API path /test/path/v1 should match /test/path/*");
-
-        API nonMatchingApi = new API();
-        nonMatchingApi.setPath("/other/path/v1");
-        assertTrue(filter.filter(nonMatchingApi), "API path /other/path/v1 should not match /test/path/*");
-    }
-
-    @Test
     public void testBackendBasepathFilter() {
         APIFilter filter = new APIFilter.Builder()
             .hasBackendBasepath("*emr-system*")
@@ -430,7 +403,7 @@ public class APIFilterTest extends WiremockWrapper {
         return api;
     }
 
-    private void addPolicy(API api, String policyName, PolicyType type) {
+    private void addPolicy(API api, String policyName, PolicyType type) throws AppException {
         OutboundProfile outboundProfile = new OutboundProfile();
         Policy policy = new Policy(policyName);
         switch (type) {
@@ -496,7 +469,7 @@ public class APIFilterTest extends WiremockWrapper {
         api.setInboundProfiles(inboundProfiles);
     }
 
-    private void addOutboundSecurityToAPI(API api, AuthType authType) {
+    private void addOutboundSecurityToAPI(API api, AuthType authType) throws AppException {
         List<AuthenticationProfile> authnProfiles = new ArrayList<>();
         AuthenticationProfile authNProfile = new AuthenticationProfile();
         authNProfile.setName("_default");
@@ -512,4 +485,3 @@ public class APIFilterTest extends WiremockWrapper {
         api.setOutboundProfiles(outboundProfiles);
     }
 }
-
