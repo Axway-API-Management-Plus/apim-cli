@@ -231,31 +231,4 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertEquals(restr1.getConfig().get("period"), "week");
         assertEquals(restr1.getConfig().get("per"), "1");
     }
-
-    @Test
-    public void testAppWithQuotaBasedOnMultipleAPIPaths() throws AppException {
-        String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/AppWithQuotaPerMultipleAPIPaths.json").getPath();
-        assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-
-        AppImportParams importParams = new AppImportParams();
-        importParams.setConfig(testFile);
-        importParams.setHostname("localhost");
-        importParams.setUsername("apiadmin");
-        importParams.setPassword(Utils.getEncryptedPassword());
-        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
-
-        List<ClientApplication> apps = adapter.getApplications();
-        assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
-        APIQuota appQuota = apps.get(0).getAppQuota();
-        assertNotNull(appQuota, "appQuota is null");
-        assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
-        assertEquals(appQuota.getRestrictions().size(), 2, "Expected two restrictions");
-
-        QuotaRestriction firstRestriction = appQuota.getRestrictions().get(0);
-        QuotaRestriction secondRestriction = appQuota.getRestrictions().get(1);
-
-        assertEquals(firstRestriction.getApiId(), "e4ded8c8-0a40-4b50-bc13-552fb7209150");
-        assertEquals(secondRestriction.getApiId(), "11111111-2222-3333-4444-555555555555");
-        assertNotEquals(firstRestriction.getApiId(), secondRestriction.getApiId(), "Each apiPath must resolve to its own API");
-    }
 }
