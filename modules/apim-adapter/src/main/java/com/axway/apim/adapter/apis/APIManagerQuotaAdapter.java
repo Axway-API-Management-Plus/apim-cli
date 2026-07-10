@@ -80,16 +80,16 @@ public class APIManagerQuotaAdapter {
 
     private void readQuotaFromAPIManager(String quotaId) throws AppException {
         if (!APIManagerAdapter.getInstance().hasAdminAccount()) return;
-        if (this.apiManagerResponse.get(quotaId) != null) return;
+        if (apiManagerResponse.get(quotaId) != null) return;
         URI uri;
         try {
             if (Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) || Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/" + quotaId).build();
             } else {
                 if (applicationsQuotaCache.containsKey(quotaId)) {
-                    if(LOG.isDebugEnabled())
+                    if (LOG.isDebugEnabled())
                         LOG.debug("Found quota with ID: {} in cache: {}", quotaId, applicationsQuotaCache.get(quotaId));
-                    this.apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
+                    apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
                     return;
                 }
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + quotaId + "/quota/").build();
@@ -102,7 +102,7 @@ public class APIManagerQuotaAdapter {
                 if (statusCode != 200) {
                     throw new AppException("Can't read API-Manager Quota-Configuration. Got status code: " + statusCode + " for request: " + uri, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                this.apiManagerResponse.put(quotaId, response);
+                apiManagerResponse.put(quotaId, response);
                 if (!Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) && !Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
                     applicationsQuotaCache.put(quotaId, response);
                 }
@@ -152,7 +152,7 @@ public class APIManagerQuotaAdapter {
             String response = httpResponse.getResponseBody();
             if (statusCode < 200 || statusCode > 299) {
                 if ((statusCode == 400 && response.contains("API not found"))
-                 || (statusCode == 500 && response.contains("Internal server error"))
+                    || (statusCode == 500 && response.contains("Internal server error") || statusCode == 102 && response.contains("Quota constraint not found"))
                 ) {
                     LOG.warn("Got unexpected error while saving quota configuration ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
@@ -166,7 +166,7 @@ public class APIManagerQuotaAdapter {
             mapper.readValue(response, APIQuota.class);
         } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
-        }catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
