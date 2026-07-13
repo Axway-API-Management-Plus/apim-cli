@@ -2,6 +2,7 @@ package com.axway.apim.apiimport.actions;
 
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.model.APIMethod;
+import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
@@ -79,6 +80,11 @@ public class CreateNewAPI {
                     ServiceProfile serviceProfile = serviceProfiles.get("_default");
                     LOG.info("Updating API backendBasePath with value : {}", backendBasePath);
                     serviceProfile.setBasePath(backendBasePath);
+                    if(EnvironmentProperties.OVERRIDE_CERTIFICATES) {
+                        //Ignore certificates downloaded from backend and use it from backendbasepath Issue #565.
+                        List<CaCert> caCerts = apiManagerAdapter.getCertInfoFromUrl(backendBasePath);
+                        createdAPI.setCaCerts(caCerts);
+                    }
                 }
             }
             if(desiredAPI.getAuthenticationProfiles() != null) {

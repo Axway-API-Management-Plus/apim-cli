@@ -14,6 +14,7 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
@@ -251,7 +252,7 @@ public class APIManagerAdapter {
         if (organizationsIdToName == null)
             return;
 
-        for (Map.Entry<String,String> entry : organizationsIdToName.entrySet()) {
+        for (Map.Entry<String, String> entry : organizationsIdToName.entrySet()) {
             String orgName = entry.getValue();
             if (orgName.equals(targetOrgName)) {
                 String role = user.getOrgs2Role().get(entry.getKey());
@@ -592,6 +593,28 @@ public class APIManagerAdapter {
                     throw new AppException("API-Manager failed to read certificate information from file. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 return response;
+            }
+        } catch (Exception e) {
+            throw new AppException("API-Manager failed to read certificate information from file.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
+    }
+
+
+    public List<CaCert> getCertInfoFromUrl(String url) throws AppException {
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfoFromUrl").build();
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("url", url));
+            params.add(new BasicNameValuePair("inbound", "true"));
+            POSTRequest postRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 200) {
+                    String response = EntityUtils.toString(httpResponse.getEntity());
+                    throw new AppException("API-Manager failed to read certificate information from URL. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                return mapper.readValue(httpResponse.getEntity().getContent(), new TypeReference<>() {
+                });
             }
         } catch (Exception e) {
             throw new AppException("API-Manager failed to read certificate information from file.", ErrorCode.API_MANAGER_COMMUNICATION, e);

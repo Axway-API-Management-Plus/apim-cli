@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class APIManagerAdapterTest extends WiremockWrapper {
@@ -278,5 +279,14 @@ public class APIManagerAdapterTest extends WiremockWrapper {
             e.printStackTrace();
             Assert.fail("fail to process certificate");
         }
+    }
+
+
+
+    @Test
+    public void getCertInfoFromUrl() throws Exception {
+        List<CaCert> caCerts = apiManagerAdapter.getCertInfoFromUrl("https://petstore3.swagger.io");
+        Assert.assertNotNull(caCerts);
+        Assert.assertEquals(3, caCerts.size());
     }
 }
