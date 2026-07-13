@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Show outbound security in export [#569](https://github.com/Axway-API-Management-Plus/apim-cli/issues/569))
 
+
 # [1.14.13]  2026-02-05
 
 
