@@ -202,7 +202,6 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
         } catch (AppException appException) {
             appException.printStackTrace();
-            //Assert.fail("unable to create application", appException);
         }
     }
 
@@ -357,6 +356,63 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         String credentialId = "1234";
         Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(null, credentialId);
         Assert.assertFalse(optionalClientAppCredential.isPresent());
+    }
+
+    @Test
+    public void getCredentialsToDeleteRemovesMissingApiKey() {
+        ClientApplication actualApp = new ClientApplication();
+        actualApp.setId("app-id");
+        APIKey actualApiKey = new APIKey();
+        actualApiKey.setApiKey("api-key-1");
+        OAuth actualOAuth = new OAuth();
+        actualOAuth.setClientId("oauth-client-1");
+        actualApp.setCredentials(List.of(actualApiKey, actualOAuth));
+
+        ClientApplication desiredApp = new ClientApplication();
+        desiredApp.setId("app-id");
+        OAuth desiredOAuth = new OAuth();
+        desiredOAuth.setClientId("oauth-client-1");
+        desiredApp.setCredentials(List.of(desiredOAuth));
+
+        List<ClientAppCredential> credentials2Delete = clientAppAdapter.getCredentialsToDelete(desiredApp, actualApp);
+        Assert.assertEquals(credentials2Delete.size(), 1);
+        Assert.assertTrue(credentials2Delete.get(0) instanceof APIKey);
+    }
+
+    @Test
+    public void getCredentialsToDeleteSkipsCredentialUpdate() {
+        ClientApplication actualApp = new ClientApplication();
+        actualApp.setId("app-id");
+        OAuth actualOAuth = new OAuth();
+        actualOAuth.setClientId("oauth-client-1");
+        actualOAuth.setType("public");
+        actualApp.setCredentials(List.of(actualOAuth));
+
+        ClientApplication desiredApp = new ClientApplication();
+        desiredApp.setId("app-id");
+        OAuth desiredOAuth = new OAuth();
+        desiredOAuth.setClientId("oauth-client-1");
+        desiredOAuth.setType("confidential");
+        desiredApp.setCredentials(List.of(desiredOAuth));
+
+        List<ClientAppCredential> credentials2Delete = clientAppAdapter.getCredentialsToDelete(desiredApp, actualApp);
+        Assert.assertTrue(credentials2Delete.isEmpty());
+    }
+
+    @Test
+    public void getCredentialDeleteEndpoint() throws AppException {
+        OAuth oauth = new OAuth();
+        oauth.setClientId("oauth-client-1");
+        Assert.assertEquals(clientAppAdapter.getCredentialDeleteEndpoint(oauth), "oauth/oauth-client-1");
+
+        ExtClients extClients = new ExtClients();
+        extClients.setId("ext-id-1");
+        extClients.setClientId("external-client-1");
+        Assert.assertEquals(clientAppAdapter.getCredentialDeleteEndpoint(extClients), "extclients/ext-id-1");
+
+        APIKey apiKey = new APIKey();
+        apiKey.setApiKey("api-key-1");
+        Assert.assertEquals(clientAppAdapter.getCredentialDeleteEndpoint(apiKey), "apikeys/api-key-1");
     }
 
     @Test
