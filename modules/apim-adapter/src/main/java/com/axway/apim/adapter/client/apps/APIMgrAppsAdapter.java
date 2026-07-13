@@ -466,6 +466,70 @@ public class APIMgrAppsAdapter {
             }
             upsertCredential(cred, filter, app.getId(), endpoint.toString(), update);
         }
+        List<ClientAppCredential> credentials2Delete = getCredentialsToDelete(app, actualApp);
+        deleteCredentials(app, credentials2Delete);
+    }
+
+    List<ClientAppCredential> getCredentialsToDelete(ClientApplication desiredApp, ClientApplication actualApp) {
+        if (actualApp == null || actualApp.getCredentials() == null || actualApp.getCredentials().isEmpty()) return Collections.emptyList();
+        if (desiredApp == null || desiredApp.getCredentials() == null || desiredApp.getCredentials().isEmpty()) return Collections.emptyList();
+
+        Set<String> desiredCredentialKeys = new HashSet<>();
+        for (ClientAppCredential credential : desiredApp.getCredentials()) {
+            desiredCredentialKeys.add(getCredentialComparisonKey(credential));
+        }
+        List<ClientAppCredential> credentials2Delete = new ArrayList<>();
+        for (ClientAppCredential existingCredential : actualApp.getCredentials()) {
+            if (!desiredCredentialKeys.contains(getCredentialComparisonKey(existingCredential))) {
+                credentials2Delete.add(existingCredential);
+            }
+        }
+        return credentials2Delete;
+    }
+
+    String getCredentialComparisonKey(ClientAppCredential credential) {
+        return credential.getCredentialType() + "|" + getCredentialIdentifier(credential);
+    }
+
+    private String getCredentialIdentifier(ClientAppCredential credential) {
+        if (credential instanceof OAuth) return ((OAuth) credential).getClientId();
+        if (credential instanceof ExtClients) return ((ExtClients) credential).getClientId();
+        if (credential instanceof APIKey) return ((APIKey) credential).getApiKey();
+        return credential.getId();
+    }
+
+    private void deleteCredentials(ClientApplication desiredApp, List<ClientAppCredential> credentials2Delete) throws AppException {
+        if (credentials2Delete == null || credentials2Delete.isEmpty()) return;
+        for (ClientAppCredential credential : credentials2Delete) {
+            deleteCredential(desiredApp, credential);
+        }
+    }
+
+    private void deleteCredential(ClientApplication desiredApp, ClientAppCredential credential) throws AppException {
+        try {
+            String endpoint = getCredentialDeleteEndpoint(credential);
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
+            RestAPICall request = new DELRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 204) {
+                    LOG.error("Error deleting application credential. Response-Code: {}", statusCode);
+                    Utils.logPayload(LOG, httpResponse);
+                    throw new AppException("Error deleting application credential. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                applicationsCredentialCache.remove(desiredApp.getId() + "|" + credential.getCredentialType());
+                LOG.info("Credential type: {} for application: {} successfully deleted", credential.getCredentialType(), desiredApp.getName());
+            }
+        } catch (Exception e) {
+            throw new AppException("Error deleting application credential. Error: " + e.getMessage(), ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
+    }
+
+    String getCredentialDeleteEndpoint(ClientAppCredential credential) throws AppException {
+        if (credential instanceof OAuth) return "oauth/" + ((OAuth) credential).getClientId();
+        if (credential instanceof ExtClients) return "extclients/" + credential.getId();
+        if (credential instanceof APIKey) return "apikeys/" + ((APIKey) credential).getApiKey();
+        throw new AppException("Unsupported credential for deletion: " + credential.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
     }
 
     public void copyClientAppCredential(ClientAppCredential cred, ClientAppCredential target, boolean copySecret) {
@@ -492,6 +556,7 @@ public class APIMgrAppsAdapter {
                     Utils.logPayload(LOG, httpResponse);
                     throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
+                applicationsCredentialCache.remove(appId + "|" + cred.getCredentialType());
             }
         } catch (Exception e) {
             throw new AppException(ERROR_CREATING_APPLICATION_ERROR, ErrorCode.CANT_CREATE_API_PROXY, e);
