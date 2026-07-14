@@ -4,26 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.14]  2026-07-13
+# [1.14.15]  In progress
 
 ### Fixed
-- code 102 and message "Quota constraint not found" [#588](https://github.com/Axway-API-Management-Plus/apim-cli/issues/588))
-- API Methods summary fields are being lost after api import [#587](https://github.com/Axway-API-Management-Plus/apim-cli/issues/587))
-- template generate -includeMethods does not work in 1.14.12 [#586](https://github.com/Axway-API-Management-Plus/apim-cli/issues/586))
-- Creating external application developer user with apim-cli [#577](https://github.com/Axway-API-Management-Plus/apim-cli/issues/577))
-- APIM CLI -state Parameter Not Working [#576](https://github.com/Axway-API-Management-Plus/apim-cli/issues/576))
 
 
 ### Added
-- Show outbound security in export [#569](https://github.com/Axway-API-Management-Plus/apim-cli/issues/569))
+- Allow deletion of application credentials like oauth/apikey [#583](https://github.com/Axway-API-Management-Plus/apim-cli/issues/583)
+- Extend the functionality of "override_certificates" environment property [#565](https://github.com/Axway-API-Management-Plus/apim-cli/issues/565)
+
+
+# [1.14.14]  2026-07-13
+
+### Fixed
+- code 102 and message "Quota constraint not found" [#588](https://github.com/Axway-API-Management-Plus/apim-cli/issues/588)
+- API Methods summary fields are being lost after api import [#587](https://github.com/Axway-API-Management-Plus/apim-cli/issues/587)
+- template generate -includeMethods does not work in 1.14.12 [#586](https://github.com/Axway-API-Management-Plus/apim-cli/issues/586)
+- Creating external application developer user with apim-cli [#577](https://github.com/Axway-API-Management-Plus/apim-cli/issues/577)
+- APIM CLI -state Parameter Not Working [#576](https://github.com/Axway-API-Management-Plus/apim-cli/issues/576)
+
+
+### Added
+- Show outbound security in export [#569](https://github.com/Axway-API-Management-Plus/apim-cli/issues/569)
 
 
 # [1.14.13]  2026-02-05
 
 
 ### Fixed
-- Parameter to override apiBasepath doesn't work [#568](https://github.com/Axway-API-Management-Plus/apim-cli/issues/568))
-- Fix issue with updating of external credentials [#570](https://github.com/Axway-API-Management-Plus/apim-cli/issues/570))
+- Parameter to override apiBasepath doesn't work [#568](https://github.com/Axway-API-Management-Plus/apim-cli/issues/568)
+- Fix issue with updating of external credentials [#570](https://github.com/Axway-API-Management-Plus/apim-cli/issues/570)
 
 ### Added
 - Full export API in JSON file (See issue [#557](https://github.com/Axway-API-Management-Plus/apim-cli/issues/557))

@@ -605,7 +605,7 @@ public class APIManagerAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfoFromUrl").build();
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("url", url));
-            params.add(new BasicNameValuePair("inbound", "true"));
+            params.add(new BasicNameValuePair("outbound", "true"));
             POSTRequest postRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
