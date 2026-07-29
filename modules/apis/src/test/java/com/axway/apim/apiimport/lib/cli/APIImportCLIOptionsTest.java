@@ -48,11 +48,12 @@ public class APIImportCLIOptionsTest {
 
 	@Test
 	public void testToggles() throws AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-force", "-forceUpdate", "-safeUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertTrue(params.isForce());
 		Assert.assertTrue(params.isForceUpdate());
+		Assert.assertTrue(params.isSafeUpdate());
 		Assert.assertTrue(params.isIgnoreCache());
 		Assert.assertTrue(params.isUpdateOnly());
 		Assert.assertTrue(params.isChangeOrganization());
@@ -96,4 +97,12 @@ public class APIImportCLIOptionsTest {
         Assert.assertTrue(params.isReferenceAPIRetire());
         Assert.assertEquals(params.getReferenceAPIRetirementDate(), "31.12.2027");
     }
+
+	@Test
+	public void testSafeUpdateDefault() throws AppException {
+		String[] args = {"-s", "prod", "-c", "myConfig.json"};
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
+		Assert.assertFalse(params.isSafeUpdate());
+	}
 }

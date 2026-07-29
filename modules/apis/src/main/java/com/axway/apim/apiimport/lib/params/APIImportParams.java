@@ -7,6 +7,7 @@ import com.axway.apim.lib.StandardImportParams;
 public class APIImportParams extends StandardImportParams implements Parameters {
 
     private boolean forceUpdate;
+    private boolean safeUpdate;
     private boolean useFEAPIDefinition;
     private boolean validateRemoteHost;
     private boolean updateOnly;
@@ -31,6 +32,12 @@ public class APIImportParams extends StandardImportParams implements Parameters 
     }
     public void setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
+    }
+    public boolean isSafeUpdate() {
+        return safeUpdate;
+    }
+    public void setSafeUpdate(boolean safeUpdate) {
+        this.safeUpdate = safeUpdate;
     }
     public boolean isValidateRemoteHost() {
         return validateRemoteHost;

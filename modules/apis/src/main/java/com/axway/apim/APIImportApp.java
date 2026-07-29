@@ -126,6 +126,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
                 .useFEAPIDefinition(params.isUseFEAPIDefinition()) // Should API-Definition load from the FE-API?
                 .build();
             API actualAPI = apimAdapter.getApiAdapter().getAPI(filter, true);
+            validateSafeUpdate(actualAPI, desiredAPI, params);
             APIChangeState changes = new APIChangeState(actualAPI, desiredAPI, params);
             new APIImportManager().applyChanges(changes, params.isForceUpdate(), params.isUpdateOnly());
             APIPropertiesExport.getInstance().store();
@@ -144,6 +145,20 @@ public class APIImportApp implements APIMCLIServiceProvider {
         } finally {
             Utils.deleteInstance(apimAdapter);
         }
+    }
+
+    void validateSafeUpdate(API actualAPI, API desiredAPI, APIImportParams params) throws AppException {
+        if (!params.isSafeUpdate()) return;
+        if (actualAPI == null) return;
+        if (actualAPI.getName() == null || desiredAPI.getName() == null) return;
+        if (actualAPI.getName().equals(desiredAPI.getName())) return;
+        if (desiredAPI.getId() != null && desiredAPI.getId().equals(actualAPI.getId())) return;
+
+        throw new AppException(
+            "Safe update blocked: Path '" + desiredAPI.getPath() + "' is already used by API '" + actualAPI.getName() +
+                "' (ID: " + actualAPI.getId() + "). Desired API name is '" + desiredAPI.getName() + "'.",
+            ErrorCode.API_PATH_IN_USE_BY_DIFFERENT_API
+        );
     }
 
     @Override

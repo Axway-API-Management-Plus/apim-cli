@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ### Added
+- API import supports `-safeUpdate` to prevent updates when an existing API path belongs to a different API name [#556](https://github.com/Axway-API-Management-Plus/apim-cli/issues/556)
 - Allow deletion of application credentials like oauth/apikey [#583](https://github.com/Axway-API-Management-Plus/apim-cli/issues/583)
 - Extend the functionality of "override_certificates" environment property [#565](https://github.com/Axway-API-Management-Plus/apim-cli/issues/565)
 
@@ -213,7 +214,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support of All / Global quotas for API and application. (See issue [#362](https://github.com/Axway-API-Management-Plus/apim-cli/issues/362))
-- Host docker cli images on github docker registry (See issue [#373](https://github.com/Axway-API-Management-Plus/apim-cli/issues/373)
+- Host docker cli images on github docker registry (See issue [#373](https://github.com/Axway-API-Management-Plus/apim-cli/issues/373))
 
 
 ## [1.13.5] 2023-03-15

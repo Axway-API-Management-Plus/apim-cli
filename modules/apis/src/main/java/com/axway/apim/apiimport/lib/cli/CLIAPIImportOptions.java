@@ -92,6 +92,10 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option.setRequired(false);
 		addOption(option);
 
+		option = new Option("safeUpdate", "If set, import fails when the same API path is already used by a different API name (unless apiId matches).");
+		option.setRequired(false);
+		addOption(option);
+
 		option = new Option("zeroDowntimeUpdate", true,"Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
 		addOption(option);
@@ -131,6 +135,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setConfig(getValue("config"));
 		params.setApiDefinition(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
+		params.setSafeUpdate(hasOption("safeUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		params.setIgnoreQuotas(hasOption("ignoreQuotas"));

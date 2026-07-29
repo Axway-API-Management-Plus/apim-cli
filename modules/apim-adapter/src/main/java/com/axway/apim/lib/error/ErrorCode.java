@@ -70,7 +70,8 @@ public enum ErrorCode {
     GRANT_ACCESS_APPLICATION_ERR(102, "Error granting application access to API."),
     REVOKE_ACCESS_APPLICATION_ERR(103, "Error revoking application access to API."),
     INVALID_SECURITY_PROFILE_CONFIG(104, "The given security profile is invalid.", false),
-    ERR_IMPORTING_API_DAT_FILE(105, "Error importing API-Dat file.", false);
+    ERR_IMPORTING_API_DAT_FILE(105, "Error importing API-Dat file.", false),
+    API_PATH_IN_USE_BY_DIFFERENT_API(106, "Configured API path is already used by a different API.", false);
 
 
     private final int code;
