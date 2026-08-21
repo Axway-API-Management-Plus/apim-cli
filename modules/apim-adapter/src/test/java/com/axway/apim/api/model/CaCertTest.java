@@ -18,5 +18,17 @@ public class CaCertTest {
         Assert.assertTrue(!fileName.contains("/"));
     }
 
+    @Test
+    public void testCertCommonNameWithBackslash() {
+        CaCert caCert = new CaCert();
+        caCert.setAlias("CN=DigitalGuardian\\,OU=Trusted");
+
+        String fileName = caCert.getCertFile();
+
+        Assert.assertEquals(fileName, "DigitalGuardian.crt");
+        Assert.assertFalse(fileName.contains("\\"));
+        Assert.assertFalse(fileName.contains("/"));
+    }
+
 
 }

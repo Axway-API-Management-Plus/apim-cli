@@ -1,5 +1,6 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,10 +181,15 @@ public class CaCert {
                 filename = "UnknownCertificate_" + UUID.randomUUID();
                 LOG.warn("Created a random filename: {}.ctr", filename);
             } else {
+                filename = Utils.replaceSpecialChars(filename);
                 filename = filename.replace(" ", "");
-                filename = filename.replace("*", "");
-                filename = filename.replace("/", "");
-                if (filename.startsWith(".")) filename = filename.replaceFirst("\\.", "");
+                if (filename.startsWith(".")) {
+                    filename = filename.replaceFirst("\\.", "");
+                }
+                if (filename.isEmpty()) {
+                    LOG.warn("Certificate CN contained only invalid filename characters for alias: {}", this.getAlias());
+                    filename = "UnknownCertificate_" + UUID.randomUUID();
+                }
             }
             certFile = filename + ".crt";
             return certFile;
