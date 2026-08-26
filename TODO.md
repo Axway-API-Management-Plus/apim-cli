@@ -42,13 +42,12 @@ that carry long-term security and maintenance risk.
   `org.apache.httpcomponents:httpclient` to `org.apache.hc.client5:httpclient5`.
 - **Files:** `pom.xml`, `modules/apim-adapter/pom.xml`, `modules/apis/pom.xml`
 
-#### 3. `org.apache.logging.log4j:log4j-slf4j-impl` — behind current release
-- **Managed version:** `2.20.0`
-- **Current release:** `2.23.x`
-- **Issue:** Log4j 2.20.0 is several releases behind. No CVE at 2.20.0 but staying current
-  is best practice given Log4j's security history.
-- **Fix:** Bump `log4j-slf4j-impl` (and corresponding `log4j-core` / `log4j-api`) to `2.23.1` (or latest).
-- **File:** `pom.xml`
+#### ~~3. `org.apache.logging.log4j:log4j-slf4j-impl` — behind current release~~ ✅ DONE
+- **Was:** `log4j-slf4j-impl:2.20.0` + `slf4j-api:1.7.36`
+- **Now:** `log4j-slf4j2-impl:2.25.4` + `log4j-api/core:2.25.4` + `slf4j-api:2.0.18`
+- `log4j-slf4j-impl` (SLF4J 1.x bridge) was discontinued at 2.20.0; replaced with
+  `log4j-slf4j2-impl` (SLF4J 2.x bridge). Source unchanged — only `Logger`/`LoggerFactory`
+  used, both backward-compatible in SLF4J 2.x.
 
 ---
 
