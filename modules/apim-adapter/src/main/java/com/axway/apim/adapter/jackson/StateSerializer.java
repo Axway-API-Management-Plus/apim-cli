@@ -2,33 +2,22 @@ package com.axway.apim.adapter.jackson;
 
 import com.axway.apim.lib.utils.Constants;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
-public class StateSerializer extends BeanPropertyWriter {
+import java.io.IOException;
 
-
-    private final BeanPropertyWriter writer;
-
-
-	private static final long serialVersionUID = 1L;
-
-    public StateSerializer(BeanPropertyWriter writer) {
-        super(writer);
-        this.writer = writer;
-    }
+public class StateSerializer extends JsonSerializer<Object> {
 
     @Override
-    public void serializeAsField(Object bean,
-                                 JsonGenerator gen,
-                                 SerializerProvider prov) throws Exception {
-        Object value = writer.get(bean);
+    public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         if (value instanceof String) {
-        	if(value.equals(Constants.API_DEPRECATED)) {
-        		gen.writeStringField(writer.getName(), Constants.API_PUBLISHED);
-        	} else {
-        		gen.writeStringField(writer.getName(), (String)value);
-        	}
+            String strValue = (String) value;
+            if (strValue.equals(Constants.API_DEPRECATED)) {
+                gen.writeString(Constants.API_PUBLISHED);
+            } else {
+                gen.writeString(strValue);
+            }
         }
     }
 }

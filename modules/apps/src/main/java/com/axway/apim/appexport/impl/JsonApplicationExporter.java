@@ -94,11 +94,11 @@ public class JsonApplicationExporter extends ApplicationExporter {
 
     public void writeContent(ExportApplication app, ObjectMapper mapper, File localFolder, String configFile) throws AppException {
         try {
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            // Use ObjectWriter to avoid mutating the shared mapper instance
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                mapper.writeValue(System.out, app);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(System.out, app);
             } else {
-                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
             }
         } catch (Exception e) {
             throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);

@@ -1,0 +1,11 @@
+{
+  "name": "Sample  API",
+  "path": "/sample/minimal/api/v1",
+  "state": "unpublished",
+  "version": "1.0.0",
+  "organization": "API Development",
+  "apiSpecification": {
+    "resource": "api.yaml"
+  },
+  "backendBasepath": "https://petstore3.swagger.io"
+}

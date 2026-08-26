@@ -1,0 +1,251 @@
+openapi: 3.0.3
+info:
+    title: Sample Task API
+    description: A sample OpenAPI 3.0 specification for a simple task management service.
+    version: 1.0.0
+    contact:
+        name: API Support
+        email: support@example.com
+    license:
+        name: MIT
+
+servers:
+    - url: https://api.example.com/v1
+      description: Production server
+    - url: https://staging-api.example.com/v1
+      description: Staging server
+
+tags:
+    - name: tasks
+      description: Operations related to tasks
+    - name: users
+      description: Operations related to users
+
+paths:
+    /tasks:
+        get:
+            tags: [tasks]
+            summary: List all tasks
+            operationId: listTasks
+            parameters:
+                - name: status
+                  in: query
+                  description: Filter tasks by status
+                  required: false
+                  schema:
+                      type: string
+                      enum: [pending, in_progress, completed]
+                - name: limit
+                  in: query
+                  description: Maximum number of results to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      default: 20
+                      minimum: 1
+                      maximum: 100
+            responses:
+                '200':
+                    description: A list of tasks
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Task'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+        post:
+            tags: [tasks]
+            summary: Create a new task
+            operationId: createTask
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TaskInput'
+            responses:
+                '201':
+                    description: Task created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Task'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+
+    /tasks/{taskId}:
+        parameters:
+            - name: taskId
+              in: path
+              required: true
+              description: Unique identifier of the task
+              schema:
+                  type: string
+                  format: uuid
+        get:
+            tags: [tasks]
+            summary: Get a task by ID
+            operationId: getTaskById
+            responses:
+                '200':
+                    description: Task found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Task'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+        put:
+            tags: [tasks]
+            summary: Update an existing task
+            operationId: updateTask
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TaskInput'
+            responses:
+                '200':
+                    description: Task updated
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Task'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+        delete:
+            tags: [tasks]
+            summary: Delete a task
+            operationId: deleteTask
+            responses:
+                '204':
+                    description: Task deleted successfully
+                '404':
+                    $ref: '#/components/responses/NotFound'
+
+    /users/{userId}:
+        get:
+            tags: [users]
+            summary: Get a user by ID
+            operationId: getUserById
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      format: uuid
+            responses:
+                '200':
+                    description: User found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+
+components:
+    schemas:
+        Task:
+            type: object
+            properties:
+                id:
+                    type: string
+                    format: uuid
+                    readOnly: true
+                title:
+                    type: string
+                    example: Write project proposal
+                description:
+                    type: string
+                    example: Draft the initial proposal for Q3 project
+                status:
+                    type: string
+                    enum: [pending, in_progress, completed]
+                    default: pending
+                dueDate:
+                    type: string
+                    format: date
+                createdAt:
+                    type: string
+                    format: date-time
+                    readOnly: true
+            required:
+                - id
+                - title
+                - status
+
+        TaskInput:
+            type: object
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: string
+                    enum: [pending, in_progress, completed]
+                dueDate:
+                    type: string
+                    format: date
+            required:
+                - title
+
+        User:
+            type: object
+            properties:
+                id:
+                    type: string
+                    format: uuid
+                name:
+                    type: string
+                    example: Jane Doe
+                email:
+                    type: string
+                    format: email
+                    example: jane.doe@example.com
+
+        Error:
+            type: object
+            properties:
+                code:
+                    type: string
+                message:
+                    type: string
+            required:
+                - code
+                - message
+
+    responses:
+        BadRequest:
+            description: The request was invalid
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        Unauthorized:
+            description: Authentication is required or has failed
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        NotFound:
+            description: The requested resource was not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+security:
+    - BearerAuth: []

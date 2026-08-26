@@ -7,7 +7,7 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.testng.annotations.BeforeClass;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -17,13 +17,10 @@ public class ConsoleAPIExportTest  {
 
 	private static final String TEST_PACKAGE = "test/export/files/apiLists/";
 
-	ObjectMapper mapper = new ObjectMapper();
-
-
-	@BeforeClass
-	public void setTest() {
-		mapper.disable(MapperFeature.USE_ANNOTATIONS);
-	}
+	// ObjectMapper.disable(MapperFeature) was removed in Jackson 2.19+; use builder instead.
+	ObjectMapper mapper = JsonMapper.builder()
+			.disable(MapperFeature.USE_ANNOTATIONS)
+			.build();
 
 	@Test
 	public void runStandardConsoleAPIExport() throws  IOException  {

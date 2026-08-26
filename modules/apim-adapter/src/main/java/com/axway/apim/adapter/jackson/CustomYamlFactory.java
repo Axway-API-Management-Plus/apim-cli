@@ -13,9 +13,13 @@ public final class CustomYamlFactory {
 
     public static YAMLFactory createYamlFactory() {
         if (yamlFactory == null) {
+            // LoaderOptions works with both SnakeYAML 1.x and SnakeYAML 2.x (used from Jackson 2.16+)
             LoaderOptions loaderOptions = new LoaderOptions();
             loaderOptions.setCodePointLimit(10 * 1024 * 1024); // 10 MB
-            yamlFactory = YAMLFactory.builder().enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).loaderOptions(loaderOptions).build();
+            yamlFactory = YAMLFactory.builder()
+                    .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                    .loaderOptions(loaderOptions)
+                    .build();
         }
         return yamlFactory;
     }

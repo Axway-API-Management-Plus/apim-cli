@@ -76,11 +76,11 @@ public class JsonOrgExporter extends OrgResultHandler {
 
     public void writeContent(ExportOrganization org, ObjectMapper mapper, File localFolder, String configFile) throws AppException {
         try {
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            // Use ObjectWriter to avoid mutating the shared mapper instance
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                mapper.writeValue(System.out, org);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(System.out, org);
             } else {
-                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), org);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(new File(localFolder.getCanonicalPath() + configFile), org);
             }
             this.result.addExportedFile((localFolder != null ? localFolder.getCanonicalPath() : null) + configFile);
         } catch (Exception e) {

@@ -1,0 +1,137 @@
+{
+  "summary": "n.a.",
+  "inboundProfiles": {
+    "_default": {
+      "queryStringPassThrough": false,
+      "monitorAPI": true,
+      "securityProfile": "_default",
+      "corsProfile": "_default",
+      "monitorSubject": "authentication.subject.id"
+    },
+    "dummyOpOne": {
+      "queryStringPassThrough": false,
+      "monitorAPI": true,
+      "securityProfile": "profile-dummyOpOne",
+      "monitorSubject": "authentication.subject.id"
+    }
+  },
+  "backendBasepath": "https://new-devstage.backendUrl.com",
+  "grantAccessFrom": [],
+  "apiSpecification": {
+    "resource": "api-581.json"
+  },
+  "version": "5.4.3",
+  "securityProfiles": [
+    {
+      "isDefault": true,
+      "devices": [
+        {
+          "name": "OAuth (External)",
+          "type": "oauthExternal",
+          "properties": {
+            "scopesMustMatch": "Any",
+            "subjectSelector": "${oauth.token.client_id}",
+            "removeCredentialsOnSuccess": "false",
+            "useClientRegistry": "true",
+            "authorizationHeaderPrefix": "Bearer",
+            "authCodeGrantTypeRequestSecretName": "client_secret",
+            "authCodeGrantTypeEnabled": "true",
+            "authCodeGrantTypeTokenEndpointTokenName": "access_code",
+            "tokenStore": "AuthorizationCode",
+            "clientCredentialsGrantTypeTokenName": "access_token",
+            "oauth.token.valid": "${oauth.token.valid}",
+            "authCodeGrantTypeRequestClientIdName": "client_id",
+            "implicitGrantLoginTokenName": "access_token",
+            "authCodeGrantTypeRequestEndpointUrl": "https://localhost:8089/api/oauth/authorize",
+            "authCodeGrantTypeTokenEndpointUrl": "https://localhost:8089/api/oauth/token",
+            "oauth.token.scopes": "${oauth.token.scopes}",
+            "clientCredentialsGrantTypeTokenEndpointUrl": "https://localhost:8089/api/oauth/token",
+            "accessTokenLocationQueryString": "",
+            "implicitGrantLoginEndpointUrl": "https://localhost:8089/api/oauth/authorize",
+            "accessTokenLocation": "HEADER",
+            "scopes": "DUMMY_SCOPE",
+            "clientCredentialsGrantTypeEnabled": "false",
+            "oauth.token.client_id": "${oauth.token.client_id}",
+            "implicitGrantEnabled": "true"
+          },
+          "order": 1
+        }
+      ],
+      "name": "_default"
+    },
+    {
+      "isDefault": false,
+      "devices": [
+        {
+          "name": "device-dummyOpOne",
+          "type": "oauthExternal",
+          "properties": {
+            "scopesMustMatch": "Any",
+            "subjectSelector": "${oauth.token.client_id}",
+            "removeCredentialsOnSuccess": "false",
+            "useClientRegistry": "true",
+            "authorizationHeaderPrefix": "Bearer",
+            "authCodeGrantTypeRequestSecretName": "client_secret",
+            "authCodeGrantTypeEnabled": "true",
+            "authCodeGrantTypeTokenEndpointTokenName": "access_code",
+            "tokenStore": "AuthorizationCode",
+            "clientCredentialsGrantTypeTokenName": "access_token",
+            "oauth.token.valid": "${oauth.token.valid}",
+            "authCodeGrantTypeRequestClientIdName": "client_id",
+            "implicitGrantLoginTokenName": "access_token",
+            "authCodeGrantTypeRequestEndpointUrl": "https://localhost:8089/api/oauth/authorize",
+            "authCodeGrantTypeTokenEndpointUrl": "https://localhost:8089/api/oauth/token",
+            "oauth.token.scopes": "${oauth.token.scopes}",
+            "clientCredentialsGrantTypeTokenEndpointUrl": "https://localhost:8089/api/oauth/token",
+            "accessTokenLocationQueryString": "",
+            "implicitGrantLoginEndpointUrl": "https://localhost:8089/api/oauth/authorize",
+            "accessTokenLocation": "HEADER",
+            "scopes": "DUMMY_SCOPE",
+            "clientCredentialsGrantTypeEnabled": "false",
+            "oauth.token.client_id": "${oauth.token.client_id}",
+            "implicitGrantEnabled": "true"
+          },
+          "order": 1
+        }
+      ],
+      "name": "profile-dummyOpOne"
+    }
+  ],
+  "tags": {
+    "MaxConnections": [
+      "60"
+    ],
+    "Subdomain": [
+      "Subdomain Staging Testing"
+    ]
+  },
+  "path": "/test-api/patcht10stagebackendurl/v5",
+  "customProperties": {
+    "api_category_severity": "MEDIUM",
+    "errorPassthrough": "111,112"
+  },
+  "apiMethods": [
+    {
+      "descriptionType": "original",
+      "name": "dummyOpOne",
+      "tags": {
+        "callbackHeaders": [
+          "Dummy-Callback-URL"
+        ]
+      }
+    }
+  ],
+  "organization": "API Development",
+  "name": "patchT10.stage.backendUrl",
+  "outboundProfiles": {
+    "_default": {
+      "authenticationProfile": "_default",
+      "responsePolicy": "Global Response Policy",
+      "routePolicy": "Backend Routing Policy",
+      "routeType": "policy",
+      "requestPolicy": "Global Request Policy"
+    }
+  },
+  "state": "published",
+  "caCerts": []
+}

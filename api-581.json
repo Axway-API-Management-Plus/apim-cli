@@ -1,0 +1,131 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "patchT10.stage.backendUrl",
+    "description": "patchT10.stage.backendUrl",
+    "version": "5.4.3"
+  },
+  "servers": [
+    {
+      "url": "https://localhost"
+    }
+  ],
+  "security": [
+    {
+      "OAuth-Internal": [
+        "read"
+      ]
+    }
+  ],
+  "paths": {
+    "/dummyOpOne": {
+      "get": {
+        "summary": "Just to have a dummy operation in the swagger.",
+        "description": "Would return something if there was a backend.",
+        "operationId": "dummyOpOne",
+        "responses": {
+          "200": {
+            "description": "no backend, no response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dummyDTO"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dummyDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dummyOpTwo": {
+      "get": {
+        "summary": "Just to have a dummy operation in the swagger.",
+        "description": "Would return something if there was a backend.",
+        "operationId": "dummyOpTwo",
+        "responses": {
+          "200": {
+            "description": "no backend, no response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dummyDTO"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dummyDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dummyInfo": {
+      "get": {
+        "summary": "Just to have a dummy operation in the swagger.",
+        "description": "Would return something if there was a backend.",
+        "operationId": "retrieveApplicationInfo",
+        "responses": {
+          "200": {
+            "description": "no backend, no response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dummyDTO"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dummyDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "dummyDTO": {
+        "type": "object",
+        "description": "Mocked Display",
+        "properties": {
+          "dummyOne": {
+            "type": "string",
+            "description": "dummy #1"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth-Internal": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "tokenUrl": "https://password.tokenUrl.oas3.dev",
+            "refreshUrl": "https://password.refreshUrl.oas3.dev",
+            "scopes": {}
+          },
+          "clientCredentials": {
+            "tokenUrl": "https://clientCredentials.tokenUrl.oas3.dev",
+            "refreshUrl": "https://clientCredentials.refreshUrl.oas3.dev",
+            "scopes": {}
+          },
+          "authorizationCode": {
+            "authorizationUrl": "https://authorizationCode.authorizationUrl.oas3.dev",
+            "tokenUrl": "https://authorizationCode.tokenUrl.oas3.dev",
+            "refreshUrl": "https://authorizationCode.refreshUrl.oas3.dev",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}

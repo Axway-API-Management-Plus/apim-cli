@@ -76,11 +76,11 @@ public class JsonUserExporter extends UserResultHandler {
 
     public void writeContent(ObjectMapper mapper, ExportUser user, String configFile, File localFolder) throws AppException {
         try {
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            // Use ObjectWriter to avoid mutating the shared mapper instance
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                mapper.writeValue(System.out, user);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(System.out, user);
             } else {
-                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), user);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(new File(localFolder.getCanonicalPath() + configFile), user);
             }
             this.result.addExportedFile((localFolder != null ? localFolder.getCanonicalPath() : null) + configFile);
         } catch (Exception e) {
