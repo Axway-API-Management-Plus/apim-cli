@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.15]  2026-8-26
 
 ### Fixed
-- Extend the functionality of "override_certificates" environment property [#591](https://github.com/Axway-API-Management-Plus/apim-cli/issues/591)
+- Can't write certificate to disc [#591](https://github.com/Axway-API-Management-Plus/apim-cli/issues/591)
 
 ### Added
 - API import supports `-safeUpdate` to prevent updates when an existing API path belongs to a different API name [#556](https://github.com/Axway-API-Management-Plus/apim-cli/issues/556)
