@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.15]  In progress
+# [1.14.15]  2026-8-26
 
 ### Fixed
 - Extend the functionality of "override_certificates" environment property [#591](https://github.com/Axway-API-Management-Plus/apim-cli/issues/591)
