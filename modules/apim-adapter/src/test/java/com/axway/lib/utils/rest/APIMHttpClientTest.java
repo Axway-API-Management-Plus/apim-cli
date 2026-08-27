@@ -4,7 +4,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

@@ -3,10 +3,10 @@ package com.axway.lib.utils;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.lib.utils.HTTPClient;
 import com.axway.apim.lib.utils.Utils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -32,13 +32,12 @@ public class HttpClientTest extends WiremockWrapper {
         HTTPClient httpClient = new HTTPClient(url, "user", Utils.getEncryptedPassword());
         httpClient.getClient();
         RequestConfig config = RequestConfig.custom()
-                .setRelativeRedirectsAllowed(true)
                 .setCircularRedirectsAllowed(true)
                 .build();
         HttpGet httpGet = new HttpGet(url);
         httpGet.setConfig(config);
         try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-            Assert.assertEquals(200, httpResponse.getStatusLine().getStatusCode());
+            Assert.assertEquals(200, httpResponse.getCode());
             String response = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
             Assert.assertNotNull(response);
         }finally {

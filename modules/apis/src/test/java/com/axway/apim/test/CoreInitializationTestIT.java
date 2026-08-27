@@ -12,7 +12,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.citrusframework.actions.AbstractTestAction;
 import org.citrusframework.context.TestContext;
 import org.citrusframework.dsl.runner.TestRunner;
@@ -64,7 +64,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
     @Autowired
     GlobalVariables globalVariables;
 
-    private final static String DEFAULT_PASSWORD = "changeme";
+    private static final String DEFAULT_PASSWORD = "changeme";
 
 
     @Override
@@ -178,7 +178,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                 testRunner.http(action -> action.client(apiManager).send()
                     .post("/users/${oadminUserId1}/changepassword/")
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .payload("newPassword="+DEFAULT_PASSWORD));
+                    .payload("newPassword=" + DEFAULT_PASSWORD));
                 testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
                 String orgAdminformat = orgAdminUsername + ":" + DEFAULT_PASSWORD;
                 String orgAdminAuthorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(orgAdminformat.getBytes());

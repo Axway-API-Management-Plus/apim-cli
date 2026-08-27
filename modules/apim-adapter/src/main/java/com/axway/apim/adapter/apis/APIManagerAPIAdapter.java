@@ -32,17 +32,18 @@ import dev.failsafe.Failsafe;
 import dev.failsafe.FailsafeException;
 import dev.failsafe.RetryPolicy;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,7 +143,7 @@ public class APIManagerAPIAdapter {
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     if (statusCode == 403 && filter.getId() != null) {
                         LOG.error("Unable to find API with ID: {} Please have in mind during API-Update the ID is re-created or add -ignoreCache !", filter.getId());
@@ -289,7 +290,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/image").build();
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                if (httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+                if (httpResponse == null || httpResponse.getEntity() == null || httpResponse.getCode() == HttpStatus.SC_NOT_FOUND) {
                     api.setImage(null);
                     return; // no Image found in API-Manager
                 }
@@ -350,7 +351,7 @@ public class APIManagerAPIAdapter {
                 .build();
             RestAPICall apiCall = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
                     LOG.error("Error updating API-Image. Received Status-Code: {} Response: {}", statusCode, response);
@@ -485,7 +486,7 @@ public class APIManagerAPIAdapter {
                 LOG.debug("Download API spec URL :{}", uri);
                 RestAPICall getRequest = new GETRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode != 200) {
                         if (filter.isUseFEAPIDefinition()) {
                             LOG.debug("Failed to download API-Specification with version {} from Frontend-API. Received Status-Code: {}", specVersion, statusCode);
@@ -556,7 +557,7 @@ public class APIManagerAPIAdapter {
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);
 
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman() + "' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -570,7 +571,7 @@ public class APIManagerAPIAdapter {
             HttpEntity entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}", ContentType.APPLICATION_JSON);
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     LOG.error("Error creating API-Proxy (FE-API) using URI: {} Received Status-Code: {} Response: {}", uri, statusCode, response);
@@ -599,7 +600,7 @@ public class APIManagerAPIAdapter {
             RestAPICall request = new PUTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error updating API-Proxy. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -640,7 +641,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting API-Proxy using URI: {} Response-Code: {}", uri, statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -659,7 +660,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting Backend-API. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -677,7 +678,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
             RestAPICall request = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     LOG.warn("Error getting Backend-API  Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -697,7 +698,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
             RestAPICall request = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     LOG.error("Error getting Frontend-API  Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -726,13 +727,16 @@ public class APIManagerAPIAdapter {
             parameters.add(new BasicNameValuePair(FILENAME, "api-export.dat"));
             parameters.add(new BasicNameValuePair(PASSWORD, password));
             parameters.add(new BasicNameValuePair("id", api.getId()));
-            HttpEntity entity = new UrlEncodedFormEntity(parameters);
-            URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                .setPath(cmd.getApiBasepath() + "/proxies/export")
-                .build();
-            RestAPICall request = new POSTRequest(entity, uri);
+            URI uri;
+            RestAPICall request;
+            try (HttpEntity entity = new UrlEncodedFormEntity(parameters)) {
+                uri = new URIBuilder(cmd.getAPIManagerURL())
+                    .setPath(cmd.getApiBasepath() + "/proxies/export")
+                    .build();
+                request = new POSTRequest(entity, uri);
+            }
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 201) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Error exporting DAT-File representation of API: {} ( {} ). Received Status-Code: {} Response: {}", api.getName(), api.getId(), statusCode, response);
@@ -744,7 +748,7 @@ public class APIManagerAPIAdapter {
             uri = new URI(cmd.getAPIManagerURL() + locationHeader);
             request = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Error getting DAT-File representation of API: {} ( {} ). Received Status-Code: {} Response: {}", api.getName(), api.getId(), statusCode, response);
@@ -771,7 +775,7 @@ public class APIManagerAPIAdapter {
                 .build();
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     LOG.error("Error import DAT-File representation of API, Received Status-Code: {} Response: {}", statusCode, response);
@@ -797,7 +801,7 @@ public class APIManagerAPIAdapter {
             }
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 201 && statusCode != 200) { // See issue: #134 The API-Manager also returns 200 on this request
                     String response = EntityUtils.toString(httpResponse.getEntity());
                     if (statusCode == 403 && response.contains("API is already unpublished")) {
@@ -834,7 +838,7 @@ public class APIManagerAPIAdapter {
                 .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
             RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate=" + formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     LOG.error("Error updating retirement data of API. Received Status-Code: {} Response: {}", statusCode, response);
@@ -892,7 +896,7 @@ public class APIManagerAPIAdapter {
             HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
             RestAPICall importWSDL = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) importWSDL.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     LOG.error("Error importing WSDL. Received Status-Code: {} Response: {}", statusCode, response);
@@ -922,7 +926,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
             RestAPICall importSwagger = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) importSwagger.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     LOG.error("Error importing API-Specification ({}) to create Backend-API using URI: {} Received Status-Code: {} Response: {}", api.getApiDefinition().getAPIDefinitionType().getNiceName(), uri, statusCode, response);
@@ -1002,7 +1006,7 @@ public class APIManagerAPIAdapter {
                                 throw new AppException("Error taking over application quota to new API. Received Status-Code: " + statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
                             }
                         }
-                    } catch (IOException | URISyntaxException e) {
+                    } catch (IOException | URISyntaxException | ParseException e) {
                         throw new AppException("Can't update application quota. Error message: " + e.getMessage(), ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
@@ -1039,7 +1043,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/upgrade/" + referenceAPI.getId()).build();
             List<NameValuePair> params = addParam(apiToUpgradeAccess, deprecateRefApi, retireRefApi, retirementDateRefAPI);
 
-            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            HttpEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
             RestAPICall request = new POSTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
@@ -1061,7 +1065,7 @@ public class APIManagerAPIAdapter {
                 }
             }
             return true;
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
         }
     }
@@ -1097,7 +1101,7 @@ public class APIManagerAPIAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/" + apiId).build();
             RestAPICall restAPICall = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) restAPICall.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
                     LOG.error("API  {} not found in API manger catalog Response code : {}", apiName, statusCode);
@@ -1155,7 +1159,7 @@ public class APIManagerAPIAdapter {
             // Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
             if (api.getClientOrganizations() == null) api.setClientOrganizations(new ArrayList<>());
             api.getClientOrganizations().addAll(grantAccessToOrgs);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             LOG.error("grantAccessToOrgs: {}", grantAccessToOrgs);
             LOG.error("allOrgs: {}", allOrgs);
             throw new AppException("Can't grant access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
@@ -1170,7 +1174,7 @@ public class APIManagerAPIAdapter {
             HttpEntity entity = new StringEntity("{\"apiId\":\"" + api.getId() + "\",\"enabled\":true}", ContentType.APPLICATION_JSON);
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     LOG.error("Error granting Application Access to  API using URI: {} Received Status-Code: {} Response: {}", uri, statusCode, response);
@@ -1189,7 +1193,7 @@ public class APIManagerAPIAdapter {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/apiaccess").addParameter(ORGANIZATION_ID, organization.getId()).build();
                 RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode != 204) {
                         LOG.error("Error revoking Organization access to API using URI: {} Response-Code: {}", uri, statusCode);
                         Utils.logPayload(LOG, httpResponse);
@@ -1198,7 +1202,7 @@ public class APIManagerAPIAdapter {
                     LOG.info("Organization : {} removed access from API: {} {} ( {} ) successfully revoked ", organization.getName(), api.getName(), api.getVersion(), api.getId());
                 }
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Can't revoke access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
     }
@@ -1212,7 +1216,7 @@ public class APIManagerAPIAdapter {
                     URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + clientApplication.getId() + "/apis/" + apiAccess.getId()).build();
                     RestAPICall request = new DELRequest(uri);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        int statusCode = httpResponse.getCode();
                         if (statusCode != 204) {
                             LOG.error("Error revoking application access to API using URI: {} Response-Code: {}", uri, statusCode);
                             Utils.logPayload(LOG, httpResponse);
@@ -1223,7 +1227,7 @@ public class APIManagerAPIAdapter {
                     break;
                 }
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Can't revoke access to organization.", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR, e);
         }
     }

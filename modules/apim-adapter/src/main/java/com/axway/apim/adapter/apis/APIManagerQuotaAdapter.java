@@ -20,12 +20,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ParseException;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,7 @@ public class APIManagerQuotaAdapter {
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load quotas with ID: {} from API-Manager URI : {}", quotaId, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 if (statusCode != 200) {
                     throw new AppException("Can't read API-Manager Quota-Configuration. Got status code: " + statusCode + " for request: " + uri, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -107,7 +108,7 @@ public class APIManagerQuotaAdapter {
                     applicationsQuotaCache.put(quotaId, response);
                 }
             }
-        } catch (URISyntaxException | UnsupportedOperationException | IOException e) {
+        } catch (URISyntaxException | UnsupportedOperationException | IOException | ParseException e) {
             throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
@@ -164,7 +165,7 @@ public class APIManagerQuotaAdapter {
             // Force reload of this quota next time
             applicationsQuotaCache.remove(quotaId);
             mapper.readValue(response, APIQuota.class);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -183,7 +184,7 @@ public class APIManagerQuotaAdapter {
         return quotaConfig;
     }
 
-    private static void retrySaveQuota(RestAPICall request) throws IOException {
+    private static void retrySaveQuota(RestAPICall request) throws IOException, ParseException {
         Response httpResponse = httpHelper.execute(request, true);
         String response = httpResponse.getResponseBody();
         int statusCode = httpResponse.getStatusCode();

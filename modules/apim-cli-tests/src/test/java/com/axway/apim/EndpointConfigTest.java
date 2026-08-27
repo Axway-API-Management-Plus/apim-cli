@@ -73,11 +73,15 @@ public class EndpointConfigTest extends TestNGCitrusSpringSupport {
             public HttpHeaders getHeaders() {
                 return httpHeaders;
             }
+
+            @Override
+            public java.util.Map<String, Object> getAttributes() {
+                return java.util.Collections.emptyMap();
+            }
         };
 
         ClientHttpRequestExecution clientHttpRequestExecution = (request, body) -> {
-            ClientHttpResponse clientHttpResponse = new MockClientHttpResponse(body, HttpStatus.OK);
-            return clientHttpResponse;
+            return new MockClientHttpResponse(body, HttpStatus.OK);
         };
         ClientHttpResponse httpResponse = basicAuthInterceptor.intercept(httpRequest, "hello world".getBytes(), clientHttpRequestExecution);
         Assert.assertNotNull(httpResponse);

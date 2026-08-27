@@ -10,9 +10,10 @@ import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ParseException;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +50,14 @@ public class APIManagerOAuthClientProfilesAdapter {
 			RestAPICall getRequest = new GETRequest(uri);
 			LOG.debug("Load OAuth-Profiles from API-Manager.");
 			try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				int statusCode = httpResponse.getCode();
 				if (statusCode != 200) {
 					throw new AppException("Can't get OAuth Client profiles from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 				this.apiManagerResponse = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 				oauthClientCache.put(CACHE_KEY, this.apiManagerResponse);
 			}
-		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
+		} catch (URISyntaxException | UnsupportedOperationException | IOException | ParseException e) {
 			throw new AppException("Can't get OAuth Client profiles from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}

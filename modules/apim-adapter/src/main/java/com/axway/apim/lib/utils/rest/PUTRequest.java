@@ -2,9 +2,9 @@ package com.axway.apim.lib.utils.rest;
 
 import java.net.URI;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
 
 import com.axway.apim.lib.error.AppException;
 

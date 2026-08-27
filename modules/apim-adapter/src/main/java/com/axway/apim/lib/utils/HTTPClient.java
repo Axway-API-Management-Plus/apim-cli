@@ -2,20 +2,22 @@ package com.axway.apim.lib.utils;
 
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.*;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.*;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,17 +51,22 @@ public class HTTPClient implements AutoCloseable {
         try {
             SSLContextBuilder builder = SSLContextBuilder.create();
             builder.loadTrustMaterial(null, new TrustAllStrategy());
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
-            HttpClientBuilder httpClientBuilder = HttpClients.custom()
-                .setSSLSocketFactory(sslsf);
+            TlsSocketStrategy tlsSocketStrategy = new DefaultClientTlsStrategy(builder.build(), HostnameVerificationPolicy.CLIENT, NoopHostnameVerifier.INSTANCE);
+            PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setTlsSocketStrategy(tlsSocketStrategy)
+                .build();
+            var httpClientBuilder = HttpClients.custom()
+                .setConnectionManager(connectionManager);
             if (this.username != null) {
-                CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+                BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(new AuthScope(null, -1),
+                    new UsernamePasswordCredentials(username, password != null ? password.toCharArray() : new char[0]));
                 AuthCache authCache = new BasicAuthCache();
                 BasicScheme basicAuth = new BasicScheme();
-                authCache.put(new HttpHost(url.getHost(), url.getPort(), url.getScheme()), basicAuth);
+                authCache.put(new HttpHost(url.getScheme(), url.getHost(), url.getPort()), basicAuth);
                 clientContext = HttpClientContext.create();
                 clientContext.setAuthCache(authCache);
+                clientContext.setCredentialsProvider(credsProvider);
                 httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
             }
             this.closeableHttpClient = httpClientBuilder.build();
@@ -68,8 +75,8 @@ public class HTTPClient implements AutoCloseable {
         }
     }
 
-    public CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
-        return closeableHttpClient.execute(request, clientContext);
+    public CloseableHttpResponse execute(ClassicHttpRequest request) throws IOException {
+        return (CloseableHttpResponse) closeableHttpClient.executeOpen(null, request, clientContext);
     }
 
     @Override

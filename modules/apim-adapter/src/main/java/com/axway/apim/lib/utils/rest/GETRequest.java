@@ -2,8 +2,8 @@ package com.axway.apim.lib.utils.rest;
 
 import java.net.URI;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 
 import com.axway.apim.lib.error.AppException;
 

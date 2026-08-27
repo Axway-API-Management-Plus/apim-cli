@@ -4,8 +4,8 @@ import com.axway.apim.adapter.apis.FilterHelper;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CustomPropertiesFilter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.List;

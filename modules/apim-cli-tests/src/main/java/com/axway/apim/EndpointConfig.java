@@ -3,8 +3,10 @@ package com.axway.apim;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.ssl.TrustStrategy;
 import org.citrusframework.dsl.endpoint.CitrusEndpoints;
@@ -56,10 +58,10 @@ public class EndpointConfig {
             SSLContext sslContext = SSLContexts.custom()
                 .loadTrustMaterial(null, acceptingTrustStrategy)
                 .build();
-            SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(
-                sslContext, NoopHostnameVerifier.INSTANCE);
+            TlsSocketStrategy tlsSocketStrategy = new DefaultClientTlsStrategy(
+                sslContext, HostnameVerificationPolicy.CLIENT, NoopHostnameVerifier.INSTANCE);
             PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
-                .setSSLSocketFactory(sslSocketFactory)
+                .setTlsSocketStrategy(tlsSocketStrategy)
                 .build();
             return HttpClients.custom()
                 .setConnectionManager(connectionManager)

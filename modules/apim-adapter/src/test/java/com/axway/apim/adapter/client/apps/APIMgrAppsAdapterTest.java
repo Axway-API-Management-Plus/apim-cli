@@ -14,12 +14,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -65,7 +65,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         ClientAppFilter filter = new ClientAppFilter.Builder().hasName("Application 123").build();
         URI requestUri = clientAppAdapter.getApplicationsUri(filter);
         Assert.assertNotNull(requestUri, "RequestUri is null");
-        Assert.assertEquals(requestUri.toString(), "https://" + testHostname + ":" + testPort + "/api/portal/v1.4/applications?field=name&op=eq&value=Application+123");
+        Assert.assertEquals(requestUri.toString(), "https://" + testHostname + ":" + testPort + "/api/portal/v1.4/applications?field=name&op=eq&value=Application%20123");
     }
 
     @Test

@@ -18,13 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class APIMgrAppsAdapter {
             LOG.debug("Sending request to find existing applications: {}", uri);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode == 404) {
                     // Nothing found - Simulate an empty response
                     apiManagerResponse.put(filter, "[]");
@@ -172,7 +172,7 @@ public class APIMgrAppsAdapter {
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load subscribed applications for API-ID: {} from API-Manager", apiId);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
                     LOG.error("Response from API Manager : {}", response);
@@ -218,7 +218,7 @@ public class APIMgrAppsAdapter {
                     RestAPICall getRequest = new GETRequest(uri);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                         response = EntityUtils.toString(httpResponse.getEntity());
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        int statusCode = httpResponse.getCode();
                         if (statusCode != 200) {
                             LOG.error("Error reading application credentials. Response-Code: {} Got response: {}", statusCode, response);
                             throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -245,7 +245,7 @@ public class APIMgrAppsAdapter {
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     LOG.error("Error reading application oauth resources. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error reading application oauth resources' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -269,7 +269,7 @@ public class APIMgrAppsAdapter {
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     LOG.error("Error reading application permissions. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error reading application permissions' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -350,7 +350,7 @@ public class APIMgrAppsAdapter {
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                 RestAPICall request = new POSTRequest(entity, uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error creating application. Response-Code: {}", statusCode);
                         throw new AppException("Error creating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -385,7 +385,7 @@ public class APIMgrAppsAdapter {
         HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         RestAPICall request = new PUTRequest(entity, uri);
         try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            int statusCode = httpResponse.getCode();
             if (statusCode < 200 || statusCode > 299) {
                 LOG.error("Error updating application. Response-Code: {}", statusCode);
                 throw new AppException("Error updating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -403,7 +403,7 @@ public class APIMgrAppsAdapter {
             .build();
         RestAPICall apiCall = new POSTRequest(entity, uri);
         try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            int statusCode = httpResponse.getCode();
             if (statusCode < 200 || statusCode > 299) {
                 LOG.error("Error saving/updating application image. Response-Code: {}", statusCode);
                 Utils.logPayload(LOG, httpResponse);
@@ -511,7 +511,7 @@ public class APIMgrAppsAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting application credential. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -550,7 +550,7 @@ public class APIMgrAppsAdapter {
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
             RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error saving/updating application credentials. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -613,7 +613,7 @@ public class APIMgrAppsAdapter {
                     // Use an admin account for this request
                     RestAPICall request = createUpsertUri(entity, uri, actualApp);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        int statusCode = httpResponse.getCode();
                         if (statusCode < 200 || statusCode > 299) {
                             LOG.error("Error creating/updating application quota. Response-Code: {}", statusCode);
                             Utils.logPayload(LOG, httpResponse);
@@ -670,7 +670,7 @@ public class APIMgrAppsAdapter {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application oauth resource. Response-Code: {}", statusCode);
                         Utils.logPayload(LOG, httpResponse);
@@ -690,7 +690,7 @@ public class APIMgrAppsAdapter {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/oauthresource/" + res.getId()).build();
                 RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode != 204) {
                         LOG.error("Error deleting application scope. Response-Code: {}", statusCode);
                         Utils.logPayload(LOG, httpResponse);
@@ -820,7 +820,7 @@ public class APIMgrAppsAdapter {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application permission. Response-Code: {}", statusCode);
                         Utils.logPayload(LOG, httpResponse);
@@ -840,7 +840,7 @@ public class APIMgrAppsAdapter {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + desiredApp.getId() + "/permissions/" + appPerm.getId()).build();
                 RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    int statusCode = httpResponse.getCode();
                     if (statusCode != 204) {
                         LOG.error("Error deleting application permission. Response-Code: {}", statusCode);
                         Utils.logPayload(LOG, httpResponse);
@@ -858,7 +858,7 @@ public class APIMgrAppsAdapter {
         try {
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting quota. Response-Code: {}", statusCode);
                     throw new AppException("Error deleting quota. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -874,7 +874,7 @@ public class APIMgrAppsAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId()).build();
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting application. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);

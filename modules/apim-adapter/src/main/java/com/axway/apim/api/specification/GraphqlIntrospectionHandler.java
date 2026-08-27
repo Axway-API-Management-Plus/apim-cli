@@ -9,11 +9,11 @@ import graphql.introspection.IntrospectionQueryBuilder;
 import graphql.introspection.IntrospectionResultToSchema;
 import graphql.language.Document;
 import graphql.schema.idl.SchemaPrinter;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class GraphqlIntrospectionHandler {
         httpPost.setEntity(httpEntity);
         httpPost.setHeader("Content-Type", "application/json");
         try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            int statusCode = httpResponse.getCode();
             LOG.debug("{} {} : {} ", httpPost.getMethod(), url, statusCode);
             if(statusCode == 200) {
                 IntrospectionResultToSchema introspectionResultToSchema = new IntrospectionResultToSchema();
