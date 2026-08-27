@@ -13,18 +13,15 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
-import org.citrusframework.actions.AbstractTestAction;
-import org.citrusframework.context.TestContext;
-import org.citrusframework.dsl.runner.TestRunner;
-import org.citrusframework.dsl.runner.TestRunnerBeforeSuiteSupport;
-import org.citrusframework.message.MessageType;
 import org.citrusframework.variable.GlobalVariables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeSuite;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,15 +30,19 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Runs once before the whole integration-test suite to make sure the organizations, the org-admin
+ * user and the test application required by the other *IT tests exist in the API-Manager, storing
+ * the resolved/created IDs in {@link GlobalVariables} so they can be referenced as {@code ${orgId}}
+ * etc. by the other tests.
+ */
 @ContextConfiguration(classes = {EndpointConfig.class})
+public class CoreInitializationTestIT extends AbstractTestNGSpringContextTests {
 
-public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
+    private static final Logger LOG = LoggerFactory.getLogger(CoreInitializationTestIT.class);
 
     @Autowired
     HttpClient httpClient;
-
-    @Autowired
-    private org.citrusframework.http.client.HttpClient apiManager;
 
     @Value("${apiManagerHost}")
     private String host;
@@ -66,178 +67,116 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
 
     private static final String DEFAULT_PASSWORD = "changeme";
 
-
-    @Override
-    public void beforeSuite(TestRunner testRunner) {
-
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
         String format = username + ":" + DEFAULT_PASSWORD;
         String authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";
 
         try {
             if (System.getenv("reset_password") != null && System.getenv("reset_password").equalsIgnoreCase("true")) {
-                testRunner.echo("Change password of user for initial setup");
+                LOG.info("Change password of user for initial setup");
                 postRequest(url + "/currentuser/changepassword", authorizationHeaderValue, password);
                 format = username + ":" + password;
                 authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
             }
-            String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), StandardCharsets.UTF_8);
-            String response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName, authorizationHeaderValue);
-            DocumentContext documentContext = JsonPath.parse(response);
-            if (!response.equals("[]")) {
-                testRunner.echo("Organization ${orgName} Already exists");
-                String orgId = documentContext.read("$.[0].id");
-                testRunner.variable("orgId", orgId);
-            } else {
-                testRunner.echo("Creating Organization ${orgName}");
-                testRunner.http(action -> action.client(apiManager)
-                    .send()
-                    .post("/organizations")
-                    .name("orgCreatedRequest")
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .payload("{\"name\": \"${orgName}\", \"description\": \"Test Org ${orgNumber}\", \"enabled\": true, \"development\": true }"));
-                testRunner.echo("####### Validate Test-Organisation: ${orgName} has been created #######");
-                testRunner.http(action -> action.client(apiManager)
-                    .receive()
-                    .response(HttpStatus.CREATED)
-                    .messageType(MessageType.JSON)
-                    .validate("$.name", "${orgName}")
-                    .extractFromPayload("$.id", "orgId"));
-                testRunner.echo("####### Extracted organization id: ${orgId} as attribute: orgId #######");
-            }
 
-            testRunner.echo("Creating second organization");
-            String orgName2 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName2"), StandardCharsets.UTF_8);
-            response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName2, authorizationHeaderValue);
-            if (!response.equals("[]")) {
-                testRunner.echo("Organization ${orgName2} Already exists");
-                documentContext = JsonPath.parse(response);
-                String orgId = documentContext.read("$.[0].id");
-                testRunner.variable("orgId2", orgId);
-            } else {
-                testRunner.echo("Creating Organization ${orgName2}");
-                testRunner.http(action -> action.client(apiManager)
-                    .send()
-                    .post("/organizations")
-                    .name("orgCreatedRequest")
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .payload("{\"name\": \"${orgName2}\", \"description\": \"Test Org 2\", \"enabled\": true, \"development\": true }"));
-                testRunner.echo("####### Validate Test-Organisation: ${orgName} has been created #######");
-                testRunner.http(action -> action.client(apiManager)
-                    .receive()
-                    .response(HttpStatus.CREATED)
-                    .messageType(MessageType.JSON)
-                    .validate("$.name", "${orgName2}")
-                    .extractFromPayload("$.id", "orgId2"));
-                testRunner.echo("####### Extracted organization id: ${orgId2} as attribute: orgId2 #######");
-            }
+            String orgNumber = (String) globalVariables.getVariables().get("orgNumber");
+            String orgName = (String) globalVariables.getVariables().get("orgName");
+            String orgId = resolveOrCreateOrganization(url, authorizationHeaderValue, orgName,
+                "Test Org " + orgNumber);
+            globalVariables.getVariables().put("orgId", orgId);
 
-            testRunner.echo("Creating third organization");
-            String orgName3 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName3"), StandardCharsets.UTF_8);
-            response = getRequest(url + "/organizations?field=name&op=eq&value=" + orgName3, authorizationHeaderValue);
-            if (!response.equals("[]")) {
-                testRunner.echo("Organization ${orgName3} Already exists");
-                documentContext = JsonPath.parse(response);
-                String orgId = documentContext.read("$.[0].id");
-                testRunner.variable("orgId3", orgId);
-            } else {
-                testRunner.echo("Creating Organization ${orgName3}");
-                testRunner.http(action -> action.client(apiManager)
-                    .send()
-                    .post("/organizations")
-                    .name("orgCreatedRequest")
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .payload("{\"name\": \"${orgName3}\", \"description\": \"Test Org 3\", \"enabled\": true, \"development\": true }"));
-                testRunner.echo("####### Validate Test-Organisation: ${orgName} has been created #######");
-                testRunner.http(action -> action.client(apiManager)
-                    .receive()
-                    .response(HttpStatus.CREATED)
-                    .messageType(MessageType.JSON)
-                    .validate("$.name", "${orgName3}")
-                    .extractFromPayload("$.id", "orgId3"));
-                testRunner.echo("####### Extracted organization id: ${orgId3} as attribute: orgId2 #######");
-            }
+            LOG.info("Creating second organization");
+            String orgName2 = (String) globalVariables.getVariables().get("orgName2");
+            String orgId2 = resolveOrCreateOrganization(url, authorizationHeaderValue, orgName2, "Test Org 2");
+            globalVariables.getVariables().put("orgId2", orgId2);
+
+            LOG.info("Creating third organization");
+            String orgName3 = (String) globalVariables.getVariables().get("orgName3");
+            String orgId3 = resolveOrCreateOrganization(url, authorizationHeaderValue, orgName3, "Test Org 3");
+            globalVariables.getVariables().put("orgId3", orgId3);
+
             String userName = (String) globalVariables.getVariables().get("oadminUsername1");
-            response = getRequest(url + "/users?field=loginName&op=eq&value=" + userName, authorizationHeaderValue);
+            String response = getRequest(url + "/users?field=loginName&op=eq&value=" + userName, authorizationHeaderValue);
+            String oadminUserId1;
             if (!response.equals("[]")) {
-                testRunner.echo("User Already exists");
-                documentContext = JsonPath.parse(response);
-                String userId = documentContext.read("$.[0].id");
-                testRunner.variable("oadminUserId1", userId);
+                LOG.info("User Already exists");
+                oadminUserId1 = JsonPath.parse(response).read("$.[0].id");
             } else {
-                testRunner.echo("Creating oadmin user ${oadminUsername1}");
-                testRunner.http(action -> action.client(apiManager)
-                    .send()
-                    .post("/users")
-                    .header("Content-Type", "application/json")
-                    .payload("{\"enabled\":true,\"loginName\":\"${oadminUsername1}\",\"name\":\"Anna Owen ${orgNumber}\",\"email\":\"anna-${orgNumber}@axway.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
-                testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
-                    .extractFromPayload("$.id", "oadminUserId1")
-                    .extractFromPayload("$.loginName", "oadminUsername1"));
-                testRunner.echo("Updating password for oadmin user ${oadminUsername1}");
-                testRunner.http(action -> action.client(apiManager).send()
-                    .post("/users/${oadminUserId1}/changepassword/")
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .payload("newPassword=" + DEFAULT_PASSWORD));
-                testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
-                String orgAdminformat = orgAdminUsername + ":" + DEFAULT_PASSWORD;
-                String orgAdminAuthorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(orgAdminformat.getBytes());
+                LOG.info("Creating oadmin user {}", orgAdminUsername);
+                String userPayload = "{\"enabled\":true,\"loginName\":\"" + orgAdminUsername + "\",\"name\":\"Anna Owen " + orgNumber + "\","
+                    + "\"email\":\"anna-" + orgNumber + "@axway.com\",\"role\":\"oadmin\",\"organizationId\":\"" + orgId + "\"}";
+                String userResponse = createEntity(url + "/users", authorizationHeaderValue, userPayload, 201);
+                DocumentContext userDocument = JsonPath.parse(userResponse);
+                oadminUserId1 = userDocument.read("$.id");
+
+                LOG.info("Updating password for oadmin user {}", orgAdminUsername);
+                postRequest(url + "/users/" + oadminUserId1 + "/changepassword/", authorizationHeaderValue, DEFAULT_PASSWORD);
+                String orgAdminFormat = orgAdminUsername + ":" + DEFAULT_PASSWORD;
+                String orgAdminAuthorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(orgAdminFormat.getBytes());
                 postRequest(url + "/currentuser/changepassword", orgAdminAuthorizationHeaderValue, orgAdminPassword);
             }
+            globalVariables.getVariables().put("oadminUserId1", oadminUserId1);
+
             String appName = (String) globalVariables.getVariables().get("testAppName");
             response = getRequest(url + "/applications?field=name&op=eq&value=" + appName, authorizationHeaderValue);
+            String testAppId;
             if (!response.equals("[]")) {
-                documentContext = JsonPath.parse(response);
-                testRunner.echo("Application Already exists");
-                String testAppId = documentContext.read("$.[0].id");
-                testRunner.variable("testAppId", testAppId);
-
+                LOG.info("Application Already exists");
+                testAppId = JsonPath.parse(response).read("$.[0].id");
             } else {
-                testRunner.http(action -> action.client(apiManager)
-                    .send()
-                    .post("/applications")
-                    .name("createApplication")
-                    .header("Content-Type", "application/json")
-                    .payload("{\"name\":\"${testAppName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
-
-                testRunner.http(action -> action.client(apiManager)
-                    .receive()
-                    .response(HttpStatus.CREATED)
-                    .messageType(MessageType.JSON)
-                    .extractFromPayload("$.id", "testAppId")
-                    .extractFromPayload("$.name", "testAppName"));
-                testRunner.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' (testAppName/testAppId) #######");
-
+                String appPayload = "{\"name\":\"" + appName + "\",\"apis\":[],\"organizationId\":\"" + orgId + "\"}";
+                String appResponse = createEntity(url + "/applications", authorizationHeaderValue, appPayload, 201);
+                testAppId = JsonPath.parse(appResponse).read("$.id");
+                LOG.info("Created a application: '{}' ID: '{}'", appName, testAppId);
             }
-            // Adjusting the API-Manager config in preparation to run integration tests
-
-            testRunner.run(new AbstractTestAction() {
-                @Override
-                public void doExecute(TestContext testContext) {
-                    globalVariables.getVariables().put("orgId", testContext.getVariable("orgId"));
-                    globalVariables.getVariables().put("orgId2", testContext.getVariable("orgId2"));
-                    globalVariables.getVariables().put("orgId3", testContext.getVariable("orgId3"));
-                    globalVariables.getVariables().put("testAppId", testContext.getVariable("testAppId"));
-                    globalVariables.getVariables().put("oadminUserId1", testContext.getVariable("oadminUserId1"));
-                }
-            });
-
+            globalVariables.getVariables().put("testAppId", testAppId);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String getRequest(String url, String authorizationHeaderValue) {
+    /**
+     * Looks up an organization by name and returns its ID, creating it first if it doesn't exist yet.
+     */
+    private String resolveOrCreateOrganization(String url, String authorizationHeaderValue, String orgName, String description) throws IOException, ParseException, URISyntaxException {
+        String encodedOrgName = URLEncoder.encode(orgName, StandardCharsets.UTF_8);
+        String response = getRequest(url + "/organizations?field=name&op=eq&value=" + encodedOrgName, authorizationHeaderValue);
+        if (!response.equals("[]")) {
+            LOG.info("Organization {} already exists", orgName);
+            return JsonPath.parse(response).read("$.[0].id");
+        }
+        LOG.info("Creating Organization {}", orgName);
+        String payload = "{\"name\": \"" + orgName + "\", \"description\": \"" + description + "\", \"enabled\": true, \"development\": true }";
+        String orgResponse = createEntity(url + "/organizations", authorizationHeaderValue, payload, 201);
+        return JsonPath.parse(orgResponse).read("$.id");
+    }
+
+    private String createEntity(String url, String authorizationHeaderValue, String jsonPayload, int expectedStatusCode) throws IOException, ParseException, URISyntaxException {
+        URI uri = new URIBuilder(url).build();
+        HttpEntity entity = new StringEntity(jsonPayload, ContentType.APPLICATION_JSON);
+        HttpPost post = new HttpPost(uri);
+        post.setEntity(entity);
+        post.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
+        try (CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(post)) {
+            String body = EntityUtils.toString(response.getEntity());
+            if (response.getCode() != expectedStatusCode) {
+                throw new RuntimeException("Error creating entity at " + url + ". Response-Code: " + response.getCode() + " Response Body: " + body);
+            }
+            return body;
+        }
+    }
+
+    public String getRequest(String url, String authorizationHeaderValue) throws IOException, ParseException {
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
         try (CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(httpGet)) {
             return EntityUtils.toString(response.getEntity());
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public void postRequest(String url, String authorizationHeaderValue, String newPassword) throws URISyntaxException {
+    public void postRequest(String url, String authorizationHeaderValue, String newPassword) throws URISyntaxException, IOException, ParseException {
         URI uri = new URIBuilder(url).build();
         HttpEntity entity = new StringEntity("newPassword=" + newPassword + "&oldPassword=" + DEFAULT_PASSWORD, ContentType.APPLICATION_FORM_URLENCODED);
         HttpPost post = new HttpPost(uri);
@@ -249,10 +188,6 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             if (statusCode != 204) {
                 throw new RuntimeException("Error changing password of user. Response-Code: " + EntityUtils.toString(response.getEntity()));
             }
-
-
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
         }
     }
 }
