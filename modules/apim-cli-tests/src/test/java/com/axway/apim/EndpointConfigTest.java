@@ -4,7 +4,7 @@ package com.axway.apim;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.citrusframework.variable.GlobalVariables;
-import org.citrusframework.variable.GlobalVariablesPropertyLoader;
+import org.citrusframework.spring.variable.GlobalVariablesPropertyLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.*;
@@ -30,7 +30,8 @@ public class EndpointConfigTest extends TestNGCitrusSpringSupport {
 
         GlobalVariables globalVariables = context.getBean("globalVariables", GlobalVariables.class);
         Assert.assertNotNull(globalVariables);
-        Assert.assertEquals(globalVariables.getVariables().get("myVar"), "foo");
+        Assert.assertEquals(globalVariables.getVariables().get("apiManagerPort"),
+            context.getEnvironment().getRequiredProperty("apiManagerPort"));
 
 
         GlobalVariablesPropertyLoader globalVariablesPropertyLoader = context.getBean("globalVariablesPropertyLoader", GlobalVariablesPropertyLoader.class);

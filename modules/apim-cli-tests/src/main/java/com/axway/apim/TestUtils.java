@@ -51,10 +51,10 @@ public class TestUtils {
 
     public static String writeDataToFile(Resource configFile, String tempDirName, String replacedConfig){
         File testDirectory = createTestDirectory(tempDirName);
-        File newConfigFilePath = new File(testDirectory, configFile.getFile().getName());
+        File newConfigFilePath = new File(testDirectory, configFile.file().getName());
         try (Writer writer = new FileWriter(newConfigFilePath)) {
             writer.write(replacedConfig);
-            copyTestAssets(configFile.getFile().getParentFile(), testDirectory);
+            copyTestAssets(configFile.file().getParentFile(), testDirectory);
         } catch (IOException e) {
             throw new ValidationException("Unable to create test config file.", e);
         }

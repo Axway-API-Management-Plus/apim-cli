@@ -2,9 +2,9 @@ package com.axway.apim.test.serviceprofile;
 
 import com.axway.apim.EndpointConfig;
 import com.axway.apim.test.ImportTestAction;
-import org.citrusframework.DefaultTestActionBuilder;
+import org.citrusframework.dsl.DefaultTestActionBuilder;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;

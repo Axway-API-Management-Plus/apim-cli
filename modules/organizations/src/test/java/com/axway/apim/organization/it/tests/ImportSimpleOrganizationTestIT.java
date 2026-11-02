@@ -6,7 +6,7 @@ import com.axway.apim.organization.OrganizationApp;
 import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.context.TestContext;
-import org.citrusframework.dsl.JsonPathSupport;
+import org.citrusframework.json.dsl.JsonPathSupport;
 import org.citrusframework.exceptions.ValidationException;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;

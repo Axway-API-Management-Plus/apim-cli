@@ -12,8 +12,8 @@ import org.apache.hc.core5.ssl.TrustStrategy;
 import org.citrusframework.dsl.endpoint.CitrusEndpoints;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.http.interceptor.LoggingClientInterceptor;
+import org.citrusframework.spring.variable.GlobalVariablesPropertyLoader;
 import org.citrusframework.variable.GlobalVariables;
-import org.citrusframework.variable.GlobalVariablesPropertyLoader;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -88,9 +88,7 @@ public class EndpointConfig {
 
     @Bean
     public GlobalVariables globalVariables() {
-        GlobalVariables globalVariables = new GlobalVariables();
-        globalVariables.getVariables().put("myVar", "foo");
-        return globalVariables;
+        return new GlobalVariables();
     }
 
     @Bean

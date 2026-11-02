@@ -1,6 +1,5 @@
 package com.axway.apim.test;
 
-import com.axway.apim.EndpointConfig;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -13,15 +12,14 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
-import org.citrusframework.container.SequenceBeforeSuite;
+import org.citrusframework.actions.AbstractTestAction;
+import org.citrusframework.context.TestContext;
 import org.citrusframework.variable.GlobalVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.BeforeSuite;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,16 +28,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-/**
- * Runs once before the whole integration-test suite to make sure the organizations, the org-admin
- * user and the test application required by the other *IT tests exist in the API-Manager, storing
- * the resolved/created IDs in {@link GlobalVariables} so they can be referenced as {@code ${orgId}}
- * etc. by the other tests.
- */
-@ContextConfiguration(classes = {EndpointConfig.class})
-public class CoreInitializationTestIT extends SequenceBeforeSuite {
+public class Setup extends AbstractTestAction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CoreInitializationTestIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Setup.class);
+
 
     @Autowired
     HttpClient httpClient;
@@ -67,8 +59,9 @@ public class CoreInitializationTestIT extends SequenceBeforeSuite {
 
     private static final String DEFAULT_PASSWORD = "changeme";
 
-    @BeforeSuite(alwaysRun = true)
-    public void beforeSuite() {
+
+    @Override
+    public void doExecute(TestContext context) {
         String format = username + ":" + DEFAULT_PASSWORD;
         String authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";
@@ -80,7 +73,6 @@ public class CoreInitializationTestIT extends SequenceBeforeSuite {
                 format = username + ":" + password;
                 authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
             }
-
             String orgNumber = (String) globalVariables.getVariables().get("orgNumber");
             String orgName = (String) globalVariables.getVariables().get("orgName");
             String orgId = resolveOrCreateOrganization(url, authorizationHeaderValue, orgName,

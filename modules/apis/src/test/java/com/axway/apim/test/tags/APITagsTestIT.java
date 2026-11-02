@@ -2,7 +2,7 @@ package com.axway.apim.test.tags;
 
 import com.axway.apim.EndpointConfig;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
@@ -12,9 +12,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 import com.axway.apim.test.ImportTestAction;
-import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
-import static org.citrusframework.dsl.JsonPathSupport.jsonPath;
+import static org.citrusframework.json.dsl.JsonPathSupport.jsonPath;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
 import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
