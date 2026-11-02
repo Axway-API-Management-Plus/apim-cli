@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class APIQuotaManager {
 
@@ -100,18 +101,17 @@ public class APIQuotaManager {
                 desiredRestriction.setApiId(null);
                 // Update restriction if actual and desired are same.
                 for (QuotaRestriction existingRestriction : existingRestrictions) {
-                    // It's considered as the same restriction when quota type, method, period & per are equal
-                    if (desiredRestriction.getMethod().equals(existingRestriction.getMethod())) {
+                    // Restrictions are matched by method + type.
+                    if (isSameRestrictionScope(desiredRestriction, existingRestriction)) {
                         mergedRestrictions.remove(existingRestriction);
-                        if(existingRestriction.getType() != desiredRestriction.getType()){
-                            existingRestriction.setType(desiredRestriction.getType());
-                        }
                         // If it is the same restriction, we need to update the restriction configuration
-                        if (existingRestriction.getType() == QuotaRestrictionType.throttle) {
+                        if (desiredRestriction.getType() == QuotaRestrictionType.throttle) {
+                            existingRestriction.setType(QuotaRestrictionType.throttle);
                             existingRestriction.getConfig().put(MESSAGES, desiredRestriction.getConfig().get(MESSAGES));
                             existingRestriction.getConfig().put(PERIOD, desiredRestriction.getConfig().get(PERIOD));
                             existingRestriction.getConfig().put(PER, desiredRestriction.getConfig().get(PER));
                         } else {
+                            existingRestriction.setType(QuotaRestrictionType.throttlemb);
                             existingRestriction.getConfig().put(MB, desiredRestriction.getConfig().get(MB));
                             existingRestriction.getConfig().put(PER, desiredRestriction.getConfig().get(PER));
                             existingRestriction.getConfig().put(PERIOD, desiredRestriction.getConfig().get(PERIOD));
@@ -124,14 +124,14 @@ public class APIQuotaManager {
 
             // Add missing desired restrictions to actual restriction
             for (QuotaRestriction desiredRestriction : desiredRestrictions) {
-                if (!quotaApiMethodExists(existingRestrictions, desiredRestriction)) {
+                if (!quotaApiRestrictionExists(existingRestrictions, desiredRestriction)) {
                     mergedRestrictions.add(desiredRestriction);
                 }
             }
 
             // Remove actual restrictions are not found in desired restriction.
             for (QuotaRestriction existingRestriction : existingRestrictions) {
-                if (!quotaApiMethodExists(desiredRestrictions, existingRestriction)) {
+                if (!quotaApiRestrictionExists(desiredRestrictions, existingRestriction)) {
                     mergedRestrictions.remove(existingRestriction);
                 }
             }
@@ -139,13 +139,18 @@ public class APIQuotaManager {
         return mergedRestrictions;
     }
 
-    public boolean quotaApiMethodExists(List<QuotaRestriction> desiredRestrictions, QuotaRestriction existingRestriction) {
+    public boolean quotaApiRestrictionExists(List<QuotaRestriction> desiredRestrictions, QuotaRestriction existingRestriction) {
         for (QuotaRestriction desiredRestriction : desiredRestrictions) {
-            if (desiredRestriction.getMethod().equals(existingRestriction.getMethod())) {
+            if (isSameRestrictionScope(desiredRestriction, existingRestriction)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean isSameRestrictionScope(QuotaRestriction firstRestriction, QuotaRestriction secondRestriction) {
+        return Objects.equals(firstRestriction.getMethod(), secondRestriction.getMethod())
+            && firstRestriction.getType() == secondRestriction.getType();
     }
 
 

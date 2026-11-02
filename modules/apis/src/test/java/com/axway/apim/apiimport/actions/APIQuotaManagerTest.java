@@ -269,6 +269,78 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         Assert.assertEquals(3, result.size());
     }
 
+    @Test
+    public void mergeRestrictionWithSameMethodAndDifferentTypes() throws IOException {
+        String actualQuota = "[\n" +
+            "  {\n" +
+            "    \"api\": \"api-1\",\n" +
+            "    \"method\": \"GET /orders\",\n" +
+            "    \"type\": \"throttle\",\n" +
+            "    \"config\": {\n" +
+            "      \"messages\": \"100\",\n" +
+            "      \"period\": \"minute\",\n" +
+            "      \"per\": \"1\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"api\": \"api-1\",\n" +
+            "    \"method\": \"GET /orders\",\n" +
+            "    \"type\": \"throttlemb\",\n" +
+            "    \"config\": {\n" +
+            "      \"mb\": \"20\",\n" +
+            "      \"period\": \"day\",\n" +
+            "      \"per\": \"1\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "]";
+
+        String desiredQuota = "[\n" +
+            "  {\n" +
+            "    \"api\": \"api-1\",\n" +
+            "    \"method\": \"GET /orders\",\n" +
+            "    \"type\": \"throttle\",\n" +
+            "    \"config\": {\n" +
+            "      \"messages\": \"250\",\n" +
+            "      \"period\": \"minute\",\n" +
+            "      \"per\": \"1\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"api\": \"api-1\",\n" +
+            "    \"method\": \"GET /orders\",\n" +
+            "    \"type\": \"throttlemb\",\n" +
+            "    \"config\": {\n" +
+            "      \"mb\": \"42\",\n" +
+            "      \"period\": \"day\",\n" +
+            "      \"per\": \"1\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "]";
+
+        TypeReference<List<QuotaRestriction>> quotaRestrictionTypeRef = new TypeReference<>() {
+        };
+        List<QuotaRestriction> actualQuotaRestriction = objectMapper.readValue(actualQuota, quotaRestrictionTypeRef);
+        List<QuotaRestriction> desiredQuotaRestriction = objectMapper.readValue(desiredQuota, quotaRestrictionTypeRef);
+
+        APIQuotaManager apiQuotaManager = new APIQuotaManager(null, null);
+        List<QuotaRestriction> result = apiQuotaManager.mergeRestriction(actualQuotaRestriction, desiredQuotaRestriction);
+
+        Assert.assertEquals(result.size(), 2);
+        QuotaRestriction throttle = result.stream()
+            .filter(restriction -> "GET /orders".equals(restriction.getMethod()) && "throttle".equals(restriction.getType().name()))
+            .findFirst()
+            .orElse(null);
+        QuotaRestriction throttleMb = result.stream()
+            .filter(restriction -> "GET /orders".equals(restriction.getMethod()) && "throttlemb".equals(restriction.getType().name()))
+            .findFirst()
+            .orElse(null);
+
+        Assert.assertNotNull(throttle);
+        Assert.assertNotNull(throttleMb);
+        Assert.assertEquals(throttle.getConfig().get("messages"), "250");
+        Assert.assertEquals(throttleMb.getConfig().get("mb"), "42");
+    }
+
 
     @Test
     public void populateMethodIdForNewApi() throws JsonProcessingException {
