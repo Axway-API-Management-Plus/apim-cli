@@ -13,6 +13,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.citrusframework.container.SequenceBeforeSuite;
 import org.citrusframework.variable.GlobalVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeSuite;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ import java.util.Base64;
  * etc. by the other tests.
  */
 @ContextConfiguration(classes = {EndpointConfig.class})
-public class CoreInitializationTestIT extends AbstractTestNGSpringContextTests {
+public class CoreInitializationTestIT extends SequenceBeforeSuite {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreInitializationTestIT.class);
 
