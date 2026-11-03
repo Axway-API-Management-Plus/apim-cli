@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.16]  In progress
 
+### Changed
+- Quota restrictions are now added, updated and removed individually using the API-Manager endpoints below
+  `/quotas/{id}/constraints` instead of replacing the complete quota document. This leaves the restrictions of
+  other APIs untouched and avoids lost updates. API-Managers older than 7.7.20261130 keep using the previous
+  document level update, and the CLI falls back to it automatically if the endpoints are not served.
+
+### Added
+- API import supports `-quotaUpdateMode` (`auto`, `legacy`, `constraints`) to control how quotas are written to
+  API-Manager. Defaults to `auto`.
+
+### Deprecated
+- **OData support is deprecated and will be removed in the next release.** Passing an OData `$metadata` / EDMX
+  document as the API definition, which the CLI detects and converts to OpenAPI before importing, is affected for
+  all three versions: OData V2, V3 and V4.
+  The conversion is built on [Apache Olingo](https://olingo.apache.org/), which is no longer maintained, so it
+  cannot be kept up to date or secured within this project.
+  The conversion will move to a separate project that turns OData metadata into an OpenAPI definition. Convert the
+  metadata there first, then import the resulting OpenAPI document with the CLI as usual. Everything else about
+  importing such an API, including the generated API-Methods, stays the same.
+
 # [1.14.15]  2026-8-26
 
 ### Fixed

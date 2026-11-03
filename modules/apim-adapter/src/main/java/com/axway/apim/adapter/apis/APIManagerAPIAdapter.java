@@ -612,27 +612,20 @@ public class APIManagerAPIAdapter {
         }
     }
 
+    /**
+     * queryStringPassThrough was added to the inboundProfiles in API-Manager 7.7.20220530.
+     */
+    public static final String QUERY_STRING_PASS_THROUGH_MIN_VERSION = "7.7.20220530";
+
     public String[] getSerializeAllExcept() throws AppException {
         String[] serializeAllExcept;
-        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (isAPIManagerVersionGreaterThan7720220530(APIManagerAdapter.getInstance().getApiManagerVersion())) {
+        if (APIManagerAdapter.hasAPIManagerVersion(QUERY_STRING_PASS_THROUGH_MIN_VERSION)) {
             serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
         } else {
             serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
         }
         LOG.debug("serializeAllExcept={}", Arrays.asList(serializeAllExcept));
         return serializeAllExcept;
-    }
-
-    private boolean isAPIManagerVersionGreaterThan7720220530(String apiManagerVersion) {
-        try {
-            apiManagerVersion = apiManagerVersion.replace("7.7.", "");
-            LOG.debug("apiManagerVersion for conversion: {}", apiManagerVersion);
-            return (Integer.parseInt(apiManagerVersion) >= 20220530);
-        } catch (NumberFormatException nfe) {
-            LOG.warn("Failed to convert API Manager version to integer: {}, returning false", apiManagerVersion);
-            return false;
-        }
     }
 
     public void deleteAPIProxy(API api) throws AppException {

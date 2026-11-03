@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/api/portal/v1.4/quotas/[0-9a-f-]+/constraints"
+  },
+  "response": {
+    "status": 201,
+    "bodyFileName": "quota_constraint_created.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

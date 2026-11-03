@@ -8,6 +8,7 @@ import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
+import com.axway.apim.lib.CoreParameters.QuotaUpdateMode;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardImportCLIOptions;
 import com.axway.apim.lib.error.AppException;
@@ -71,6 +72,10 @@ public class CLIAPIImportOptions extends CLIOptions {
 
 		option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
 		option.setArgName(IGNORE_REPLACE_ADD);
+		addOption(option);
+
+		option = new Option("quotaUpdateMode", true, "Controls how quotas are written to API-Manager. auto uses the per-constraint endpoints if the API-Manager is new enough, legacy always replaces the complete quota document, constraints always uses the per-constraint endpoints. Defaults to auto!");
+		option.setArgName("auto|legacy|constraints");
 		addOption(option);
 
 
@@ -143,6 +148,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setClientOrgsMode(Mode.valueOfDefault(getValue("clientOrgsMode")));
 		params.setClientAppsMode(Mode.valueOfDefault(getValue("clientAppsMode")));
 		params.setQuotaMode(Mode.valueOfDefault(getValue("quotaMode")));
+		params.setQuotaUpdateMode(QuotaUpdateMode.valueOfDefault(getValue("quotaUpdateMode")));
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));

@@ -9,9 +9,24 @@ import com.axway.apim.api.API;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonFilter("QuotaRestrictionFilter")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class QuotaRestriction {
+
+    /**
+     * The constraint ID assigned by the API-Manager. It is readOnly in the API-Manager REST-API: it is ignored on
+     * POST /quotas/{id}/constraints and taken from the URL on PUT, hence it must never be serialized. It must also
+     * not leak into exported API-/Application-Config files.
+     * Access.WRITE_ONLY removes the property from the BeanSerializer itself, which covers all serialization paths
+     * at once - including the ones that do NOT go through the QuotaRestrictionFilter (ExportHelper and
+     * JsonAPIManagerSetupExporter serialize this class with the default bean serializer).
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    String id;
+
     /**
      * Contains the ID of the API this restriction is applied to or a "*" if applied to all APIs.
      * The JsonAlias is required for Deserialization as the API-Manager returns the information in field api
@@ -33,6 +48,14 @@ public class QuotaRestriction {
     QuotaRestrictionType type;
 
     Map<String, String> config;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getApiId() {
         return apiId;
@@ -84,6 +107,12 @@ public class QuotaRestriction {
     }
 
 
+    /**
+     * Note: id and apiId are deliberately NOT part of equals/hashCode.
+     * This equals is the desired-vs-actual change detector reached from APIQuota.equals via Utils.compareValues
+     * and finally APIChangeState. Desired restrictions are read from a config file and therefore never carry the
+     * API-Manager assigned id, so including it here would report every API as changed on every single run.
+     */
     @Override
     public boolean equals(Object other) {
         if (other == null) return false;
@@ -92,7 +121,7 @@ public class QuotaRestriction {
             return
                 StringUtils.equals(quotaRestriction.getMethod(), this.getMethod()) &&
                     quotaRestriction.getType() == this.getType() &&
-                    quotaRestriction.getConfig().equals(this.getConfig());
+                    Objects.equals(quotaRestriction.getConfig(), this.getConfig());
         } else {
             return false;
         }
@@ -105,6 +134,6 @@ public class QuotaRestriction {
 
     @Override
     public String toString() {
-        return "QuotaRestriction [api=" + apiId + ", method=" + method + ", type=" + type + ", config=" + config + "]";
+        return "QuotaRestriction [id=" + id + ", api=" + apiId + ", method=" + method + ", type=" + type + ", config=" + config + "]";
     }
 }

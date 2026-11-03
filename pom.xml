@@ -61,7 +61,8 @@
         <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <citrus.version>5.1.0</citrus.version>
-        <log4j.version>2.25.4</log4j.version>
+        <log4j.version>2.26.1</log4j.version>
+        <slf4j.version>2.0.20</slf4j.version>
         <jackson.version>2.22.2</jackson.version>
         <!-- Starting Jackson 2.20, jackson-annotations dropped the patch version suffix -->
         <jackson.version.annotations>2.22</jackson.version.annotations>
@@ -218,7 +219,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.18</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>

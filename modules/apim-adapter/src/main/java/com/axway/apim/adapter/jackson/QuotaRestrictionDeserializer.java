@@ -65,6 +65,12 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
         String per = quotaConfig.get("per").asText();
 
         QuotaRestriction restriction = new QuotaRestriction();
+        // Take over the constraint ID assigned by the API-Manager, which is required to address a single
+        // restriction via /quotas/{id}/constraints/{constraintId}. Deliberately restricted to apiManagerData:
+        // a config file must never be able to inject a stale or foreign constraint ID into a PUT URL.
+        if (deserializeMode == DeserializeMode.apiManagerData && node.hasNonNull("id")) {
+            restriction.setId(node.get("id").asText());
+        }
         try {
             restriction.setType(QuotaRestrictionType.valueOf(type));
         } catch (IllegalArgumentException e) {
