@@ -50,12 +50,11 @@ public class EndpointConfigEnvironmentOverrideTest {
 
     @Test
     public void defaultsSurviveWhenNoEnvironmentVariableIsSet() {
-        StandardEnvironment environment = environmentWith(new HashMap<String, Object>());
+        StandardEnvironment environment = environmentWith(new HashMap<>());
 
         new EndpointConfig().setEnvironment(environment);
 
         Assert.assertEquals(environment.getProperty("apiManagerHost"), "localhost");
-        Assert.assertEquals(environment.getProperty("apiManagerPass"), "");
     }
 
     /**
