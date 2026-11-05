@@ -81,7 +81,7 @@ public class QuotaConstraintScopeChangeTestIT extends TestNGCitrusSpringSupport 
         Matcher matcher = Pattern.compile("(\\d{8})$").matcher(productVersion);
         if (matcher.find() && Integer.parseInt(matcher.group(1)) < 20261130) {
             $(echo("Skipping the Quota constraint test, API-Manager " + productVersion + " does not support it"));
-            //    return;
+            return;
         }
 
         $(echo("####### Record the constraint ID the API-Manager assigned to the restriction of API 1 #######"));
