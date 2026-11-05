@@ -57,11 +57,17 @@ public class Setup extends AbstractTestAction {
     @Autowired
     GlobalVariables globalVariables;
 
-    private static final String DEFAULT_PASSWORD = "changeme";
+    private static String DEFAULT_PASSWORD = "changeme";
 
 
     @Override
     public void doExecute(TestContext context) {
+
+
+        if(  System.getenv("reset_password") == null){
+            DEFAULT_PASSWORD = password;
+        }
+
         String format = username + ":" + DEFAULT_PASSWORD;
         String authorizationHeaderValue = "Basic " + Base64.getEncoder().encodeToString(format.getBytes());
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";

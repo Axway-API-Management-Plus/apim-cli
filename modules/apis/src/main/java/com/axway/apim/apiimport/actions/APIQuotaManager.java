@@ -121,7 +121,6 @@ public class APIQuotaManager {
                     }
                 }
             }
-
             // Add missing desired restrictions to actual restriction
             for (QuotaRestriction desiredRestriction : desiredRestrictions) {
                 if (!quotaApiRestrictionExists(existingRestrictions, desiredRestriction)) {

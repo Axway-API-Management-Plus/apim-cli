@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota.isDefaultQuota;
+
 public class APIManagerQuotaAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerQuotaAdapter.class);
@@ -132,7 +134,7 @@ public class APIManagerQuotaAdapter {
         if (apiManagerResponse.get(quotaId) != null) return;
         URI uri;
         try {
-            if (Quota.isDefaultQuota(quotaId)) {
+            if (isDefaultQuota(quotaId)) {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/" + quotaId).build();
             } else {
                 if (applicationsQuotaCache.containsKey(quotaId)) {
@@ -152,7 +154,7 @@ public class APIManagerQuotaAdapter {
                     throw new AppException("Can't read API-Manager Quota-Configuration. Got status code: " + statusCode + " for request: " + uri, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 apiManagerResponse.put(quotaId, response);
-                if (!Quota.isDefaultQuota(quotaId)) {
+                if (!isDefaultQuota(quotaId)) {
                     applicationsQuotaCache.put(quotaId, response);
                 }
             }
@@ -217,13 +219,13 @@ public class APIManagerQuotaAdapter {
     /**
      * Decides whether the per-constraint endpoints can be used for the given quota.
      */
-    private boolean useConstraints(String quotaId) throws AppException {
+    public boolean useConstraints(String quotaId) {
         if (constraintsUnavailable) return false;
         QuotaUpdateMode quotaUpdateMode = cmd.getQuotaUpdateMode();
         if (quotaUpdateMode == QuotaUpdateMode.legacy) return false;
         // The API-Manager exposes the constraints only below /quotas/{id}. Application specific quotas are managed
         // through /applications/{id}/quota, which has no per-constraint sub resource.
-        if (!Quota.isDefaultQuota(quotaId)) return false;
+        if (!isDefaultQuota(quotaId)) return false;
         if (quotaUpdateMode == QuotaUpdateMode.constraints) return true;
         if (constraintsSupported == null) {
             constraintsSupported = APIManagerAdapter.hasAPIManagerVersion(QUOTA_CONSTRAINTS_MIN_VERSION);
@@ -331,19 +333,6 @@ public class APIManagerQuotaAdapter {
         return restrictions;
     }
 
-    /**
-     * Returns a single restriction of the given quota, or null if it does not exist.
-     */
-    public QuotaRestriction getConstraint(String quotaId, String constraintId) throws AppException {
-        if (!APIManagerAdapter.getInstance().hasAdminAccount()) return null;
-        URI uri = constraintsUri(quotaId, constraintId);
-        Response response = executeConstraintCall(new GETRequest(uri), "read quota constraint", uri);
-        if (response.getStatusCode() == 404) return null;
-        if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
-            throw new AppException("Can't read API-Manager quota constraint. Got status code: " + response.getStatusCode() + " for request: " + uri + " Response: '" + response.getResponseBody() + "'", ErrorCode.API_MANAGER_COMMUNICATION);
-        }
-        return readConstraint(response.getResponseBody(), uri);
-    }
 
     /**
      * Adds a single restriction to the given quota, leaving the other restrictions untouched.

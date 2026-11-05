@@ -2,7 +2,9 @@ package com.axway.apim.test.quota;
 
 import com.axway.apim.EndpointConfig;
 import com.axway.apim.test.ImportTestAction;
+import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
+import org.citrusframework.context.TestContext;
 import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
@@ -10,9 +12,12 @@ import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.actions.SleepAction.Builder.sleep;
@@ -38,7 +43,7 @@ public class QuotaConstraintScopeChangeTestIT extends TestNGCitrusSpringSupport 
 
     @CitrusTest
     @Test
-    public void run() throws IOException {
+    public void run(@Optional @CitrusResource TestContext context) throws IOException {
         ImportTestAction swaggerImport = new ImportTestAction();
         description("Make sure updating the quota of one API does not disturb the restrictions of other APIs");
         variable("oadminUsername1", "${apiManagerUser}");
@@ -65,6 +70,19 @@ public class QuotaConstraintScopeChangeTestIT extends TestNGCitrusSpringSupport 
             .validate(jsonPath().expression("$.[?(@.path=='${apiPath}')].name", "${apiName}"))
             .extract(fromBody().expression("$.[?(@.path=='${apiPath}')].id", "apiId")));
         $(sleep().seconds(5));
+
+        $(http().client(apiManager).send().get("/config"));
+        $(http().client(apiManager).receive().response(HttpStatus.OK).message().type(MessageType.JSON)
+            .extract(fromBody().expression("$.productVersion", "productVersion")));
+
+        // Read the extracted test variable into a Java variable, e.g. "7.7-20260228" -> 20260228
+        String productVersion = context.getVariable("productVersion");
+        $(echo("####### Product version is: " + productVersion + " #######"));
+        Matcher matcher = Pattern.compile("(\\d{8})$").matcher(productVersion);
+        if (matcher.find() && Integer.parseInt(matcher.group(1)) < 20261130) {
+            $(echo("Skipping the Quota constraint test, API-Manager " + productVersion + " does not support it"));
+            //    return;
+        }
 
         $(echo("####### Record the constraint ID the API-Manager assigned to the restriction of API 1 #######"));
         $(http().client(apiManager).send().get(SYSTEM_QUOTA + "/constraints"));
