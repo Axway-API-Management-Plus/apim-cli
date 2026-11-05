@@ -7,10 +7,10 @@ import com.axway.apim.lib.utils.HTTPClient;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,13 +137,12 @@ public class APISpecificationFactory {
         String password = url.getPassword();
         try (HTTPClient httpClient = new HTTPClient(uri, username, password)) {
             RequestConfig config = RequestConfig.custom()
-                .setRelativeRedirectsAllowed(true)
                 .setCircularRedirectsAllowed(true)
                 .build();
             HttpGet httpGet = new HttpGet(uri);
             httpGet.setConfig(config);
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 LOG.debug("{} {} : {} ", httpGet.getMethod(), uri, statusCode);
                 String response = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
                 if (statusCode >= 200 && statusCode < 300) {

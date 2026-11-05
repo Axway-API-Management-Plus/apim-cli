@@ -3,14 +3,14 @@ package com.axway.apim.test.policies;
 import com.axway.apim.EndpointConfig;
 import com.axway.apim.test.ImportTestAction;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 
 @ContextConfiguration(classes = {EndpointConfig.class})

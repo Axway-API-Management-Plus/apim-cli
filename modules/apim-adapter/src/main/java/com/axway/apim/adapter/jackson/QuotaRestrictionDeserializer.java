@@ -12,7 +12,6 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.InternalException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,8 +56,8 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 
     @Override
     public QuotaRestriction deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-        ObjectCodec oc = jp.getCodec();
-        JsonNode node = oc.readTree(jp);
+        // ObjectCodec / jp.getCodec() was deprecated and removed in Jackson 2.19+; use ctxt.readTree() instead.
+        JsonNode node = ctxt.readTree(jp);
         String type = node.get("type").asText();
         JsonNode quotaConfig = node.get("config");
 
@@ -66,6 +65,12 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
         String per = quotaConfig.get("per").asText();
 
         QuotaRestriction restriction = new QuotaRestriction();
+        // Take over the constraint ID assigned by the API-Manager, which is required to address a single
+        // restriction via /quotas/{id}/constraints/{constraintId}. Deliberately restricted to apiManagerData:
+        // a config file must never be able to inject a stale or foreign constraint ID into a PUT URL.
+        if (deserializeMode == DeserializeMode.apiManagerData && node.hasNonNull("id")) {
+            restriction.setId(node.get("id").asText());
+        }
         try {
             restriction.setType(QuotaRestrictionType.valueOf(type));
         } catch (IllegalArgumentException e) {

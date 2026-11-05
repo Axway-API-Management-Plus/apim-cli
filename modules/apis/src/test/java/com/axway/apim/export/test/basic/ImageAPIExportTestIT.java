@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.context.TestContext;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Optional;
@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.testng.Assert.*;
 
@@ -69,7 +69,7 @@ public class ImageAPIExportTestIT extends TestNGCitrusSpringSupport {
         assertFalse(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean());
         assertTrue(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean());
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M04.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M01.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/" + context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/api-image.jpg").exists(), "API-Image is missing");
     }

@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.actions.SleepAction.Builder.sleep;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;

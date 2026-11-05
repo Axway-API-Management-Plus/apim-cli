@@ -18,17 +18,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ParseException;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.StateTransitionException;
@@ -231,7 +232,7 @@ public class APIManagerAdapter {
             User user = getCurrentUser();
             String role = getHigherRole(user);
             assignRoles(role);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -294,7 +295,7 @@ public class APIManagerAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             DELRequest logoutRequest = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
                     LOG.warn("Logout failed with statusCode: {}  Got response: {}", statusCode, response);
@@ -313,7 +314,7 @@ public class APIManagerAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) currentUserRequest.execute()) {
                 getCsrfToken(httpResponse);
                 String currentUser = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     throw new AppException("Status-Code: " + statusCode + ", Can't get current-user for user '" + currentUser + "'",
                         ErrorCode.API_MANAGER_COMMUNICATION);
@@ -332,7 +333,7 @@ public class APIManagerAdapter {
     }
 
     private static void getCsrfToken(HttpResponse response) throws AppException {
-        for (Header header : response.getAllHeaders()) {
+        for (Header header : response.getHeaders()) {
             if (header.getName().equalsIgnoreCase("csrf-token")) {
                 APIMHttpClient.getInstance().setCsrfToken(header.getValue());
                 break;
@@ -532,7 +533,7 @@ public class APIManagerAdapter {
         try {
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode == 404) return null; // No Image found
                 if (statusCode != 200) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
@@ -583,7 +584,7 @@ public class APIManagerAdapter {
                 .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
                     if (response != null && response.contains("Bad password")) {
@@ -608,7 +609,7 @@ public class APIManagerAdapter {
             params.add(new BasicNameValuePair("outbound", "true"));
             POSTRequest postRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 200) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
                     throw new AppException("API-Manager failed to read certificate information from URL. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);

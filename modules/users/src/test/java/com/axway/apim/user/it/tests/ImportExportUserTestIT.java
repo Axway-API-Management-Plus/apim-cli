@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
 import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
-import static org.citrusframework.validation.json.JsonPathMessageValidationContext.Builder.jsonPath;
+import static org.citrusframework.validation.context.json.JsonPathMessageValidationContext.Builder.jsonPath;
 
 
 @ContextConfiguration(classes = {EndpointConfig.class})

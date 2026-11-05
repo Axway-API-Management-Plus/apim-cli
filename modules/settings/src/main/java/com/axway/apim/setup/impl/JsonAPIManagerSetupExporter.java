@@ -62,7 +62,6 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
             }
         }
         try {
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
             mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(true)));
             FilterProvider filters = new SimpleFilterProvider()
@@ -71,10 +70,11 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
                 .addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("apiId")) // Is handled in ExportApplication
                 .setFailOnUnknownId(false);
             mapper.setFilterProvider(filters);
+            // Use ObjectWriter to avoid mutating the shared mapper instance
             if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                mapper.writeValue(System.out, apimanagerConfig);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(System.out, apimanagerConfig);
             } else {
-                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), apimanagerConfig);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(new File(localFolder.getCanonicalPath() + configFile), apimanagerConfig);
                 result.addExportedFile(localFolder.getCanonicalPath() + configFile);
             }
         } catch (Exception e) {

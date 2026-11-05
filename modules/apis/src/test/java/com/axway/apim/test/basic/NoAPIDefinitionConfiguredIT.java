@@ -4,14 +4,14 @@ import com.axway.apim.EndpointConfig;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.test.ImportTestAction;
 import org.citrusframework.annotations.CitrusTest;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 
 

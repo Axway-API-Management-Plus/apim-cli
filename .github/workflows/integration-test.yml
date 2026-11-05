@@ -10,6 +10,8 @@ env:
   FED_FILE: swagger-promote-7.7-20260228.fed
   LOG_LEVEL: debug
   reset_password: true
+  apimanager_password: ${{ secrets.APIMANAGER_PASSWORD }}
+  oadmin_password: ${{ secrets.OADMIN_PASSWORD }}
 
 jobs:
   integration-test:

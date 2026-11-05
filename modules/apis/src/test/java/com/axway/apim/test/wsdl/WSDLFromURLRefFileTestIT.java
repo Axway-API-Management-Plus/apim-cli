@@ -5,7 +5,7 @@ import com.axway.apim.test.ImportTestAction;
 import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.context.TestContext;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
@@ -20,7 +20,7 @@ import java.io.IOException;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
 import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
-import static org.citrusframework.validation.json.JsonPathMessageValidationContext.Builder.jsonPath;
+import static org.citrusframework.validation.context.json.JsonPathMessageValidationContext.Builder.jsonPath;
 
 @ContextConfiguration(classes = {EndpointConfig.class})
 public class WSDLFromURLRefFileTestIT extends TestNGCitrusSpringSupport {

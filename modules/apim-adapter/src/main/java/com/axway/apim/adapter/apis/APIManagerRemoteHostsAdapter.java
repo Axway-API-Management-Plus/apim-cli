@@ -17,12 +17,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class APIManagerRemoteHostsAdapter {
             LOG.debug("Load remote hosts from API-Manager using filter: {}", filter);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error loading remoteHosts from API-Manager. Response-Code: {} Got Response Body:{}", statusCode, response);
                     throw new AppException("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -124,7 +124,7 @@ public class APIManagerRemoteHostsAdapter {
                 request = new PUTRequest(entity, uri);
             }
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Error creating/updating remote host. Response-Code: {}  Response Body: {}", statusCode, errorResponse);

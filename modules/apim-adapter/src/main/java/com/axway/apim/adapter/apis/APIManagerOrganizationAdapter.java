@@ -17,14 +17,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +73,8 @@ public class APIManagerOrganizationAdapter {
             LOG.debug("Load organizations from API-Manager using filter: {}", filter);
             LOG.debug("Load organization with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Received Status-Code: {}", httpResponse.getStatusLine().getStatusCode());
+                if (httpResponse.getCode() != HttpStatus.SC_OK) {
+                    LOG.error("Received Status-Code: {}", httpResponse.getCode());
                     Utils.logPayload(LOG, httpResponse);
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
@@ -144,7 +144,7 @@ public class APIManagerOrganizationAdapter {
                 request = new PUTRequest(entity, uri);
             }
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error creating/updating organization. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -162,7 +162,7 @@ public class APIManagerOrganizationAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId()).build();
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting organization. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -188,7 +188,7 @@ public class APIManagerOrganizationAdapter {
         try {
             RestAPICall apiCall = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error saving/updating organization image. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);

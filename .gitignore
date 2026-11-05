@@ -17,3 +17,6 @@
 
 .DS_Store
 /.idea/
+/.claude/
+/CLAUDE.md
+/.mcp.json

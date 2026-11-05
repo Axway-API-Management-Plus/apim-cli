@@ -15,14 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +72,10 @@ public class APIManagerUserAdapter {
             LOG.debug("Load users from API-Manager using filter: {}", filter);
             LOG.debug("Load users with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
-                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+                if (httpResponse.getCode() == HttpStatus.SC_NOT_FOUND) {
                     throw new AppException("No user found for user id: " + userId, ErrorCode.UNKNOWN_USER);
-                } else if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Received Status-Code: {}", httpResponse.getStatusLine().getStatusCode());
+                } else if (httpResponse.getCode() != HttpStatus.SC_OK) {
+                    LOG.error("Received Status-Code: {}", httpResponse.getCode());
                     Utils.logPayload(LOG, httpResponse);
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
@@ -204,7 +204,7 @@ public class APIManagerUserAdapter {
             }
             LOG.debug("Create/Update User Http Verb : {} URI : {}", request.getClass().getName(), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error creating/updating user. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -228,7 +228,7 @@ public class APIManagerUserAdapter {
             HttpEntity entity = new StringEntity("newPassword=" + newPassword, ContentType.APPLICATION_FORM_URLENCODED);
             request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error changing password of user. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -245,7 +245,7 @@ public class APIManagerUserAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + USERS + user.getId()).build();
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting user. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);
@@ -270,7 +270,7 @@ public class APIManagerUserAdapter {
         try {
             RestAPICall apiCall = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error saving/updating user image. Response-Code: {}", statusCode);
                     Utils.logPayload(LOG, httpResponse);

@@ -1,0 +1,11 @@
+{
+  "id": "c0000000-0000-0000-0000-0000000000ff",
+  "api": "*",
+  "method": "*",
+  "type": "throttle",
+  "config": {
+    "messages": "10000",
+    "period": "second",
+    "per": "1"
+  }
+}

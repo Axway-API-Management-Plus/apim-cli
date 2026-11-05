@@ -10,12 +10,12 @@ import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +110,7 @@ public class APIManagerAPIMethodAdapter {
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
             RestAPICall putRequest = new PUTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) putRequest.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.debug("Response from server: {}", response);

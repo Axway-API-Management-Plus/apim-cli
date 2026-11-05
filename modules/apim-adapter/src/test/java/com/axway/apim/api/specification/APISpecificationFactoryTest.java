@@ -1,16 +1,10 @@
 package com.axway.apim.api.specification;
 
 import com.axway.apim.WiremockWrapper;
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.util.Asserts;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

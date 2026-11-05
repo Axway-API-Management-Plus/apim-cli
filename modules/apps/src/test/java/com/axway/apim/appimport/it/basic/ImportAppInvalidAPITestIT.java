@@ -6,7 +6,7 @@ import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.context.TestContext;
 import org.citrusframework.exceptions.ValidationException;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;

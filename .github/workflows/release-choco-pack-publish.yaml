@@ -9,14 +9,12 @@ jobs:
     name: Publish Choco package
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6.0.0
       name: Check-Out
     - name: Fetch release package
-      uses: wyozi/download-gh-release-asset@master
-      with:
-        args: axway-apimcli-${{ github.event.release.tag_name }}.zip
+      run: gh release download "${{ github.event.release.tag_name }}" --repo "$GITHUB_REPOSITORY" --pattern "axway-apimcli-${{ github.event.release.tag_name }}.zip"
       env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     - name: Move release to tools
       run: |
         mv axway-apimcli-${{ github.event.release.tag_name }}.zip tools/choco/axway-apim-cli/tools

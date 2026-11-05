@@ -3,31 +3,31 @@ package com.axway.apim.lib.utils.rest;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.conn.routing.HttpRoutePlanner;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.HttpRoute;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.routing.HttpRoutePlanner;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ import java.util.StringTokenizer;
 public class APIMHttpClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIMHttpClient.class);
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
     private PoolingHttpClientConnectionManager httpClientConnectionManager;
     private HttpClientContext clientContext;
     private final BasicCookieStore cookieStore = new BasicCookieStore();
@@ -73,30 +73,31 @@ public class APIMHttpClient {
         HttpHost targetHost;
         SSLContextBuilder builder = new SSLContextBuilder();
         try {
-            builder.loadTrustMaterial(null, new TrustAllStrategy());
-            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
-            Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register(uri.getScheme(), sslConnectionSocketFactory)
-                .register("http", PlainConnectionSocketFactory.INSTANCE)
-                .build();
+            CoreParameters params = CoreParameters.getInstance();
+            int timeout = params.getTimeout();
+            LOG.debug("API Manager CLI http client timeout : {}", timeout);
 
-            httpClientConnectionManager = new PoolingHttpClientConnectionManager(r);
-            httpClientConnectionManager.setMaxTotal(5);
-            httpClientConnectionManager.setDefaultMaxPerRoute(2);
-            targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+            builder.loadTrustMaterial(null, new TrustAllStrategy());
+            TlsSocketStrategy tlsSocketStrategy = new DefaultClientTlsStrategy(builder.build(), HostnameVerificationPolicy.CLIENT, NoopHostnameVerifier.INSTANCE);
+
+            httpClientConnectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setTlsSocketStrategy(tlsSocketStrategy)
+                .setMaxConnTotal(5)
+                .setMaxConnPerRoute(2)
+                .setDefaultConnectionConfig(ConnectionConfig.custom()
+                    .setConnectTimeout(Timeout.ofMilliseconds(timeout))
+                    .build())
+                .build();
+            targetHost = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
             // Add AuthCache to the execution context
             clientContext = HttpClientContext.create();
             clientContext.setCookieStore(cookieStore);
             httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
             // We have make sure, that cookies are correctly parsed!
-            CoreParameters params = CoreParameters.getInstance();
-            int timeout = params.getTimeout();
-            LOG.debug("API Manager CLI http client timeout : {}", timeout);
             RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .setCookieSpec(CookieSpecs.STANDARD);
+                .setResponseTimeout(Timeout.ofMilliseconds(timeout))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(timeout))
+                .setCookieSpec(StandardCookieSpec.RELAXED);
             HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .disableRedirectHandling()
                 .setConnectionManager(httpClientConnectionManager)
@@ -110,8 +111,10 @@ public class APIMHttpClient {
                 clientBuilder.setRoutePlanner(routePlanner);
                 if (params.getProxyUsername() != null) {
                     LOG.debug("API Manager CLI using Http(s) proxy Authentication");
-                    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                    credentialsProvider.setCredentials(new AuthScope(params.getProxyHost(), params.getProxyPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
+                    BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                    credentialsProvider.setCredentials(
+                        new AuthScope(params.getProxyHost(), params.getProxyPort()),
+                        new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword().toCharArray()));
                     clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
                 }
                 defaultRequestConfig.setProxy(proxyHost);
@@ -145,7 +148,7 @@ public class APIMHttpClient {
         return headers;
     }
 
-    public HttpClient getHttpClient() {
+    public CloseableHttpClient getHttpClient() {
         return httpClient;
     }
 

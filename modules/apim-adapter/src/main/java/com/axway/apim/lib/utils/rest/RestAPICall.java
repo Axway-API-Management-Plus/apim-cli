@@ -2,11 +2,11 @@ package com.axway.apim.lib.utils.rest;
 
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.NoHttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +38,12 @@ public abstract class RestAPICall {
 
     public abstract HttpResponse execute() throws AppException;
 
-    protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
+    protected HttpResponse sendRequest(ClassicHttpRequest request) throws AppException {
         try {
             APIMHttpClient apimClient = APIMHttpClient.getInstance();
-            LOG.debug("Http verb:{} and URI: {}", request.getMethod(), request.getURI());
+            LOG.debug("Http verb:{} and URI: {}", request.getMethod(), request.getRequestUri());
             if (apimClient.getCsrfToken() != null) request.addHeader("CSRF-Token", apimClient.getCsrfToken());
-            return apimClient.getHttpClient().execute(request, apimClient.getClientContext());
+            return apimClient.getHttpClient().executeOpen(null, request, apimClient.getClientContext());
         } catch (NoHttpResponseException e) {
             throw new AppException("No response received for request: " + request + " from API-Manager within time limit. "
                     + "Perhaps the API-Manager is overloaded or contains too many entities to process the request.", ErrorCode.UNXPECTED_ERROR, e);

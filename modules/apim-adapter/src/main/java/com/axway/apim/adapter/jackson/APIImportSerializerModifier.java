@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
+
 public class APIImportSerializerModifier extends BeanSerializerModifier {
 
 
@@ -19,10 +20,11 @@ public class APIImportSerializerModifier extends BeanSerializerModifier {
 	@Override
 	public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
 			List<BeanPropertyWriter> beanProperties) {
-		for(int i=0; i<beanProperties.size();i++) {
-			BeanPropertyWriter writer = beanProperties.get(i);
-			if(writer.getName().equals("state")) {
-				beanProperties.set(i, new StateSerializer(writer));
+		for (BeanPropertyWriter writer : beanProperties) {
+			if (writer.getName().equals("state")) {
+				// Assign a custom serializer instead of subclassing BeanPropertyWriter
+				// (BeanPropertyWriter subclassing was removed in Jackson 2.19+)
+				writer.assignSerializer(new StateSerializer());
 				break;
 			}
 		}

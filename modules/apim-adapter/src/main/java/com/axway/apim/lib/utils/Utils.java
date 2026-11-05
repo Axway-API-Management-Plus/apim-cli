@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -419,7 +419,7 @@ public class Utils {
         }
     }
 
-    public static void logPayload(Logger logger, HttpResponse httpResponse) throws IOException {
+    public static void logPayload(Logger logger, ClassicHttpResponse httpResponse) throws IOException, org.apache.hc.core5.http.ParseException {
         if (logger.isDebugEnabled()) {
             logger.debug("APIManager Response : {}", EntityUtils.toString(httpResponse.getEntity()));
         }

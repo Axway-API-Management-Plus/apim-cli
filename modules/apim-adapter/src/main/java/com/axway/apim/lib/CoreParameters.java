@@ -37,6 +37,28 @@ public class CoreParameters implements Parameters {
         }
     }
 
+    /**
+     * Controls how quota restrictions are written to the API-Manager.
+     * auto        - use the /quotas/{id}/constraints endpoints when the API-Manager is new enough, otherwise
+     *               replace the complete quota document. This is the default.
+     * legacy      - always replace the complete quota document, as done before the constraints endpoints existed.
+     * constraints - always use the constraints endpoints, regardless of the reported API-Manager version.
+     */
+    public enum QuotaUpdateMode {
+        auto,
+        legacy,
+        constraints;
+
+        public static QuotaUpdateMode valueOfDefault(String key) {
+            for (QuotaUpdateMode e : values()) {
+                if (e.name().equals(key)) {
+                    return e;
+                }
+            }
+            return QuotaUpdateMode.auto;
+        }
+    }
+
     public static final String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
     private static final String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
     private URI apiManagerUrl = null;
@@ -59,6 +81,7 @@ public class CoreParameters implements Parameters {
     private boolean ignoreQuotas;
     private boolean zeroDowntimeUpdate;
     private Mode quotaMode;
+    private QuotaUpdateMode quotaUpdateMode;
     private Mode clientAppsMode;
     private Mode clientOrgsMode;
     private String detailsExportFile;
@@ -203,6 +226,19 @@ public class CoreParameters implements Parameters {
     public void setQuotaMode(Mode quotaMode) {
         if (quotaMode == null) return;
         this.quotaMode = quotaMode;
+    }
+
+    public QuotaUpdateMode getQuotaUpdateMode() {
+        if (quotaUpdateMode != null) return quotaUpdateMode;
+        if (getFromProperties("quotaUpdateMode") != null) {
+            return QuotaUpdateMode.valueOfDefault(getFromProperties("quotaUpdateMode"));
+        }
+        return QuotaUpdateMode.auto;
+    }
+
+    public void setQuotaUpdateMode(QuotaUpdateMode quotaUpdateMode) {
+        if (quotaUpdateMode == null) return;
+        this.quotaUpdateMode = quotaUpdateMode;
     }
 
     public boolean isIgnoreClientApps() {

@@ -22,12 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ParseException;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +89,7 @@ public class APIManagerAPIAccessAdapter {
             LOG.debug("Load API-Access with type: {} from API-Manager with ID: {}", type, id);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error loading API-Access from API-Manager for {}. Response-Code: {}. Got response: {}", type, statusCode, response);
                     throw new AppException("Error loading API-Access from API-Manager for " + type + ". Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
@@ -100,7 +101,7 @@ public class APIManagerAPIAccessAdapter {
                 apiManagerResponse.put(type, mappedResponse);
                 putToCache(id, type, response);
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Error loading API-Access from API-Manager for " + type + " from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -215,7 +216,7 @@ public class APIManagerAPIAccessAdapter {
             HttpEntity entity = new StringEntity(mapper.writeValueAsString(apiAccess), ContentType.APPLICATION_JSON);
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 201) {
                     if (statusCode == 409 && response.contains(RESOURCE_ALREADY_EXISTS)) {
@@ -283,7 +284,7 @@ public class APIManagerAPIAccessAdapter {
             removeFromCache(parentEntity.getId(), type);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | ParseException e) {
             throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
@@ -294,7 +295,7 @@ public class APIManagerAPIAccessAdapter {
             // Use an admin account for this request
             RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, errorResponse);
@@ -342,7 +343,7 @@ public class APIManagerAPIAccessAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/apiaccess").build();
             RestAPICall request = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int statusCode = httpResponse.getCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode > 200) {
                     LOG.error("Can't get API access requests for API. Response-Code: {}. Got response: {}", statusCode, response);

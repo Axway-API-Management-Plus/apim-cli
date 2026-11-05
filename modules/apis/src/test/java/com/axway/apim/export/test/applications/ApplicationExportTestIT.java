@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.citrusframework.annotations.CitrusResource;
 import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.context.TestContext;
-import org.citrusframework.functions.core.RandomNumberFunction;
+import org.citrusframework.base.functions.core.RandomNumberFunction;
 import org.citrusframework.http.client.HttpClient;
 import org.citrusframework.message.MessageType;
 import org.citrusframework.testng.spring.TestNGCitrusSpringSupport;
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import static org.citrusframework.DefaultTestActionBuilder.action;
+import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.http.actions.HttpActionBuilder.http;
 import static org.citrusframework.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
@@ -100,7 +100,7 @@ public class ApplicationExportTestIT extends TestNGCitrusSpringSupport {
         assertNull(app.getId(), "The ID of an application shouldn't be exported.");
         assertNull(app.getAppQuota(), "The application quota should not be exported. It's not supported by the export!");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M04.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+        assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRSA2048M01.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
         assertTrue(new File(context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/" + context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
     }

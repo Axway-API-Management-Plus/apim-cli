@@ -101,11 +101,11 @@ public class ExportHelper {
     public void writeToConsole(ObjectMapper mapper, List<ExportAPI> exportAPI) throws AppException {
         if (exportAPI == null || exportAPI.isEmpty()) return;
         try {
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            // Use ObjectWriter to avoid mutating the shared mapper instance
             if (exportAPI.size() == 1)
-                mapper.writeValue(System.out, exportAPI.get(0));
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(System.out, exportAPI.get(0));
             else
-                mapper.writeValue(System.out, exportAPI);
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(System.out, exportAPI);
         } catch (IOException e) {
             throw new AppException("Problem in writing JSON / Yaml data", ErrorCode.UNXPECTED_ERROR, e);
 
@@ -197,8 +197,8 @@ public class ExportHelper {
     public void writeContent(ObjectMapper mapper, ExportAPI exportAPI, File localFolder, String configFile) throws AppException {
         try {
             if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
-                mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
+                // Use ObjectWriter to avoid mutating the shared mapper instance
+                mapper.writer().with(SerializationFeature.INDENT_OUTPUT).writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
             }
         } catch (Exception e) {
             throw new AppException("Can't create API-Configuration file for API: '" + exportAPI.getName() + "' exposed on path: '" + exportAPI.getPath() + "'.", ErrorCode.UNXPECTED_ERROR, e);

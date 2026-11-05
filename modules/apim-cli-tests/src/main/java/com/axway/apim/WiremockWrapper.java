@@ -14,6 +14,12 @@ public class WiremockWrapper {
 
     WireMockServer wireMockServer;
 
+    /**
+     * Allows tests in other packages to assert which requests the CLI actually sent.
+     */
+    public WireMockServer getWireMockServer() {
+        return wireMockServer;
+    }
 
     public void initWiremock() {
         Notifier notifier;

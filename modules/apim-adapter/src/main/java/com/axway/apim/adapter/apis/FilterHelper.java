@@ -1,7 +1,7 @@
 package com.axway.apim.adapter.apis;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.util.List;
 
