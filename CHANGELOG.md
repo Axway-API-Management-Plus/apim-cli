@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.16]  In progress
 
+### Fixed
+API import of a WSDL based API with -overrideSpecBasePath ignores backendBasepath and uses the endpoint from the WSDL
+
 ### Changed
 - Quota restrictions are now added, updated and removed individually using the API-Manager endpoints below
   `/quotas/{id}/constraints` instead of replacing the complete quota document. This leaves the restrictions of
