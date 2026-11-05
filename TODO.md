@@ -1,6 +1,7 @@
 # TODO — Security & Dependency Hygiene
 
 Generated: 2026-08-26  
+Last reviewed: 2026-11-05  
 Branch: `fix/jackson-2.22-upgrade`
 
 ---
@@ -9,6 +10,9 @@ Branch: `fix/jackson-2.22-upgrade`
 
 **CVE scan date:** 2026-08-26  
 **Result:** ✅ No known CVEs found in any direct or transitive dependency.
+
+**Update 2026-11-05:** Jackson was bumped from `2.22.2` to `2.22.4` (`d2a17fa6`) to pick up the
+latest security fixes.
 
 ---
 
@@ -32,19 +36,14 @@ that carry long-term security and maintenance risk.
 
 ### 🟠 Medium Priority
 
-#### 2. `org.apache.httpcomponents:httpclient` — EOL library
-- **Managed version:** `4.5.14`
-- **Issue:** Apache HttpClient 4.x is **end-of-life**. The successor is
-  `org.apache.hc.client5:httpclient5` (HttpClient 5.x), which is already used in
-  `modules/apim-cli-tests`. No CVE at 4.5.14 today, but the 4.x line will not receive
-  security patches.
-- **Fix:** Migrate usages in `modules/apim-adapter` and `modules/apis` from
-  `org.apache.httpcomponents:httpclient` to `org.apache.hc.client5:httpclient5`.
-- **Files:** `pom.xml`, `modules/apim-adapter/pom.xml`, `modules/apis/pom.xml`
+#### ~~2. `org.apache.httpcomponents:httpclient` — EOL library~~ ✅ DONE
+- **Was:** `httpclient:4.5.14` (HttpClient 4.x is end-of-life)
+- **Now:** `org.apache.hc.client5:httpclient5:5.6.4`, used by `modules/apim-adapter`, `modules/apis`
+  and `modules/apim-cli-tests`. No `org.apache.http.*` imports remain (commit `30a39167`).
 
 #### ~~3. `org.apache.logging.log4j:log4j-slf4j-impl` — behind current release~~ ✅ DONE
 - **Was:** `log4j-slf4j-impl:2.20.0` + `slf4j-api:1.7.36`
-- **Now:** `log4j-slf4j2-impl:2.25.4` + `log4j-api/core:2.25.4` + `slf4j-api:2.0.18`
+- **Now:** `log4j-slf4j2-impl` + `log4j-api/core:2.26.1` + `slf4j-api:2.0.20`
 - `log4j-slf4j-impl` (SLF4J 1.x bridge) was discontinued at 2.20.0; replaced with
   `log4j-slf4j2-impl` (SLF4J 2.x bridge). Source unchanged — only `Logger`/`LoggerFactory`
   used, both backward-compatible in SLF4J 2.x.
@@ -53,14 +52,9 @@ that carry long-term security and maintenance risk.
 
 ### 🟡 Low Priority
 
-#### 4. `org.slf4j:slf4j-api` — legacy branch
-- **Managed version:** `1.7.36`
-- **Current release:** `2.0.x`
-- **Issue:** SLF4J 1.x is the legacy branch. 2.x has been stable for over a year. No CVE
-  at 1.7.36.
-- **Fix:** Upgrade to `slf4j-api:2.0.x` (requires aligning `log4j-slf4j-impl` →
-  `log4j-slf4j2-impl` artifact rename).
-- **File:** `pom.xml`
+#### ~~4. `org.slf4j:slf4j-api` — legacy branch~~ ✅ DONE
+- **Was:** `slf4j-api:1.7.36`
+- **Now:** `slf4j-api:2.0.20` together with `log4j-slf4j2-impl` (done as part of item 3).
 
 #### 5. `org.glassfish.jaxb:jaxb-runtime` — dated release
 - **Managed version:** `2.3.9`
@@ -74,7 +68,9 @@ that carry long-term security and maintenance risk.
 - **Effective version (transitive):** `1.2`
 - **Current release:** `1.3.x`
 - **Issue:** Pulled transitively via `httpclient:4.5.14`. No CVE at 1.2.
-- **Fix:** Add `commons-logging:commons-logging:1.3.x` to `dependencyManagement` to force
-  the newer version, or resolve as part of the HttpClient 5.x migration (item #2 above).
+- **Update:** The HttpClient 5.x migration (item #2) removed `httpclient:4.5.14`, so this path no longer
+  applies. Run `mvn dependency:tree -Dincludes=commons-logging` to confirm it is gone from the
+  classpath, then close this item. If another dependency still pulls it in, add
+  `commons-logging:commons-logging:1.3.x` to `dependencyManagement`.
 - **File:** `pom.xml`
 

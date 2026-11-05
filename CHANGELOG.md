@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 API import of a WSDL based API with -overrideSpecBasePath ignores backendBasepath and uses the endpoint from the WSDL
 
 ### Changed
+- Upgraded dependencies:
+    - Apache HttpClient 4.5.14 (end-of-life) to HttpClient 5 (`httpclient5` 5.6.4)
+    - jackson-* to 2.22.4 to fix security issues
+    - log4j to 2.26.1 and slf4j-api from 1.7.36 to 2.0.20. `log4j-slf4j-impl` is replaced by `log4j-slf4j2-impl`
 - Quota restrictions are now added, updated and removed individually using the API-Manager endpoints below
   `/quotas/{id}/constraints` instead of replacing the complete quota document. This leaves the restrictions of
   other APIs untouched and avoids lost updates. API-Managers older than 7.7.20261130 keep using the previous
