@@ -39,6 +39,10 @@ public class WSDLSpecification extends APISpecification {
     public void configureBasePath(String backendBasePath, API api) throws AppException {
         // For SOAP services, the WSDL has not been adapted in any case,
         // so the necessary service profile is to be created here.
+        // Overriding the spec base path is not supported for WSDL. Reset it here (and not in parse()), as parse() returns
+        // early for ?wsdl / .wsdl / ?singlewsdl URLs and is also invoked while probing non-WSDL specifications.
+        // Otherwise, the backendBasepath is not applied and the endpoint from the WSDL is used.
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         if (backendBasePath != null) {
             ServiceProfile serviceProfile = new ServiceProfile();
             serviceProfile.setBasePath(backendBasePath);
@@ -62,7 +66,6 @@ public class WSDLSpecification extends APISpecification {
             return true;
         }
         try {
-            CoreParameters.getInstance().setOverrideSpecBasePath(false); // Not allowing override base path for WSDL, hence changing it to false.
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             // to be compliant, completely disable DOCTYPE declaration:
