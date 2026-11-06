@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 API import of a WSDL based API with -overrideSpecBasePath ignores backendBasepath and uses the endpoint from the WSDL
 
 ### Changed
+- With `-quotaMode replace` an API without an application or system quota now removes the quota configured for the
+  API in API-Manager. With the other quota modes a missing quota still keeps the existing one.
 - Upgraded dependencies:
     - Apache HttpClient 4.5.14 (end-of-life) to HttpClient 5 (`httpclient5` 5.6.4)
     - jackson-* to 2.22.4 to fix security issues

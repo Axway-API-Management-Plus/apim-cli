@@ -47,18 +47,20 @@ public class APIQuotaManager {
         boolean sameAPI = this.actualState != null && this.actualState.getId().equals(createdAPI.getId());
         // Handle the system quota
         List<QuotaRestriction> actualRestrictions = actualState != null ? getRestrictions(actualState.getSystemQuota()) : null;
-        List<QuotaRestriction> desiredRestrictions = getRestrictions(desiredState.getSystemQuota());
+        List<QuotaRestriction> desiredRestrictions = getDesiredRestrictions(desiredState.getSystemQuota());
 
         updateRestrictions(actualRestrictions, desiredRestrictions, createdAPI, Quota.SYSTEM_DEFAULT, sameAPI);
         // Handle the application quota
         actualRestrictions = actualState != null ? getRestrictions(actualState.getApplicationQuota()) : null;
-        desiredRestrictions = getRestrictions(desiredState.getApplicationQuota());
+        desiredRestrictions = getDesiredRestrictions(desiredState.getApplicationQuota());
         updateRestrictions(actualRestrictions, desiredRestrictions, createdAPI, Quota.APPLICATION_DEFAULT, sameAPI);
     }
 
     public void updateRestrictions(List<QuotaRestriction> actualRestrictions, List<QuotaRestriction> desiredRestrictions, API createdAPI, Quota type, boolean sameAPI) throws AppException {
+        // Desired restrictions are only null, if no quota is desired and quotaMode is replace. Then the quota of the API must be removed.
+        boolean removeQuota = desiredRestrictions == null;
+        if (removeQuota && (actualRestrictions == null || actualRestrictions.isEmpty())) return;
         // If restrictions are equal and the API is not re-created, there is nothing to do
-        if (actualRestrictions == null && desiredRestrictions == null) return;
         if (desiredRestrictions != null && desiredRestrictions.equals(actualRestrictions) && sameAPI) {
             LOG.info("{} quota for API: {} is UN-CHANGED. Nothing to do.", type.getFriendlyName(), createdAPI.getName());
             return;
@@ -68,12 +70,17 @@ public class APIQuotaManager {
             return;
         }
         APIManagerQuotaAdapter quotaManager = APIManagerAdapter.getInstance().getQuotaAdapter();
-        LOG.info("Updating {} quota for API: {}", type.getFriendlyName(), createdAPI.getName());
+        if (removeQuota) {
+            LOG.info("Removing {} quota for API: {}, as no quota is desired and quotaMode is replace.", type.getFriendlyName(), createdAPI.getName());
+        } else {
+            LOG.info("Updating {} quota for API: {}", type.getFriendlyName(), createdAPI.getName());
+        }
         LOG.debug("{}-Restrictions: Desired: {}, Actual: {}", type.getFriendlyName(), desiredRestrictions, actualRestrictions);
         // Load the entire current default quota
         APIQuota currentDefaultQuota = quotaManager.getDefaultQuota(type);
         LOG.debug("Current Default Quota : {}", currentDefaultQuota);
-        List<QuotaRestriction> mergedRestrictions = mergeRestriction(actualRestrictions, desiredRestrictions);
+        // Without a desired quota nothing is merged, all restrictions of the actual API are removed below
+        List<QuotaRestriction> mergedRestrictions = removeQuota ? new ArrayList<>() : mergeRestriction(actualRestrictions, desiredRestrictions);
         LOG.debug("Merged  Quota : {}", mergedRestrictions);
         populateMethodId(createdAPI, mergedRestrictions);
         // If there is an actual API, remove the restrictions for the current actual API
@@ -186,6 +193,15 @@ public class APIQuotaManager {
         APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().getMethodAdapter();
         APIMethod newMethod = methodAdapter.getMethodForName(createdAPI.getId(), restriction.getMethod());
         restriction.setMethod(newMethod.getId());
+    }
+
+    /**
+     * @return an empty list, if no quota is desired and quotaMode is replace, which means an existing quota must be removed.
+     * Otherwise, the restrictions of the desired quota, or an empty list if no quota is desired, which keeps an existing quota.
+     */
+    private List<QuotaRestriction> getDesiredRestrictions(APIQuota quota) {
+        if (quota == null && CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.replace)) return Collections.emptyList();
+        return getRestrictions(quota);
     }
 
     private List<QuotaRestriction> getRestrictions(APIQuota quota) {

@@ -2,8 +2,11 @@ package com.axway.apim.apiimport;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Constants;
@@ -14,12 +17,14 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is key, as the desired and actual API comes together.
  * <p>
- * This class compares the desired- with the actual-API to create the Change-State. Basically
+ * This class compares the desired-with the actual-API to create the Change-State. Basically
  * a list of changes that are needed to bring the API in sync.
  * <p>
  * For that the class iterates through all the declared API-Properties, in case of changes
@@ -97,24 +102,24 @@ public class APIChangeState {
                     Object actualValue = method2.invoke(actualAPI,  null);
                     APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
                     if (desiredValue == null && actualValue == null) continue;
-                    if (desiredValue == null && property.ignoreNull()) {
+                    if (desiredValue == null && property.ignoreNull() && !isQuotaToRemove(actualValue)) {
                         LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), null, actualValue);
                         continue; // No change, if nothing is provided!
                     }
                     if (actualValue == null || !Utils.compareValues(actualValue, desiredValue)) {
                         // Property change requires proxy update
-                        if (property.copyProp()) this.proxyUpdateRequired = true;
+                        if (property.copyProp()) proxyUpdateRequired = true;
                         if (property.isBreaking()) {
-                            this.isBreaking = true;
-                            this.breakingChanges.add(field.getName());
+                            isBreaking = true;
+                            breakingChanges.add(field.getName());
                         } else {
-                            this.nonBreakingChanges.add(field.getName());
+                            nonBreakingChanges.add(field.getName());
                         }
                         if (property.isRecreate()) {
-                            this.recreateAPI = true;
+                            recreateAPI = true;
                         }
-                        if (!isWritable(property, this.actualAPI.getState())) {
-                            this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
+                        if (!isWritable(property, actualAPI.getState())) {
+                            updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
                         }
                         LOG.debug("Changed property: {} [Desired: {} vs Actual: {}]", field.getName(), desiredValue, actualValue);
                     } else {
@@ -125,6 +130,20 @@ public class APIChangeState {
                 throw new AppException("Can't verify API-Change-State for: " + field.getName(), ErrorCode.CANT_CREATE_STATE_CHANGE, e);
             }
         }
+    }
+
+    /**
+     * With quotaMode replace, a desired API without a quota removes the quota set for the actual API.
+     * With any other quotaMode a missing quota means: keep the actual quota.
+     *
+     * @param actualValue the actual property value
+     * @return true, if the actual value is a quota with restrictions that must be removed, as no quota is desired.
+     */
+    private static boolean isQuotaToRemove(Object actualValue) {
+        if (!(actualValue instanceof APIQuota)) return false;
+        if (!CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.replace)) return false;
+        List<QuotaRestriction> restrictions = ((APIQuota) actualValue).getRestrictions();
+        return restrictions != null && !restrictions.isEmpty();
     }
 
     public static void initCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
@@ -184,13 +203,9 @@ public class APIChangeState {
     }
 
     private static List<String> getAllAPIProperties() {
-        List<String> allAPIProps = new ArrayList<>();
+        List<String> allAPIProps;
         Field[] fields = API.class.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
-                allAPIProps.add(field.getName());
-            }
-        }
+        allAPIProps = Arrays.stream(fields).filter(field -> field.isAnnotationPresent(APIPropertyAnnotation.class)).map(Field::getName).collect(Collectors.toList());
         return allAPIProps;
     }
 
@@ -220,7 +235,7 @@ public class APIChangeState {
      * @return true, if a breakingChange or a nonBreakingChange was found otherwise false.
      */
     public boolean hasAnyChanges() {
-        return !this.breakingChanges.isEmpty() || !this.nonBreakingChanges.isEmpty();
+        return !breakingChanges.isEmpty() || !nonBreakingChanges.isEmpty();
     }
 
     /**
@@ -228,8 +243,8 @@ public class APIChangeState {
      */
     public boolean isBreaking() {
         // We will only break API, if the API is no longer in state: "unpublished"
-        if (this.actualAPI.getState().equals(Constants.API_UNPUBLISHED)) return false;
-        if (this.actualAPI.getState().equals(Constants.API_PENDING)) return false;
+        if (actualAPI.getState().equals(Constants.API_UNPUBLISHED)) return false;
+        if (actualAPI.getState().equals(Constants.API_PENDING)) return false;
         return isBreaking;
     }
 
