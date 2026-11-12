@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+# [1.14.17] In progress
+
+### Removed
+- **OData support was removed.** Passing an OData `$metadata` / EDMX document (OData V2, V3 and V4) as the API
+  definition of `api import` is no longer supported and fails with a message pointing to the replacement.
+  The conversion was built on [Apache Olingo](https://olingo.apache.org/), which is no longer maintained. It moved to
+  the separate project `apim-cli-odata`, which converts OData V2/V4 metadata into an OpenAPI 3 specification:
+  ```
+  apim-odata convert -m <metadata file or URL> -b <backend of the OData service> -o openapi.json
+  ```
+  Convert the metadata first, then import the resulting OpenAPI file with the CLI as usual. Everything else about
+  importing such an API stays the same. The OData-Routing policy is still required for these APIs. API-Specification
+  filters can still be applied, as they now work on the converted OpenAPI file.
+- Removed the OData example configurations from `examples/basic` and the Apache Olingo dependencies.
+
 # [1.14.16]  2026-11-12
 
 ### Fixed

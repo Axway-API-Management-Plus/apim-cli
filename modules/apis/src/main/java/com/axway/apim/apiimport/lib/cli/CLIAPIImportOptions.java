@@ -117,7 +117,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		Console.println("Import an API including the API-Specification using environment properties file: env.api-env.properties:");
 		Console.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification.json -s api-env");
 		Console.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification-filtered.json -s api-env");
-		Console.println(getBinaryName()+" api import -c samples/basic/odata-v2-northwind-api.json -s api-env");
 		Console.println();
 		Console.println();
 		Console.println(getBinaryName()+" api import -c samples/complex/complete-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");

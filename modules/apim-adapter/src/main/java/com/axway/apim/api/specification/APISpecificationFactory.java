@@ -47,8 +47,7 @@ public class APISpecificationFactory {
 
     public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError, boolean logDetectedVersion) throws AppException {
         List<APISpecification> specificationTypes = Arrays.asList(new OAS3xSpecification(), new Swagger2xSpecification(), new Swagger1xSpecification(),
-            new GraphqlSpecification(), new WSDLSpecification(), new WADLSpecification(), new ODataV2Specification(),
-            new ODataV3Specification(), new ODataV4Specification());
+            new GraphqlSpecification(), new WSDLSpecification(), new WADLSpecification());
         if (LOG.isDebugEnabled()) {
             LOG.debug("Handle API-Specification: {} , apiDefinitionFile: {} , API Name : {} ", getContentStart(apiSpecificationContent), apiDefinitionFile, apiName);
         }
@@ -74,7 +73,18 @@ public class APISpecificationFactory {
             return new UnknownAPISpecification(apiName);
         }
         LOG.debug("API: {} has a unknown/invalid API-Specification", apiName);
+        if (isODataMetadata(apiSpecificationContent)) {
+            throw new AppException("Detected an OData specification ($metadata), which is no longer supported by the APIM-CLI. "
+                + "Convert it into an OpenAPI specification using apim-cli-odata (apim-odata convert -m <metadata> -b <backend> -o openapi.json) "
+                + "and import the resulting OpenAPI file instead.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
+        }
         throw new AppException("Can't handle API specification. No suitable API-Specification implementation available.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
+    }
+
+    static boolean isODataMetadata(byte[] apiSpecificationContent) {
+        if (apiSpecificationContent == null || apiSpecificationContent.length == 0) return false;
+        String start = new String(apiSpecificationContent, 0, Math.min(apiSpecificationContent.length, 500), StandardCharsets.UTF_8).toLowerCase();
+        return start.contains("edmx");
     }
 
     static String getContentStart(byte[] apiSpecificationContent) {
