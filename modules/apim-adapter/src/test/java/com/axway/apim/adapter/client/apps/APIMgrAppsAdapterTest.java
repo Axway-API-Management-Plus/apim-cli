@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -317,6 +318,36 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
         Optional<ClientAppCredential> optionalClientAppCredential = clientAppAdapter.searchForExistingCredential(clientApplication, credentialId);
         Assert.assertTrue(optionalClientAppCredential.isPresent());
         Assert.assertEquals(clientAppCredential, optionalClientAppCredential.get());
+    }
+
+    @Test
+    public void searchForExistingCredentialSameClientIdDifferentType() {
+        String clientId = "1234";
+        ClientApplication clientApplication = new ClientApplication();
+        clientApplication.setName("test");
+        clientApplication.setId("1d2aeeca-2716-449e-a7a0-5d7213dbcbaf");
+        OAuth oauth = new OAuth();
+        oauth.setClientId(clientId);
+        oauth.setId(clientId);
+        ExtClients extClients = new ExtClients();
+        extClients.setClientId(clientId);
+        extClients.setId("ext-credential-id");
+
+        List<ClientAppCredential> credentials = new ArrayList<>();
+        credentials.add(oauth);
+        credentials.add(extClients);
+        clientApplication.setCredentials(credentials);
+
+        Optional<ClientAppCredential> ext = clientAppAdapter.searchForExistingCredential(clientApplication, clientId, ExtClients.class);
+        Assert.assertTrue(ext.isPresent());
+        Assert.assertSame(extClients, ext.get());
+        Optional<ClientAppCredential> oauthResult = clientAppAdapter.searchForExistingCredential(clientApplication, clientId, OAuth.class);
+        Assert.assertTrue(oauthResult.isPresent());
+        Assert.assertSame(oauth, oauthResult.get());
+
+        // Only an OAuth credential exists: an extclients lookup with the same id must not match it
+        clientApplication.setCredentials(new ArrayList<>(Collections.singletonList(oauth)));
+        Assert.assertFalse(clientAppAdapter.searchForExistingCredential(clientApplication, clientId, ExtClients.class).isPresent());
     }
 
     @Test

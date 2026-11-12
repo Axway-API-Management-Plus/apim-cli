@@ -34,6 +34,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class APIMgrAppsAdapter {
 
@@ -426,7 +427,7 @@ public class APIMgrAppsAdapter {
                 filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept(CREDENTIAL_TYPE, "clientId", API_KEY));
                 final String credentialId = ((OAuth) cred).getClientId();
-                Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+                Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId, OAuth.class);
                 if (opt.isPresent()) {
                     LOG.info("Found oauth credential with same ID for application");
                     //I found a credential with same id name but different in some properties, I have to update it
@@ -439,7 +440,7 @@ public class APIMgrAppsAdapter {
                 endpoint.append("extclients");
                 filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept(CREDENTIAL_TYPE, API_KEY, "applicationId"));
-                Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+                Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId, ExtClients.class);
                 if (opt.isPresent()) {
                     LOG.info("Found extclients credential with same ID");
                     //I found a credential with same id name but different in some properties, I have to update it
@@ -453,7 +454,7 @@ public class APIMgrAppsAdapter {
                 endpoint.append("apikeys");
                 filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept(CREDENTIAL_TYPE, "clientId", API_KEY));
-                Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+                Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId, APIKey.class);
                 if (opt.isPresent()) {
                     LOG.info("Found apikey credential with same ID");
                     //I found a credential with same id name but different in some properties, I have to update it
@@ -474,17 +475,8 @@ public class APIMgrAppsAdapter {
         if (actualApp == null || actualApp.getCredentials() == null || actualApp.getCredentials().isEmpty()) return Collections.emptyList();
         if (desiredApp == null || desiredApp.getCredentials() == null || desiredApp.getCredentials().isEmpty()) return Collections.emptyList();
 
-        Set<String> desiredCredentialKeys = new HashSet<>();
-        for (ClientAppCredential credential : desiredApp.getCredentials()) {
-            desiredCredentialKeys.add(getCredentialComparisonKey(credential));
-        }
-        List<ClientAppCredential> credentials2Delete = new ArrayList<>();
-        for (ClientAppCredential existingCredential : actualApp.getCredentials()) {
-            if (!desiredCredentialKeys.contains(getCredentialComparisonKey(existingCredential))) {
-                credentials2Delete.add(existingCredential);
-            }
-        }
-        return credentials2Delete;
+        Set<String> desiredCredentialKeys = desiredApp.getCredentials().stream().map(this::getCredentialComparisonKey).collect(Collectors.toSet());
+        return actualApp.getCredentials().stream().filter(existingCredential -> !desiredCredentialKeys.contains(getCredentialComparisonKey(existingCredential))).collect(Collectors.toList());
     }
 
     String getCredentialComparisonKey(ClientAppCredential credential) {
@@ -565,8 +557,19 @@ public class APIMgrAppsAdapter {
 
     protected Optional<ClientAppCredential> searchForExistingCredential(ClientApplication actualApp,
                                                                         final String credentialId) {
+        return searchForExistingCredential(actualApp, credentialId, ClientAppCredential.class);
+    }
+
+    /**
+     * Searches for an existing credential with the given ID, restricted to the given credential type.
+     * An OAuth credential and an external client (extclients) credential may share the same clientId,
+     * so the type must be taken into account (see issue #597).
+     */
+    protected Optional<ClientAppCredential> searchForExistingCredential(ClientApplication actualApp,
+                                                                        final String credentialId,
+                                                                        final Class<? extends ClientAppCredential> type) {
         if (actualApp != null) {
-            return actualApp.getCredentials().stream().filter(o -> {
+            return actualApp.getCredentials().stream().filter(type::isInstance).filter(o -> {
                 if (o instanceof OAuth)
                     return ((OAuth) o).getClientId().equals(credentialId);
                 if (o instanceof ExtClients)

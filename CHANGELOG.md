@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.16]  In progress
 
 ### Fixed
-API import of a WSDL based API with -overrideSpecBasePath ignores backendBasepath and uses the endpoint from the WSDL
+- API import of a WSDL based API with -overrideSpecBasePath ignores backendBasepath and uses the endpoint from the WSDL
+
+- Updating an existing application with an `extclients` credential failed with a 404 when its `clientId` was the same as
+the `clientId` of an existing OAuth credential, because the OAuth credential was matched instead. Credentials are now
+matched by type as well as by ID ([#597](https://github.com/Axway-API-Management-Plus/apim-cli/issues/597)).
 
 ### Changed
 - With `-quotaMode replace` an API without an application or system quota now removes the quota configured for the
