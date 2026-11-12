@@ -19,7 +19,7 @@
 
     <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
     <artifactId>parent</artifactId>
-    <version>1.14.16</version>
+    <version>1.14.17-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Axway API-Manager CLI Parent</name>
@@ -76,7 +76,7 @@
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
         <developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</developerConnection>
         <url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
-        <tag>parent-1.14.16</tag>
+        <tag>parent-1.14.4</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
