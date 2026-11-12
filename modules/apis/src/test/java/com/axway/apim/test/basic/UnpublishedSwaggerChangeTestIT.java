@@ -82,6 +82,6 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusSpringSupport {
 
         $(echo("####### Validate the previous BE-API has been deleted #######"));
         $(http().client(apiManager).send().get("/apirepo/${beApiId}"));
-        $(http().client(apiManager).receive().response(HttpStatus.NOT_FOUND));
+        $(http().client(apiManager).receive().response(HttpStatus.FORBIDDEN));
 	}
 }
