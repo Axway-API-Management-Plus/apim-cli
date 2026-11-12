@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.16]  In progress
+# [1.14.16]  2026-11-12
 
 ### Fixed
 - API import of a WSDL based API with -overrideSpecBasePath ignores backendBasepath and uses the endpoint from the WSDL
