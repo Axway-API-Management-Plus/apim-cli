@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.17] In progress
 
+### Changed
+- Upgraded dependencies:
+    - swagger-parser 2.1.19 to 2.1.48
+    - swagger-models 2.2.0 to 2.2.55 (swagger-core 2.2.55 is now managed as well). The 3.x line of swagger-models requires
+      Jackson 3 and is not supported by swagger-parser yet, so it is not used.
+
 ### Removed
 - **OData support was removed.** Passing an OData `$metadata` / EDMX document (OData V2, V3 and V4) as the API
   definition of `api import` is no longer supported and fails with a message pointing to the replacement.
