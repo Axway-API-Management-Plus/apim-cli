@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import static org.citrusframework.actions.SleepAction.Builder.sleep;
 import static org.citrusframework.dsl.DefaultTestActionBuilder.action;
 import static org.citrusframework.actions.EchoAction.Builder.echo;
 import static org.citrusframework.json.dsl.JsonPathSupport.jsonPath;
@@ -84,7 +85,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusSpringSupport {
         variable("expectedReturnCode", "0");
         variable("useFEAPIDefinition", "true"); // In this case we simulate to export the FE-API-Definition instead of the backend
         swaggerExport.doExecute(context);
-
+        $(sleep().seconds(10));
         String exportedAPIConfigFile = context.getVariable("exportLocation") + "/" + context.getVariable("exportFolder") + "/api-config.json";
         $(echo("####### Reading exported API-Config file: '" + exportedAPIConfigFile + "' #######"));
         JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(new File(exportedAPIConfigFile).toPath()));
