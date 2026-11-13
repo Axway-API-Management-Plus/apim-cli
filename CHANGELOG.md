@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.17] In progress
 
 ### Fixed
+- Application quota restrictions of different APIs, which are given by `apiPath`, were all applied to the first API. The API lookup reused
+  the cached response of a previous lookup by another API path, as the cache key of the API filter ignored the API path
+  ([#567](https://github.com/Axway-API-Management-Plus/apim-cli/issues/567)). The same applies to any other lookup of APIs by `apiPath`,
+  `state`, `deprecated`, `retired` or `createdOn` within one execution.
 - Updating an API failed with "No operation found with name: '<id>'" if an inbound or outbound profile exists for a specific operation and the API
   is updated more than once during an import, for example when the backendBasepath is changed together with other properties
   ([#581](https://github.com/Axway-API-Management-Plus/apim-cli/issues/581)).

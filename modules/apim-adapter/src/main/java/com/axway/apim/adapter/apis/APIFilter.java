@@ -386,6 +386,13 @@ public class APIFilter implements CustomPropertiesFilter {
         this.failOnError = failOnError;
     }
 
+    /**
+     * The responses of the API-Manager are cached per filter. Therefore, two filters are equal if they result in the same request to the
+     * API-Manager, which is defined by the type of the API (front-end/back-end), the ID and the filters sent to the API-Manager (e.g.
+     * name, API path, state). Everything else is applied on the response and doesn't change the request.
+     * It is important to include all of them. Otherwise, the lookup of an API returns the API of a previous lookup, for instance
+     * when APIs are looked up by different API paths (issue #567).
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
@@ -395,16 +402,15 @@ public class APIFilter implements CustomPropertiesFilter {
         return (
             StringUtils.equals(other.getId(), this.getId()) &&
                 StringUtils.equals(other.getName(), this.getName()) &&
-                StringUtils.equals(other.getApiId(), this.getApiId())
+                StringUtils.equals(other.getApiId(), this.getApiId()) &&
+                StringUtils.equals(other.getApiType(), this.getApiType()) &&
+                Objects.equals(other.getFilters(), this.getFilters())
         );
     }
 
     @Override
     public int hashCode() {
-        int hashCode = 0;
-        hashCode += (this.id != null) ? this.id.hashCode() : 0;
-        hashCode += (this.name != null) ? this.name.hashCode() : 0;
-        return hashCode;
+        return Objects.hash(id, name, apiId, getApiType(), filters);
     }
 
     public boolean isIncludeMethods() {
