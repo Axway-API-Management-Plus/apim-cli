@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.17] In progress
 
 ### Fixed
+- Updating an API failed with "No operation found with name: '<id>'" if an inbound or outbound profile exists for a specific operation and the API
+  is updated more than once during an import, for example when the backendBasepath is changed together with other properties
+  ([#581](https://github.com/Axway-API-Management-Plus/apim-cli/issues/581)).
 - OpenAPI 3.1 specifications with `resolve_openapi_ref=true` failed silently on import ([#582](https://github.com/Axway-API-Management-Plus/apim-cli/issues/582)):
   - The resolved specification was ignored, as the original specification was used after resolving the references.
   - The resolved OpenAPI 3.1 model was serialized with a plain Jackson mapper instead of the one of swagger-core, which fails for

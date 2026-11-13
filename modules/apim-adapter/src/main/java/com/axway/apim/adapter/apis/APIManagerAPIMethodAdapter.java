@@ -81,6 +81,21 @@ public class APIManagerAPIMethodAdapter {
         throw new AppException("No operation found with name: '" + methodName + "'", ErrorCode.API_OPERATION_NOT_FOUND);
     }
 
+    /**
+     * @param apiId     the API the operations are loaded for
+     * @param methodKey the ID or the name of an operation
+     * @param byId      true to check if methodKey is the ID of an operation, otherwise it is checked against the names
+     * @return true, if the API has an operation with the given ID or name
+     * @throws AppException if the operations cannot be loaded
+     */
+    public boolean hasMethod(String apiId, String methodKey, boolean byId) throws AppException {
+        for (APIMethod method : getAllMethodsForAPI(apiId)) {
+            String value = byId ? method.getId() : method.getName();
+            if (methodKey.equals(value)) return true;
+        }
+        return false;
+    }
+
     private void logMessage(String apiId) {
         LOG.warn("No operations found for API with id: {}", apiId);
     }
