@@ -132,7 +132,13 @@ public class APIManagerCLI {
             try {
                 rc = (int) this.selectedMethod.invoke(this.selectedService, (Object) args);
                 return rc;
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            } catch (InvocationTargetException e) {
+                // Don't swallow errors thrown by a command (e.g. NoSuchMethodError caused by a wrong library), see issue #582
+                Throwable cause = e.getCause() != null ? e.getCause() : e;
+                LOG.error("Unexpected error executing: {} : {}", getMethodName(this.selectedMethod), cause.toString(), cause);
+                return ErrorCode.UNXPECTED_ERROR.getCode();
+            } catch (IllegalAccessException | IllegalArgumentException e) {
+                LOG.error("Unexpected error executing: {} : {}", getMethodName(this.selectedMethod), e.toString(), e);
                 return ErrorCode.UNXPECTED_ERROR.getCode();
             }
         }

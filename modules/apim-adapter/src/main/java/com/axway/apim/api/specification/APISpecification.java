@@ -19,7 +19,6 @@ public abstract class APISpecification {
     private static final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
     public static final String JSON = ".json";
     public static final String YAML = ".yaml";
-    public static final String METADATA = "$metadata";
 
 
     public enum APISpecType {
@@ -31,10 +30,6 @@ public abstract class APISpecification {
         OPEN_API_30_YAML("Open API 3.x (YAML)", YAML),
         WSDL_API("WSDL", ".xml"),
         WADL_API("Web Application Description Language (WADL)", ".wadl"),
-        ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", METADATA, "Given OData specification is converted into an OpenAPI 3 specification.",
-            "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
-        ODATA_V3("OData V4", METADATA),
-        ODATA_V4("OData V4", METADATA),
         GRAPHQL("Graphql", ".graphqls"),
         UNKNOWN("Unknown", ".txt");
 
@@ -98,10 +93,6 @@ public abstract class APISpecification {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof OAS3xSpecification) {
                 return compareJSON(otherSwagger, this);
-            } else if (other instanceof ODataSpecification) {
-                ODataSpecification importSpec = (ODataSpecification) other;
-                OAS3xSpecification specFromGateway = (OAS3xSpecification) this; // Gateway stores as openapi
-                return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
             } else if (other instanceof Swagger1xSpecification) {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification || other instanceof GraphqlSpecification) {

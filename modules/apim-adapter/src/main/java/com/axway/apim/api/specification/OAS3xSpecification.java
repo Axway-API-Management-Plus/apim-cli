@@ -10,16 +10,26 @@ import com.axway.apim.lib.error.InternalException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.swagger.v3.core.util.Json;
+import io.swagger.v3.core.util.Json31;
+import io.swagger.v3.core.util.Yaml;
+import io.swagger.v3.core.util.Yaml31;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 
 public class OAS3xSpecification extends APISpecification {
@@ -28,6 +38,7 @@ public class OAS3xSpecification extends APISpecification {
     public static final String OPENAPI = "openapi";
 
     private JsonNode openApiNode = null;
+    private boolean resolveOpenApiRef = EnvironmentProperties.RESOLVE_OPENAPI_REF;
 
     public OAS3xSpecification() {
         super();
@@ -151,32 +162,71 @@ public class OAS3xSpecification extends APISpecification {
     }
 
     @Override
-    public boolean parse(byte[] apiSpecificationContent) {
+    public boolean parse(byte[] apiSpecificationContent) throws AppException {
         try {
             this.apiSpecificationContent = apiSpecificationContent;
             setMapperForDataFormat();
-            if(EnvironmentProperties.RESOLVE_OPENAPI_REF){
-                this.apiSpecificationContent = resolveReferences(apiSpecificationContent);
-            }
             if (this.mapper == null) return false;
             openApiNode = this.mapper.readTree(apiSpecificationContent);
             LOG.debug("openapi tag value : {}", openApiNode.get(OPENAPI));
-            return openApiNode.has(OPENAPI) && openApiNode.get(OPENAPI).asText().startsWith("3.");
+            if (!(openApiNode.has(OPENAPI) && openApiNode.get(OPENAPI).asText().startsWith("3."))) {
+                return false;
+            }
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("No OpenAPI 3.x specification.", e);
             }
             return false;
         }
+        // It is an OpenAPI 3.x specification. From here on, errors must not be swallowed, as the
+        // specification would be reported as unsupported or the import would silently stop (issue #582)
+        if (resolveOpenApiRef) {
+            resolveReferences();
+        }
+        return true;
     }
 
-    public byte[] resolveReferences(byte[] apiSpecificationContent) throws JsonProcessingException {
+    private void resolveReferences() throws AppException {
+        try {
+            this.apiSpecificationContent = resolveReferences(this.apiSpecificationContent);
+            // Continue with the resolved specification
+            this.openApiNode = this.mapper.readTree(this.apiSpecificationContent);
+        } catch (Exception | LinkageError e) { // LinkageError: e.g. NoSuchMethodError caused by mixed up swagger library versions
+            throw new AppException("Unable to resolve the references of the OpenAPI specification (resolve_openapi_ref=true): " + e, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+        }
+    }
+
+    public byte[] resolveReferences(byte[] apiSpecificationContent) throws IOException {
         OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setResolve(true); // Enable resolution of $ref references
         parseOptions.setFlatten(true);
-        SwaggerParseResult swaggerParseResult = openAPIV3Parser.readContents(new String(apiSpecificationContent), null, parseOptions);
-        return mapper.writeValueAsBytes(swaggerParseResult.getOpenAPI());
+        SwaggerParseResult swaggerParseResult = openAPIV3Parser.readContents(new String(apiSpecificationContent, StandardCharsets.UTF_8), null, parseOptions);
+        List<String> messages = swaggerParseResult.getMessages();
+        OpenAPI openAPI = swaggerParseResult.getOpenAPI();
+        if (openAPI == null) {
+            throw new IOException("The OpenAPI specification cannot be parsed: " + messages);
+        }
+        if (messages != null) {
+            for (String message : messages) {
+                LOG.warn("Resolving OpenAPI references: {}", message);
+            }
+        }
+        // Use the mappers of swagger-core to serialize the model. A plain Jackson mapper doesn't know how to
+        // serialize the OpenAPI 3.1 model (e.g. boolean schemas like additionalProperties: false)
+        boolean yaml = mapper.getFactory() instanceof YAMLFactory;
+        boolean openApi31 = SpecVersion.V31.equals(openAPI.getSpecVersion());
+        ObjectMapper swaggerMapper;
+        if (yaml) {
+            swaggerMapper = openApi31 ? Yaml31.mapper() : Yaml.mapper();
+        } else {
+            swaggerMapper = openApi31 ? Json31.mapper() : Json.mapper();
+        }
+        return swaggerMapper.writeValueAsBytes(openAPI);
+    }
+
+    void setResolveOpenApiRef(boolean resolveOpenApiRef) {
+        this.resolveOpenApiRef = resolveOpenApiRef;
     }
 
     @Override

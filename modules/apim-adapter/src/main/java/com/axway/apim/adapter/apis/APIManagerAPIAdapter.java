@@ -363,6 +363,16 @@ public class APIManagerAPIAdapter {
         }
     }
 
+    private boolean isTranslated(String key, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
+        // When translated as ID the key is an operation ID, and the other way around an operation name
+        boolean translatedKeyIsId = mode != METHOD_TRANSLATION.AS_NAME;
+        for (String apiId : apiIds) {
+            if (APIManagerAdapter.getInstance().getMethodAdapter().hasMethod(apiId, key, translatedKeyIsId))
+                return true;
+        }
+        return false;
+    }
+
     private <T> void translateMethodIds(Map<String, T> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
         Map<String, T> updatedEntries = new HashMap<>();
         if (profiles != null) {
@@ -370,6 +380,9 @@ public class APIManagerAPIAdapter {
             while (keys.hasNext()) {
                 String key = keys.next();
                 if (key.equals("_default")) continue;
+                // The profiles are translated in place. If the same API is handled more than once (e.g. a proxy update
+                // followed by a backendBasepath update), the key is already translated and must be kept (issue #581)
+                if (isTranslated(key, mode, apiIds)) continue;
                 APIMethod method = null;
                 for (String apiId : apiIds) {
                     if (mode == METHOD_TRANSLATION.AS_NAME) {
@@ -617,7 +630,7 @@ public class APIManagerAPIAdapter {
      */
     public static final String QUERY_STRING_PASS_THROUGH_MIN_VERSION = "7.7.20220530";
 
-    public String[] getSerializeAllExcept() throws AppException {
+    public String[] getSerializeAllExcept() {
         String[] serializeAllExcept;
         if (APIManagerAdapter.hasAPIManagerVersion(QUERY_STRING_PASS_THROUGH_MIN_VERSION)) {
             serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};

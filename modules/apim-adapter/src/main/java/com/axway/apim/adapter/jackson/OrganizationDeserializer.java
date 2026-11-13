@@ -16,6 +16,15 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 
     private static final long serialVersionUID = 1L;
 
+    public enum Params {
+        /**
+         * Don't load the organization from the API-Manager, only the organization ID is set. Used if the organization is not required
+         * for all entities, which are deserialized. The organization can be loaded afterwards with APIManagerOrganizationAdapter.getOrgForId.
+         * Only applies to the organizationId given by the API-Manager.
+         */
+        SKIP_LOOKUP
+    }
+
     public OrganizationDeserializer() {
         this(null);
     }
@@ -33,6 +42,11 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
         // Deserialization depends on the direction
         if ("organizationId".equals(jp.currentName())) {
             // organizationId is given by API-Manager
+            if (Boolean.TRUE.equals(context.getAttribute(Params.SKIP_LOOKUP))) {
+                Organization organization = new Organization();
+                organization.setId(node.asText());
+                return organization;
+            }
             return organizationAdapter.getOrgForId(node.asText());
         } else {
             // Otherwise make sure the organization exists and try to load it

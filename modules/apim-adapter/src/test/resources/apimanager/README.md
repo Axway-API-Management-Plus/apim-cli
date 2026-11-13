@@ -33,8 +33,11 @@ Github workflow file integration-test.yaml
 - Run upgradeconfig CLI command to update fed file to newer version
 
 ```bash
-docker run -it  -v /home/axway/apim-cli/modules/apim-adapter/src/test/resources/apimanager:/opt/Axway/apiprojects docker.repository.axway.com/apigateway-docker-prod/7.7/gateway:7.7.0.20240530-1-BN0092-ubi9 /bin/sh /opt/Axway/apigateway/posix/bin/upgradeconfig -f /opt/Axway/apiprojects/swagger-promote-7.7-20240228.fed -o /opt/Axway/apiprojects/new
+podman run -it  -v /home/axway/apim-cli/modules/apim-adapter/src/test/resources/apimanager:/opt/Axway/apiprojects docker.repository.axway.com/apigateway-docker-prod/7.7/gateway:7.7.0.20240530-1-BN0092-ubi9 /bin/sh /opt/Axway/apigateway/posix/bin/upgradeconfig -f /opt/Axway/apiprojects/swagger-promote-7.7-20260228.fed -o /opt/Axway/apiprojects/new
 ```
+
+
+podman run -it  -v /Users/rnatarajan/IdeaProjects/apim-cli/modules/apim-adapter/src/test/resources/apimanager:/opt/Axway/apiprojects docker.repository.axway.com/apigateway-docker-prod/7.7/gateway:7.7.0.20261130-2-BN0530-ubi9 /bin/sh /opt/Axway/apigateway/posix/bin/upgradeconfig -f /opt/Axway/apiprojects/swagger-promote-7.7-20260228.fed -o /opt/Axway/apiprojects/new
 
 Above command creates new folder named **new** under modules/apim-adapter/src/test/resources/apimanager and files (suffix with .fed, .pol, .env)
 

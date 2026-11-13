@@ -80,27 +80,11 @@ public class APISpecificationFactoryTest extends WiremockWrapper {
         Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
     }
 
-    @Test
-    public void getAPISpecificationOdataV2() throws AppException {
-        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
-        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("ODataV2NorthWindMetadata.xml", specDirPath, "petstore");
-        Assert.assertEquals(APISpecification.APISpecType.valueOf("ODATA_V2"), apiSpecification.getAPIDefinitionType());
-        Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
-    }
-
-    @Test(expectedExceptions = AppException.class)
-    public void getAPISpecificationOdataV3() throws AppException {
-        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/odata").getFile();
-        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("ODataV3ODataDemoMetadata.xml", specDirPath, "petstore");
-        Assert.assertEquals(APISpecification.APISpecType.valueOf("ODATA_V3"), apiSpecification.getAPIDefinitionType());
-    }
-
-    @Test
-    public void getAPISpecificationOdataV4() throws AppException {
-        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/odata").getFile();
-        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("ODataV4TrippinServiceMetadata.xml", specDirPath, "petstore");
-        Assert.assertEquals(APISpecification.APISpecType.valueOf("ODATA_V4"), apiSpecification.getAPIDefinitionType());
-        Assert.assertNotNull(apiSpecification.getApiSpecificationContent());
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = ".*OData.*apim-cli-odata.*")
+    public void getAPISpecificationOdataIsNotSupported() throws AppException {
+        String edmx = "<?xml version=\"1.0\" encoding=\"utf-8\"?><edmx:Edmx Version=\"4.0\" xmlns:edmx=\"http://docs.oasis-open.org/odata/ns/edmx\">"
+            + "<edmx:DataServices><Schema Namespace=\"Test\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\"/></edmx:DataServices></edmx:Edmx>";
+        APISpecificationFactory.getAPISpecification(edmx.getBytes(java.nio.charset.StandardCharsets.UTF_8), "https://any.odata.service/$metadata", "odata-api");
     }
 
     @Test

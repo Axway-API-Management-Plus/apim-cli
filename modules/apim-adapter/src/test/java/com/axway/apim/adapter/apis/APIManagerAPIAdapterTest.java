@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.springframework.integration.annotation.Filters;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -29,10 +28,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
@@ -912,4 +908,31 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         apiManagerAPIAdapter.importAPIDatFile(new File(filePath),"changeme", organization.getId());
     }
 
+    /**
+     * Issue #581: The same API is updated more than once (e.g. proxy update and backendBasePath update). The profiles
+     * given by method name are translated in place, which must not fail the second time.
+     */
+    @Test
+    public void translateMethodIdsMoreThanOnce() throws AppException {
+        String apiId = "e4ded8c8-0a40-4b50-bc13-552fb7209150";
+        APIMethod deletePet = apiManagerAdapter.getMethodAdapter().getMethodForName(apiId, "deletePet");
+        API api = new API();
+        api.setId(apiId);
+        Map<String, InboundProfile> inboundProfiles = new HashMap<>();
+        inboundProfiles.put("_default", new InboundProfile());
+        inboundProfiles.put("deletePet", new InboundProfile());
+        api.setInboundProfiles(inboundProfiles);
+
+        apiManagerAPIAdapter.translateMethodIds(api, apiId, APIFilter.METHOD_TRANSLATION.AS_ID);
+        apiManagerAPIAdapter.translateMethodIds(api, apiId, APIFilter.METHOD_TRANSLATION.AS_ID);
+        Assert.assertEquals(api.getInboundProfiles().size(), 2);
+        Assert.assertTrue(api.getInboundProfiles().containsKey(deletePet.getId()), "Profile must be translated to the ID of the method");
+        Assert.assertFalse(api.getInboundProfiles().containsKey("deletePet"));
+
+        apiManagerAPIAdapter.translateMethodIds(api, apiId, APIFilter.METHOD_TRANSLATION.AS_NAME);
+        apiManagerAPIAdapter.translateMethodIds(api, apiId, APIFilter.METHOD_TRANSLATION.AS_NAME);
+        Assert.assertEquals(api.getInboundProfiles().size(), 2, "No profile must get lost");
+        Assert.assertTrue(api.getInboundProfiles().containsKey("deletePet"), "Profile must be translated to the name of the method");
+        Assert.assertFalse(api.getInboundProfiles().containsKey(deletePet.getId()));
+    }
 }

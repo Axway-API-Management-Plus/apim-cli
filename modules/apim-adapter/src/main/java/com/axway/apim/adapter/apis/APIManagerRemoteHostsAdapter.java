@@ -1,8 +1,13 @@
 package com.axway.apim.adapter.apis;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.jackson.OrganizationSerializerModifier;
+import com.axway.apim.adapter.jackson.UserDeserializer;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.RemoteHost;
+import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -13,6 +18,7 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -68,15 +74,47 @@ public class APIManagerRemoteHostsAdapter {
     public Map<String, RemoteHost> getRemoteHosts(RemoteHostFilter filter) throws AppException {
         readRemoteHostsFromAPIManager(filter);
         try {
-            List<RemoteHost> remoteHostsList = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<>() {});
+            // The users and organizations are only resolved for the remote hosts, which are requested. Otherwise, they are loaded
+            // one by one for all remote hosts, even if only one is requested (issue #462).
+            // If the remote hosts are filtered by organization, the organization is required to filter.
+            boolean organizationRequiredToFilter = filter.getOrganization() != null;
+            ObjectReader reader = mapper.readerFor(new TypeReference<List<RemoteHost>>() {})
+                .withAttribute(UserDeserializer.Params.SKIP_LOOKUP, true)
+                .withAttribute(OrganizationDeserializer.Params.SKIP_LOOKUP, !organizationRequiredToFilter);
+            List<RemoteHost> remoteHostsList = reader.readValue(apiManagerResponse.get(filter));
             remoteHostsList.removeIf(filter::filter);
             Map<String, RemoteHost> remoteHosts = new HashMap<>();
             for (RemoteHost remoteHost : remoteHostsList) {
+                resolveReferences(remoteHost, !organizationRequiredToFilter);
                 remoteHosts.put(remoteHost.getName(), remoteHost);
             }
             return remoteHosts;
         } catch (Exception e) {
             throw new AppException("Error parsing API-Manager remote hosts", ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
+    }
+
+    /**
+     * Loads the details of the user and the organization, which are only given by their ID.
+     */
+    private void resolveReferences(RemoteHost remoteHost, boolean resolveOrganization) throws AppException {
+        User createdBy = remoteHost.getCreatedBy();
+        if (createdBy != null && createdBy.getId() != null) {
+            User user = null;
+            try {
+                user = APIManagerAdapter.getInstance().getUserAdapter().getUserForId(createdBy.getId());
+            } catch (AppException e) {
+                LOG.error("Error reading user with ID: {} from API-Manager.", createdBy.getId());
+            }
+            if (user != null) {
+                remoteHost.setCreatedBy(user);
+            } else {
+                LOG.error("User with ID: {} not found.", createdBy.getId());
+            }
+        }
+        Organization organization = remoteHost.getOrganization();
+        if (resolveOrganization && organization != null && organization.getId() != null) {
+            remoteHost.setOrganization(APIManagerAdapter.getInstance().getOrgAdapter().getOrgForId(organization.getId()));
         }
     }
 

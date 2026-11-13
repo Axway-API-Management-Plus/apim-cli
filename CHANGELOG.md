@@ -4,6 +4,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+# [1.14.17] In progress
+
+### Fixed
+- Updating the quota of an API corrupted restrictions that use the same method, e.g. a `throttle` and a `throttlemb` restriction for `*`
+  ([#592](https://github.com/Axway-API-Management-Plus/apim-cli/issues/592)). Restrictions were matched by method only, which turned
+  one restriction into the other. They are now identified by method, type, period and per. Restrictions of the same type and method with a different
+  period (e.g. 100 messages per second and 10000 messages per day) are kept apart. Changing the limit updates the restriction, changing
+  the type, period or per replaces it.
+- Application quota restrictions of different APIs, which are given by `apiPath`, were all applied to the first API. The API lookup reused
+  the cached response of a previous lookup by another API path, as the cache key of the API filter ignored the API path
+  ([#567](https://github.com/Axway-API-Management-Plus/apim-cli/issues/567)). The same applies to any other lookup of APIs by `apiPath`,
+  `state`, `deprecated`, `retired` or `createdOn` within one execution.
+- Updating an API failed with "No operation found with name: '<id>'" if an inbound or outbound profile exists for a specific operation and the API
+  is updated more than once during an import, for example when the backendBasepath is changed together with other properties
+  ([#581](https://github.com/Axway-API-Management-Plus/apim-cli/issues/581)).
+- OpenAPI 3.1 specifications with `resolve_openapi_ref=true` failed silently on import ([#582](https://github.com/Axway-API-Management-Plus/apim-cli/issues/582)):
+  - The resolved specification was ignored, as the original specification was used after resolving the references.
+  - The resolved OpenAPI 3.1 model was serialized with a plain Jackson mapper instead of the one of swagger-core, which fails for
+    boolean schemas like `additionalProperties: false`. Mixed up swagger library versions (`NoSuchMethodError` for `booleanSchemaValue`)
+    were fixed by aligning swagger-models and swagger-core.
+  - Errors while resolving the references now fail the import with a message. References are only resolved for OpenAPI 3.x specifications.
+  - Errors thrown by a command, which are no longer lost silently, are now logged by the CLI.
+
+### Changed
+- Improved the performance of commands loading remote hosts, like `api get`, `api import` and the settings export. The users (createdBy) and organizations
+  of remote hosts are only loaded for the requested remote hosts, instead of one by one (`/users/{id}`) for all remote hosts on every
+  lookup ([#462](https://github.com/Axway-API-Management-Plus/apim-cli/issues/462)).
+- Upgraded dependencies:
+    - swagger-parser 2.1.19 to 2.1.48
+    - swagger-models 2.2.0 to 2.2.55 (swagger-core 2.2.55 is now managed as well). The 3.x line of swagger-models requires
+      Jackson 3 and is not supported by swagger-parser yet, so it is not used.
+    - Ehcache 3.10.8 to 3.12.0, now using its `jakarta` build together with `jaxb-runtime` 4.0.9 (jakarta.xml.bind) instead of
+      the javax based `jaxb-runtime` 2.3.9 to read `cacheConfig.xml`. A customized `conf/cacheConfig.xml` keeps working.
+
+### Removed
+- **OData support was removed.** Passing an OData `$metadata` / EDMX document (OData V2, V3 and V4) as the API
+  definition of `api import` is no longer supported and fails with a message pointing to the replacement.
+  The conversion was built on [Apache Olingo](https://olingo.apache.org/), which is no longer maintained. It moved to
+  the separate project `apim-cli-odata`, which converts OData V2/V4 metadata into an OpenAPI 3 specification:
+  ```
+  apim-odata convert -m <metadata file or URL> -b <backend of the OData service> -o openapi.json
+  ```
+  Convert the metadata first, then import the resulting OpenAPI file with the CLI as usual. Everything else about
+  importing such an API stays the same. The OData-Routing policy is still required for these APIs. API-Specification
+  filters can still be applied, as they now work on the converted OpenAPI file.
+- Removed the OData example configurations from `examples/basic` and the Apache Olingo dependencies.
+
 # [1.14.16]  2026-11-12
 
 ### Fixed
