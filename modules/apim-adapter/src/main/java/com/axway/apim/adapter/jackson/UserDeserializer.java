@@ -16,7 +16,12 @@ import java.io.IOException;
 public class UserDeserializer extends StdDeserializer<User> {
 
     public enum Params {
-        USE_LOGIN_NAME
+        USE_LOGIN_NAME,
+        /**
+         * Don't load the user from the API-Manager, only the user ID is set. Used if the user is not required for all entities,
+         * which are deserialized. The user can be loaded afterwards with APIManagerUserAdapter.getUserForId.
+         */
+        SKIP_LOOKUP
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(UserDeserializer.class);
@@ -51,6 +56,11 @@ public class UserDeserializer extends StdDeserializer<User> {
             user = new User();
             user.setLoginName(node.asText());
         } else {
+            if (isSkipLookup(ctxt)) {
+                user = new User();
+                user.setId(node.asText());
+                return user;
+            }
             // Try to initialize this user based on the User-ID
             try {
                 user = userAdapter.getUserForId(node.asText());
@@ -64,6 +74,10 @@ public class UserDeserializer extends StdDeserializer<User> {
             user.setId(node.asText());
         }
         return user;
+    }
+
+    private boolean isSkipLookup(DeserializationContext context) {
+        return Boolean.TRUE.equals(context.getAttribute(Params.SKIP_LOOKUP));
     }
 
     private boolean isUseLoginName(DeserializationContext context) {

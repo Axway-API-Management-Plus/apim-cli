@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Errors thrown by a command, which are no longer lost silently, are now logged by the CLI.
 
 ### Changed
+- Improved the performance of commands loading remote hosts, like `api get`, `api import` and the settings export. The users (createdBy) and organizations
+  of remote hosts are only loaded for the requested remote hosts, instead of one by one (`/users/{id}`) for all remote hosts on every
+  lookup ([#462](https://github.com/Axway-API-Management-Plus/apim-cli/issues/462)).
 - Upgraded dependencies:
     - swagger-parser 2.1.19 to 2.1.48
     - swagger-models 2.2.0 to 2.2.55 (swagger-core 2.2.55 is now managed as well). The 3.x line of swagger-models requires
