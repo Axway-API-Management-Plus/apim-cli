@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.17] In progress
 
+### Fixed
+- OpenAPI 3.1 specifications with `resolve_openapi_ref=true` failed silently on import ([#582](https://github.com/Axway-API-Management-Plus/apim-cli/issues/582)):
+  - The resolved specification was ignored, as the original specification was used after resolving the references.
+  - The resolved OpenAPI 3.1 model was serialized with a plain Jackson mapper instead of the one of swagger-core, which fails for
+    boolean schemas like `additionalProperties: false`. Mixed up swagger library versions (`NoSuchMethodError` for `booleanSchemaValue`)
+    were fixed by aligning swagger-models and swagger-core.
+  - Errors while resolving the references now fail the import with a message. References are only resolved for OpenAPI 3.x specifications.
+  - Errors thrown by a command, which are no longer lost silently, are now logged by the CLI.
+
 ### Changed
 - Upgraded dependencies:
     - swagger-parser 2.1.19 to 2.1.48

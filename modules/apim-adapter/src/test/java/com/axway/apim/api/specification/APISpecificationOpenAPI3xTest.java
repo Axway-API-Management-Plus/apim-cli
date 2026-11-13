@@ -14,6 +14,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class APISpecificationOpenAPI3xTest {
@@ -289,5 +292,101 @@ public class APISpecificationOpenAPI3xTest {
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
 		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+	}
+
+	@Test
+	public void resolveExternalReferencesOpenAPI31Yaml() throws IOException, AppException {
+		// Issue #582: OpenAPI 3.1 specifications with boolean schemas (additionalProperties: false) in referenced files
+		Path dir = Files.createTempDirectory("oas31-refs");
+		Path pet = dir.resolve("Pet.yaml");
+		Files.write(pet, ("type: object\n"
+			+ "additionalProperties: false\n"
+			+ "properties:\n"
+			+ "  name:\n"
+			+ "    type: string\n").getBytes(StandardCharsets.UTF_8));
+		String spec = "openapi: \"3.1.0\"\n"
+			+ "info:\n"
+			+ "  title: Pets\n"
+			+ "  version: \"1.0\"\n"
+			+ "servers:\n"
+			+ "  - url: https://petstore.example.com/v1\n"
+			+ "paths:\n"
+			+ "  /pets:\n"
+			+ "    get:\n"
+			+ "      operationId: getPets\n"
+			+ "      responses:\n"
+			+ "        '200':\n"
+			+ "          description: OK\n"
+			+ "          content:\n"
+			+ "            application/json:\n"
+			+ "              schema:\n"
+			+ "                $ref: '" + pet.toAbsolutePath() + "'\n";
+		OAS3xSpecification specification = new OAS3xSpecification();
+		specification.setResolveOpenApiRef(true);
+		specification.setApiSpecificationFile("pets.yaml");
+		Assert.assertTrue(specification.parse(spec.getBytes(StandardCharsets.UTF_8)));
+
+		byte[] content = specification.getApiSpecificationContent();
+		String resolved = new String(content, StandardCharsets.UTF_8);
+		Assert.assertFalse(resolved.contains("Pet.yaml"), "The reference to the file must be resolved. Content: " + resolved);
+		Assert.assertFalse(resolved.contains("booleanSchemaValue"), resolved);
+		Assert.assertFalse(resolved.contains("types:"), "Model specific properties must not be serialized: " + resolved);
+		// It must still be YAML and an OpenAPI 3.1 specification
+		Assert.assertTrue(specification.getAPIDefinitionType() == APISpecType.OPEN_API_30_YAML);
+		JsonNode openAPI = ymlMapper.readTree(content);
+		Assert.assertEquals(openAPI.get("openapi").asText(), "3.1.0");
+		JsonNode schema = findPetSchema(openAPI);
+		Assert.assertTrue(schema.get("additionalProperties").isBoolean(), "additionalProperties must be a boolean. Schema: " + schema);
+		Assert.assertFalse(schema.get("additionalProperties").asBoolean());
+		Assert.assertEquals(schema.get("properties").get("name").get("type").asText(), "string");
+	}
+
+	@Test
+	public void resolveExternalReferencesOpenAPI30Json() throws IOException, AppException {
+		Path dir = Files.createTempDirectory("oas30-refs");
+		Path pet = dir.resolve("Pet.json");
+		Files.write(pet, "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}".getBytes(StandardCharsets.UTF_8));
+		String spec = "{\"openapi\":\"3.0.1\",\"info\":{\"title\":\"Pets\",\"version\":\"1.0\"},\"servers\":[{\"url\":\"https://petstore.example.com/v1\"}],"
+			+ "\"paths\":{\"/pets\":{\"get\":{\"operationId\":\"getPets\",\"responses\":{\"200\":{\"description\":\"OK\",\"content\":{\"application/json\":"
+			+ "{\"schema\":{\"$ref\":\"" + pet.toAbsolutePath() + "\"}}}}}}}}}";
+		OAS3xSpecification specification = new OAS3xSpecification();
+		specification.setResolveOpenApiRef(true);
+		specification.setApiSpecificationFile("pets.json");
+		Assert.assertTrue(specification.parse(spec.getBytes(StandardCharsets.UTF_8)));
+
+		byte[] content = specification.getApiSpecificationContent();
+		Assert.assertFalse(new String(content, StandardCharsets.UTF_8).contains("Pet.json"), "The reference to the file must be resolved");
+		Assert.assertTrue(specification.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+		JsonNode openAPI = mapper.readTree(content);
+		Assert.assertEquals(openAPI.get("openapi").asText(), "3.0.1");
+		Assert.assertEquals(findPetSchema(openAPI).get("properties").get("name").get("type").asText(), "string");
+	}
+
+	@Test
+	public void referencesAreNotResolvedByDefault() throws IOException, AppException {
+		String spec = "{\"openapi\":\"3.0.1\",\"info\":{\"title\":\"Pets\",\"version\":\"1.0\"},\"paths\":{}}";
+		OAS3xSpecification specification = new OAS3xSpecification();
+		specification.setResolveOpenApiRef(false);
+		Assert.assertTrue(specification.parse(spec.getBytes(StandardCharsets.UTF_8)));
+		Assert.assertEquals(specification.getApiSpecificationContent(), spec.getBytes(StandardCharsets.UTF_8), "The given specification must be untouched");
+	}
+
+	@Test
+	public void noOpenAPISpecificationIsNotResolved() throws AppException {
+		OAS3xSpecification specification = new OAS3xSpecification();
+		specification.setResolveOpenApiRef(true);
+		Assert.assertFalse(specification.parse("{\"swagger\":\"2.0\",\"info\":{\"title\":\"Pets\",\"version\":\"1.0\"},\"paths\":{}}".getBytes(StandardCharsets.UTF_8)));
+	}
+
+	private JsonNode findPetSchema(JsonNode openAPI) {
+		// The referenced file is either inlined or moved to the components by the resolver
+		JsonNode schema = openAPI.at("/paths/~1pets/get/responses/200/content/application~1json/schema");
+		if (schema.has("$ref")) {
+			String ref = schema.get("$ref").asText();
+			Assert.assertTrue(ref.startsWith("#/"), "Only internal references are expected: " + ref);
+			schema = openAPI.at(ref.substring(1));
+		}
+		Assert.assertFalse(schema.isMissingNode(), "Pet schema not found");
+		return schema;
 	}
 }

@@ -1,6 +1,13 @@
 package com.axway.apim.cli;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -85,5 +92,67 @@ public class APIManagerCLITest {
         APIManagerCLI apiManagerCLI = new APIManagerCLI(args);
         int returnCode = apiManagerCLI.run(args);
         Assert.assertEquals(99, returnCode);
+    }
+
+    /**
+     * Errors thrown by a command (e.g. a NoSuchMethodError caused by mixed up library versions) must not get lost
+     * silently, see issue #582.
+     */
+    @Test
+    public void testErrorThrownByCommandIsLogged() throws Exception {
+        APIManagerCLI cli = new APIManagerCLI(new String[]{"api", "import"});
+        cli.selectedService = new FailingService();
+        cli.selectedMethod = FailingService.class.getMethod("failingCommand", String[].class);
+
+        List<String> messages = new ArrayList<>();
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        AbstractAppender appender = new AbstractAppender("issue582", null, null, true, Property.EMPTY_ARRAY) {
+            @Override
+            public void append(LogEvent event) {
+                String thrown = event.getThrown() != null ? " " + event.getThrown() : "";
+                messages.add(event.getMessage().getFormattedMessage() + thrown);
+            }
+        };
+        appender.start();
+        context.getConfiguration().getRootLogger().addAppender(appender, null, null);
+        context.updateLoggers();
+        int returnCode;
+        try {
+            returnCode = cli.run(new String[]{"api", "import"});
+        } finally {
+            context.getConfiguration().getRootLogger().removeAppender("issue582");
+            context.updateLoggers();
+            appender.stop();
+        }
+        Assert.assertEquals(returnCode, 99);
+        Assert.assertTrue(messages.stream().anyMatch(m -> m.contains("NoSuchMethodError") && m.contains("booleanSchemaValue")),
+            "The error thrown by the command must be logged. Logged: " + messages);
+    }
+
+    public static class FailingService implements APIMCLIServiceProvider {
+        @CLIServiceMethod(name = "failing", description = "Fails with an Error")
+        public int failingCommand(String[] args) {
+            throw new NoSuchMethodError("booleanSchemaValue(Boolean)");
+        }
+
+        @Override
+        public String getName() {
+            return "Failing service";
+        }
+
+        @Override
+        public String getVersion() {
+            return "1.0";
+        }
+
+        @Override
+        public String getGroupId() {
+            return "failing";
+        }
+
+        @Override
+        public String getGroupDescription() {
+            return "Failing service";
+        }
     }
 }

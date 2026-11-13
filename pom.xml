@@ -226,6 +226,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!-- Must match jaxb-runtime. swagger-core brings 2.3.3 (javax.xml.bind package), but Ehcache (jakarta) and WireMock need jakarta.xml.bind -->
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>4.0.5</version>
+            </dependency>
             <!-- used by ehcache to read xml configuration -->
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
