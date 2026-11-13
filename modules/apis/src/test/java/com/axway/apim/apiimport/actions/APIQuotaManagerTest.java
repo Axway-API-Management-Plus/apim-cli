@@ -16,15 +16,19 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class APIQuotaManagerTest extends WiremockWrapper {
 
     @BeforeClass
+    @Override
     public void initWiremock() {
         super.initWiremock();
     }
 
     @AfterClass
+    @Override
     public void close() {
         super.close();
     }
@@ -95,7 +99,10 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         List<QuotaRestriction> desiredQuotaRestriction = objectMapper.readValue(desiredQuota, quotaRestrictionTypeRef);
         APIQuotaManager apiQuotaManager = new APIQuotaManager(null, null);
         List<QuotaRestriction> result = apiQuotaManager.mergeRestriction(actualQuotaRestriction, desiredQuotaRestriction);
-        Assert.assertEquals(3, result.size());
+        // The existing restrictions (per=2) are not part of the desired state, which only contains the restrictions with per=8 and per=5.
+        // As period and per are part of the identity of a restriction, they are replaced and must not be merged into each other (issue #592).
+        Assert.assertEquals(result.size(), 2, "Result: " + result);
+        Assert.assertEquals(result.stream().map(restriction -> restriction.getConfig().get("per")).collect(Collectors.toSet()), Set.of("8", "5"));
     }
 
 
@@ -162,7 +169,7 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         List<QuotaRestriction> desiredQuotaRestriction = objectMapper.readValue(desiredQuota, quotaRestrictionTypeRef);
         APIQuotaManager apiQuotaManager = new APIQuotaManager(null, null);
         List<QuotaRestriction> result = apiQuotaManager.mergeRestriction(actualQuotaRestriction, desiredQuotaRestriction);
-        Assert.assertEquals(2, result.size());
+        Assert.assertEquals(result.size(), 2);
     }
 
     @Test
@@ -223,7 +230,7 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         List<QuotaRestriction> desiredQuotaRestriction = objectMapper.readValue(desiredQuota, quotaRestrictionTypeRef);
         APIQuotaManager apiQuotaManager = new APIQuotaManager(null, null);
         List<QuotaRestriction> result = apiQuotaManager.mergeRestriction(actualQuotaRestriction, desiredQuotaRestriction);
-        Assert.assertEquals(3, result.size());
+        Assert.assertEquals(result.size(), 3);
     }
 
 
@@ -266,7 +273,7 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         List<QuotaRestriction> desiredQuotaRestriction = objectMapper.readValue(desiredQuota, quotaRestrictionTypeRef);
         APIQuotaManager apiQuotaManager = new APIQuotaManager(null, null);
         List<QuotaRestriction> result = apiQuotaManager.mergeRestriction(actualQuotaRestriction, desiredQuotaRestriction);
-        Assert.assertEquals(3, result.size());
+        Assert.assertEquals(result.size(), 3);
     }
 
     @Test
@@ -341,6 +348,74 @@ public class APIQuotaManagerTest extends WiremockWrapper {
         Assert.assertEquals(throttleMb.getConfig().get("mb"), "42");
     }
 
+
+    private List<QuotaRestriction> restrictions(String... restrictions) throws JsonProcessingException {
+        return objectMapper.readValue("[" + String.join(",", restrictions) + "]", new TypeReference<List<QuotaRestriction>>() {
+        });
+    }
+
+    private String throttle(String method, String messages, String period, String per) {
+        return "{\"api\":\"api-1\",\"method\":\"" + method + "\",\"type\":\"throttle\",\"config\":{\"messages\":\"" + messages + "\",\"period\":\"" + period + "\",\"per\":\"" + per + "\"}}";
+    }
+
+    private String throttleMb(String method, String mb, String period, String per) {
+        return "{\"api\":\"api-1\",\"method\":\"" + method + "\",\"type\":\"throttlemb\",\"config\":{\"mb\":\"" + mb + "\",\"period\":\"" + period + "\",\"per\":\"" + per + "\"}}";
+    }
+
+    private QuotaRestriction find(List<QuotaRestriction> restrictions, String type, String period) {
+        return restrictions.stream()
+            .filter(restriction -> restriction.getType().name().equals(type) && period.equals(restriction.getConfig().get("period")))
+            .findFirst().orElse(null);
+    }
+
+    /**
+     * Issue #592: Both restrictions are applied to all methods. Only the message limit is changed.
+     */
+    @Test
+    public void mergeRestrictionOfAllMethodsOnlyChangesTheChangedRestriction() throws IOException {
+        List<QuotaRestriction> actual = restrictions(throttle("*", "10000", "day", "1"), throttleMb("*", "100", "minute", "1"));
+        List<QuotaRestriction> desired = restrictions(throttle("*", "20000", "day", "1"), throttleMb("*", "100", "minute", "1"));
+
+        List<QuotaRestriction> result = new APIQuotaManager(null, null).mergeRestriction(actual, desired);
+
+        Assert.assertEquals(result.size(), 2, "Result: " + result);
+        QuotaRestriction throttle = find(result, "throttle", "day");
+        QuotaRestriction throttleMb = find(result, "throttlemb", "minute");
+        Assert.assertNotNull(throttle, "The throttle restriction must not get lost. Result: " + result);
+        Assert.assertNotNull(throttleMb, "Result: " + result);
+        Assert.assertEquals(throttle.getConfig().get("messages"), "20000");
+        Assert.assertNull(throttle.getConfig().get("mb"), "Config of the other type must not be mixed in");
+        Assert.assertEquals(throttleMb.getConfig().get("mb"), "100");
+        Assert.assertNull(throttleMb.getConfig().get("messages"), "Config of the other type must not be mixed in");
+    }
+
+    /**
+     * Several restrictions of the same type for the same method, which only differ in period/per (e.g. 100 per second and 10000 per day).
+     */
+    @Test
+    public void mergeRestrictionWithSameMethodAndSameTypeAndDifferentPeriods() throws IOException {
+        List<QuotaRestriction> actual = restrictions(throttle("*", "100", "second", "1"), throttle("*", "10000", "day", "1"));
+        List<QuotaRestriction> desired = restrictions(throttle("*", "100", "second", "1"), throttle("*", "20000", "day", "1"));
+
+        List<QuotaRestriction> result = new APIQuotaManager(null, null).mergeRestriction(actual, desired);
+
+        Assert.assertEquals(result.size(), 2, "Result: " + result);
+        Assert.assertEquals(find(result, "throttle", "second").getConfig().get("messages"), "100");
+        Assert.assertEquals(find(result, "throttle", "day").getConfig().get("messages"), "20000");
+    }
+
+    @Test
+    public void mergeRestrictionWithChangedPeriodReplacesTheRestriction() throws IOException {
+        List<QuotaRestriction> actual = restrictions(throttle("*", "100", "minute", "1"), throttleMb("*", "100", "minute", "1"));
+        List<QuotaRestriction> desired = restrictions(throttle("*", "100", "second", "1"), throttleMb("*", "100", "minute", "1"));
+
+        List<QuotaRestriction> result = new APIQuotaManager(null, null).mergeRestriction(actual, desired);
+
+        Assert.assertEquals(result.size(), 2, "Result: " + result);
+        Assert.assertNull(find(result, "throttle", "minute"), "The old restriction must be removed. Result: " + result);
+        Assert.assertEquals(find(result, "throttle", "second").getConfig().get("messages"), "100");
+        Assert.assertEquals(find(result, "throttlemb", "minute").getConfig().get("mb"), "100");
+    }
 
     @Test
     public void populateMethodIdForNewApi() throws JsonProcessingException {

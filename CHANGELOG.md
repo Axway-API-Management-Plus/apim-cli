@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.17] In progress
 
 ### Fixed
+- Updating the quota of an API corrupted restrictions that use the same method, e.g. a `throttle` and a `throttlemb` restriction for `*`
+  ([#592](https://github.com/Axway-API-Management-Plus/apim-cli/issues/592)). Restrictions were matched by method only, which turned
+  one restriction into the other. They are now identified by method, type, period and per. Restrictions of the same type and method with a different
+  period (e.g. 100 messages per second and 10000 messages per day) are kept apart. Changing the limit updates the restriction, changing
+  the type, period or per replaces it.
 - Application quota restrictions of different APIs, which are given by `apiPath`, were all applied to the first API. The API lookup reused
   the cached response of a previous lookup by another API path, as the cache key of the API filter ignored the API path
   ([#567](https://github.com/Axway-API-Management-Plus/apim-cli/issues/567)). The same applies to any other lookup of APIs by `apiPath`,

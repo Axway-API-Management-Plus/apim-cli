@@ -108,7 +108,7 @@ public class APIQuotaManager {
                 desiredRestriction.setApiId(null);
                 // Update restriction if actual and desired are same.
                 for (QuotaRestriction existingRestriction : existingRestrictions) {
-                    // Restrictions are matched by method + type.
+                    // Restrictions are matched by method + type + period + per.
                     if (isSameRestrictionScope(desiredRestriction, existingRestriction)) {
                         mergedRestrictions.remove(existingRestriction);
                         // If it is the same restriction, we need to update the restriction configuration
@@ -154,9 +154,22 @@ public class APIQuotaManager {
         return false;
     }
 
+    /**
+     * Identifies a restriction of an API. A method may have several restrictions, which are told apart by their type (throttle/throttlemb)
+     * and their period and per (e.g. 100 messages per second and 10000 messages per day). Changing the limit (messages or mb) updates the
+     * restriction, changing the type, period or per results in the removal of the old and the creation of a new restriction.
+     */
     private boolean isSameRestrictionScope(QuotaRestriction firstRestriction, QuotaRestriction secondRestriction) {
         return Objects.equals(firstRestriction.getMethod(), secondRestriction.getMethod())
-            && firstRestriction.getType() == secondRestriction.getType();
+            && firstRestriction.getType() == secondRestriction.getType()
+            && Objects.equals(getConfigValue(firstRestriction, PERIOD), getConfigValue(secondRestriction, PERIOD))
+            && Objects.equals(getConfigValue(firstRestriction, PER), getConfigValue(secondRestriction, PER));
+    }
+
+    private String getConfigValue(QuotaRestriction restriction, String key) {
+        if (restriction.getConfig() == null) return null;
+        String value = restriction.getConfig().get(key);
+        return value == null ? null : value.trim();
     }
 
 
