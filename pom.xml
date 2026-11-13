@@ -212,23 +212,25 @@
                 <artifactId>ascii-table</artifactId>
                 <version>1.8.0</version>
             </dependency>
+            <!-- The jakarta classifier reads the XML configuration (cacheConfig.xml) with jakarta.xml.bind instead of javax.xml.bind -->
             <dependency>
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
-                <version>3.10.8</version>
+                <version>3.12.0</version>
+                <classifier>jakarta</classifier>
                 <exclusions>
+                    <!-- javax based JAXB runtime ([2.2,3)), replaced by the jakarta based one below -->
                     <exclusion>
                         <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId> jaxb-runtime</artifactId>
+                        <artifactId>jaxb-runtime</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- used by ehcache to read xml configuration-->
-
+            <!-- used by ehcache to read xml configuration -->
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
-                <version>2.3.9</version>
+                <version>4.0.9</version>
             </dependency>
             <dependency>
                 <groupId>dev.failsafe</groupId>
