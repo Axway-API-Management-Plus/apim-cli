@@ -86,7 +86,41 @@ public class APIImportApp implements APIMCLIServiceProvider {
         }
     }
 
+    public String importAPIwithDetails(APIImportParams params) {
+        StringBuffer errors = new StringBuffer();
+        ErrorCodeMapper mapper = new ErrorCodeMapper();
+        try {
+            return String.valueOf(importAPIwithParams(params));
+        } catch (AppException ap) {
+            APIPropertiesExport.getInstance().store(); // Try to create it, even
+            if (!ap.getError().equals(ErrorCode.NO_CHANGE)) {
+                RollbackHandler rollback = RollbackHandler.getInstance();
+                rollback.executeRollback();
+            }
+            ap.logException(LOG);
+            errors.append(mapper.getMapedErrorCode(ap.getError()).getCode());
+            errors.append(mapper.getMapedErrorCode(ap.getError()));
+            return errors.toString();
+        }
+        
+    }
+
     public int importAPI(APIImportParams params) {
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+        try {
+            return importAPIwithParams(params);
+        } catch (AppException ap) {
+            APIPropertiesExport.getInstance().store(); // Try to create it, even
+            if (!ap.getError().equals(ErrorCode.NO_CHANGE)) {
+                RollbackHandler rollback = RollbackHandler.getInstance();
+                rollback.executeRollback();
+            }
+            ap.logException(LOG);
+            return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
+        }
+    }
+
+    public int importAPIwithParams(APIImportParams params) throws AppException {
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         APIManagerAdapter apimAdapter = null;
         try {
@@ -132,13 +166,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
             APIPropertiesExport.getInstance().store();
             return 0;
         } catch (AppException ap) {
-            APIPropertiesExport.getInstance().store(); // Try to create it, even
-            if (!ap.getError().equals(ErrorCode.NO_CHANGE)) {
-                RollbackHandler rollback = RollbackHandler.getInstance();
-                rollback.executeRollback();
-            }
-            ap.logException(LOG);
-            return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
+            throw ap;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ErrorCode.UNXPECTED_ERROR.getCode();
