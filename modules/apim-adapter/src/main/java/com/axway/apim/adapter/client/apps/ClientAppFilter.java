@@ -1,7 +1,11 @@
 package com.axway.apim.adapter.client.apps;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +34,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
     public static final String FIELD = "field";
     public static final String VALUE = "value";
+    public static final List<String> SUPPORTED_CREDENTIAL_TYPES = Collections.unmodifiableList(Arrays.asList("oauth", "apikeys", "extclients"));
 
     boolean includeQuota;
 
@@ -44,6 +49,11 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     private String credential;
 
     private String redirectUrl;
+
+    /**
+     * Credential types (oauth, apikeys, extclients), of which an application must have at least one. Null or empty means no restriction.
+     */
+    private Set<String> credentialTypes;
 
     private String applicationName;
 
@@ -189,6 +199,18 @@ public class ClientAppFilter implements CustomPropertiesFilter {
         this.credential = credential;
     }
 
+    public Set<String> getCredentialTypes() {
+        return credentialTypes;
+    }
+
+    public void setCredentialTypes(Set<String> credentialTypes) {
+        this.credentialTypes = credentialTypes;
+    }
+
+    private boolean hasCredentialTypeFilter() {
+        return credentialTypes != null && !credentialTypes.isEmpty();
+    }
+
     public String getRedirectUrl() {
         return redirectUrl;
     }
@@ -249,14 +271,16 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     }
 
     public boolean filter(ClientApplication app) {
-        if (this.getCredential() == null && this.getRedirectUrl() == null && this.getApiName() == null) { // Nothing given to filter out.
+        if (this.getCredential() == null && this.getRedirectUrl() == null && this.getApiName() == null && !hasCredentialTypeFilter()) { // Nothing given to filter out.
             return false;
         }
-        if (this.getCredential() != null || this.getRedirectUrl() != null) {
+        if (this.getCredential() != null || this.getRedirectUrl() != null || hasCredentialTypeFilter()) {
             // Filter this app, as it doesn't have any credentials
             if (app.getCredentials() == null) return true;
             boolean match = false;
             for (ClientAppCredential cred : app.getCredentials()) {
+                // Ignore credentials of a type, which is not requested
+                if (hasCredentialTypeFilter() && !credentialTypes.contains(cred.getCredentialType())) continue;
                 switch (cred.getCredentialType()) {
                     case "oauth":
                         match = filterCredential(((OAuth) cred).getClientId(), ((OAuth) cred).getRedirectUrls(), app.getName());
@@ -353,6 +377,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         private String redirectUrl;
 
+        private Set<String> credentialTypes;
+
         private boolean includeOauthResources;
 
         private String apiName;
@@ -382,6 +408,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
             filter.setIncludeAPIAccess(this.includeAPIAccess);
             filter.setCredential(this.credential);
             filter.setRedirectUrl(this.redirectUrl);
+            filter.setCredentialTypes(this.credentialTypes);
             filter.setIncludeOauthResources(this.includeOauthResources);
             filter.setCustomProperties(this.customProperties);
             filter.setApiName(this.apiName);
@@ -452,6 +479,28 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
         public Builder hasRedirectUrl(String redirectUrl) {
             this.redirectUrl = redirectUrl;
+            return this;
+        }
+
+        /**
+         * Restricts the applications to those having at least one credential of the given type(s).
+         *
+         * @param credentialTypes comma separated list of credential types: oauth, apikeys, extclients (case-insensitive). Null or empty means no restriction.
+         * @return the builder
+         * @throws AppException if an unsupported credential type is given
+         */
+        public Builder hasCredentialType(String credentialTypes) throws AppException {
+            if (StringUtils.isBlank(credentialTypes)) return this;
+            Set<String> types = new LinkedHashSet<>();
+            for (String type : credentialTypes.split(",")) {
+                String normalized = type.trim().toLowerCase();
+                if (normalized.isEmpty()) continue;
+                if (!SUPPORTED_CREDENTIAL_TYPES.contains(normalized)) {
+                    throw new AppException("Unsupported credential type: '" + type.trim() + "'. Supported types are: " + String.join(", ", SUPPORTED_CREDENTIAL_TYPES), ErrorCode.INVALID_PARAMETER);
+                }
+                types.add(normalized);
+            }
+            this.credentialTypes = types.isEmpty() ? null : types;
             return this;
         }
 

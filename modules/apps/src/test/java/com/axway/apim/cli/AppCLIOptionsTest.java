@@ -54,7 +54,7 @@ public class AppCLIOptionsTest {
 
     @Test
     public void testExportApplicationParameters() throws AppException {
-        String[] args = {"-s", "prod", "-n", "*My Great App*", "-id", "UUID-ID-OF-THE-APP", "-state", "pending", "-orgName", "*Partners*", "-createdBy", "Tom", "-credential", "*9877979779*", "-redirectUrl", "*localhost*", "-o", "json", "-wide", "-apimCLIHome", apimCliHome};
+        String[] args = {"-s", "prod", "-n", "*My Great App*", "-id", "UUID-ID-OF-THE-APP", "-state", "pending", "-orgName", "*Partners*", "-createdBy", "Tom", "-credential", "*9877979779*", "-redirectUrl", "*localhost*", "-credentialType", "oauth,apikeys", "-o", "json", "-wide", "-apimCLIHome", apimCliHome};
         CLIOptions options = AppExportCLIOptions.create(args);
         AppExportParams params = (AppExportParams) options.getParams();
         // Validate core parameters are included
@@ -74,6 +74,7 @@ public class AppCLIOptionsTest {
         Assert.assertEquals(params.getCreatedBy(), "Tom");
         Assert.assertEquals(params.getCredential(), "*9877979779*");
         Assert.assertEquals(params.getRedirectUrl(), "*localhost*");
+        Assert.assertEquals(params.getCredentialType(), "oauth,apikeys");
         Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
     }
 

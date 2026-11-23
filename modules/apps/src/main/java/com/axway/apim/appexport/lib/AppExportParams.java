@@ -13,6 +13,7 @@ public class AppExportParams extends StandardExportParams implements Parameters 
 	private String createdBy;
 	private String credential;
 	private String redirectUrl;
+	private String credentialType;
 	private String apiName;
 	
 	public static synchronized AppExportParams getInstance() {
@@ -65,6 +66,14 @@ public class AppExportParams extends StandardExportParams implements Parameters 
 
 	public void setCredential(String credential) {
 		this.credential = credential;
+	}
+
+	public String getCredentialType() {
+		return credentialType;
+	}
+
+	public void setCredentialType(String credentialType) {
+		this.credentialType = credentialType;
 	}
 
 	public String getRedirectUrl() {

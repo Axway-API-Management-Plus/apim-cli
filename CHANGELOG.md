@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 # [1.14.17] In progress
 
 ### Added
+- New option `-credentialType` for `app get` to export only applications having at least one credential of the given type
+  ([#601](https://github.com/Axway-API-Management-Plus/apim-cli/issues/601)). Supported types are `oauth`, `apikeys` and `extclients`; several
+  types can be given comma separated, e.g. `apim app get -s api-env -credentialType oauth -o json -t /tmp/exported_apps`. The option can be combined
+  with `-credential` and `-redirectUrl`, in which case the matching credential must be of the given type.
 - `APIImportApp` returns the details of an error ([#594](https://github.com/Axway-API-Management-Plus/apim-cli/issues/594)). Applications, which use
   the class to import APIs (e.g. in a service used by a CI/CD pipeline), get the error code, the name of the error, the message and the details of the
   underlying causes instead of only the return code: `APIImportApp.importAPIwithDetails(params)` returns a one-line JSON, e.g.
@@ -16,6 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   variable is not set.
 
 ### Fixed
+- Applications with the same name (in the same or in different organizations) were not all exported by `app get`: the second application was
+  skipped, or with `-deleteTarget` replaced the export of the first one, as the export folder was derived from the application name only
+  ([#600](https://github.com/Axway-API-Management-Plus/apim-cli/issues/600)). Each application is now exported into its own folder; a repeated
+  name gets a numeric suffix (`My-App`, `My-App_1`, `My-App_2`). This applies to the JSON and YAML export.
 - Updating the quota of an API corrupted restrictions that use the same method, e.g. a `throttle` and a `throttlemb` restriction for `*`
   ([#592](https://github.com/Axway-API-Management-Plus/apim-cli/issues/592)). Restrictions were matched by method only, which turned
   one restriction into the other. They are now identified by method, type, period and per. Restrictions of the same type and method with a different

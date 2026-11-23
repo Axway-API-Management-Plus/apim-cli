@@ -75,6 +75,7 @@ public abstract class ApplicationExporter {
                 .hasId(params.getId())
                 .hasCredential(params.getCredential())
                 .hasRedirectUrl(params.getRedirectUrl())
+                .hasCredentialType(params.getCredentialType())
                 .hasOrganizationName(params.getOrgName())
                 .hasCreatedByLoginName(params.getCreatedBy())
                 .includeCustomProperties(getCustomProperties())
@@ -82,7 +83,7 @@ public abstract class ApplicationExporter {
                 .includeOauthResources(false)
                 .hasApiName(params.getApiName())
                 .includeImage(false);
-        if (params.getCredential() != null || params.getRedirectUrl() != null) builder.includeCredentials(true);
+        if (params.getCredential() != null || params.getRedirectUrl() != null || params.getCredentialType() != null) builder.includeCredentials(true);
         if (params.getApiName() != null) builder.includeAPIAccess(true);
         return builder;
     }

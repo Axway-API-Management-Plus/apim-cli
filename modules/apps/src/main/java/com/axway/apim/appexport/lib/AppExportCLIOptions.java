@@ -65,6 +65,11 @@ public class AppExportCLIOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("*localhost*");
 		addOption(option);
+
+		option = new  Option("credentialType", true, "Filter applications having at least one credential of this type. Supported types: oauth, apikeys, extclients. Multiple types can be given comma separated.");
+		option.setRequired(false);
+		option.setArgName("oauth");
+		addOption(option);
 	}
 
 	@Override
@@ -85,6 +90,8 @@ public class AppExportCLIOptions extends CLIOptions {
 		Console.println(getBinaryName()+" app get -s api-env -n \"App 123\" -t /tmp/exported_apps -o json -deleteTarget");
 		Console.println(getBinaryName()+" app get -s api-env -redirectUrl \"localhost\"");
 		Console.println(getBinaryName()+" app get -s api-env -credential 16378192");
+		Console.println(getBinaryName()+" app get -s api-env -credentialType oauth -t /tmp/exported_apps -o json -deleteTarget");
+		Console.println(getBinaryName()+" app get -s api-env -credentialType oauth,apikeys");
 		Console.println();
 		Console.println("For more information and advanced examples please visit:");
 		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
@@ -105,6 +112,7 @@ public class AppExportCLIOptions extends CLIOptions {
 		params.setCreatedBy(getValue("createdBy"));
 		params.setCredential(getValue("credential"));
 		params.setRedirectUrl(getValue("redirectUrl"));
+		params.setCredentialType(getValue("credentialType"));
 		params.setApiName(getValue("api"));
 		return params;
 	}

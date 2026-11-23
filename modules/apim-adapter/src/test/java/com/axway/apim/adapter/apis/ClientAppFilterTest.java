@@ -108,6 +108,61 @@ public class ClientAppFilterTest extends WiremockWrapper {
 	}
 
 	@Test
+	public void credentialTypeFilterTest() throws IOException, AppException {
+		ClientApplication mixedApp = getTestApp("client-app-with-two-redirectUrls.json"); // oauth + apikeys
+		ClientApplication apiKeyOnlyApp = getTestApp("client-app-with-two-api-key-only.json");
+		ClientApplication noCredentialApp = getTestApp("client-app-with-two-redirectUrls.json");
+		noCredentialApp.setCredentials(null);
+
+		ClientAppFilter oauth = new ClientAppFilter.Builder().hasCredentialType("oauth").build();
+		assertFalse(oauth.filter(mixedApp), "App with an OAuth credential SHOULD match");
+		assertTrue(oauth.filter(apiKeyOnlyApp), "App with API-Keys only SHOULD NOT match oauth");
+		assertTrue(oauth.filter(noCredentialApp), "App without credentials SHOULD NOT match");
+
+		ClientAppFilter apiKeys = new ClientAppFilter.Builder().hasCredentialType("apikeys").build();
+		assertFalse(apiKeys.filter(mixedApp));
+		assertFalse(apiKeys.filter(apiKeyOnlyApp));
+
+		ClientAppFilter extClients = new ClientAppFilter.Builder().hasCredentialType("extclients").build();
+		assertTrue(extClients.filter(mixedApp), "App without external client credential SHOULD NOT match");
+
+		ClientAppFilter multiple = new ClientAppFilter.Builder().hasCredentialType(" OAuth , extclients ").build();
+		assertFalse(multiple.filter(mixedApp), "Types are case-insensitive and trimmed");
+		assertTrue(multiple.filter(apiKeyOnlyApp));
+
+		ClientAppFilter none = new ClientAppFilter.Builder().hasCredentialType(null).build();
+		assertFalse(none.filter(apiKeyOnlyApp), "No credential type given means no restriction");
+	}
+
+	@Test
+	public void credentialTypeCombinedWithCredentialValueTest() throws IOException, AppException {
+		ClientApplication mixedApp = getTestApp("client-app-with-two-redirectUrls.json");
+		// The API-Key value belongs to the apikeys credential, not to the OAuth one
+		ClientAppFilter filter = new ClientAppFilter.Builder()
+				.hasCredentialType("oauth")
+				.hasCredential("6cd55c27-675a-444a-9bc7-ae9a7869184d")
+				.build();
+		assertTrue(filter.filter(mixedApp), "The matching credential must be of the requested type");
+
+		filter = new ClientAppFilter.Builder()
+				.hasCredentialType("apikeys")
+				.hasCredential("6cd55c27-675a-444a-9bc7-ae9a7869184d")
+				.build();
+		assertFalse(filter.filter(mixedApp));
+
+		filter = new ClientAppFilter.Builder()
+				.hasCredentialType("oauth")
+				.hasRedirectUrl("*oauthclient:8088*")
+				.build();
+		assertFalse(filter.filter(mixedApp));
+	}
+
+	@Test(expectedExceptions = AppException.class)
+	public void unsupportedCredentialTypeTest() throws AppException {
+		new ClientAppFilter.Builder().hasCredentialType("oauth,unknown");
+	}
+
+	@Test
 	public void testAppHavingAPIKeyButNoClientID() throws IOException {
    		ClientApplication testApp = getTestApp("client-app-with-two-api-key-only.json");
 		((APIKey)testApp.getCredentials().get(0)).setApiKey(null);
