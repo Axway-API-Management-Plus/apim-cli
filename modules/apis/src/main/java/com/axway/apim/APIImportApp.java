@@ -18,9 +18,11 @@ import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.APIPropertiesExport;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.error.ErrorCodeMapper;
+import com.axway.apim.lib.error.ErrorDetails;
 import com.axway.apim.lib.utils.Utils;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -44,6 +46,8 @@ import java.util.List;
 public class APIImportApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
+
+    private boolean printErrorDetails = EnvironmentProperties.PRINT_ERROR_DETAILS;
 
     @CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
     public static int importAPI(String[] args) {
@@ -86,40 +90,57 @@ public class APIImportApp implements APIMCLIServiceProvider {
         }
     }
 
+    /**
+     * Imports the API like {@link #importAPI(APIImportParams)}, but returns the details of an error (issue #594).
+     *
+     * @param params the import parameters
+     * @return "0" if the API was imported successfully (or the return code of an error, which is not an AppException). Otherwise, a
+     * one-line JSON summary of the error: error code, error name, mapped error code, message and details. See {@link ErrorDetails}
+     */
     public String importAPIwithDetails(APIImportParams params) {
-        StringBuffer errors = new StringBuffer();
-        ErrorCodeMapper mapper = new ErrorCodeMapper();
         try {
             return String.valueOf(importAPIwithParams(params));
         } catch (AppException ap) {
-            APIPropertiesExport.getInstance().store(); // Try to create it, even
-            if (!ap.getError().equals(ErrorCode.NO_CHANGE)) {
-                RollbackHandler rollback = RollbackHandler.getInstance();
-                rollback.executeRollback();
-            }
             ap.logException(LOG);
-            errors.append(mapper.getMapedErrorCode(ap.getError()).getCode());
-            errors.append(mapper.getMapedErrorCode(ap.getError()));
-            return errors.toString();
+            return ErrorDetails.toJson(ap, getErrorCodeMapper(params).getMapedErrorCode(ap.getError()));
         }
-        
     }
 
     public int importAPI(APIImportParams params) {
-        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
             return importAPIwithParams(params);
         } catch (AppException ap) {
-            APIPropertiesExport.getInstance().store(); // Try to create it, even
-            if (!ap.getError().equals(ErrorCode.NO_CHANGE)) {
-                RollbackHandler rollback = RollbackHandler.getInstance();
-                rollback.executeRollback();
-            }
             ap.logException(LOG);
-            return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
+            ErrorCode mappedErrorCode = getErrorCodeMapper(params).getMapedErrorCode(ap.getError());
+            if (printErrorDetails) {
+                System.err.println(ErrorDetails.toJson(ap, mappedErrorCode));
+            }
+            return mappedErrorCode.getCode();
         }
     }
 
+    void setPrintErrorDetails(boolean printErrorDetails) {
+        this.printErrorDetails = printErrorDetails;
+    }
+
+    private ErrorCodeMapper getErrorCodeMapper(APIImportParams params) {
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+        try {
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
+        } catch (RuntimeException e) {
+            LOG.error("Invalid returnCodeMapping: {} The error code is not mapped.", params.getReturnCodeMapping(), e);
+        }
+        return errorCodeMapper;
+    }
+
+    /**
+     * Imports the API. The rollback and the clean-up is done in this method, hence an AppException is only given to the caller to
+     * decide how to report it. The return code mapping must be applied by the caller using the returnCodeMapping of the params.
+     *
+     * @param params the import parameters
+     * @return the return code, if no AppException is thrown
+     * @throws AppException if the import fails
+     */
     public int importAPIwithParams(APIImportParams params) throws AppException {
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         APIManagerAdapter apimAdapter = null;
@@ -127,7 +148,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
             params.validateRequiredParameters();
             // Clean some Singleton-Instances, as tests are running in the same JVM
             RollbackHandler.deleteInstance();
-            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping()); // Fails early if the mapping is invalid
             apimAdapter = APIManagerAdapter.getInstance();
             APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params);
             // Creates an API-Representation of the desired API
@@ -166,6 +187,12 @@ public class APIImportApp implements APIMCLIServiceProvider {
             APIPropertiesExport.getInstance().store();
             return 0;
         } catch (AppException ap) {
+            APIPropertiesExport.getInstance().store(); // Try to create it, even
+            if (!ap.getError().equals(ErrorCode.NO_CHANGE)) {
+                // Must be done before the API-Manager adapter is cleaned up in finally
+                RollbackHandler rollback = RollbackHandler.getInstance();
+                rollback.executeRollback();
+            }
             throw ap;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);

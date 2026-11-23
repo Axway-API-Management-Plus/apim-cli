@@ -48,6 +48,10 @@ public class AppException extends JsonProcessingException {
         return error;
     }
 
+    public String getSecondMessage() {
+        return secondMessage;
+    }
+
     public void logException(Logger logger) {
         if (error == ErrorCode.SUCCESS || error == ErrorCode.CLI_PARSING)
             return;

@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # [1.14.17] In progress
 
+### Added
+- `APIImportApp` returns the details of an error ([#594](https://github.com/Axway-API-Management-Plus/apim-cli/issues/594)). Applications, which use
+  the class to import APIs (e.g. in a service used by a CI/CD pipeline), get the error code, the name of the error, the message and the details of the
+  underlying causes instead of only the return code: `APIImportApp.importAPIwithDetails(params)` returns a one-line JSON, e.g.
+  `{"errorCode":25,"error":"CANT_SEND_HTTP_REQUEST","mappedErrorCode":25,"message":"Can't login to API-Manager","details":["Connect to https://localhost:8075 failed: Connection refused"]}`.
+  `mappedErrorCode` is the return code of the CLI, which differs from `errorCode` if `-returnCodeMapping` is used.
+- The CLI prints the same one-line JSON to stderr, if `api import` fails and the environment variable `print_error_details=true` is set. Nothing changes if the
+  variable is not set.
+
 ### Fixed
 - Updating the quota of an API corrupted restrictions that use the same method, e.g. a `throttle` and a `throttlemb` restriction for `*`
   ([#592](https://github.com/Axway-API-Management-Plus/apim-cli/issues/592)). Restrictions were matched by method only, which turned
