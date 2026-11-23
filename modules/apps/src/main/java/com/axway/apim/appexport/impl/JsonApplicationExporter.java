@@ -28,12 +28,16 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonApplicationExporter.class);
     public static final String CREATED_BY = "createdBy";
+
+    private final Set<String> usedFolderNames = new HashSet<>();
 
 
     public JsonApplicationExporter(AppExportParams params, ExportResult result) {
@@ -105,8 +109,22 @@ public class JsonApplicationExporter extends ApplicationExporter {
         }
     }
 
+    /**
+     * Returns a folder name that is unique within this export run. Applications may share the same name
+     * (e.g. in different organizations), in which case a numeric suffix (_1, _2, ...) is appended so that
+     * no application overwrites or skips another one.
+     */
     private String getExportFolder(ExportApplication app) {
-        return Utils.replaceSpecialChars(app.getName());
+        String baseName = Utils.replaceSpecialChars(app.getName());
+        String folderName = baseName;
+        int counter = 1;
+        while (!usedFolderNames.add(folderName)) {
+            folderName = baseName + "_" + counter++;
+        }
+        if (counter > 1) {
+            LOG.info("Application name '{}' is not unique, exporting into folder: {}", app.getName(), folderName);
+        }
+        return folderName;
     }
 
     public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
