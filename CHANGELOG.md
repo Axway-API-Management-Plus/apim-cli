@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.14.17] In progress
+# [1.15.0] 2026-11-25
 
 ### Added
 - New option `-credentialType` for `app get` to export only applications having at least one credential of the given type
