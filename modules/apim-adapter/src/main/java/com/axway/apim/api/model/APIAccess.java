@@ -1,8 +1,7 @@
 package com.axway.apim.api.model;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonFilter;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Objects;
 
@@ -94,8 +93,8 @@ public class APIAccess {
         if (other instanceof APIAccess) {
             APIAccess otherApiAccess = (APIAccess) other;
             return
-                StringUtils.equals(otherApiAccess.getApiName(), this.getApiName()) &&
-                    StringUtils.equals(otherApiAccess.getApiVersion(), this.getApiVersion());
+                Strings.CS.equals(otherApiAccess.getApiName(), this.getApiName()) &&
+                    Strings.CS.equals(otherApiAccess.getApiVersion(), this.getApiVersion());
         }
         return false;
     }
@@ -107,6 +106,6 @@ public class APIAccess {
 
     @Override
     public int hashCode() {
-        return Objects.hash(apiName, apiVersion, state);
+        return Objects.hash(apiName, apiVersion);
     }
 }

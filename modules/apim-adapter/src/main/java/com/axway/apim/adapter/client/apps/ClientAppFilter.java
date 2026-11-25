@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import com.axway.apim.adapter.apis.FilterHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -242,8 +243,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
         if (!(obj instanceof ClientAppFilter)) return false;
         ClientAppFilter other = (ClientAppFilter) obj;
         return (
-                StringUtils.equals(other.getApplicationName(), this.getApplicationName()) &&
-                        StringUtils.equals(other.getState(), this.getState()) &&
+            Strings.CS.equals(other.getApplicationName(), this.getApplicationName()) &&
+                        Strings.CS.equals(other.getState(), this.getState()) &&
                         (other.getOrganization() == null || other.getOrganization().equals(this.getOrganization()))
         );
     }
@@ -251,7 +252,6 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     @Override
     public int hashCode() {
         int hashCode = 0;
-        hashCode += (this.applicationId != null) ? this.applicationId.hashCode() : 0;
         hashCode += (this.state != null) ? this.state.hashCode() : 0;
         hashCode += (this.applicationName != null) ? this.applicationName.hashCode() : 0;
         return hashCode;
@@ -271,50 +271,53 @@ public class ClientAppFilter implements CustomPropertiesFilter {
     }
 
     public boolean filter(ClientApplication app) {
-        if (this.getCredential() == null && this.getRedirectUrl() == null && this.getApiName() == null && !hasCredentialTypeFilter()) { // Nothing given to filter out.
+        boolean credentialFilter = this.getCredential() != null || this.getRedirectUrl() != null || hasCredentialTypeFilter();
+        if (!credentialFilter && this.getApiName() == null) { // Nothing given to filter out.
             return false;
         }
-        if (this.getCredential() != null || this.getRedirectUrl() != null || hasCredentialTypeFilter()) {
-            // Filter this app, as it doesn't have any credentials
-            if (app.getCredentials() == null) return true;
-            boolean match = false;
-            for (ClientAppCredential cred : app.getCredentials()) {
-                // Ignore credentials of a type, which is not requested
-                if (hasCredentialTypeFilter() && !credentialTypes.contains(cred.getCredentialType())) continue;
-                switch (cred.getCredentialType()) {
-                    case "oauth":
-                        match = filterCredential(((OAuth) cred).getClientId(), ((OAuth) cred).getRedirectUrls(), app.getName());
-                        break;
-                    case "extclients":
-                        match = filterCredential(((ExtClients) cred).getClientId(), null, app.getName());
-                        break;
-                    case "apikeys":
-                        match = filterCredential(((APIKey) cred).getApiKey(), null, app.getName());
-                        break;
-                    default:
-                        break;
-                }
-                if (match) break;
-            }
-            // Not match found, filter this app
-            if (!match) return true;
+        // Filter this app, if none of its credentials matches
+        if (credentialFilter && !hasMatchingCredential(app)) {
+            return true;
         }
+        // Filter this app, if none of its APIs matches
         if (this.getApiName() != null) {
-            // App has no access to any API
-            if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return true;
-            boolean apiAccessNameMatch = false;
-            Pattern pattern = Pattern.compile(this.apiName.replace("*", ".*"));
-            for (APIAccess apiAccess : app.getApiAccess()) {
-                Matcher matcher = pattern.matcher(apiAccess.getApiName());
-                if (matcher.matches()) {
-                    apiAccessNameMatch = true;
-                    break;
-                }
-            }
-            // None of the APIs matches
-            return !apiAccessNameMatch;
+            return !hasMatchingApiAccess(app);
         }
         // Nothing filtered this application!
+        return false;
+    }
+
+    private boolean hasMatchingCredential(ClientApplication app) {
+        // An app without any credentials can't match
+        if (app.getCredentials() == null) return false;
+        for (ClientAppCredential cred : app.getCredentials()) {
+            // Ignore credentials of a type, which is not requested
+            if (hasCredentialTypeFilter() && !credentialTypes.contains(cred.getCredentialType())) continue;
+            if (credentialMatches(cred, app.getName())) return true;
+        }
+        return false;
+    }
+
+    private boolean credentialMatches(ClientAppCredential cred, String appName) {
+        switch (cred.getCredentialType()) {
+            case "oauth":
+                return filterCredential(((OAuth) cred).getClientId(), ((OAuth) cred).getRedirectUrls(), appName);
+            case "extclients":
+                return filterCredential(((ExtClients) cred).getClientId(), null, appName);
+            case "apikeys":
+                return filterCredential(((APIKey) cred).getApiKey(), null, appName);
+            default:
+                return false;
+        }
+    }
+
+    private boolean hasMatchingApiAccess(ClientApplication app) {
+        // App has no access to any API
+        if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return false;
+        Pattern pattern = Pattern.compile(this.apiName.replace("*", ".*"));
+        for (APIAccess apiAccess : app.getApiAccess()) {
+            if (pattern.matcher(apiAccess.getApiName()).matches()) return true;
+        }
         return false;
     }
 

@@ -132,13 +132,19 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         Quotas quotas = new Quotas();
         APIQuota systemQuota = adapter.getQuotaAdapter().getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
         APIQuota applicationQuota = adapter.getQuotaAdapter().getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
-        QuotaRestriction systemQuotaRestriction = systemQuota.getRestrictions().stream().filter(
-            quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().orElse(null);
-        QuotaRestriction applicationQuotaRestriction = applicationQuota.getRestrictions().stream().filter(
-            quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().orElse(null);
+        QuotaRestriction systemQuotaRestriction = findGlobalRestriction(systemQuota);
+        QuotaRestriction applicationQuotaRestriction = findGlobalRestriction(applicationQuota);
         quotas.setSystemQuota(systemQuotaRestriction);
         quotas.setApplicationQuota(applicationQuotaRestriction);
         return quotas;
+    }
+
+    // The default quota is not available without admin account, same for its restrictions if none are defined
+    private static QuotaRestriction findGlobalRestriction(APIQuota quota) {
+        if (quota == null || quota.getRestrictions() == null) return null;
+        return quota.getRestrictions().stream()
+            .filter(quotaRestriction -> "*".equals(quotaRestriction.getApi()))
+            .findFirst().orElse(null);
     }
 
     public Result importConfig(StandardImportParams params) {
@@ -195,6 +201,10 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction systemQuotaRestriction = quotas.getSystemQuota();
         APIQuota systemQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
+        if (systemQuota == null) {
+            LOG.debug("Default system quota is not available (admin account required), skipping.");
+            return;
+        }
         if (systemQuotaRestriction != null && systemQuotaRestriction.getApi() != null) { // Updating quota
             LOG.debug("Updating System Global Quota : {}", systemQuotaRestriction);
             if (systemQuota.getRestrictions() != null) {
@@ -213,7 +223,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
     }
 
     public void removeExistingGlobalQuota( APIQuota systemQuota) {
-        systemQuota.getRestrictions().removeIf(quotaRestriction -> quotaRestriction.getApi().equals("*"));
+        systemQuota.getRestrictions().removeIf(quotaRestriction -> "*".equals(quotaRestriction.getApi()));
     }
 
     public void upsertGlobalApplicationQuota(Quotas quotas) throws AppException {
@@ -221,6 +231,10 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         APIManagerQuotaAdapter quotaAdapter = adapter.getQuotaAdapter();
         QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
         APIQuota applicationQuota = quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
+        if (applicationQuota == null) {
+            LOG.debug("Default application quota is not available (admin account required), skipping.");
+            return;
+        }
         if (applicationQuotaRestriction != null && applicationQuotaRestriction.getApi() != null) {
             LOG.debug("Updating Application Global Quota : {}", applicationQuotaRestriction);
             if (applicationQuota.getRestrictions() != null) {

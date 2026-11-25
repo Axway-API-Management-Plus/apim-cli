@@ -10,6 +10,8 @@ import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class ClientAppImportManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientAppImportManager.class);
@@ -51,15 +53,25 @@ public class ClientAppImportManager {
     }
 
     public static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
+        if (actualApp == null) {
+            return false;
+        }
         boolean application = desiredApp.equals(actualApp);
-        boolean apiAccess = (desiredApp.getApiAccess() == null || Utils.compareValues(desiredApp.getApiAccess(), actualApp.getApiAccess()));
-        boolean permission = (desiredApp.getPermissions() == null || Utils.compareValues(desiredApp.getPermissions(), actualApp.getPermissions()));
+        boolean apiAccess = listsAreEqual(desiredApp.getApiAccess(), actualApp.getApiAccess());
+        boolean permission = listsAreEqual(desiredApp.getPermissions(), actualApp.getPermissions());
         boolean quota = (desiredApp.getAppQuota() == null || desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
         LOG.debug("apps Not changed: {}", application);
         LOG.debug("api access Not changed: {}", apiAccess);
         LOG.debug("Permission Not changed: {}", permission);
         LOG.debug("Quota Not changed: {}", quota);
         return application && apiAccess && permission && quota;
+    }
+
+    // A desired list that is not set means "don't care". A missing actual list is treated like an empty one.
+    private static boolean listsAreEqual(List<?> desired, List<?> actual) {
+        if (desired == null) return true;
+        if (actual == null) return desired.isEmpty();
+        return Utils.compareValues(desired, actual);
     }
 
     private void copyAppCreatedByPermission(ClientApplication desiredApp, ClientApplication actualApp) {

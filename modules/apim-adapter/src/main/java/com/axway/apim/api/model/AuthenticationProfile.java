@@ -1,7 +1,7 @@
 package com.axway.apim.api.model;
 
 import com.axway.apim.lib.utils.Utils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,9 +65,9 @@ public class AuthenticationProfile {
             Map<String, Object> thisParameters = this.getParameters();
             otherParameters.remove("_id_");
             thisParameters.remove("_id_");
-            if (StringUtils.equals(authenticationProfile.getName(), this.getName())
+            if (Strings.CS.equals(authenticationProfile.getName(), this.getName())
                 && authenticationProfile.getIsDefault() == this.getIsDefault()
-                && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())) {
+                && Strings.CS.equals(authenticationProfile.getType().name(), this.getType().name())) {
                 if (authenticationProfile.getType().equals(AuthType.ssl) || authenticationProfile.getType().equals(AuthType.http_basic)) {
                     Map<String, Object> otherParametersCopy = new HashMap<>(otherParameters);
                     Map<String, Object> thisParametersCopy = new HashMap<>(thisParameters);
@@ -90,8 +90,8 @@ public class AuthenticationProfile {
     public String toString() {
         String parametersString = this.getParameters().toString();
         if (type.equals(AuthType.ssl)) {
-            String pfx = (String) parameters.get("pfx");
-            if (pfx.length() > 50) pfx = pfx.substring(0, 49) + "...";
+            String pfx = (String) this.getParameters().get("pfx");
+            if (pfx != null && pfx.length() > 50) pfx = pfx.substring(0, 49) + "...";
             parametersString = "{trustAll=" + this.getParameters().get("trustAll") + ", password=" + Utils.getEncryptedPassword() + ", pfx=" + pfx + "}";
         }
         return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parametersString
