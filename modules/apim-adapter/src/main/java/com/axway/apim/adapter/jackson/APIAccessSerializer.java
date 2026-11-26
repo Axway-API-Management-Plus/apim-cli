@@ -9,24 +9,25 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class APIAccessSerializer extends StdSerializer<List<APIAccess>> {
-	
-	private static final long serialVersionUID = 1L;
-	
-	public APIAccessSerializer() {
-		this(null);
-	}
 
-	public APIAccessSerializer(Class<List<APIAccess>> apiAccess) {
-		super(apiAccess);
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public void serialize(List<APIAccess> apiAccess, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-		//provider.getConfig().
-		jgen.writeStartArray();
-		for(APIAccess access : apiAccess) {
-			jgen.writeString(access.getApiId());
-		}
-		jgen.writeEndArray();
-	}
+    // Default constructor needed by Jackson
+    public APIAccessSerializer() {
+        this(null);
+    }
+
+    public APIAccessSerializer(Class<List<APIAccess>> apiAccess) {
+        super(apiAccess);
+    }
+
+    @Override
+    public void serialize(List<APIAccess> apiAccess, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+        //provider.getConfig().
+        jgen.writeStartArray();
+        for (APIAccess access : apiAccess) {
+            jgen.writeString(access.getApiId());
+        }
+        jgen.writeEndArray();
+    }
 }

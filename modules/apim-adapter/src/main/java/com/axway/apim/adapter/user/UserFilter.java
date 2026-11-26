@@ -312,5 +312,4 @@ public class UserFilter implements CustomPropertiesFilter {
         if (organizationId == null) return;
         filters.add(new BasicNameValuePair("organizationId", organizationId));
     }
-
 }

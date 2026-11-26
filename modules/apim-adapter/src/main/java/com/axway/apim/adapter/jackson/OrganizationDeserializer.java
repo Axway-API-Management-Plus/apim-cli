@@ -25,6 +25,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
         SKIP_LOOKUP
     }
 
+    // Default constructor needed by Jackson
     public OrganizationDeserializer() {
         this(null);
     }

@@ -70,7 +70,6 @@ public class APIManagerUserAdapter {
                 .build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load users from API-Manager using filter: {}", filter);
-            LOG.debug("Load users with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getCode() == HttpStatus.SC_NOT_FOUND) {
                     throw new AppException("No user found for user id: " + userId, ErrorCode.UNKNOWN_USER);
